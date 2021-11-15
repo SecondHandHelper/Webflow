@@ -127,8 +127,8 @@ function openPickupToast(itemId, soldDate, brand) {
 }
 
 function setDatesOfPickupToast(soldDate) {
-
-    // Get the 4 first business days, 3 days after soldDate
+    // Kolla här Josef
+    // Get the 4 first business§ days, 3 days after soldDate
     var soldDate = new Date(soldDate);
     var firstDate = new Date(soldDate);
 
