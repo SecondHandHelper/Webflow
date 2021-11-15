@@ -1,0 +1,196 @@
+<script>
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            console.log('Mobilnummer: ' + user.phoneNumber);
+            console.log('UID: ' + user.uid);
+            window.uid = user.uid;
+
+            // Om användare ej har document i users -> skapa dokument och lägg till telefonnummer
+            if (user.phoneNumber) {
+                writePhoneNumberToFirestore(user.uid, user.phoneNumber);
+                phoneNumberDiv.style.display = "none"; // Be inte om telefonnummer om användaren redan har ett
+            }
+
+            // Om användare har telefonnummer, be inte om telefonnummer i formuläret
+            var docRef = db.collection("users").doc(user.uid);
+            docRef.get().then((doc) => {
+                if (doc.data().phoneNumber) {
+                    phoneNumberDiv.style.display = "none"; // Be inte om telefonnummer om användaren redan har ett
+                }
+            });
+        } else {
+            console.log('No user is logged in')
+        }
+    });
+</script>
+
+<script>
+    // Go back arrow
+    $(document).ready(function () {
+        $(".goback").click(function () {
+            window.history.back();
+        });
+    });
+</script>
+
+<script>
+    let frontImageUpload = document.getElementById("frontImage");
+    let frontImagePreviewUploading = document.getElementById("frontImagePreviewUploading");
+    let frontImagePreview = document.getElementById("frontImagePreview");
+    let brandTagImageUpload = document.getElementById("brandTagImage");
+    let brandTagImagePreviewUploading = document.getElementById("brandTagImagePreviewUploading");
+    let brandTagImagePreview = document.getElementById("brandTagImagePreview");
+    let productImageUpload = document.getElementById("productImage");
+    let productImagePreview = document.getElementById("productImagePreview");
+    let defectImageUpload = document.getElementById("defectImage");
+    let defectImagePreview = document.getElementById("defectImagePreview");
+    let materialTagImageUpload = document.getElementById("materialTagImage");
+    let materialTagImagePreview = document.getElementById("materialTagImagePreview");
+    let extraImageUpload = document.getElementById("extraImage");
+    let extraImagePreview = document.getElementById("extraImagePreview");
+
+    // display image when file has been selected
+    frontImageUpload.onchange = function () {
+        let input = this.files[0];
+        if (input) {
+            let src = URL.createObjectURL(input);
+            frontImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+            frontImagePreview.style.backgroundImage = `url('${src}')`;
+        }
+    };
+    brandTagImageUpload.onchange = function () {
+        let input = this.files[0];
+        if (input) {
+            let src = URL.createObjectURL(input);
+            brandTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+            brandTagImagePreview.style.backgroundImage = `url('${src}')`;
+        }
+    };
+    productImageUpload.onchange = function () {
+        let input = this.files[0];
+        if (input) {
+            let src = URL.createObjectURL(input);
+            productImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+            productImagePreview.style.backgroundImage = `url('${src}')`;
+        }
+
+    };
+    defectImageUpload.onchange = function () {
+        let input = this.files[0];
+        if (input) {
+            let src = URL.createObjectURL(input);
+            defectImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+            defectImagePreview.style.backgroundImage = `url('${src}')`;
+        }
+
+    };
+    materialTagImageUpload.onchange = function () {
+        let input = this.files[0];
+        if (input) {
+            let src = URL.createObjectURL(input);
+            materialTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+            materialTagImagePreview.style.backgroundImage = `url('${src}')`;
+        }
+
+    };
+    extraImageUpload.onchange = function () {
+        let input = this.files[0];
+        if (input) {
+            let src = URL.createObjectURL(input);
+            extraImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+            extraImagePreview.style.backgroundImage = `url('${src}')`;
+        }
+    };
+
+    // Calculate their share and display to user
+
+    let itemHappyPrice = document.getElementById("itemHappyPrice");
+    let itemAcceptPrice = document.getElementById("itemAcceptPrice");
+
+    itemHappyPrice.oninput = function () {
+        console.log("this.value", this.value);
+        calculateSellerGets(this.value, "youGetDivHappyPrice", "feeDivHappyPrice");
+    };
+
+    itemAcceptPrice.oninput = function () {
+        console.log("this.value", this.value);
+        calculateSellerGets(this.value, "youGetDivAcceptPrice", "feeDivAcceptPrice");
+    };
+
+    // Change text color of dropdown itemAge when user selects a value
+    let itemAge = document.getElementById("itemAge");
+
+    itemAge.onchange = function () {
+        let input = this.value;
+        if (input != "") {
+            itemAge.style.color = "#333";
+        } else {
+            itemAge.style.color = "#929292";
+        }
+    };
+
+    // Hide / Show warning about difficulty to sell certain brands
+    let brand = document.getElementById("itemBrand");
+    let hardToSellDiv = document.getElementById("hardToSellDiv");
+    hardToSellDiv.style.display = 'none'; // Initially hide this div
+    let words = ["H&M", "HM", "Zara", "ASOS", "Nelly", "Gina Tricot", "BikBok", "Lindex", "Kappahl", "Cubus", "NA-KD", "NAKD", "Mango"];
+
+    brand.onchange = function () {
+        let input = this.value;
+        if(words.some(words => input.toLowerCase().includes(words.toLowerCase()))){
+            hardToSellDiv.style.display = 'block';
+        } else {
+            hardToSellDiv.style.display = 'none';
+        }
+    };
+
+    // Hide / Show extra fields for defects
+    let itemCondition = document.getElementById("itemCondition");
+    let defectInfoDiv = document.getElementById("defectInfoDiv");
+
+    itemCondition.onchange = function () {
+        let input = this.value;
+        if (input == "Använd, tecken på slitage") {
+            defectInfoDiv.style.display = 'block';
+            itemCondition.style.color = "#333";
+        } else if (input == "") {
+            defectInfoDiv.style.display = 'none';
+            itemCondition.style.color = "#929292";
+        } else {
+            defectInfoDiv.style.display = 'none';
+            itemCondition.style.color = "#333";
+        }
+    };
+
+    // Hide / Show price input fields
+    let setPriceDiv = document.getElementById("setPriceDiv");
+    setPriceDiv.style.display = 'none';
+
+    var radios = document.querySelectorAll('input[type=radio][name="Pricing"]');
+    radios.forEach(radio => radio.addEventListener('change', () => {
+        if (radio.value == "Seller sets price") {
+            setPriceDiv.style.display = 'block';
+            setLowestPriceDiv.style.display = 'none';
+            document.getElementById("itemHappyPrice").required = true;
+            document.getElementById("itemAcceptPrice").required = true;
+        } else {
+            setPriceDiv.style.display = 'none';
+            setLowestPriceDiv.style.display = 'block';
+            document.getElementById("itemHappyPrice").required = false;
+            document.getElementById("itemAcceptPrice").required = false;
+        }
+    }));
+</script>
+
+<script>
+    function closeAddressForm() {
+        window.location.href = window.location.origin + "/private";
+    }
+
+    // Initially hide this form
+    addressFormDiv.style.display = 'none';
+    itemConfirmationDiv.style.display = 'none';
+    addItemForm.addEventListener("submit", addItem);
+    userAddressForm.addEventListener("submit", addUserAddress);
+    closeAddressFormButton.addEventListener("click", closeAddressForm);
+</script>

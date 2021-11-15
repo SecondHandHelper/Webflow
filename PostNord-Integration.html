@@ -1,0 +1,69 @@
+<script>
+    bookPickupButton.addEventListener('click', bookPickup);
+
+    function bookPickup() {
+        //This is taken from this page https://guides.developer.postnord.com/#4aca1adc-90da-43e1-ae6a-7c1f09ba535b
+        
+        const myHeaders = new Headers({
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
+            'Host': 'application/json',
+            'Connection': 'keep-alive',
+        });
+        
+        var raw = JSON.stringify({
+            "shipment": {
+                "service": {
+                    "basicServiceCode": "30",
+                    "additionalServiceCode": [
+                        "0"
+                    ]
+                },
+                "items": [
+                    373500489530470000
+                ]
+            },
+            "location": {
+                "place": "Company name or information about pickup place e.g. garage",
+                "streetName": "Skrindavägen",
+                "streetNumber": "117",
+                "postalCode": 19162,
+                "city": "Sollentuna",
+                "countryCode": "SE"
+            },
+            "order": {
+                "customerNumber": "1234567891",
+                "orderReference": "Ref-1212122A",
+                "contactName": "Nils Andersson",
+                "contactEmail": "Nils.Andersson@postnord.com",
+                "phoneNumber": "+4670788888",
+                "smsNumber": "+4670788888",
+                "entryCode": "8216"
+            },
+            "pickup": [
+                {
+                    "typeOfItem": "parcel",
+                    "noUnits": 1
+                }
+            ],
+            "dateAndTimes": {
+                "readyPickupDate": "2021-04-15T09:52:07.929Z",
+                "latestPickupDate": "2021-04-15T09:52:07.929Z",
+                "earliestPickupDate": "2021-04-15T09:52:07.929Z"
+            }
+        });
+
+        var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+        };
+
+        fetch("https://atapi2.postnord.com/rest/order/v1/pickup/SE?apikey=c967288b0bba98635175329b77b7d4b1", requestOptions)
+        .then(response => response.text())
+        .then(result => console.log(result))
+        .catch(error => console.log('error', error));
+
+    }
+</script>

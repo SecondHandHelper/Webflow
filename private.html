@@ -1,0 +1,172 @@
+<script>
+    // Styling initial state
+    setInitialStylePrivatePage();
+
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            ifSoldItemAskForAddress(user.uid);
+            emptyListsInnerHTML();
+            loadSoldByOthers(user.uid);
+
+            // MY ITEMS QUERY + Add cards to lists
+            db.collection("items")
+                .where("user", "==", user.uid)
+                .where("createdAt", "!=", false)
+                .orderBy('createdAt', 'desc')
+                .get()
+                .then((querySnapshot) => {
+                    loadingDiv.style.display = "none";
+                    noItemsDiv.style.display = "block";
+                    soldByOthersDiv.style.display = "block";
+                    quickInfoDiv.style.display = "block";
+                    var youEarned = 0;
+
+                    querySnapshot.forEach((doc) => {
+                        var itemId = doc.id
+                        var createdDate = doc.data().createdAt;
+                        var soldDate = doc.data().soldDate;
+                        var images = doc.data().images;
+                        var status = doc.data().status;
+                        var shippingStatus = doc.data().shippingStatus;
+                        var brand = doc.data().brand;
+                        var soldPrice = doc.data().soldPrice;
+                        var frontImageUrl = images.frontImage;
+                        var sellerGets = doc.data().sellerGets;
+                        var buyerFirstName = doc.data().buyerFirstName;
+                        var buyerAddressCity = doc.data().buyerAddressCity;
+                        var minPriceEstimate = doc.data().minPriceEstimate;
+                        var maxPriceEstimate = doc.data().maxPriceEstimate;
+                        var happyPrice = doc.data().happyPrice;
+                        var acceptPrice = doc.data().acceptPrice;
+                        var pricing = doc.data().pricing;
+                        var pickupDate = doc.data().pickupDate;
+                        var archived = doc.data().archived;
+
+                        if (archived == undefined && status != "Unsold"){
+                            displayItemCard();
+                        }
+                            
+                        function displayItemCard() {
+                            // Putting the items in the right list
+                            if (status != "Sold") {
+                                // Add card to list
+                                var statusTextHtml = "";
+                                var salesProcessURL = window.location.origin + "/our-sales-process";
+
+                                // If price-estimate is set, show info to user.
+                                if (status == "Published" || status == "New") {
+                                    if (pricing == "We set price") {
+                                        if (minPriceEstimate != null && maxPriceEstimate != null) {
+                                            statusTextHtml = `<div class='text-block-34'>${minPriceEstimate} - ${maxPriceEstimate} kr</div>`;
+                                        } else {
+                                            statusTextHtml = `<div class='text-block-34'>Förbereds</div>`;
+                                        }
+                                    } else {
+                                        statusTextHtml = `<div class='text-block-34'>${acceptPrice} - ${happyPrice} kr</div>`;
+                                    }
+                                }
+
+                                var sellingItemCardHTML = `<div class="div-block-14"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div><div class="text-block-14">${brand}</div><a href="${salesProcessURL}" style="text-decoration:none;">${statusTextHtml}</a></div>`;
+                                itemListSelling.innerHTML += sellingItemCardHTML;
+
+                                // Display list
+                                myItemsDiv.style.display = "block";
+
+                                // Hide empty state
+                                noItemsDiv.style.display = "none";
+                                headerSellItemButton.style.display = "block";
+                                sellButtonText.innerHTML = "Sälj ett plagg";
+
+                            } else if (status == "Sold" && shippingStatus != "Sent") {
+                                // Add card to list
+                                // If buyer info exists, show info to user.
+                                var buyerInfoTextHTML = "";
+                                if (buyerFirstName != null && buyerAddressCity != null) {
+                                    buyerInfoTextHTML = `<div class="text-block-44">Till ${buyerFirstName} i ${buyerAddressCity}</div>`;
+                                }
+
+                                var pickupTimeInfoDiv = getPickupTimeInfoDiv(pickupDate);
+                                var bookPickupButton = getBookPickupButton(itemId, soldDate, brand);
+                                var soldNotSentCardHTML = ``;
+
+                                if (pickupDate) {
+                                    soldNotSentCardHTML =
+                                        `<div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">Såld för ${soldPrice} kr</div>${buyerInfoTextHTML}<div class="text-block-44">Du får ${sellerGets}</div>
+                                    ${pickupTimeInfoDiv}
+                                </div></div></div>`;
+                                } else {
+                                    soldNotSentCardHTML =
+                                        `<div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">Såld för ${soldPrice} kr</div>${buyerInfoTextHTML}<div class="text-block-44">Du får ${sellerGets}</div>
+                                    ${bookPickupButton}
+                                </div></div></div>`;
+                                }
+
+                                itemListSoldNotSent.innerHTML += soldNotSentCardHTML;
+
+                                // Display list
+                                soldNotSentDiv.style.display = "block";
+
+                                // Hide empty state
+                                noItemsDiv.style.display = "none";
+                                headerSellItemButton.style.display = "block";
+                                sellButtonText.innerHTML = "Sälj ett plagg";
+
+                            } else {
+                                // Add card to list
+                                var soldItemCardHTML = `<div class="div-block-14"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>Du fick ${sellerGets}</div></div>`;
+                                itemListSold.innerHTML += soldItemCardHTML;
+
+                                // Display list, hide empty state
+                                soldItemsDiv.style.display = "block";
+                                itemListSoldContainer.style.display = "block";
+                                sellButtonText.innerHTML = "Sälj ett plagg";
+
+                                youEarned = youEarned + sellerGets;
+                                youEarnedDiv.innerHTML = `Du har tjänat ${youEarned} kr`;
+                            }
+                        }
+                    });
+                });
+        } else {
+            console.log('No user')
+        }
+    });
+</script>
+
+<script>
+    signoutButton.addEventListener('click', signOut);
+    bookPickupForm.addEventListener("submit", bookPickup);
+    closePickupToastIcon.addEventListener("click", closePickupToast);
+    closeFeedbackFormButton.addEventListener("click", closeFeedbackForm);
+    happySmileyButton.addEventListener("click", function () {setHappinessRate(3);}, false);
+    neutralSmileyButton.addEventListener("click", function () {setHappinessRate(2);}, false);
+    angrySmileyButton.addEventListener("click", function () {setHappinessRate(1);}, false);
+    feedbackForm.addEventListener("submit", storeFeedback);
+</script>
+
+<script>
+    var userId = sessionStorage.getItem("userId");
+    var email = sessionStorage.getItem("email");
+    var phone = sessionStorage.getItem("phone");
+
+    if (email == "null") {
+        email = "";
+    }
+
+    if (phone == "null") {
+        phone = "";
+    }
+
+    if (email != null) {
+        window.intercomSettings = {
+            app_id: "klyy0le5",
+            email: `${email}`,
+            phone: `${phone}`,
+            user_id: `${userId}`
+        };
+    }
+</script>
+
+<script>
+    (function () { var w = window; var ic = w.Intercom; if (typeof ic === "function") { ic('reattach_activator'); ic('update', w.intercomSettings); } else { var d = document; var i = function () { i.c(arguments); }; i.q = []; i.c = function (args) { i.q.push(args); }; w.Intercom = i; var l = function () { var s = d.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = 'https://widget.intercom.io/widget/klyy0le5'; var x = d.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x); }; if (w.attachEvent) { w.attachEvent('onload', l); } else { w.addEventListener('load', l, false); } } })();
+</script>

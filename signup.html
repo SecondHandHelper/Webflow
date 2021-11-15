@@ -1,0 +1,166 @@
+<script>
+  firebase.auth().onAuthStateChanged(function (user) {
+    if (user) {
+      // User is signed in. Redirect from signin page to private page.
+
+      // Check browser support before useing Web storage
+      if (typeof (Storage) !== "undefined") {
+        sessionStorage.setItem("userId", user.uid);
+        sessionStorage.setItem("email", user.email);
+        sessionStorage.setItem("phone", user.phoneNumber);
+      } else {
+        console.log("Sorry, your browser does not support Web Storage...");
+      }
+
+      window.location.replace('./private');
+    } else {
+      // No user is signed in.
+      signinFormsDiv.style.display = 'block';
+      signinLoadingDiv.style.display = 'none';
+      console.log("No user is signed in.");
+    }
+  });
+
+
+  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sendCodeButton', {
+    'size': 'invisible',
+    'callback': (response) => {
+      // reCAPTCHA solved, allow signInWithPhoneNumber.
+      onSignInSubmit();
+    }
+  });
+</script>
+
+<script>
+  // Show loading icon that will show when users come back from Google Auth
+  signinFormsDiv.style.display = 'none';
+  mobileNumberDiv.style.display = 'none';
+  orLoginOtherWayDiv.style.display = 'none';
+  verifyDiv.style.display = 'none';
+  var form = document.getElementById("Phone-number-form");
+
+  form.addEventListener('submit', phoneSignIn);
+
+  function phoneSignIn(event) {
+    event.preventDefault();
+
+    submitLoadIcon.style.display = 'block';
+    sendCodeButton.style.display = 'none';
+    sendCodeButton
+    const formPhoneNumber = signinPhoneNumber.value;
+    const phoneNumber = `+46${formPhoneNumber}`;
+
+    console.log(formPhoneNumber, phoneNumber);
+
+    const appVerifier = window.recaptchaVerifier;
+
+    firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+      .then((confirmationResult) => {
+        // SMS sent. Prompt user to type the code from the message, then sign the
+        // user in with confirmationResult.confirm(code).
+
+        //sessionStorage.setItem('confirmationResult', confirmationResult);
+        window.confirmationResult = confirmationResult;
+        console.log('V Code' + window.confirmationResult.verificationId);
+        mobileNumberDiv.style.display = 'none';
+        verifyDiv.style.display = 'block';
+
+      }).catch((error) => {
+        // Error; SMS not sent
+        // ...
+        errorMessageDiv.style.display = 'block';
+        submitLoadIcon.style.display = 'none';
+        errorMessageDiv.innerText = error.message;
+        console.log('Error message: ' + error.message);
+      });
+  }
+
+</script>
+
+<script>
+
+  phoneSignInButton.addEventListener('click', function () {
+    mobileNumberDiv.style.display = 'block';
+    orLoginOtherWayDiv.style.display = 'block';
+    loginAlternativesDiv.style.display = 'none';
+  });
+
+
+  // GOOGLE AUTH STUFF
+  var provider = new firebase.auth.GoogleAuthProvider();
+
+  googleSignInButton.addEventListener('click', signInWithGoogle);
+  googleSignInButton2.addEventListener('click', signInWithGoogle);
+
+  function signInWithGoogle() {
+
+    // [START auth_google_provider_create]
+    var provider = new firebase.auth.GoogleAuthProvider();
+    // [END auth_google_provider_create]
+
+    firebase.auth().signInWithRedirect(provider);
+
+    firebase.auth()
+      .getRedirectResult()
+      .then((result) => {
+        if (result.credential) {
+          /** @type {firebase.auth.OAuthCredential} */
+          var credential = result.credential;
+
+          // This gives you a Google Access Token. You can use it to access the Google API.
+          var token = credential.accessToken;
+          // ...
+
+        }
+        // The signed-in user info.
+        var user = result.user;
+        window.userId = user.uid;
+
+      }).catch((error) => {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // The email of the user's account used.
+        var email = error.email;
+        // The firebase.auth.AuthCredential type that was used.
+        var credential = error.credential;
+        // ...
+
+        console.log("Error message:", errorCode, errorMessage);
+      });
+  }
+</script>
+
+
+<script>
+
+  signinButton.addEventListener('click', verifyCode);
+
+  function verifyCode() {
+    // [START auth_phone_verify_code]
+    const code = verificationCode.value;
+    console.log('Verify screen. My code: ' + code);
+    console.log('VerificationID' + confirmationResult.verificationId);
+    confirmationResult.confirm(code).then((result) => {
+      // User signed in successfully.
+      const user = result.user;
+
+      // Check browser support before useing Web storage
+      if (typeof (Storage) !== "undefined") {
+        sessionStorage.setItem("userId", user.uid);
+        sessionStorage.setItem("email", user.email);
+        sessionStorage.setItem("phone", user.phoneNumber);
+      } else {
+        console.log("Sorry, your browser does not support Web Storage...");
+      }
+
+      window.location.replace('./private');
+      // ...
+    }).catch((error) => {
+      // User couldn't sign in (bad verification code?)
+      // ...
+      console.log('My error: ' + error.message);
+    });
+    // [END auth_phone_verify_code]
+  }
+</script>
