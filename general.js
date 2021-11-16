@@ -127,8 +127,7 @@ function openPickupToast(itemId, soldDate, brand) {
 }
 
 function setDatesOfPickupToast(soldDate) {
-    // Kolla här Josef
-    // Get the 4 first business§ days, 3 days after soldDate
+    // Get the 4 first business days, 3 days after soldDate
     var soldDate = new Date(soldDate);
     var firstDate = new Date(soldDate);
 
@@ -153,7 +152,7 @@ function setDatesOfPickupToast(soldDate) {
         thirdDate.setDate(thirdDate.getDate() + 2);
     }
 
-    var forthDate = new Date(soldDate);
+    var forthDate = new Date(thirdDate);
     forthDate.setDate(forthDate.getDate() + 1);
     if (forthDate.getDay() == 6) {
         forthDate.setDate(forthDate.getDate() + 2);
@@ -161,7 +160,7 @@ function setDatesOfPickupToast(soldDate) {
 
     var days = ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'];
     var months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
-    
+
     /*
     var dateNumber1 = firstDate.getDate();
     var dateNumber2 = secondDate.getDate();
@@ -205,7 +204,7 @@ async function bookPickup() {
         console.log(`pickupDate is now set on Firestore item`);
         bookPickupToast.style.display = 'none';
         feedbackForm.style.display = 'block';
-        happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
+        happinessQuestionText.innerText = `Hur nöjd är du med försäljningen
     av ditt ${currentBrand}-plagg?`;
     });
 }
