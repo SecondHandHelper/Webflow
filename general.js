@@ -128,10 +128,8 @@ function openPickupToast(itemId, soldDate, brand) {
 
 function setDatesOfPickupToast(soldDate) {
     // Get the 4 first business days, 3 days after soldDate
-    var soldDate = new Date(soldDate);
     var firstDate = new Date(soldDate);
-
-    firstDate.setDate(soldDate.getDate() + 4); // 4
+    firstDate.setDate(firstDate.getDate() + 4);
 
     // Om helgdag, skjut på det så att man bara kan välja veckodagar
     if (firstDate.getDay() == 0) {
@@ -204,7 +202,7 @@ async function bookPickup() {
         console.log(`pickupDate is now set on Firestore item`);
         bookPickupToast.style.display = 'none';
         feedbackForm.style.display = 'block';
-        happinessQuestionText.innerText = `Hur nöjd är du med försäljningen
+        happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
     av ditt ${currentBrand}-plagg?`;
     });
 }

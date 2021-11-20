@@ -2,12 +2,10 @@
 // npx run-func testFunction.js functionToTest "2021-03-10"
 
 const functionToTest = (soldDate) => {
-  // Get the 4 first business§ days, 3 days after soldDate
-  var soldDate = new Date(soldDate);
+  // Get the 4 first business days, 3 days after soldDate
   var firstDate = new Date(soldDate);
-
-  firstDate.setDate(soldDate.getDate() + 4); // 4
-
+  firstDate.setDate(firstDate.getDate() + 4); // 4
+  
   // Om helgdag, skjut på det så att man bara kan välja veckodagar
   if (firstDate.getDay() == 0) {
       firstDate.setDate(firstDate.getDate() + 1);
