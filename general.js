@@ -21,7 +21,7 @@ async function ifSoldItemAskForAddress(userID) {
     let shippingStatus = "";
     let addressFirstName = "";
 
-    // First, get items with status "Sold" and shippingStatus "Not sent"
+    // First, ge items with status "Sold" and shippingStatus "Not sent"
     await db.collection("items")
         .where("user", "==", userID)
         .where("status", "==", "Sold")
