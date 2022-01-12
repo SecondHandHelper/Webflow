@@ -330,6 +330,19 @@
     });
   }
 
+  async function addPersonalId() {
+    // Grab values from form
+    const personalId = document.getElementById("personalId").value;
+
+    // Write to Firestore
+    const itemRef = db.collection('users').doc(window.uid);
+    const res = await itemRef.update({
+      personalId: personalId
+    }).then(function () {
+      console.log(`PersonalId of ${uid} is now updated`);
+      window.location.href = window.location.origin + "/private";
+    });
+  }
 </script>
 
 <script>

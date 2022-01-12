@@ -20,6 +20,7 @@ async function ifSoldItemAskForAddress(userID) {
     let status = "";
     let shippingStatus = "";
     let addressFirstName = "";
+    let personalId = "";
 
     // First, ge items with status "Sold" and shippingStatus "Not sent"
     await db.collection("items")
@@ -35,14 +36,20 @@ async function ifSoldItemAskForAddress(userID) {
             });
         });
 
-    // Second, check if user has no address added yet
+    // Second, check if user has no address or personal id added yet
     await db.collection("users").doc(userID).get().then((doc) => {
         addressFirstName = doc.data().addressFirstName;
+        personalId = doc.data().personalId;
     });
 
     // Third, redirect user if user has no address and at least one item that's sold but not shipped
     if (status == "Sold" && shippingStatus == "Not sent" && addressFirstName == undefined) {
         window.location.href = window.location.origin + "/address-form";
+    }
+
+    // Ugly placement of this, BUT, here I check if the user haven't added their personalId yet, and redirect to form
+    if (status == "Sold" && shippingStatus == "Not sent" && personalId == undefined) {
+        window.location.href = window.location.origin + "/personal-id-form";
     }
 }
 
