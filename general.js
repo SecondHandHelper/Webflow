@@ -48,9 +48,11 @@ async function ifSoldItemAskForAddress(userID) {
     }
 
     // Ugly placement of this, BUT, here I check if the user haven't added their personalId yet, and redirect to form
+    /*
     if (status == "Sold" && shippingStatus == "Not sent" && personalId == undefined) {
         window.location.href = window.location.origin + "/personal-id-form";
     }
+    */
 }
 
 function loadSoldByOthers(userID) {
