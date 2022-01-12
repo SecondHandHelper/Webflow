@@ -8,7 +8,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-functions.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/trosman/second-hand-helper@v0.0.5/general.js"></script>
+<script src="https://rawcdn.githack.com/secondhandhelper/webflow/fd197538d3e3232583bf3548a389c22ff045bc9b/general.js?raw=true"></script>
 
 <script>
   // Your web app's Firebase configuration
@@ -310,6 +310,7 @@
     const addressPostalCode = document.getElementById("addressPostalCode").value;
     const addressCity = document.getElementById("addressCity").value;
     const addressDoorCode = document.getElementById("addressDoorCode").value;
+    const personalId = document.getElementById("personalId").value;
 
     // Write to Firestore
     const itemRef = db.collection('users').doc(window.uid);
@@ -319,7 +320,8 @@
       addressStreetAddress: addressStreetAddress,
       addressPostalCode: addressPostalCode,
       addressCity: addressCity,
-      addressDoorCode: addressDoorCode
+      addressDoorCode: addressDoorCode,
+      personalId: personalId
     }).then(function () {
       console.log(`User address of ${uid} is now updated`);
 
