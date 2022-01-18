@@ -1,4 +1,12 @@
 <script>
+  // Temporary redirect from Seconhandhelper.se to Maiapp.se
+  var domain = window.location.origin;
+  if (domain.includes("secondhandhelper")) {
+      window.location = "https://www.maiapp.se";
+  }
+</script>
+
+<script>
   firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
       // User is signed in. Redirect from signin page to private page.
