@@ -67,7 +67,8 @@ function autocomplete(inp, arr) {
   /*execute a function when bluring the input field:*/
   inp.addEventListener("blur", function (e) {
     //Close only the list that is blured
-    inp.removeChild(inp.firstChild);
+    let element = document.getElementById("itemBrandautocomplete-list");
+    inp.parentNode.removeChild(element);
   });
   function addActive(x) {
     /*a function to classify an item as "active":*/
