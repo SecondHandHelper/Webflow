@@ -64,10 +64,18 @@ function autocomplete(inp, arr) {
     }
   });
   // TOBIAS ADDED
-  /*execute a function presses a key on the keyboard:*/
+  /*execute a function when bluring the input field:*/
   inp.addEventListener("blur", function (e) {
     console.log("blur event was registered");
-    closeAllLists(e.target);
+    //Close only the list that is blured
+    var element = e.target;
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (element == x[i]) {
+        console.log("closing the list");
+        x[i].parentNode.removeChild(x[i]);
+      }
+    }
   });
   function addActive(x) {
     /*a function to classify an item as "active":*/
