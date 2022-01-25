@@ -31,6 +31,18 @@
 </script>
 
 <script>
+
+  // Temporary redirect from Home to Home Desktop if user is on desktop
+  var isMobile = false;
+  
+  	if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    isMobile = true;
+  }
+  
+  if (!isMobile && window.location.pathname != "/home-desktop") {
+    window.location.replace('./home-desktop');
+  }
+
   // FUNCTIONS FOR START PAGE
   function loadRecentlySold() {
     console.log("Funktionen loadRecentlySold påbörjad!");
@@ -55,7 +67,7 @@
             var soldPrice = data[key].soldPrice;
             var imageUrl = data[key].imageUrl;
             if (soldPrice >= 240) {
-              var itemCardHTML = `<div class="div-block-14"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>${brand}</div></div>`;
+              var itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>${brand}</div></div>`;
               var itemListRecentlySoldStartPage = document.getElementById('itemListRecentlySoldStartPage');
               itemListRecentlySoldStartPage.innerHTML += itemCardHTML;
             }
