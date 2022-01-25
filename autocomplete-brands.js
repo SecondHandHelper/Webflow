@@ -66,9 +66,9 @@ function autocomplete(inp, arr) {
   // TOBIAS ADDED
   /*execute a function when bluring the input field:*/
   inp.addEventListener("blur", function (e) {
-    //Close only the list that is blured
-    let element = document.getElementById("itemBrandautocomplete-list");
-    inp.parentNode.removeChild(element);
+    setTimeout(function() {
+      closeAllLists();
+    }, 50);
   });
   function addActive(x) {
     /*a function to classify an item as "active":*/
