@@ -65,7 +65,8 @@ function autocomplete(inp, arr) {
   });
   // TOBIAS ADDED
   /*execute a function presses a key on the keyboard:*/
-  inp.addEventListener("focusout", function (e) {
+  inp.addEventListener("blur", function (e) {
+    console.log("blur event was registered");
     closeAllLists(e.target);
   });
   function addActive(x) {
@@ -87,6 +88,7 @@ function autocomplete(inp, arr) {
   function closeAllLists(elmnt) {
     /*close all autocomplete lists in the document,
     except the one passed as an argument:*/
+    console.log("closeAllLists are running");
     var x = document.getElementsByClassName("autocomplete-items");
     for (var i = 0; i < x.length; i++) {
       if (elmnt != x[i] && elmnt != inp) {
