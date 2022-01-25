@@ -68,7 +68,7 @@ function autocomplete(inp, arr) {
   inp.addEventListener("blur", function (e) {
     console.log("blur event was registered");
     //Close only the list that is blured
-    inp.parentNode.removeChild(x[i]);
+    inp.parentNode.removeChild(inp);
   });
   function addActive(x) {
     /*a function to classify an item as "active":*/
