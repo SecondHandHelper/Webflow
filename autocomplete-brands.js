@@ -66,9 +66,8 @@ function autocomplete(inp, arr) {
   // TOBIAS ADDED
   /*execute a function when bluring the input field:*/
   inp.addEventListener("blur", function (e) {
-    console.log("blur event was registered");
     //Close only the list that is blured
-    inp.parentNode.removeChild(inp);
+    inp.removeChild(inp.firstChild);
   });
   function addActive(x) {
     /*a function to classify an item as "active":*/
@@ -89,7 +88,6 @@ function autocomplete(inp, arr) {
   function closeAllLists(elmnt) {
     /*close all autocomplete lists in the document,
     except the one passed as an argument:*/
-    console.log("closeAllLists are running");
     var x = document.getElementsByClassName("autocomplete-items");
     for (var i = 0; i < x.length; i++) {
       if (elmnt != x[i] && elmnt != inp) {
