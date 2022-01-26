@@ -33,11 +33,19 @@
 
 <script>
 
-  // Temporary redirect from Home to Home Desktop if user is on desktop, and not for the test domain
+  // REDIRECTS
   var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   var path = window.location.pathname;
   var domain = window.location.origin;
-  if (!isMobile && !(path == "/home-desktop" || path == "/privacy-policy" || path == "/end-user-agreement") && !domain.includes("shh-test")) {
+
+  // Temporary redirect from Seconhandhelper.se to Maiapp.se
+  if (domain.includes("secondhandhelper")) {
+      let newLocation = "https://www.maiapp.se" + path;
+      window.location = newLocation;
+  }
+
+  // Temporary redirect from Home to Home Desktop if user is on desktop, and not for the test domain
+  if (!isMobile && !(path == "/home-desktop" || path == "/privacy-policy" || path == "/end-user-agreement" || path == "/private") && !domain.includes("shh-test")) {
     window.location.replace('./home-desktop');
   }
 
