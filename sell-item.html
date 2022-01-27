@@ -137,7 +137,7 @@
 
     brand.onchange = function () {
         let input = this.value;
-        if(words.some(words => input.toLowerCase().includes(words.toLowerCase()))){
+        if (words.some(words => input.toLowerCase().includes(words.toLowerCase()))) {
             hardToSellDiv.style.display = 'block';
         } else {
             hardToSellDiv.style.display = 'none';
@@ -193,4 +193,6 @@
     addItemForm.addEventListener("submit", addItem);
     userAddressForm.addEventListener("submit", addUserAddress);
     closeAddressFormButton.addEventListener("click", closeAddressForm);
+    /*initiate the autocomplete function on the "itemBrand" element, and pass along the brands array as possible autocomplete values:*/
+    autocomplete(document.getElementById("itemBrand"), brands);
 </script>

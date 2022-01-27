@@ -1512,6 +1512,3 @@ var brands = ["& Other Stories",
   "Zoo York",
   "Zunblock",
   "Åhléns"];
-
-/*initiate the autocomplete function on the "myInput" element, and pass along the brands array as possible autocomplete values:*/
-autocomplete(document.getElementById("itemBrand"), brands);
