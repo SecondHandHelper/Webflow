@@ -31,8 +31,12 @@
   var storage = firebase.storage();
 </script>
 
-<script>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KWV4J65" height="0" width="0"
+    style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 
+<script>
   // REDIRECTS
   var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   var path = window.location.pathname;
@@ -40,14 +44,15 @@
 
   // Temporary redirect from Seconhandhelper.se to Maiapp.se
   if (domain.includes("secondhandhelper")) {
-      let newLocation = "https://www.maiapp.se" + path;
-      window.location = newLocation;
+    let newLocation = "https://www.maiapp.se" + path;
+    window.location = newLocation;
   }
 
   // Temporary redirect from Home to Home Desktop if user is on desktop, and not for the test domain
   if (!isMobile && !(path == "/home-desktop" || path == "/privacy-policy" || path == "/end-user-agreement" || path == "/private") && !domain.includes("shh-test")) {
     window.location.replace('./home-desktop');
   }
+
 
   // FUNCTIONS FOR START PAGE
   function loadRecentlySold() {
