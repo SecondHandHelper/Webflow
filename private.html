@@ -1,16 +1,42 @@
 <script>
+    function updateIC() {
+        if (email == "null") {
+            email = "";
+        }
+        if (phone == "null") {
+            phone = "";
+        }
+        window.intercomSettings = {
+            app_id: "klyy0le5",
+            email: `${email}`,
+            phone: `${phone}`,
+            mai_user_id: `${userId}`
+        };
+    };
+</script>
+
+<script>
+    var userId;
+    var email;
+    var phone;
+
     // Styling initial state
     setInitialStylePrivatePage();
-
+ 
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
-            ifSoldItemAskForAddress(user.uid);
+            userId = user.uid;
+            email = user.email;
+            phone = user.phone;
+
+            updateIC(); // intercomSettings
+            ifSoldItemAskForAddress(userId);
             emptyListsInnerHTML();
-            loadSoldByOthers(user.uid);
+            loadSoldByOthers(userId);
 
             // MY ITEMS QUERY + Add cards to lists
             db.collection("items")
-                .where("user", "==", user.uid)
+                .where("user", "==", userId)
                 .where("createdAt", "!=", false)
                 .orderBy('createdAt', 'desc')
                 .get()
@@ -42,10 +68,10 @@
                         var pickupDate = doc.data().pickupDate;
                         var archived = doc.data().archived;
 
-                        if (archived == undefined && status != "Unsold"){
+                        if (archived == undefined && status != "Unsold") {
                             displayItemCard();
                         }
-                            
+
                         function displayItemCard() {
                             // Putting the items in the right list
                             if (status != "Sold") {
@@ -128,7 +154,7 @@
                     });
                 });
         } else {
-            console.log('No user')
+            console.log('No user');
         }
     });
 </script>
@@ -138,35 +164,10 @@
     bookPickupForm.addEventListener("submit", bookPickup);
     closePickupToastIcon.addEventListener("click", closePickupToast);
     closeFeedbackFormButton.addEventListener("click", closeFeedbackForm);
-    happySmileyButton.addEventListener("click", function () {setHappinessRate(3);}, false);
-    neutralSmileyButton.addEventListener("click", function () {setHappinessRate(2);}, false);
-    angrySmileyButton.addEventListener("click", function () {setHappinessRate(1);}, false);
+    happySmileyButton.addEventListener("click", function () { setHappinessRate(3); }, false);
+    neutralSmileyButton.addEventListener("click", function () { setHappinessRate(2); }, false);
+    angrySmileyButton.addEventListener("click", function () { setHappinessRate(1); }, false);
     feedbackForm.addEventListener("submit", storeFeedback);
-</script>
 
-<script>
-    var userId = sessionStorage.getItem("userId");
-    var email = sessionStorage.getItem("email");
-    var phone = sessionStorage.getItem("phone");
-
-    if (email == "null") {
-        email = "";
-    }
-
-    if (phone == "null") {
-        phone = "";
-    }
-
-    if (email != null) {
-        window.intercomSettings = {
-            app_id: "klyy0le5",
-            email: `${email}`,
-            phone: `${phone}`,
-            user_id: `${userId}`
-        };
-    }
-</script>
-
-<script>
     (function () { var w = window; var ic = w.Intercom; if (typeof ic === "function") { ic('reattach_activator'); ic('update', w.intercomSettings); } else { var d = document; var i = function () { i.c(arguments); }; i.q = []; i.c = function (args) { i.q.push(args); }; w.Intercom = i; var l = function () { var s = d.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = 'https://widget.intercom.io/widget/klyy0le5'; var x = d.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x); }; if (w.attachEvent) { w.attachEvent('onload', l); } else { w.addEventListener('load', l, false); } } })();
 </script>

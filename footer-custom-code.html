@@ -326,7 +326,6 @@
     }
   }
 
-
   async function addUserAddress() {
     // Grab values from form
     const addressFirstName = document.getElementById("addressFirstName").value;
@@ -336,6 +335,13 @@
     const addressCity = document.getElementById("addressCity").value;
     const addressDoorCode = document.getElementById("addressDoorCode").value;
     const personalId = document.getElementById("personalId").value;
+
+    // Update Intercom
+    var fullName = addressFirstName + addressLastName;
+    window.intercomSettings = {
+      app_id: "klyy0le5",
+      name: `${fullName}`
+    };
 
     // Write to Firestore
     const itemRef = db.collection('users').doc(window.uid);
