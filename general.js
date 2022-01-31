@@ -154,8 +154,8 @@ function getPickupTimeInfoDiv(pickupDate) {
     var pickupTimeInfoText = dayName + ", " + dateNumber + " " + monthName + ", kl 9-16";
     const div = `<div id="pickupTimeInfoDiv" class="div-block-54">
                                         <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/608db91c363e28ae251e0998_delivery-truck%204.svg" loading="lazy" width="34" alt="" class="image-12">
-                                        <div class="text-block-17-copy">Hämtas upp</div>
-                                        <div id="pickupTimeInfoText" class="text-block-17-copy">${pickupTimeInfoText}</div>
+                                        <div class="text-pickup-small">Hämtas upp</div>
+                                        <div id="pickupTimeInfoText" class="text-pickup-small">${pickupTimeInfoText}</div>
                                     </div>`;
     return div;
 }
@@ -163,7 +163,7 @@ function getPickupTimeInfoDiv(pickupDate) {
 function getBookPickupButton(itemId, soldDate, brand) {
     const div = `<a id="bookPickupButton" href="javascript:openPickupToast('${itemId}', '${soldDate}', '${brand}');" class="link-block-13 w-inline-block">
                                         <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/608db91c363e28ae251e0998_delivery-truck%204.svg" loading="lazy" width="34" alt="" class="image-4">
-                                        <div class="text-block-17-copy">Boka hämtning</div>
+                                        <div class="text-pickup-small">Boka hämtning</div>
                                     </a>`;
     return div;
 }
