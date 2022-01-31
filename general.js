@@ -17,7 +17,6 @@ function setInitialStylePrivatePage() {
 }
 
 function updateIC(userId, em, ph) {
-    const userId = userId;
     const email = em;
     const phone = ph;
     
