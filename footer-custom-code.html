@@ -122,12 +122,12 @@
       if (doc.exists) {
         console.log("Document data:", doc.data());
         console.log("Now adding the phone number to the user document");
-        // Add a new document in collection "users"
+        // Update document
         db.collection("users").doc(userID).update({
           phoneNumber: formattedPhoneNumber
         })
           .then(() => {
-            console.log("User document successfully written!");
+            console.log("User document successfully updated!");
           })
           .catch((error) => {
             console.error("Error writing document: ", error);

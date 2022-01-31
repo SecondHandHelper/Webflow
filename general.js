@@ -43,12 +43,6 @@ function updateFirestoreUserDocument(userId, email, phone) {
     if (phone){
         fields["phoneNumber"] = phone;
     }
-    if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1") {
-        userId = "0123456789-TestUser"
-    }
-    if (userId === "MM6w71I1Rnb3f1Weksofs1jqfJH3") {
-        userId = "0123456789-TestUser2"
-    }
     console.log(fields);
     
     var docRef = db.collection("users").doc(userId);
@@ -56,10 +50,10 @@ function updateFirestoreUserDocument(userId, email, phone) {
       if (doc.exists) {
         console.log("Document data:", doc.data());
         console.log("Now updating the user document with missed information");
-        // Add a new document in collection "users"
+        // Update document
         db.collection("users").doc(userId).update(fields)
           .then(() => {
-            console.log("User document successfully written!");
+            console.log("User document successfully updated!");
           })
           .catch((error) => {
             console.error("Error writing document: ", error);

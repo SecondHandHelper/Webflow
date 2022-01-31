@@ -7,7 +7,7 @@
         if (user) {
             userId = user.uid;
             email = user.email;
-            phone = user.phone;
+            phone = user.phoneNumber;
             updateIC(userId, email, phone);
             ifSoldItemAskForAddress(userId);
             updateFirestoreUserDocument(userId, email, phone);
