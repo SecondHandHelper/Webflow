@@ -1,20 +1,4 @@
 <script>
-    function updateIC() {
-        if (email == "null") {
-            email = "";
-        }
-        if (phone == "null") {
-            phone = "";
-        }
-        window.intercomSettings = {
-            app_id: "klyy0le5",
-            email: `${email}`,
-            phone: `${phone}`,
-            mai_user_id: `${userId}`
-        };
-    };
-</script>
-<script>
     var userId;
     var email;
     var phone;
@@ -27,7 +11,7 @@
             userId = user.uid;
             email = user.email;
             phone = user.phone;
-            updateIC();
+            updateIC(uid, em, ph);
             ifSoldItemAskForAddress(userId);
             emptyListsInnerHTML();
             loadSoldByOthers(userId);

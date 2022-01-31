@@ -16,6 +16,25 @@ function setInitialStylePrivatePage() {
     feedbackSubmitButton.style.display = "none";
 }
 
+function updateIC(userId, em, ph) {
+    const userId = userId;
+    const email = em;
+    const phone = ph;
+    
+    if (email == "null") {
+        email = "";
+    }
+    if (phone == "null") {
+        phone = "";
+    }
+    window.intercomSettings = {
+        app_id: "klyy0le5",
+        email: `${email}`,
+        phone: `${phone}`,
+        mai_user_id: `${userId}`
+    };
+};
+
 async function ifSoldItemAskForAddress(userID) {
     let status = "";
     let shippingStatus = "";
