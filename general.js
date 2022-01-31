@@ -34,6 +34,50 @@ function updateIC(userId, em, ph) {
     };
 };
 
+function updateFirestoreUserDocument(userId, email, phone) {
+    //var docRef = db.collection("users").doc(userID);
+    console.log("updateFirestoreUserDocument function is running!");
+
+    var email = email;
+    var phone = phone;
+    var userId = userId;
+    var fields = {};
+
+    if (email){
+        fields["email"] = email;
+    }
+    if (phone){
+        fields["phoneNumber"] = phone;
+    }
+    if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1") {
+        userId = "0123456789-TestUser"
+    }
+    if (userId === "MM6w71I1Rnb3f1Weksofs1jqfJH3") {
+        userId = "0123456789-TestUser2"
+    }
+
+    console.log(fields);
+
+    docRef.get().then((doc) => {
+      if (doc.exists) {
+        console.log("Document data:", doc.data());
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such user document exists! Creating it now and adds user details.");
+        // Add a new document in collection "users"
+        db.collection("users").doc(userID).set(fields)
+          .then(() => {
+            console.log("User document successfully written!");
+          })
+          .catch((error) => {
+            console.error("Error writing document: ", error);
+          });
+      }
+    }).catch((error) => {
+      console.log("Error getting document:", error);
+    });
+};
+
 async function ifSoldItemAskForAddress(userID) {
     let status = "";
     let shippingStatus = "";

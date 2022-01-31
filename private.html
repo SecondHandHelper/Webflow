@@ -3,9 +3,6 @@
     var email;
     var phone;
 
-    // Styling initial state
-    setInitialStylePrivatePage();
-
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
             userId = user.uid;
@@ -13,6 +10,7 @@
             phone = user.phone;
             updateIC(userId, email, phone);
             ifSoldItemAskForAddress(userId);
+            updateFirestoreUserDocument(userId, email, phone);
             emptyListsInnerHTML();
             loadSoldByOthers(userId);
 
@@ -141,14 +139,19 @@
     });
 </script>
 <script>
-    signoutButton.addEventListener('click', signOut);
-    bookPickupForm.addEventListener("submit", bookPickup);
-    closePickupToastIcon.addEventListener("click", closePickupToast);
-    closeFeedbackFormButton.addEventListener("click", closeFeedbackForm);
-    happySmileyButton.addEventListener("click", function () { setHappinessRate(3); }, false);
-    neutralSmileyButton.addEventListener("click", function () { setHappinessRate(2); }, false);
-    angrySmileyButton.addEventListener("click", function () { setHappinessRate(1); }, false);
-    feedbackForm.addEventListener("submit", storeFeedback);
+    window.addEventListener('load', function () {
+        signoutButton.addEventListener('click', signOut);
+        bookPickupForm.addEventListener("submit", bookPickup);
+        closePickupToastIcon.addEventListener("click", closePickupToast);
+        closeFeedbackFormButton.addEventListener("click", closeFeedbackForm);
+        happySmileyButton.addEventListener("click", function () { setHappinessRate(3); }, false);
+        neutralSmileyButton.addEventListener("click", function () { setHappinessRate(2); }, false);
+        angrySmileyButton.addEventListener("click", function () { setHappinessRate(1); }, false);
+        feedbackForm.addEventListener("submit", storeFeedback);
+        // Styling initial state
+        setInitialStylePrivatePage();
+    })
+
     window.intercomSettings = {
         app_id: "klyy0le5"
     };
