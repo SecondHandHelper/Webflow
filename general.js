@@ -35,12 +35,8 @@ function updateIC(userId, em, ph) {
 };
 
 function updateFirestoreUserDocument(userId, email, phone) {
-    var docRef = db.collection("users").doc(userID);
+    var docRef = db.collection("users").doc(userId);
     console.log("updateFirestoreUserDocument function is running!");
-
-    var email = email;
-    var phone = phone;
-    var userId = userId;
     var fields = {};
 
     if (email){
@@ -62,7 +58,7 @@ function updateFirestoreUserDocument(userId, email, phone) {
         console.log("Document data:", doc.data());
         console.log("Now updating the user document with missed information");
         // Add a new document in collection "users"
-        db.collection("users").doc(userID).update(fields)
+        db.collection("users").doc(userId).update(fields)
           .then(() => {
             console.log("User document successfully written!");
           })
@@ -73,7 +69,7 @@ function updateFirestoreUserDocument(userId, email, phone) {
         // doc.data() will be undefined in this case
         console.log("No such user document exists! Creating it now and adds user details.");
         // Add a new document in collection "users"
-        db.collection("users").doc(userID).set(fields)
+        db.collection("users").doc(userId).set(fields)
           .then(() => {
             console.log("User document successfully written!");
           })
