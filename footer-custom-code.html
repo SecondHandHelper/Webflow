@@ -121,9 +121,20 @@
     docRef.get().then((doc) => {
       if (doc.exists) {
         console.log("Document data:", doc.data());
+        console.log("Now adding the phone number to the user document");
+        // Add a new document in collection "users"
+        db.collection("users").doc(userID).update({
+          phoneNumber: formattedPhoneNumber
+        })
+          .then(() => {
+            console.log("User document successfully written!");
+          })
+          .catch((error) => {
+            console.error("Error writing document: ", error);
+          });
       } else {
         // doc.data() will be undefined in this case
-        console.log("No such document! Creating it now and adds phone number!");
+        console.log("No such document! Creating it and adding phone number!");
         // Add a new document in collection "users"
         db.collection("users").doc(userID).set({
           phoneNumber: formattedPhoneNumber
@@ -213,7 +224,9 @@
     }
 
     // Add phone number to user document
-    writePhoneNumberToFirestore(window.uid, phoneNumber);
+    if (phoneNumber) {
+      writePhoneNumberToFirestore(window.uid, phoneNumber);
+    }
 
     // Create item in FS without the images first, to get the ItemID
     var itemId = "";

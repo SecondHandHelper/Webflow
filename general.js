@@ -55,12 +55,20 @@ function updateFirestoreUserDocument(userId, email, phone) {
     if (userId === "MM6w71I1Rnb3f1Weksofs1jqfJH3") {
         userId = "0123456789-TestUser2"
     }
-
     console.log(fields);
-
+    
     docRef.get().then((doc) => {
       if (doc.exists) {
         console.log("Document data:", doc.data());
+        console.log("Now updating the user document with missed information");
+        // Add a new document in collection "users"
+        db.collection("users").doc(userID).update(fields)
+          .then(() => {
+            console.log("User document successfully written!");
+          })
+          .catch((error) => {
+            console.error("Error writing document: ", error);
+          });
       } else {
         // doc.data() will be undefined in this case
         console.log("No such user document exists! Creating it now and adds user details.");
