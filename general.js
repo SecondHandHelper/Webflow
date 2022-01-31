@@ -35,7 +35,7 @@ function updateIC(userId, em, ph) {
 };
 
 function updateFirestoreUserDocument(userId, email, phone) {
-    //var docRef = db.collection("users").doc(userID);
+    var docRef = db.collection("users").doc(userID);
     console.log("updateFirestoreUserDocument function is running!");
 
     var email = email;
