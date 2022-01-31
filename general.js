@@ -35,10 +35,8 @@ function updateIC(userId, em, ph) {
 };
 
 function updateFirestoreUserDocument(userId, email, phone) {
-    var docRef = db.collection("users").doc(userId);
     console.log("updateFirestoreUserDocument function is running!");
     var fields = {};
-
     if (email){
         fields["email"] = email;
     }
@@ -53,6 +51,7 @@ function updateFirestoreUserDocument(userId, email, phone) {
     }
     console.log(fields);
     
+    var docRef = db.collection("users").doc(userId);
     docRef.get().then((doc) => {
       if (doc.exists) {
         console.log("Document data:", doc.data());
