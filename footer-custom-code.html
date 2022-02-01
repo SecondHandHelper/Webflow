@@ -350,11 +350,12 @@
     const personalId = document.getElementById("personalId").value;
 
     // Update Intercom
-    var fullName = addressFirstName + addressLastName;
-    window.intercomSettings = {
-      app_id: "klyy0le5",
-      name: `${fullName}`
-    };
+    var fullName = "";
+    fullName = addressFirstName + addressLastName;
+    Intercom('update', {
+      "name": fullName,
+      "city": addressCity
+    });
 
     // Write to Firestore
     const itemRef = db.collection('users').doc(window.uid);

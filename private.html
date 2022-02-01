@@ -3,6 +3,9 @@
     var email;
     var phone;
 
+    // Styling initial state
+    setInitialStylePrivatePage();
+
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
             userId = user.uid;
@@ -148,8 +151,6 @@
         neutralSmileyButton.addEventListener("click", function () { setHappinessRate(2); }, false);
         angrySmileyButton.addEventListener("click", function () { setHappinessRate(1); }, false);
         feedbackForm.addEventListener("submit", storeFeedback);
-        // Styling initial state
-        setInitialStylePrivatePage();
     })
 
     window.intercomSettings = {

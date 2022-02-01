@@ -30,7 +30,8 @@ function updateIC(userId, em, ph) {
         app_id: "klyy0le5",
         email: `${email}`,
         phone: `${phone}`,
-        mai_user_id: `${userId}`
+        mai_user_id: `${userId}`,
+        user_id: `${userId}`
     };
 };
 
