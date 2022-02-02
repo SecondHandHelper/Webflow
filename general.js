@@ -29,16 +29,27 @@ function updateIC(userId, em, ph) {
         phone = "";
     }
 
+    window.intercomSettings = {
+        app_id: "klyy0le5",
+        user_id: `${userId}`
+    };
+
     console.log(`Email: ${email}, Phone: ${phone}`);
 
-    var fields = {};
+    var fields = {
+        mai_user_id: `${userId}`,
+        user_id: `${userId}`,
+        phone: `${phone}`,
+        email: `${email}`
+    };
+    /*
     if (email) {
         fields["email"] = email;
     }
     if (phone) {
         fields["phone"] = phone;
     }
-
+    */
     console.log(`Fields to update:`,  fields);
     Intercom('update', fields);
 };
