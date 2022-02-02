@@ -25,14 +25,13 @@ function updateIC(userId, em, ph) {
     if (email === null) {
         email = "";
     }
-    if (phone === null) {
+    if (phone == null) {
         phone = "";
     }
 
     console.log(`Email: ${email}, Phone: ${phone}`);
 
     var fields = {
-        app_id: "klyy0le5",
         mai_user_id: `${userId}`,
         user_id: `${userId}`
     };
@@ -44,7 +43,8 @@ function updateIC(userId, em, ph) {
         fields["phone"] = phone;
     }
 
-    window.intercomSettings = fields;
+    console.log(`Fields to update:`,  fields);
+    Intercom('update', fields);
 };
 
 function updateFirestoreUserDocument(userId, email, phone) {
