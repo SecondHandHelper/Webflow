@@ -19,60 +19,72 @@ function setInitialStylePrivatePage() {
 function updateIC(userId, em, ph) {
     const email = em;
     const phone = ph;
-    
-    if (email == "null") {
+
+    console.log("Updates Intercom");
+
+    if (email === null) {
         email = "";
     }
-    if (phone == "null") {
+    if (phone === null) {
         phone = "";
     }
-    window.intercomSettings = {
+
+    console.log(`Email: ${email}, Phone: ${phone}`);
+
+    var fields = {
         app_id: "klyy0le5",
-        email: `${email}`,
-        phone: `${phone}`,
         mai_user_id: `${userId}`,
         user_id: `${userId}`
     };
+
+    if (email) {
+        fields["email"] = email;
+    }
+    if (phone) {
+        fields["phone"] = phone;
+    }
+
+    window.intercomSettings = fields;
 };
 
 function updateFirestoreUserDocument(userId, email, phone) {
     console.log("updateFirestoreUserDocument function is running!");
     var fields = {};
-    if (email){
+    if (email) {
         fields["email"] = email;
     }
-    if (phone){
+    if (phone) {
         fields["phoneNumber"] = phone;
     }
     console.log(fields);
-    
+
     var docRef = db.collection("users").doc(userId);
     docRef.get().then((doc) => {
-      if (doc.exists) {
-        console.log("Document data:", doc.data());
-        console.log("Now updating the user document with missed information");
-        // Update document
-        db.collection("users").doc(userId).update(fields)
-          .then(() => {
-            console.log("User document successfully updated!");
-          })
-          .catch((error) => {
-            console.error("Error writing document: ", error);
-          });
-      } else {
-        // doc.data() will be undefined in this case
-        console.log("No such user document exists! Creating it now and adds user details.");
-        // Add a new document in collection "users"
-        db.collection("users").doc(userId).set(fields)
-          .then(() => {
-            console.log("User document successfully written!");
-          })
-          .catch((error) => {
-            console.error("Error writing document: ", error);
-          });
-      }
+        if (doc.exists) {
+            console.log("Document data:", doc.data());
+            console.log("Now updating the user document with missed information");
+            // Update document
+            db.collection("users").doc(userId).update(fields)
+                .then(() => {
+                    console.log("User document successfully updated!");
+                })
+                .catch((error) => {
+                    console.error("Error writing document: ", error);
+                });
+        } else {
+            // doc.data() will be undefined in this case
+            console.log("No such user document exists! Creating it now and adds user details.");
+            // Add a new document in collection "users"
+            db.collection("users").doc(userId).set(fields)
+                .then(() => {
+                    console.log("User document successfully written!");
+                })
+                .catch((error) => {
+                    console.error("Error writing document: ", error);
+                });
+        }
     }).catch((error) => {
-      console.log("Error getting document:", error);
+        console.log("Error getting document:", error);
     });
 };
 
