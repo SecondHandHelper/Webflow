@@ -127,7 +127,7 @@
           phoneNumber: formattedPhoneNumber
         })
           .then(() => {
-            console.log("User document successfully updated!");
+            console.log("User document successfully updated with phone number: ", formattedPhoneNumber);
           })
           .catch((error) => {
             console.error("Error writing document: ", error);
@@ -349,16 +349,9 @@
     const addressDoorCode = document.getElementById("addressDoorCode").value;
     const personalId = document.getElementById("personalId").value;
 
-    // Update Intercom
-    var fullName = "";
-    fullName = addressFirstName + addressLastName;
-    Intercom('update', {
-      "name": fullName,
-      "city": addressCity
-    });
-
     // Write to Firestore
     const itemRef = db.collection('users').doc(window.uid);
+    
     const res = await itemRef.update({
       addressFirstName: addressFirstName,
       addressLastName: addressLastName,
