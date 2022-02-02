@@ -60,14 +60,7 @@ function updateIC(userId, em, ph) {
                 name: `${name}`,
                 city: `${city}`,
             };
-            /*
-            if (email) {
-                fields["email"] = email;
-            }
-            if (phone) {
-                fields["phone"] = phone;
-            }
-            */
+
             console.log(`Fields to update:`, fields);
             Intercom('update', fields);
         } else {
@@ -76,10 +69,6 @@ function updateIC(userId, em, ph) {
     }).catch((error) => {
         console.log("Error getting document:", error);
     });
-
-
-
-
 };
 
 function updateFirestoreUserDocument(userId, email, phone) {
@@ -100,8 +89,8 @@ function updateFirestoreUserDocument(userId, email, phone) {
             console.log("Now updating the user document with missed information");
             // Update document
             db.collection("users").doc(userId).update(fields)
-                .then(() => {
-                    console.log("User document successfully updated!");
+                .then((docRef) => {
+                    console.log(`User document ${docRef.id} was successfully updated with these fields: `, fields);
                 })
                 .catch((error) => {
                     console.error("Error writing document: ", error);
@@ -110,8 +99,8 @@ function updateFirestoreUserDocument(userId, email, phone) {
             console.log("No such user document exists! Creating it now and adds user details.");
             // Add a new document in collection "users"
             db.collection("users").doc(userId).set(fields)
-                .then(() => {
-                    console.log("User document successfully written!");
+                .then((docRef) => {
+                    console.log(`User document was created with id ${docRef.id} and these fields: `, fields);
                 })
                 .catch((error) => {
                     console.error("Error writing document: ", error);
