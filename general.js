@@ -25,7 +25,7 @@ function updateIC(userId, em, ph) {
     if (email === null) {
         email = "";
     }
-    if (phone == null) {
+    if (phone === null) {
         phone = "";
     }
 
