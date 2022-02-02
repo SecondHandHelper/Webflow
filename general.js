@@ -17,8 +17,8 @@ function setInitialStylePrivatePage() {
 }
 
 function updateIC(userId, em, ph) {
-    const email = em;
-    const phone = ph;
+    let email = em;
+    let phone = ph;
 
     console.log("Updates Intercom");
 
@@ -72,7 +72,6 @@ function updateFirestoreUserDocument(userId, email, phone) {
                     console.error("Error writing document: ", error);
                 });
         } else {
-            // doc.data() will be undefined in this case
             console.log("No such user document exists! Creating it now and adds user details.");
             // Add a new document in collection "users"
             db.collection("users").doc(userId).set(fields)
