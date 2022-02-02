@@ -90,7 +90,8 @@ function updateFirestoreUserDocument(userId, email, phone) {
             // Update document
             db.collection("users").doc(userId).update(fields)
                 .then((docRef) => {
-                    console.log(`User document ${docRef.id} was successfully updated with these fields: `, fields);
+                    let uid = docRef.id;
+                    console.log(`User document ${uid} was successfully updated with these fields: `, fields);
                 })
                 .catch((error) => {
                     console.error("Error writing document: ", error);
@@ -100,7 +101,8 @@ function updateFirestoreUserDocument(userId, email, phone) {
             // Add a new document in collection "users"
             db.collection("users").doc(userId).set(fields)
                 .then((docRef) => {
-                    console.log(`User document was created with id ${docRef.id} and these fields: `, fields);
+                    let uid = docRef.id;
+                    console.log(`User document was created with id ${uid} and these fields: `, fields);
                 })
                 .catch((error) => {
                     console.error("Error writing document: ", error);
