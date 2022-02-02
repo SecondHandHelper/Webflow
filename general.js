@@ -31,11 +31,7 @@ function updateIC(userId, em, ph) {
 
     console.log(`Email: ${email}, Phone: ${phone}`);
 
-    var fields = {
-        mai_user_id: `${userId}`,
-        user_id: `${userId}`
-    };
-
+    var fields = {};
     if (email) {
         fields["email"] = email;
     }
