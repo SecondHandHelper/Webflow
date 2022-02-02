@@ -34,24 +34,52 @@ function updateIC(userId, em, ph) {
         user_id: `${userId}`
     };
 
-    console.log(`Email: ${email}, Phone: ${phone}`);
+    var docRef = db.collection("users").doc(userId);
+    docRef.get().then((doc) => {
+        if (doc.exists) {
+            const data = doc.data();
+            let name = "";
+            let city = "";
+            console.log("data.addressFirstName", data.addressFirstName, typeof data.addressFirstName);
+            if (data.addressFirstName) {
+                console.log("Setting variables");
+                const fn = data.addressFirstName;
+                const ln = data.addressLastName;
+                name = fn + " " + ln;
+                city = data.addressCity;
+            }
 
-    var fields = {
-        mai_user_id: `${userId}`,
-        user_id: `${userId}`,
-        phone: `${phone}`,
-        email: `${email}`
-    };
-    /*
-    if (email) {
-        fields["email"] = email;
-    }
-    if (phone) {
-        fields["phone"] = phone;
-    }
-    */
-    console.log(`Fields to update:`,  fields);
-    Intercom('update', fields);
+            console.log("Now updating intercom");
+            // Update intercom
+
+            var fields = {
+                mai_user_id: `${userId}`,
+                user_id: `${userId}`,
+                phone: `${phone}`,
+                email: `${email}`,
+                name: `${name}`,
+                city: `${city}`,
+            };
+            /*
+            if (email) {
+                fields["email"] = email;
+            }
+            if (phone) {
+                fields["phone"] = phone;
+            }
+            */
+            console.log(`Fields to update:`, fields);
+            Intercom('update', fields);
+        } else {
+            console.log("No such user document exist!");
+        }
+    }).catch((error) => {
+        console.log("Error getting document:", error);
+    });
+
+
+
+
 };
 
 function updateFirestoreUserDocument(userId, email, phone) {
