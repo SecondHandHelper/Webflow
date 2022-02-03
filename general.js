@@ -48,6 +48,9 @@ function updateIC(userId, em, ph) {
                 name = fn + " " + ln;
                 city = data.addressCity;
             }
+            if (data.phoneNumber) {
+                phone = data.phoneNumber;
+            }
 
             console.log("Now updating intercom");
             // Update intercom
@@ -58,7 +61,7 @@ function updateIC(userId, em, ph) {
                 phone: `${phone}`,
                 email: `${email}`,
                 name: `${name}`,
-                city: `${city}`,
+                city: `${city}`
             };
 
             console.log(`Fields to update:`, fields);
