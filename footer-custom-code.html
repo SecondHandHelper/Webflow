@@ -351,8 +351,7 @@
 
     // Write to Firestore
     const itemRef = db.collection('users').doc(window.uid);
-    
-    const res = await itemRef.update({
+    itemRef.update({
       addressFirstName: addressFirstName,
       addressLastName: addressLastName,
       addressStreetAddress: addressStreetAddress,
@@ -360,12 +359,16 @@
       addressCity: addressCity,
       addressDoorCode: addressDoorCode,
       personalId: personalId
-    }).then(function () {
-      console.log(`User address of ${uid} is now updated`);
-
-      itemConfirmationDiv.style.display = 'block';
-      addressFormDiv.style.display = 'none';
-    });
+    })
+      .then(() => {
+        console.log(`User address of ${uid} is now updated`);
+        itemConfirmationDiv.style.display = 'block';
+        addressFormDiv.style.display = 'none';
+      })
+      .catch((error) => {
+        // The document probably doesn't exist.
+        console.error("Error updating document: ", error);
+      });
   }
 
   async function addPersonalId() {
