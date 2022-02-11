@@ -92,8 +92,8 @@ function updateFirestoreUserDocument(userId, email, phone) {
             console.log("Now updating the user document with missed information");
             // Update document
             db.collection("users").doc(userId).update(fields)
-                .then((docRef) => {
-                    let uid = docRef.id;
+                .then((document) => {
+                    let uid = document.id;
                     console.log(`User document ${uid} was successfully updated with these fields: `, fields);
                 })
                 .catch((error) => {
@@ -103,8 +103,8 @@ function updateFirestoreUserDocument(userId, email, phone) {
             console.log("No such user document exists! Creating it now and adds user details.");
             // Add a new document in collection "users"
             db.collection("users").doc(userId).set(fields)
-                .then((docRef) => {
-                    let uid = docRef.id;
+                .then((document) => {
+                    let uid = document.id;
                     console.log(`User document was created with id ${uid} and these fields: `, fields);
                 })
                 .catch((error) => {
@@ -142,12 +142,10 @@ async function askForAdditionalUserDetails(userID) {
         addressFirstName = doc.data().addressFirstName;
         personalId = doc.data().personalId;
         if (personalId){
-            console.log("If (personalId)");
             if (personalId === ""){
                 personalIdExists = false;
             }
         } else {    
-            console.log("else");
             personalIdExists = false;
         }
     });

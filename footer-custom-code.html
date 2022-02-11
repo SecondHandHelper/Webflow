@@ -339,7 +339,7 @@
     }
   }
 
-  async function addUserAddress() {
+  async function addUserDetails() {
     // Grab values from form
     const addressFirstName = document.getElementById("addressFirstName").value;
     const addressLastName = document.getElementById("addressLastName").value;
@@ -364,6 +364,35 @@
         console.log(`User address of ${uid} is now updated`);
         itemConfirmationDiv.style.display = 'block';
         addressFormDiv.style.display = 'none';
+      })
+      .catch((error) => {
+        // The document probably doesn't exist.
+        console.error("Error updating document: ", error);
+      });
+  }
+
+  async function addUserAddress() {
+    // Grab values from form
+    const addressFirstName = document.getElementById("addressFirstName").value;
+    const addressLastName = document.getElementById("addressLastName").value;
+    const addressStreetAddress = document.getElementById("addressStreetAddress").value;
+    const addressPostalCode = document.getElementById("addressPostalCode").value;
+    const addressCity = document.getElementById("addressCity").value;
+    const addressDoorCode = document.getElementById("addressDoorCode").value;
+
+    // Write to Firestore
+    const itemRef = db.collection('users').doc(window.uid);
+    itemRef.update({
+      addressFirstName: addressFirstName,
+      addressLastName: addressLastName,
+      addressStreetAddress: addressStreetAddress,
+      addressPostalCode: addressPostalCode,
+      addressCity: addressCity,
+      addressDoorCode: addressDoorCode
+    })
+      .then(() => {
+        console.log(`User address of ${uid} is now updated`);
+        window.location.href = window.location.origin + "/private";
       })
       .catch((error) => {
         // The document probably doesn't exist.
