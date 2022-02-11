@@ -383,7 +383,8 @@
       })
         .then(() => {
           console.log(`PersonalId of ${uid} is now updated`);
-          window.location.href = window.location.origin + "/private";
+          personalIdConfirmationDiv.style.display = 'block';
+          personalIdFormDiv.style.display = 'none';
         })
         .catch((error) => {
           // The document probably doesn't exist.
@@ -392,24 +393,6 @@
     } else {
       window.location.href = window.location.origin + "/private";
     }
-
-
-
-    // Write to Firestore
-    /*
-    if (personalId) {
-      const itemRef = db.collection('users').doc(window.uid);
-      const res = await itemRef.update({
-        personalId: personalId
-      }).then(function () {
-        console.log(`PersonalId of ${uid} is now updated`);
-        window.location.href = window.location.origin + "/private";
-      });
-    } else {
-      window.location.href = window.location.origin + "/private";
-    }
-    */
-
   }
 </script>
 

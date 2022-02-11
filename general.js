@@ -120,7 +120,8 @@ async function askForAdditionalUserDetails(userID) {
     let status = "";
     let shippingStatus = "";
     let addressFirstName = "";
-    let personalId = "";
+    let personalId;
+    let personalIdExists = true;
 
     // First, get items with status "Sold" and shippingStatus "Not sent"
     await db.collection("items")
@@ -140,6 +141,20 @@ async function askForAdditionalUserDetails(userID) {
     await db.collection("users").doc(userID).get().then((doc) => {
         addressFirstName = doc.data().addressFirstName;
         personalId = doc.data().personalId;
+
+        console.log("PersonalId: ", personalId);
+        console.log("PersonalIdExists check 1: ", personalIdExists);
+
+        if (personalId){
+            console.log("If (personalId)");
+            if (personalId === ""){
+                personalIdExists = false;
+            }
+        } else {    
+            console.log("else");
+            personalIdExists = false;
+        }
+
     });
 
     // Redirect user if user has no address and at least one item that's sold but not shipped
@@ -147,8 +162,10 @@ async function askForAdditionalUserDetails(userID) {
         window.location.href = window.location.origin + "/address-form";
     }
 
+    console.log("PersonalIdExists check 2: ", personalIdExists);
+
     // Redirect user to personalId form if they haven't added it yet
-    if (status == "Sold" && shippingStatus == "Not sent" && personalId == undefined) {
+    if (status == "Sold" && shippingStatus == "Not sent" && personalIdExists == false) {
         window.location.href = window.location.origin + "/personal-id-form";
     }
 }
