@@ -116,13 +116,13 @@ function updateFirestoreUserDocument(userId, email, phone) {
     });
 };
 
-async function ifSoldItemAskForAddress(userID) {
+async function askForAdditionalUserDetails(userID) {
     let status = "";
     let shippingStatus = "";
     let addressFirstName = "";
     let personalId = "";
 
-    // First, ge items with status "Sold" and shippingStatus "Not sent"
+    // First, get items with status "Sold" and shippingStatus "Not sent"
     await db.collection("items")
         .where("user", "==", userID)
         .where("status", "==", "Sold")
@@ -142,17 +142,15 @@ async function ifSoldItemAskForAddress(userID) {
         personalId = doc.data().personalId;
     });
 
-    // Third, redirect user if user has no address and at least one item that's sold but not shipped
+    // Redirect user if user has no address and at least one item that's sold but not shipped
     if (status == "Sold" && shippingStatus == "Not sent" && addressFirstName == undefined) {
         window.location.href = window.location.origin + "/address-form";
     }
 
-    // Ugly placement of this, BUT, here I check if the user haven't added their personalId yet, and redirect to form
-    /*
+    // Redirect user to personalId form if they haven't added it yet
     if (status == "Sold" && shippingStatus == "Not sent" && personalId == undefined) {
         window.location.href = window.location.origin + "/personal-id-form";
     }
-    */
 }
 
 function loadSoldByOthers(userID) {

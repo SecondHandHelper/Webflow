@@ -12,7 +12,7 @@
             email = user.email;
             phone = user.phoneNumber;
             updateIC(userId, email, phone);
-            ifSoldItemAskForAddress(userId);
+            askForAdditionalUserDetails(userId);
             updateFirestoreUserDocument(userId, email, phone);
             emptyListsInnerHTML();
             loadSoldByOthers(userId);

@@ -378,6 +378,27 @@
     // Write to Firestore
     if (personalId) {
       const itemRef = db.collection('users').doc(window.uid);
+      itemRef.update({
+        personalId: personalId
+      })
+        .then(() => {
+          console.log(`PersonalId of ${uid} is now updated`);
+          window.location.href = window.location.origin + "/private";
+        })
+        .catch((error) => {
+          // The document probably doesn't exist.
+          console.error("Error updating document: ", error);
+        });
+    } else {
+      window.location.href = window.location.origin + "/private";
+    }
+
+
+
+    // Write to Firestore
+    /*
+    if (personalId) {
+      const itemRef = db.collection('users').doc(window.uid);
       const res = await itemRef.update({
         personalId: personalId
       }).then(function () {
@@ -387,6 +408,8 @@
     } else {
       window.location.href = window.location.origin + "/private";
     }
+    */
+
   }
 </script>
 
