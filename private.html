@@ -39,7 +39,6 @@
                         var shippingStatus = doc.data().shippingStatus;
                         var brand = doc.data().brand;
                         var soldPrice = doc.data().soldPrice;
-                        var frontImageUrl = images.frontImage;
                         var sellerGets = doc.data().sellerGets;
                         var buyerFirstName = doc.data().buyerFirstName;
                         var buyerAddressCity = doc.data().buyerAddressCity;
@@ -50,6 +49,10 @@
                         var pricing = doc.data().pricing;
                         var pickupDate = doc.data().pickupDate;
                         var archived = doc.data().archived;
+                        var frontImageUrl = images.frontImage;
+                        if (images.frontImageSmall){
+                            frontImageUrl = images.frontImageSmall;
+                        }
 
                         if (archived == undefined && status != "Unsold") {
                             displayItemCard();
