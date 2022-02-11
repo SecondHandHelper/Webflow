@@ -92,9 +92,8 @@ function updateFirestoreUserDocument(userId, email, phone) {
             console.log("Now updating the user document with missed information");
             // Update document
             db.collection("users").doc(userId).update(fields)
-                .then((document) => {
-                    let uid = document.id;
-                    console.log(`User document ${uid} was successfully updated with these fields: `, fields);
+                .then((docRef) => {
+                    console.log(`User document ${userId} was successfully updated with these fields: `, fields);
                 })
                 .catch((error) => {
                     console.error("Error writing document: ", error);
@@ -103,9 +102,8 @@ function updateFirestoreUserDocument(userId, email, phone) {
             console.log("No such user document exists! Creating it now and adds user details.");
             // Add a new document in collection "users"
             db.collection("users").doc(userId).set(fields)
-                .then((document) => {
-                    let uid = document.id;
-                    console.log(`User document was created with id ${uid} and these fields: `, fields);
+                .then((docRef) => {
+                    console.log(`User document was created with id ${userId} and these fields: `, fields);
                 })
                 .catch((error) => {
                     console.error("Error writing document: ", error);
