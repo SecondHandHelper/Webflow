@@ -141,10 +141,6 @@ async function askForAdditionalUserDetails(userID) {
     await db.collection("users").doc(userID).get().then((doc) => {
         addressFirstName = doc.data().addressFirstName;
         personalId = doc.data().personalId;
-
-        console.log("PersonalId: ", personalId);
-        console.log("PersonalIdExists check 1: ", personalIdExists);
-
         if (personalId){
             console.log("If (personalId)");
             if (personalId === ""){
@@ -154,15 +150,12 @@ async function askForAdditionalUserDetails(userID) {
             console.log("else");
             personalIdExists = false;
         }
-
     });
 
     // Redirect user if user has no address and at least one item that's sold but not shipped
     if (status == "Sold" && shippingStatus == "Not sent" && addressFirstName == undefined) {
         window.location.href = window.location.origin + "/address-form";
     }
-
-    console.log("PersonalIdExists check 2: ", personalIdExists);
 
     // Redirect user to personalId form if they haven't added it yet
     if (status == "Sold" && shippingStatus == "Not sent" && personalIdExists == false) {
