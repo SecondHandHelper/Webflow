@@ -2,10 +2,7 @@
     var userId;
     var email;
     var phone;
-
-    // Styling initial state
-    setInitialStylePrivatePage();
-
+    setInitialStylePrivatePage();// Styling initial state
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
             userId = user.uid;
@@ -59,13 +56,12 @@
                         }
 
                         function displayItemCard() {
-                            // Putting the items in the right list
+                            //Putting the items in the right list
                             if (status != "Sold") {
-                                // Add card to list
                                 var statusTextHtml = "";
                                 var salesProcessURL = window.location.origin + "/our-sales-process";
 
-                                // If price-estimate is set, show info to user.
+                                //If price-estimate is set, show info
                                 if (status == "Published" || status == "New") {
                                     if (pricing == "We set price") {
                                         if (minPriceEstimate != null && maxPriceEstimate != null) {
@@ -81,17 +77,15 @@
                                 var sellingItemCardHTML = `<div class="div-block-14"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div><div class="text-block-14">${brand}</div><a href="${salesProcessURL}" style="text-decoration:none;">${statusTextHtml}</a></div>`;
                                 itemListSelling.innerHTML += sellingItemCardHTML;
 
-                                // Display list
+                                //Display list
                                 myItemsDiv.style.display = "block";
-
-                                // Hide empty state
+                                //Hide empty state
                                 noItemsDiv.style.display = "none";
                                 headerSellItemButton.style.display = "block";
                                 sellButtonText.innerHTML = "Sälj ett plagg";
 
                             } else if (status == "Sold" && shippingStatus != "Sent") {
-                                // Add card to list
-                                // If buyer info exists, show info to user.
+                                //If buyer info exists, show info
                                 var buyerInfoTextHTML = "";
                                 if (buyerFirstName != null && buyerAddressCity != null) {
                                     buyerInfoTextHTML = `<div class="text-block-44">Till ${buyerFirstName} i ${buyerAddressCity}</div>`;
@@ -117,14 +111,12 @@
 
                                 // Display list
                                 soldNotSentDiv.style.display = "block";
-
                                 // Hide empty state
                                 noItemsDiv.style.display = "none";
                                 headerSellItemButton.style.display = "block";
                                 sellButtonText.innerHTML = "Sälj ett plagg";
 
                             } else {
-                                // Add card to list
                                 var soldItemCardHTML = `<div class="div-block-14"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>Du fick ${sellerGets}</div></div>`;
                                 itemListSold.innerHTML += soldItemCardHTML;
 
@@ -132,7 +124,6 @@
                                 soldItemsDiv.style.display = "block";
                                 itemListSoldContainer.style.display = "block";
                                 sellButtonText.innerHTML = "Sälj ett plagg";
-
                                 youEarned = youEarned + sellerGets;
                                 youEarnedDiv.innerHTML = `Du har tjänat ${youEarned} kr`;
                             }
