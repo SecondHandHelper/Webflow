@@ -139,11 +139,11 @@ async function askForAdditionalUserDetails(userID) {
     await db.collection("users").doc(userID).get().then((doc) => {
         addressFirstName = doc.data().addressFirstName;
         personalId = doc.data().personalId;
-        if (personalId){
-            if (personalId === ""){
+        if (personalId) {
+            if (personalId === "") {
                 personalIdExists = false;
             }
-        } else {    
+        } else {
             personalIdExists = false;
         }
     });
@@ -175,12 +175,12 @@ function loadSoldByOthers(userID) {
                 var soldPrice = doc.data().soldPrice;
                 var images = doc.data().images;
                 var imageUrl = images.frontImage;
-                if (images.frontImageSmall){
+                if (images.frontImageSmall) {
                     imageUrl = images.frontImageSmall;
                 }
 
                 // Add card to list if seller is other than myself
-                if (sellerId != userID && soldPrice >= 200) {                    
+                if (sellerId != userID && soldPrice >= 200) {
                     var soldByOthersItemCardHTML = `<div class="div-block-14"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>${brand}</div></div>`;
                     itemListSoldByOthers.innerHTML += soldByOthersItemCardHTML;
                 }
@@ -240,6 +240,12 @@ function openPickupToast(itemId, soldDate, brand) {
 }
 
 function setDatesOfPickupToast(soldDate) {
+    // Hide all options first, to later determine which one to show
+    radioFieldOne.style.display = 'none';
+    radioFieldTwo.style.display = 'none';
+    radioFieldThree.style.display = 'none';
+    radioFieldFour.style.display = 'none';
+
     // Get the 4 first business days, 3 days after soldDate
     var firstDate = new Date(soldDate);
     firstDate.setDate(firstDate.getDate() + 4);
@@ -272,31 +278,34 @@ function setDatesOfPickupToast(soldDate) {
     var days = ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'];
     var months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
 
-    /*
-    var dateNumber1 = firstDate.getDate();
-    var dateNumber2 = secondDate.getDate();
-    var monthName1 = months[firstDate.getMonth()];
-    var monthName2 = months[secondDate.getMonth()];
-    var dayName1 = days[firstDate.getDay()];
-    var dayName2 = days[secondDate.getDay()];
-    */
+    // Change value of radio buttons and display to user
+    let today = new Date();
+    console.log("Today", today);
 
-    // Change value of radio buttons
-    $('#radioButtonOne').val(firstDate.toISOString().split('T')[0]); //yyyy-mm-dd
-    $('#radioButtonTwo').val(secondDate.toISOString().split('T')[0]); //yyyy-mm-dd
-    $('#radioButtonThree').val(thirdDate.toISOString().split('T')[0]); //yyyy-mm-dd
-    $('#radioButtonFour').val(forthDate.toISOString().split('T')[0]); //yyyy-mm-dd
-
-    // Show dates
-    pickupDateOne.innerHTML = days[firstDate.getDay()] + ", " + firstDate.getDate() + " " + months[firstDate.getMonth()] + ", kl 9-16";
-    pickupDateTwo.innerHTML = days[secondDate.getDay()] + ", " + secondDate.getDate() + " " + months[secondDate.getMonth()] + ", kl 9-16";
-    pickupDateThree.innerHTML = days[thirdDate.getDay()] + ", " + thirdDate.getDate() + " " + months[thirdDate.getMonth()] + ", kl 9-16";
-    pickupDateFour.innerHTML = days[forthDate.getDay()] + ", " + forthDate.getDate() + " " + months[forthDate.getMonth()] + ", kl 9-16";
-
-    /*
-    pickupDateOne.innerHTML = dayName1 + ", " + dateNumber1 + " " + monthName1 + ", kl 9-16";
-    pickupDateTwo.innerHTML = dayName2 + ", " + dateNumber2 + " " + monthName2 + ", kl 9-16";
-    */
+    console.log("firstDate > today", (firstDate > today));
+    console.log("secondDate > today", (secondDate > today));
+    console.log("thirdDate > today", (thirdDate > today));
+    console.log("forthDate > today", (forthDate > today));
+    if (firstDate > today) {
+        $('#radioButtonOne').val(firstDate.toISOString().split('T')[0]); //yyyy-mm-dd
+        pickupDateOne.innerHTML = days[firstDate.getDay()] + ", " + firstDate.getDate() + " " + months[firstDate.getMonth()] + ", kl 9-16";
+        radioFieldOne.style.display = 'block';
+    }
+    if (secondDate > today) {
+        $('#radioButtonTwo').val(secondDate.toISOString().split('T')[0]);
+        pickupDateTwo.innerHTML = days[secondDate.getDay()] + ", " + secondDate.getDate() + " " + months[secondDate.getMonth()] + ", kl 9-16";
+        radioFieldTwo.style.display = 'block';
+    }
+    if (thirdDate > today) {
+        $('#radioButtonThree').val(thirdDate.toISOString().split('T')[0]);
+        pickupDateThree.innerHTML = days[thirdDate.getDay()] + ", " + thirdDate.getDate() + " " + months[thirdDate.getMonth()] + ", kl 9-16";
+        radioFieldThree.style.display = 'block';
+    }
+    if (forthDate > today) {
+        $('#radioButtonFour').val(forthDate.toISOString().split('T')[0]);
+        pickupDateFour.innerHTML = days[forthDate.getDay()] + ", " + forthDate.getDate() + " " + months[forthDate.getMonth()] + ", kl 9-16";
+        radioFieldFour.style.display = 'block';
+    }
 }
 
 async function bookPickup() {
