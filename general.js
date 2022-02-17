@@ -246,9 +246,9 @@ function setDatesOfPickupToast(soldDate) {
     radioFieldThree.style.display = 'none';
     radioFieldFour.style.display = 'none';
 
-    // Get the 4 first business days, 3 days after soldDate
+    // Get the 4 first bookable business days, starting 3 days after soldDate
     var firstDate = new Date(soldDate);
-    firstDate.setDate(firstDate.getDate() + 4);
+    firstDate.setDate(firstDate.getDate() + 3);
 
     // Om helgdag, skjut på det så att man bara kan välja veckodagar
     if (firstDate.getDay() == 0) {
@@ -280,6 +280,7 @@ function setDatesOfPickupToast(soldDate) {
 
     // Change value of radio buttons and display to user
     let today = new Date();
+    let optionsDisplayed = 0;
     console.log("Today", today);
 
     console.log("firstDate > today", (firstDate > today));
@@ -290,22 +291,63 @@ function setDatesOfPickupToast(soldDate) {
         $('#radioButtonOne').val(firstDate.toISOString().split('T')[0]); //yyyy-mm-dd
         pickupDateOne.innerHTML = days[firstDate.getDay()] + ", " + firstDate.getDate() + " " + months[firstDate.getMonth()] + ", kl 9-16";
         radioFieldOne.style.display = 'block';
+        optionsDisplayed++;
     }
     if (secondDate > today) {
         $('#radioButtonTwo').val(secondDate.toISOString().split('T')[0]);
         pickupDateTwo.innerHTML = days[secondDate.getDay()] + ", " + secondDate.getDate() + " " + months[secondDate.getMonth()] + ", kl 9-16";
         radioFieldTwo.style.display = 'block';
+        optionsDisplayed++;
     }
     if (thirdDate > today) {
         $('#radioButtonThree').val(thirdDate.toISOString().split('T')[0]);
         pickupDateThree.innerHTML = days[thirdDate.getDay()] + ", " + thirdDate.getDate() + " " + months[thirdDate.getMonth()] + ", kl 9-16";
         radioFieldThree.style.display = 'block';
+        optionsDisplayed++;
     }
     if (forthDate > today) {
         $('#radioButtonFour').val(forthDate.toISOString().split('T')[0]);
         pickupDateFour.innerHTML = days[forthDate.getDay()] + ", " + forthDate.getDate() + " " + months[forthDate.getMonth()] + ", kl 9-16";
         radioFieldFour.style.display = 'block';
+        optionsDisplayed++;
     }
+
+    // If less than two options displayed, add at least two options
+    if (optionsDisplayed < 2) {
+        radioFieldOne.style.display = 'none';
+        radioFieldTwo.style.display = 'none';
+        radioFieldThree.style.display = 'none';
+        radioFieldFour.style.display = 'none';
+
+        var dayOne = new Date();
+        var dayAfterTomorrow = new Date();
+        tomorrow.setDate(today.getDate() + 1);
+        dayAfterTomorrow.setDate(today.getDate() + 2);
+        console.log("Tomorrow: ", tomorrow);
+        console.log("Day after: ", dayAfterTomorrow);
+
+        if (dayOne.getDay() == 0) {
+            dayOne.setDate(dayOne.getDate() + 1);
+        } else if (dayOne.getDay() == 6) {
+            dayOne.setDate(dayOne.getDate() + 2);
+        }
+        var dayTwo = new Date(dayOne);
+        dayTwo.setDate(dayTwo.getDate() + 1);
+        if (dayTwo.getDay() == 6) {
+            dayTwo.setDate(dayTwo.getDate() + 2);
+        }
+
+        // Show tomorrow as an option
+        $('#radioButtonOne').val(dayOne.toISOString().split('T')[0]);
+        pickupDateOne.innerHTML = days[dayOne.getDay()] + ", " + dayOne.getDate() + " " + months[dayOne.getMonth()] + ", kl 9-16";
+        radioFieldOne.style.display = 'block';
+
+        // Show day after tomorrow as an option
+        $('#radioButtonTwo').val(dayTwo.toISOString().split('T')[0]);
+        pickupDateTwo.innerHTML = days[dayTwo.getDay()] + ", " + dayTwo.getDate() + " " + months[dayTwo.getMonth()] + ", kl 9-16";
+        radioFieldTwo.style.display = 'block';
+    }
+
 }
 
 async function bookPickup() {
