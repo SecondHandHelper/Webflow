@@ -320,12 +320,7 @@ function setDatesOfPickupToast(soldDate) {
         radioFieldFour.style.display = 'none';
 
         var dayOne = new Date();
-        var dayAfterTomorrow = new Date();
-        tomorrow.setDate(today.getDate() + 1);
-        dayAfterTomorrow.setDate(today.getDate() + 2);
-        console.log("Tomorrow: ", tomorrow);
-        console.log("Day after: ", dayAfterTomorrow);
-
+        dayOne.setDate(today.getDate() + 1);
         if (dayOne.getDay() == 0) {
             dayOne.setDate(dayOne.getDate() + 1);
         } else if (dayOne.getDay() == 6) {
@@ -336,7 +331,8 @@ function setDatesOfPickupToast(soldDate) {
         if (dayTwo.getDay() == 6) {
             dayTwo.setDate(dayTwo.getDate() + 2);
         }
-
+        console.log("dayOne: ", dayOne);
+        console.log("dayTwo: ", dayTwo);
         // Show tomorrow as an option
         $('#radioButtonOne').val(dayOne.toISOString().split('T')[0]);
         pickupDateOne.innerHTML = days[dayOne.getDay()] + ", " + dayOne.getDate() + " " + months[dayOne.getMonth()] + ", kl 9-16";
