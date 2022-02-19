@@ -20,8 +20,6 @@ function updateIC(userId, em, ph) {
     let email = em;
     let phone = ph;
 
-    console.log("Updates Intercom");
-
     if (email === null) {
         email = "";
     }
@@ -40,9 +38,7 @@ function updateIC(userId, em, ph) {
             const data = doc.data();
             let name = "";
             let city = "";
-            console.log("data.addressFirstName", data.addressFirstName, typeof data.addressFirstName);
             if (data.addressFirstName) {
-                console.log("Setting variables");
                 const fn = data.addressFirstName;
                 const ln = data.addressLastName;
                 name = fn + " " + ln;
@@ -52,9 +48,7 @@ function updateIC(userId, em, ph) {
                 phone = data.phoneNumber;
             }
 
-            console.log("Now updating intercom");
             // Update intercom
-
             var fields = {
                 mai_user_id: `${userId}`,
                 user_id: `${userId}`,
@@ -63,9 +57,6 @@ function updateIC(userId, em, ph) {
                 name: `${name}`,
                 city: `${city}`
             };
-
-            console.log(`Fields to update:`, fields);
-            Intercom('update', fields);
         } else {
             console.log("No such user document exist!");
         }
@@ -75,7 +66,6 @@ function updateIC(userId, em, ph) {
 };
 
 function updateFirestoreUserDocument(userId, email, phone) {
-    console.log("updateFirestoreUserDocument function is running!");
     var fields = {};
     if (email) {
         fields["email"] = email;
@@ -89,7 +79,6 @@ function updateFirestoreUserDocument(userId, email, phone) {
     docRef.get().then((doc) => {
         if (doc.exists) {
             console.log("Document data:", doc.data());
-            console.log("Now updating the user document with missed information");
             // Update document
             db.collection("users").doc(userId).update(fields)
                 .then((docRef) => {
@@ -207,7 +196,7 @@ function getPickupTimeInfoDiv(pickupDate) {
 
 function getBookPickupButton(itemId, soldDate, brand) {
     const div = `<a id="bookPickupButton" href="javascript:openPickupToast('${itemId}', '${soldDate}', '${brand}');" class="link-block-13 w-inline-block">
-                                        <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/608db91c363e28ae251e0998_delivery-truck%204.svg" loading="lazy" width="34" alt="" class="image-4">
+                                        <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/608db91c363e28ae251e0998_delivery-truck%204.svg" loading="lazy" width="30" alt="" class="image-4">
                                         <div class="text-pickup-small">Boka hämtning</div>
                                     </a>`;
     return div;

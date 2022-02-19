@@ -8,7 +8,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-functions.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.1/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.5/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.1/autocomplete-brands.js"></script>
 
 <script>
@@ -53,6 +53,11 @@
     window.location.replace('./home-desktop');
   }
 
+  // FUNCTIONS FOR PRIVATE PAGE (Also in general.js)
+  function openItemPage(itemId) {
+    console.log("Item clicked!", itemId);
+    window.location.href = window.location.origin + `/item?id=${itemId}`;
+  }
 
   // FUNCTIONS FOR START PAGE
   function loadRecentlySold() {
@@ -99,8 +104,6 @@
       });
     // [END fb_functions_call_add_message_error]
   }
-
-
 </script>
 
 <script>
