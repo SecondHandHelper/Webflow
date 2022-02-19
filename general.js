@@ -218,12 +218,11 @@ function emptyListsInnerHTML() {
 }
 
 // PICKUP RELATED FUNCTIONS
-var currentItem = "";
 var currentBrand = "";
 
 function openPickupToast(itemId, soldDate, brand) {
     setDatesOfPickupToast(soldDate);
-    currentItem = itemId;
+    window.pickupFlowItemId = itemId;
     currentBrand = brand;
     document.getElementById('triggerPickupAnimation').click();
 }
@@ -344,7 +343,7 @@ async function bookPickup() {
         }
     }
 
-    const itemRef = db.collection('items').doc(currentItem);
+    const itemRef = db.collection('items').doc(pickupFlowItemId);
     const res = await itemRef.update({
         pickupDate: pickupDate
     }).then(function () {
@@ -357,7 +356,7 @@ async function bookPickup() {
 }
 
 async function setHappinessRate(value) {
-    const itemRef = db.collection('items').doc(currentItem);
+    const itemRef = db.collection('items').doc(pickupFlowItemId);
     const res = await itemRef.update({
         happinessRate: value
     }).then(function () {
@@ -370,7 +369,7 @@ async function setHappinessRate(value) {
 
 async function storeFeedback() {
     const value = feedbackTextField.value;
-    const itemRef = db.collection('items').doc(currentItem);
+    const itemRef = db.collection('items').doc(pickupFlowItemId);
     const res = await itemRef.update({
         feedbackText: value
     }).then(function () {
