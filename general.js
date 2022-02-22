@@ -228,21 +228,21 @@ function openPickupToast(itemId, soldDate, brand) {
 }
 
 function setDatesOfPickupToast(soldDate) {
-    // Hide all options first, to later determine which one to show
+    // Hide all options first, to later determine which ones to show
     radioFieldOne.style.display = 'none';
     radioFieldTwo.style.display = 'none';
     radioFieldThree.style.display = 'none';
     radioFieldFour.style.display = 'none';
 
-    // Get the 4 first bookable business days, starting 3 days after soldDate
+    // Create the 4 first possible pickup dates, starting 4 b-days after soldDate
     var firstDate = new Date(soldDate);
-    firstDate.setDate(firstDate.getDate() + 3);
+    firstDate.setDate(firstDate.getDate() + 4);
 
     // Om helgdag, skjut på det så att man bara kan välja veckodagar
-    if (firstDate.getDay() == 0) {
-        firstDate.setDate(firstDate.getDate() + 1);
-    } else if (firstDate.getDay() == 6) {
-        firstDate.setDate(firstDate.getDate() + 2);
+    if (firstDate.getDay() == 6 || firstDate.getDay() == 0 || firstDate.getDay() == 1 || firstDate.getDay() == 2) { 
+        firstDate.setDate(firstDate.getDate() + 2); // If sat, sun, mon, tue => compensate for weekend with 2 days
+    } else if (firstDate.getDay() == 3) { 
+        firstDate.setDate(firstDate.getDate() + 1); // If wednesday, add 1 days to compensate for sunday
     }
 
     var secondDate = new Date(firstDate);
