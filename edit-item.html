@@ -51,7 +51,6 @@
                         const noAnimals = data.noAnimals;
                         const userComment = data.userComment;
                         const images = data.images;
-                        imagesBeforeChange = images;
                         let frontImg = images.frontImage;
                         if (images.frontImageSmall) {
                             frontImg = images.frontImageSmall;
@@ -122,7 +121,6 @@
             });
     }
 
-    let imagesBeforeChange;
     async function saveChanges() {
         saveChangesButtonText.style.color = "#e2dede";
         console.log("changedImages: ", changedImages);
