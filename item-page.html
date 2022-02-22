@@ -7,22 +7,21 @@
 </script>
 
 <script>
+    // Get params
+    var queryStr = window.location.search; // will give ?id=fg6Hjkads8dsjklnas9
+    var paramPairs = queryStr.substr(1).split('&');
+    var params = {};
+    for (var i = 0; i < paramPairs.length; i++) {
+        var parts = paramPairs[i].split('=');
+        params[parts[0]] = parts[1];
+    }
+</script>
+
+<script>
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
             console.log('UID: ' + user.uid);
             userId = user.uid;
-
-            // Get params
-            var queryStr = window.location.search; // will give ?id=fg6Hjkads8dsjklnas9
-            var paramPairs = queryStr.substr(1).split('&');
-            var params = {};
-            for (var i = 0; i < paramPairs.length; i++) {
-                var parts = paramPairs[i].split('=');
-                params[parts[0]] = parts[1];
-            }
-
-            // Load item
-            loadItem(params.id);
         } else {
             console.log('No user is logged in');
             window.location.href = window.location.origin;
@@ -38,71 +37,75 @@
                 if (doc.exists) {
                     console.log("Item data:", doc.data());
                     data = doc.data();
-                    const brand = data.brand;
-                    const images = data.images;
-                    const imgUrl = images.frontImageSmall;
-                    const status = data.status;
-                    let statusText = "Försäljning pågår"
-                    let daysLeftText = "";
-                    let publishedDate = data.publishedDate;
-                    if (data.publishedDate) {
-                        publishedDate = new Date(publishedDate);
-                        var nowDate = new Date();
-                        var timeDifference = nowDate.getTime() - publishedDate.getTime();
-                        var daysDifference = timeDifference / (1000 * 3600 * 24);
-                        console.log(daysDifference);
-                        var daysLeft = Math.round(30 - daysDifference);
-                        console.log(daysLeft);
-                        if (daysLeft <= 0) {
-                            daysLeftText = `0 dagar kvar`;
-                        } else {
-                            daysLeftText = `${daysLeft} dagar kvar`;
+                    if (userId === data.user) {
+                        const brand = data.brand;
+                        const images = data.images;
+                        let imgUrl = images.frontImage;
+                        if (images.frontImageSmall){
+                            imgUrl = images.frontImageSmall;
                         }
-                    }
-                    let min = data.minPriceEstimate;
-                    let max = data.maxPriceEstimate;
-                    let valuation = "";
-                    if (min && max) {
-                        valuation = `${min}-${max} kr`;
-                    }
-                    let category = "";
-                    if (data.category) {
-                        category = data.category;
-                    }
-                    if (status == "New") {
-                        statusText = "Förbereds";
-                        daysLeftText = "";
-                        valuation = "Värdering pågår"
-                    }
+                        const status = data.status;
+                        let statusText = "Försäljning pågår"
+                        let daysLeftText = "";
+                        let publishedDate = data.publishedDate;
+                        if (data.publishedDate) {
+                            publishedDate = new Date(publishedDate);
+                            let nowDate = new Date();
+                            let timeDifference = nowDate.getTime() - publishedDate.getTime();
+                            let daysDifference = timeDifference / (1000 * 3600 * 24);
+                            console.log(daysDifference);
+                            let daysLeft = Math.round(30 - daysDifference);
+                            console.log(daysLeft);
+                            if (daysLeft <= 0) {
+                                daysLeftText = `0 dagar kvar`;
+                            } else {
+                                daysLeftText = `${daysLeft} dagar kvar`;
+                            }
+                        }
+                        let min = data.minPriceEstimate;
+                        let max = data.maxPriceEstimate;
+                        let valuation = "";
+                        if (min && max) {
+                            valuation = `${min}-${max} kr`;
+                        }
+                        let category = "";
+                        if (data.category) {
+                            category = data.category;
+                        }
+                        if (status == "New") {
+                            statusText = "Förbereds";
+                            daysLeftText = "";
+                            valuation = "Värdering pågår"
+                        }
 
+                        var pageTitleComponentHTML = `
+                            <div class="div-block-102">
+                                <div id="itemBrandText" class="text-block-16-copy">${brand}</div>
+                                <div id="itemCategoryText" class="text-block-62">${category}</div>
+                            </div>`;
 
-                    var pageTitleComponentHTML = `
-                        <div class="div-block-102">
-                            <div id="itemBrandText" class="text-block-16-copy">${brand}</div>
-                            <div id="itemCategoryText" class="text-block-62">${category}</div>
-                        </div>`;
-                    
-                    pageTitleDiv.innerHTML = pageTitleComponentHTML;
-                    pageTitleDiv.style.display = "block";
+                        pageTitleDiv.innerHTML = pageTitleComponentHTML;
+                        pageTitleDiv.style.display = "block";
 
-                    var itemComponentHTML = `
-                        <div class="div-block-104">
-                            <div class="div-block-103">
-                                <div class="ratio-box _16-9">
-                                    <div class="content-block with-image">
-                                        <div class="img-container" style="background-image: url('${imgUrl}');"></div>
+                        var itemComponentHTML = `
+                            <div class="div-block-104">
+                                <div class="div-block-103">
+                                    <div class="ratio-box _16-9">
+                                        <div class="content-block with-image">
+                                            <div class="img-container" style="background-image: url('${imgUrl}');"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="div-block-105">
-                            <div id="itemStatusText" class="text-block-16-copy">${statusText}</div>
-                            <div id="itemDaysLeftText" class="text-block-63">${daysLeftText}</div>
-                            <div id="itemValuationText" class="text-block-63">${valuation}</div>
-                        </div>`;
-                    itemDiv.innerHTML = itemComponentHTML;
-                    itemDiv.style.display = "block";
-                    loadingDiv.style.display = "none";
+                            <div class="div-block-105">
+                                <div id="itemStatusText" class="text-block-16-copy">${statusText}</div>
+                                <div id="itemDaysLeftText" class="text-block-63">${daysLeftText}</div>
+                                <div id="itemValuationText" class="text-block-63">${valuation}</div>
+                            </div>`;
+                        itemDiv.innerHTML = itemComponentHTML;
+                        itemDiv.style.display = "block";
+                        loadingDiv.style.display = "none";
+                    }
                 } else {
                     console.log("No such document!");
                 }
@@ -110,4 +113,11 @@
                 console.log("Error getting item document:", error);
             });
     }
+
+    editItemLink.addEventListener('click', function () {
+        window.location.href = window.location.origin + `/edit-item?id=${params.id}`;
+    });
+
+    // Load item
+    loadItem(params.id);
 </script>

@@ -14,7 +14,7 @@
             emptyListsInnerHTML();
             loadSoldByOthers(userId);
 
-            // MY ITEMS QUERY + Add cards to lists
+            //Build card lists
             db.collection("items")
                 .where("user", "==", userId)
                 .where("createdAt", "!=", false)
