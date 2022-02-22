@@ -331,7 +331,6 @@ function setDatesOfPickupToast(soldDate) {
         pickupDateTwo.innerHTML = days[dayTwo.getDay()] + ", " + dayTwo.getDate() + " " + months[dayTwo.getMonth()] + ", kl 9-16";
         radioFieldTwo.style.display = 'block';
     }
-
 }
 
 async function bookPickup() {
