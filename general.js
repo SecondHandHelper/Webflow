@@ -109,18 +109,26 @@ async function askForAdditionalUserDetails(userID) {
     let addressFirstName = "";
     let personalId;
     let personalIdExists = true;
+    let oneItemNotPaid = false
+    let oneItemNotSent = false;
 
     // First, get items with status "Sold" and shippingStatus "Not sent"
     await db.collection("items")
         .where("user", "==", userID)
         .where("status", "==", "Sold")
-        .where("shippingStatus", "==", "Not sent")
         .orderBy("soldDate")
         .get()
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 status = doc.data().status;
                 shippingStatus = doc.data().shippingStatus;
+                payoutStatus = doc.data().payoutStatus;
+                if(shippingStatus === "Not sent"){
+                    oneItemNotSent = true;
+                }
+                if(payoutStatus !== "Payed"){
+                    oneItemNotPaid = true;
+                }
             });
         });
 
@@ -143,7 +151,7 @@ async function askForAdditionalUserDetails(userID) {
     }
 
     // Redirect user to personalId form if they haven't added it yet
-    if (status == "Sold" && shippingStatus == "Not sent" && personalIdExists == false) {
+    if (status == "Sold" && oneItemNotPaid == true && personalIdExists == false) {
         window.location.href = window.location.origin + "/personal-id-form";
     }
 }
@@ -237,8 +245,6 @@ function setDatesOfPickupToast(soldDate) {
     // Create the 4 first possible pickup dates, starting 4 b-days after soldDate
     var firstDate = new Date(soldDate);
     firstDate.setDate(firstDate.getDate() + 4);
-
-    // Om helgdag, skjut på det så att man bara kan välja veckodagar
     if (firstDate.getDay() == 6 || firstDate.getDay() == 0 || firstDate.getDay() == 1 || firstDate.getDay() == 2) { 
         firstDate.setDate(firstDate.getDate() + 2); // If sat, sun, mon, tue => compensate for weekend with 2 days
     } else if (firstDate.getDay() == 3) { 
