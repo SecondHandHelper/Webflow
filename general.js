@@ -146,12 +146,12 @@ async function askForAdditionalUserDetails(userID) {
     });
 
     // Redirect user if user has no address and at least one item that's sold but not shipped
-    if (status == "Sold" && shippingStatus == "Not sent" && addressFirstName == undefined) {
+    if (oneItemNotSent == true && addressFirstName == undefined) {
         window.location.href = window.location.origin + "/address-form";
     }
 
     // Redirect user to personalId form if they haven't added it yet
-    if (status == "Sold" && oneItemNotPaid == true && personalIdExists == false) {
+    if (oneItemNotPaid == true && personalIdExists == false) {
         window.location.href = window.location.origin + "/personal-id-form";
     }
 }
