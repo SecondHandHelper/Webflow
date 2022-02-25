@@ -123,10 +123,10 @@ async function askForAdditionalUserDetails(userID) {
                 status = doc.data().status;
                 shippingStatus = doc.data().shippingStatus;
                 payoutStatus = doc.data().payoutStatus;
-                if(shippingStatus === "Not sent"){
+                if (shippingStatus === "Not sent") {
                     oneItemNotSent = true;
                 }
-                if(payoutStatus !== "Payed"){
+                if (payoutStatus !== "Payed") {
                     oneItemNotPaid = true;
                 }
             });
@@ -245,9 +245,9 @@ function setDatesOfPickupToast(soldDate) {
     // Create the 4 first possible pickup dates, starting 4 b-days after soldDate
     var firstDate = new Date(soldDate);
     firstDate.setDate(firstDate.getDate() + 4);
-    if (firstDate.getDay() == 6 || firstDate.getDay() == 0 || firstDate.getDay() == 1 || firstDate.getDay() == 2) { 
+    if (firstDate.getDay() == 6 || firstDate.getDay() == 0 || firstDate.getDay() == 1 || firstDate.getDay() == 2) {
         firstDate.setDate(firstDate.getDate() + 2); // If sat, sun, mon, tue => compensate for weekend with 2 days
-    } else if (firstDate.getDay() == 3) { 
+    } else if (firstDate.getDay() == 3) {
         firstDate.setDate(firstDate.getDate() + 1); // If wednesday, add 1 days to compensate for sunday
     }
 
@@ -390,4 +390,203 @@ function signOut() {
     }).catch((error) => {
 
     });
+}
+
+// FUNCTIONS FOR START PAGE (Logged out)
+function loadRecentlySold() {
+    console.log("Funktionen loadRecentlySold påbörjad!");
+    var data = {};
+
+    // [START fb_functions_call_add_message_error]
+    var addMessage = firebase.functions().httpsCallable('addMessage');
+
+    addMessage()
+        .then((result) => {
+            // Read result of the Cloud Function.
+            console.log('Cloud Function är klar! Nu gör vi något med resultatet!');
+
+            var itemListRecentlySoldStartPage = document.getElementById('itemListRecentlySoldStartPage');
+            itemListRecentlySoldStartPage.innerHTML = "";
+
+            data = result.data;
+
+            for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+                    var brand = data[key].brand;
+                    var soldPrice = data[key].soldPrice;
+                    var images = data[key].images;
+                    var imageUrl = images.frontImage;
+                    if (images.frontImageSmall) {
+                        imageUrl = images.frontImageSmall;
+                    }
+
+                    if (soldPrice >= 240) {
+                        var itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>${brand}</div></div>`;
+                        var itemListRecentlySoldStartPage = document.getElementById('itemListRecentlySoldStartPage');
+                        itemListRecentlySoldStartPage.innerHTML += itemCardHTML;
+                    }
+                }
+            }
+        })
+        .catch((error) => {
+            // Getting the Error details.
+            var code = error.code;
+            var message = error.message;
+            var details = error.details;
+            console.log('Error message: ', message, code);
+        });
+    // [END fb_functions_call_add_message_error]
+}
+
+// FUNCTIONS FOR ADDING USER DETAILS
+async function addUserDetails() {
+    // Grab values from form
+    const addressFirstName = document.getElementById("addressFirstName").value;
+    const addressLastName = document.getElementById("addressLastName").value;
+    const addressStreetAddress = document.getElementById("addressStreetAddress").value;
+    const addressPostalCode = document.getElementById("addressPostalCode").value;
+    const addressCity = document.getElementById("addressCity").value;
+    const addressDoorCode = document.getElementById("addressDoorCode").value;
+    const personalId = document.getElementById("personalId").value;
+
+    // Write to Firestore
+    const itemRef = db.collection('users').doc(window.uid);
+    itemRef.update({
+        addressFirstName: addressFirstName,
+        addressLastName: addressLastName,
+        addressStreetAddress: addressStreetAddress,
+        addressPostalCode: addressPostalCode,
+        addressCity: addressCity,
+        addressDoorCode: addressDoorCode,
+        personalId: personalId
+    })
+        .then(() => {
+            console.log(`User address of ${uid} is now updated`);
+            itemConfirmationDiv.style.display = 'block';
+            addressFormDiv.style.display = 'none';
+        })
+        .catch((error) => {
+            // The document probably doesn't exist.
+            console.error("Error updating document: ", error);
+        });
+}
+
+async function addUserAddress() {
+    // Grab values from form
+    const addressFirstName = document.getElementById("addressFirstName").value;
+    const addressLastName = document.getElementById("addressLastName").value;
+    const addressStreetAddress = document.getElementById("addressStreetAddress").value;
+    const addressPostalCode = document.getElementById("addressPostalCode").value;
+    const addressCity = document.getElementById("addressCity").value;
+    const addressDoorCode = document.getElementById("addressDoorCode").value;
+
+    // Write to Firestore
+    const itemRef = db.collection('users').doc(window.uid);
+    itemRef.update({
+        addressFirstName: addressFirstName,
+        addressLastName: addressLastName,
+        addressStreetAddress: addressStreetAddress,
+        addressPostalCode: addressPostalCode,
+        addressCity: addressCity,
+        addressDoorCode: addressDoorCode
+    })
+        .then(() => {
+            console.log(`User address of ${uid} is now updated`);
+            window.location.href = window.location.origin + "/private";
+        })
+        .catch((error) => {
+            // The document probably doesn't exist.
+            console.error("Error updating document: ", error);
+        });
+}
+
+async function addPersonalId() {
+    // Grab values from form
+    const personalId = document.getElementById("personalId").value;
+
+    // Write to Firestore
+    if (personalId) {
+        const itemRef = db.collection('users').doc(window.uid);
+        itemRef.update({
+            personalId: personalId
+        })
+            .then(() => {
+                console.log(`PersonalId of ${uid} is now updated`);
+                personalIdConfirmationDiv.style.display = 'block';
+                personalIdFormDiv.style.display = 'none';
+            })
+            .catch((error) => {
+                // The document probably doesn't exist.
+                console.error("Error updating document: ", error);
+            });
+    } else {
+        window.location.href = window.location.origin + "/private";
+    }
+}
+
+// FUNCTIONS FOR SELL ITEM PAGE
+function writePhoneNumberToFirestore(userID, phoneNumber) {
+    var docRef = db.collection("users").doc(userID);
+    console.log("writePhoneNumberToFirestore function is running!");
+
+    var formattedPhoneNumber = formatPhoneNumber(phoneNumber);
+
+    docRef.get().then((doc) => {
+        if (doc.exists) {
+            console.log("Document data:", doc.data());
+            console.log("Now adding the phone number to the user document");
+            // Update document
+            db.collection("users").doc(userID).update({
+                phoneNumber: formattedPhoneNumber
+            })
+                .then(() => {
+                    console.log("User document successfully updated with phone number: ", formattedPhoneNumber);
+                })
+                .catch((error) => {
+                    console.error("Error writing document: ", error);
+                });
+        } else {
+            // doc.data() will be undefined in this case
+            console.log("No such document! Creating it and adding phone number!");
+            // Add a new document in collection "users"
+            db.collection("users").doc(userID).set({
+                phoneNumber: formattedPhoneNumber
+            })
+                .then(() => {
+                    console.log("User document successfully written!");
+                })
+                .catch((error) => {
+                    console.error("Error writing document: ", error);
+                });
+        }
+    }).catch((error) => {
+        console.log("Error getting document:", error);
+    });
+}
+
+function calculateSellerGets(value, elementId, feeElementId) {
+
+    let div = document.getElementById(elementId);
+    let feeDiv = document.getElementById(feeElementId);
+    const price = parseFloat(value);
+    let sellerGets = 0;
+
+    if (price < 250) {
+        sellerGets = Math.ceil(price - 50);
+        if (sellerGets < 0) {
+            sellerGets = 0;
+        }
+        feeDiv.innerText = `Minst 50kr kommission`;
+    } else {
+        sellerGets = Math.ceil(price * 0.8);
+        feeDiv.innerText = `20% kommission`;
+    }
+
+    if (sellerGets >= 0) {
+        div.innerText = `Du får ${sellerGets} kr`;
+        div.style.display = 'block';
+
+    } else {
+        div.style.display = 'none';
+    }
 }
