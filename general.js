@@ -57,6 +57,8 @@ function updateIC(userId, em, ph) {
                 name: `${name}`,
                 city: `${city}`
             };
+
+            Intercom('update', fields);
         } else {
             console.log("No such user document exist!");
         }
