@@ -103,6 +103,9 @@
                             if (condition == options[i].innerText) {
                                 itemCondition.selectedIndex = i;
                                 itemCondition.style.color = "#333";
+                                if (options[i].innerText == "Använd, tecken på slitage"){
+                                    defectInfoDiv.style.display = 'block';
+                                }
                             }
                         }
 
@@ -156,7 +159,7 @@
     elementsArray.forEach(function (elem) {
         elem.addEventListener("input", function () {
             saveChangesButtonText.style.color = "#c24700";
-            saveChangesButtonText.innerHTML = "Spara";
+            saveChangesButtonText.innerHTML = "Sparar...";
             if (elem.id.includes("Image")){
                 changedImages.push(elem.id);
             }
@@ -165,9 +168,14 @@
 
     itemCondition.onchange = function () {
         let input = this.value;
-        if (input == "") {
+        if (input == "Använd, tecken på slitage") {
+            defectInfoDiv.style.display = 'block';
+            itemCondition.style.color = "#333";
+        } else if (input == "") {
+            defectInfoDiv.style.display = 'none';
             itemCondition.style.color = "#929292";
         } else {
+            defectInfoDiv.style.display = 'none';
             itemCondition.style.color = "#333";
         }
     };

@@ -53,9 +53,7 @@
                             let nowDate = new Date();
                             let timeDifference = nowDate.getTime() - publishedDate.getTime();
                             let daysDifference = timeDifference / (1000 * 3600 * 24);
-                            console.log(daysDifference);
-                            let daysLeft = Math.round(30 - daysDifference);
-                            console.log(daysLeft);
+                            let daysLeft = Math.round(31 - daysDifference);
                             if (daysLeft <= 0) {
                                 daysLeftText = `0 dagar kvar`;
                             } else {
