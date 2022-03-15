@@ -16,6 +16,17 @@
   verifyDiv.style.display = 'none';
   var form = document.getElementById("Phone-number-form");
 
+  // Disable Webflow form submit
+  $('#Password-form').submit(function () {
+    return false;
+  });
+  $('#Choose-password-form').submit(function () {
+    return false;
+  });
+
+
+  ////////// PHONE NUMBER SIGN IN
+
   form.addEventListener('submit', phoneSignIn);
 
   function phoneSignIn(event) {
@@ -52,18 +63,45 @@
       });
   }
 
-</script>
-
-<script>
-
+  signinButton.addEventListener('click', verifyCode);
   smsCodeButton.addEventListener('click', function () {
     mobileNumberDiv.style.display = 'block';
     orLoginOtherWayDiv.style.display = 'block';
     loginAlternativesDiv.style.display = 'none';
   });
 
+  function verifyCode() {
+    // [START auth_phone_verify_code]
+    const code = verificationCode.value;
+    console.log('Verify screen. My code: ' + code);
+    console.log('VerificationID' + confirmationResult.verificationId);
+    confirmationResult.confirm(code).then((result) => {
+      // User signed in successfully.
+      const user = result.user;
 
-  // GOOGLE AUTH STUFF
+      // Check browser support before useing Web storage
+      if (typeof (Storage) !== "undefined") {
+        sessionStorage.setItem("userId", user.uid);
+        sessionStorage.setItem("email", user.email);
+        sessionStorage.setItem("phone", user.phoneNumber);
+      } else {
+        console.log("Sorry, your browser does not support Web Storage...");
+      }
+
+      window.location.replace('./private');
+      // ...
+    }).catch((error) => {
+      // User couldn't sign in (bad verification code?)
+      // ...
+      console.log('My error: ' + error.message);
+    });
+    // [END auth_phone_verify_code]
+  }
+</script>
+
+<script>
+  ////////// GOOGLE ACCOUNT SIGN IN
+
   googleSignInButton.addEventListener('click', signInWithGoogle);
   googleSignInButton2.addEventListener('click', signInWithGoogle);
 
@@ -110,36 +148,116 @@
 
 </script>
 
-
 <script>
+  // EMAIL AND PASSWORD SIGN UP
 
-  signinButton.addEventListener('click', verifyCode);
-
-  function verifyCode() {
-    // [START auth_phone_verify_code]
-    const code = verificationCode.value;
-    console.log('Verify screen. My code: ' + code);
-    console.log('VerificationID' + confirmationResult.verificationId);
-    confirmationResult.confirm(code).then((result) => {
-      // User signed in successfully.
-      const user = result.user;
-
-      // Check browser support before useing Web storage
-      if (typeof (Storage) !== "undefined") {
-        sessionStorage.setItem("userId", user.uid);
-        sessionStorage.setItem("email", user.email);
-        sessionStorage.setItem("phone", user.phoneNumber);
-      } else {
-        console.log("Sorry, your browser does not support Web Storage...");
-      }
-
-      window.location.replace('./private');
-      // ...
-    }).catch((error) => {
-      // User couldn't sign in (bad verification code?)
-      // ...
-      console.log('My error: ' + error.message);
-    });
-    // [END auth_phone_verify_code]
+  function signInWithEmailPassword() {
+    const email = emailAddress.value;
+    const password = emailPassword.value;
+    signInWithEmailButton.style.display = 'none';
+    passwordLoadIcon.style.display = 'block';
+    // [START auth_signin_password]
+    firebase.auth().signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        // Signed in
+        var user = userCredential.user;
+        console.log("Logged in user: ", user.uid);
+        window.location.replace('./private');
+      })
+      .catch((error) => {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log("Error message:", errorCode, errorMessage);
+        if (errorCode = "auth/wrong-password") {
+          passwordFeedback.innerText = "Fel lösenord";
+          passwordFeedback.style.display = 'block';
+          signInWithEmailButton.style.display = 'block';
+          passwordLoadIcon.style.display = 'none';
+        }
+      });
+    // [END auth_signin_password]
   }
+
+  function signUpWithEmailPassword() {
+    const email = emailAddress.value;
+    const password = newPassword.value;
+    signUpWithEmailButton.style.display = 'none';
+    newPasswordLoadIcon.style.display = 'block';
+    // [START auth_signup_password]
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        // Signed in 
+        var user = userCredential.user;
+        console.log("Logged in user: ", user.uid);
+        window.location.replace('./private');
+      })
+      .catch((error) => {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log("Error message:", errorCode, errorMessage);
+        newPasswordFeedback.innerText = errorMessage;
+        signUpWithEmailButton.style.display = 'block';
+        newPasswordLoadIcon.style.display = 'none';
+      });
+    // [END auth_signup_password]
+  }
+
+  function sendEmailVerification() {
+    // [START auth_send_email_verification]
+    firebase.auth().currentUser.sendEmailVerification()
+      .then(() => {
+        // Email verification sent!
+        // ...
+      });
+    // [END auth_send_email_verification]
+  }
+
+  function sendPasswordReset() {
+    const email = "sam@example.com";
+    // [START auth_send_password_reset]
+    firebase.auth().sendPasswordResetEmail(email)
+      .then(() => {
+        // Password reset email sent!
+        // ..
+      })
+      .catch((error) => {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // ..
+      });
+    // [END auth_send_password_reset]
+  }
+
+  function checkEmail() {
+    const email = emailAddress.value;
+    console.log("emailAddress: ", email);
+
+    firebase.auth().fetchSignInMethodsForEmail(email)
+      .then((signInMethods) => {
+        if (signInMethods.indexOf(
+          firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD) != -1) {
+          // User can sign in with email/password.
+          console.log("Account exists -> Login with email");
+          chooseEmailDiv.style.display = 'none';
+          signinWithEmailDiv.style.display = 'block';
+        } else {
+          // User have to register instead of signing in.
+          console.log("Account doesn't exist -> Create new account");
+          chooseEmailDiv.style.display = 'none';
+          choosePasswordDiv.style.display = 'block';
+        }
+      })
+      .catch((error) => {
+        console.log("Error message:", error.code, error.message);
+      });
+  }
+
+  //Eventlisteners
+  emailNextStepButton.addEventListener('click', checkEmail);
+  emailAndPasswordButton.addEventListener('click', function () {
+    chooseEmailDiv.style.display = 'block';
+    loginAlternativesDiv.style.display = 'none';
+  });
+  signUpWithEmailButton.addEventListener('click', signUpWithEmailPassword);
+  signInWithEmailButton.addEventListener('click', signInWithEmailPassword);
 </script>
