@@ -14,7 +14,6 @@
   mobileNumberDiv.style.display = 'none';
   orLoginOtherWayDiv.style.display = 'none';
   verifyDiv.style.display = 'none';
-  var form = document.getElementById("Phone-number-form");
 
   // Disable Webflow form submit
   $('#Password-form').submit(function () {
@@ -24,9 +23,8 @@
     return false;
   });
 
-
   ////////// PHONE NUMBER SIGN IN
-
+  var form = document.getElementById("Phone-number-form");
   form.addEventListener('submit', phoneSignIn);
 
   function phoneSignIn(event) {
@@ -34,7 +32,6 @@
 
     submitLoadIcon.style.display = 'block';
     sendCodeButton.style.display = 'none';
-    sendCodeButton
     const formPhoneNumber = signinPhoneNumber.value;
     const phoneNumber = `+46${formPhoneNumber}`;
 
@@ -162,7 +159,14 @@
         // Signed in
         var user = userCredential.user;
         console.log("Logged in user: ", user.uid);
-        window.location.replace('./private');
+        const emailVerified = firebase.auth().currentUser.emailVerified;
+        if (!emailVerified) {
+          sendEmailVerification();
+          waitOnVerificationDiv.style.display = 'block';
+          signinWithEmailDiv.style.display = 'none';
+        } else {
+          window.location.replace('./private');
+        }
       })
       .catch((error) => {
         var errorCode = error.code;
@@ -189,7 +193,14 @@
         // Signed in 
         var user = userCredential.user;
         console.log("Logged in user: ", user.uid);
-        window.location.replace('./private');
+        const emailVerified = firebase.auth().currentUser.emailVerified;
+        if (!emailVerified) {
+          sendEmailVerification();
+          waitOnVerificationDiv.style.display = 'block';
+          choosePasswordDiv.style.display = 'none';
+        } else {
+          window.location.replace('./private');
+        }
       })
       .catch((error) => {
         var errorCode = error.code;
@@ -231,7 +242,6 @@
   function checkEmail() {
     const email = emailAddress.value;
     console.log("emailAddress: ", email);
-
     firebase.auth().fetchSignInMethodsForEmail(email)
       .then((signInMethods) => {
         if (signInMethods.indexOf(
@@ -260,4 +270,13 @@
   });
   signUpWithEmailButton.addEventListener('click', signUpWithEmailPassword);
   signInWithEmailButton.addEventListener('click', signInWithEmailPassword);
+
+  window.addEventListener('focus', function () {
+    if (waitOnVerificationDiv.style.display == 'block') {
+      const emailVerified = firebase.auth().currentUser.emailVerified;
+      if (emailVerified) {
+        window.location.replace('./private');
+      }
+    }
+  });
 </script>
