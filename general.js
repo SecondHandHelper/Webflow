@@ -286,25 +286,25 @@ function setDatesOfPickupToast(soldDate) {
     if (firstDate > today) {
         $('#radioButtonOne').val(firstDate.toISOString().split('T')[0]); //yyyy-mm-dd
         pickupDateOne.innerHTML = days[firstDate.getDay()] + ", " + firstDate.getDate() + " " + months[firstDate.getMonth()] + ", kl 9-16";
-        radioFieldOne.style.display = 'block';
+        radioFieldOne.style.display = 'flex';
         optionsDisplayed++;
     }
     if (secondDate > today) {
         $('#radioButtonTwo').val(secondDate.toISOString().split('T')[0]);
         pickupDateTwo.innerHTML = days[secondDate.getDay()] + ", " + secondDate.getDate() + " " + months[secondDate.getMonth()] + ", kl 9-16";
-        radioFieldTwo.style.display = 'block';
+        radioFieldTwo.style.display = 'flex';
         optionsDisplayed++;
     }
     if (thirdDate > today) {
         $('#radioButtonThree').val(thirdDate.toISOString().split('T')[0]);
         pickupDateThree.innerHTML = days[thirdDate.getDay()] + ", " + thirdDate.getDate() + " " + months[thirdDate.getMonth()] + ", kl 9-16";
-        radioFieldThree.style.display = 'block';
+        radioFieldThree.style.display = 'flex';
         optionsDisplayed++;
     }
     if (forthDate > today) {
         $('#radioButtonFour').val(forthDate.toISOString().split('T')[0]);
         pickupDateFour.innerHTML = days[forthDate.getDay()] + ", " + forthDate.getDate() + " " + months[forthDate.getMonth()] + ", kl 9-16";
-        radioFieldFour.style.display = 'block';
+        radioFieldFour.style.display = 'flex';
         optionsDisplayed++;
     }
 
@@ -332,12 +332,12 @@ function setDatesOfPickupToast(soldDate) {
         // Show tomorrow as an option
         $('#radioButtonOne').val(dayOne.toISOString().split('T')[0]);
         pickupDateOne.innerHTML = days[dayOne.getDay()] + ", " + dayOne.getDate() + " " + months[dayOne.getMonth()] + ", kl 9-16";
-        radioFieldOne.style.display = 'block';
+        radioFieldOne.style.display = 'flex';
 
         // Show day after tomorrow as an option
         $('#radioButtonTwo').val(dayTwo.toISOString().split('T')[0]);
         pickupDateTwo.innerHTML = days[dayTwo.getDay()] + ", " + dayTwo.getDate() + " " + months[dayTwo.getMonth()] + ", kl 9-16";
-        radioFieldTwo.style.display = 'block';
+        radioFieldTwo.style.display = 'flex';
     }
 }
 
