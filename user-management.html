@@ -32,6 +32,10 @@
             // Display email verification handler and UI.
             handleVerifyEmail(auth, actionCode, continueUrl, lang);
             break;
+        case 'sendEmailVerification':
+            // Display email verification handler and UI.
+            sendEmailVerification(auth);
+            break;
         default:
         // Error: invalid mode.
     }
@@ -111,6 +115,7 @@
             // Show confirmation.
             emailVerifiedDiv.style.display = 'block';
             loadingDiv.style.display = 'none';
+            toMaiButton.style.display = 'block';
         }).catch((error) => {
             emailVerificationFailedDiv.style.display = 'block';
             loadingDiv.style.display = 'none';
@@ -119,4 +124,21 @@
         });
     }
     // [END auth_handle_verify_email]
+
+    function sendEmailVerification(auth) {
+        verifyEmailDiv.style.display = 'block';
+        loadingDiv.style.display = 'none';
+    }
+
+    sendEmailVerificationButton.addEventListener('click', function sendEmail() {
+        firebase.auth().currentUser.sendEmailVerification()
+            .then(() => {
+                // Email verification sent!
+                emailSentDiv.style.display = 'block';
+                sendEmailVerificationButton.style.display = 'none';
+                setTimeout(function showButton() {
+                    toMaiButton.style.display = 'block';
+                }, 5000);
+            });
+    });
 </script>

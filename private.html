@@ -5,15 +5,20 @@
     setInitialStylePrivatePage();// Styling initial state
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
+            console.log("user", user);
             userId = user.uid;
             email = user.email;
             phone = user.phoneNumber;
+            emailVerified = user.emailVerified;
             updateIC(userId, email, phone);
             askForAdditionalUserDetails(userId);
             updateFirestoreUserDocument(userId, email, phone);
             emptyListsInnerHTML();
             loadSoldByOthers(userId);
             buildCardLists(userId);
+            if (!emailVerified && email){
+                window.location.replace('./user-management?mode=sendEmailVerification');
+            }
         } else {
             console.log('No user');
         }
