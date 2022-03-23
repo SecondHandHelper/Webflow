@@ -1,21 +1,5 @@
 // FUNCTIONS FOR PRIVATE PAGE
 
-function setInitialStylePrivatePage() {
-    noItemsDiv.style.display = "none";
-    myItemsDiv.style.display = "none";
-    soldNotSentDiv.style.display = "none";
-    soldItemsDiv.style.display = "none";
-    soldByOthersDiv.style.display = "none";
-    itemListSoldContainer.style.display = "none";
-    headerSellItemButton.style.display = "none";
-    header.style.backgroundColor = "transparent";
-    quickInfoDiv.style.display = "none";
-    bookPickupToast.style.display = "none";
-    openQuestionDiv.style.display = "none";
-    feedbackForm.style.display = "none";
-    feedbackSubmitButton.style.display = "none";
-}
-
 function updateIC(userId, em, ph) {
     let email = em;
     let phone = ph;
@@ -198,7 +182,6 @@ function getPickupTimeInfoDiv(pickupDate) {
     var pickupTimeInfoText = dayName + ", " + dateNumber + " " + monthName + ", kl 9-16";
     const div = `<div id="pickupTimeInfoDiv" class="div-block-54">
                                         <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/608db91c363e28ae251e0998_delivery-truck%204.svg" loading="lazy" width="34" alt="" class="image-12">
-                                        <div class="text-pickup-small">Hämtas upp</div>
                                         <div id="pickupTimeInfoText" class="text-pickup-small">${pickupTimeInfoText}</div>
                                     </div>`;
     return div;
@@ -246,6 +229,7 @@ function setDatesOfPickupToast(soldDate) {
 
     // Create the 4 first possible pickup dates, starting 4 b-days after soldDate
     var firstDate = new Date(soldDate);
+    firstDate.setTime(firstDate.getTime() + (1*60*60*1000)); // With soldDate on format "yyyy-m-dd" (note one m) the time is set to 00 which resulted in bug, had to add 1 hour, or fix the format.
     firstDate.setDate(firstDate.getDate() + 4);
     if (firstDate.getDay() == 6 || firstDate.getDay() == 0 || firstDate.getDay() == 1 || firstDate.getDay() == 2) {
         firstDate.setDate(firstDate.getDate() + 2); // If sat, sun, mon, tue => compensate for weekend with 2 days
