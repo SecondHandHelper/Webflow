@@ -4,6 +4,7 @@
             console.log('Mobilnummer: ' + user.phoneNumber);
             console.log('UID: ' + user.uid);
             window.uid = user.uid;
+            console.log("window:", window);
 
             // Om användare ej har document i users -> skapa dokument och lägg till telefonnummer
             if (user.phoneNumber) {
