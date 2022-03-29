@@ -182,7 +182,7 @@ function getPickupTimeInfoDiv(pickupDate) {
     var pickupTimeInfoText = dayName + ", " + dateNumber + " " + monthName + ", kl 9-16";
     const div = `<div id="pickupTimeInfoDiv" class="div-block-54">
                                         <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/608db91c363e28ae251e0998_delivery-truck%204.svg" loading="lazy" width="34" alt="" class="image-12">
-                                        <div id="pickupTimeInfoText" class="text-pickup-small">${pickupTimeInfoText}</div>
+                                        <div id="pickupTimeInfoText" class="next-step-text-small">${pickupTimeInfoText}</div>
                                     </div>`;
     return div;
 }
@@ -201,6 +201,7 @@ function closePickupToast() {
 
 function closeFeedbackForm() {
     feedbackForm.style.display = 'none';
+    location.reload();
 }
 
 function emptyListsInnerHTML() {
@@ -339,6 +340,7 @@ async function bookPickup() {
         pickupDate: pickupDate
     }).then(function () {
         console.log(`pickupDate is now set on Firestore item`);
+        storeShippingMethod(pickupFlowItemId, 'Pickup');
         bookPickupToast.style.display = 'none';
         feedbackForm.style.display = 'block';
         happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
