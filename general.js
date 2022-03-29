@@ -212,12 +212,13 @@ function emptyListsInnerHTML() {
 }
 
 // PICKUP RELATED FUNCTIONS
-var currentBrand = "";
 
-function openPickupToast(itemId, soldDate, brand) {
+function openPickupToast(itemId, soldDate) {
     setDatesOfPickupToast(soldDate);
     window.pickupFlowItemId = itemId;
-    currentBrand = brand;
+    if (shippingMethodToast.style.display == 'block'){  
+        document.getElementById('triggerShippingToastClose').click();
+    }
     document.getElementById('triggerPickupAnimation').click();
 }
 
@@ -344,7 +345,7 @@ async function bookPickup() {
         bookPickupToast.style.display = 'none';
         feedbackForm.style.display = 'block';
         happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
-    av ditt ${currentBrand}-plagg?`;
+    av ditt plagg?`;
     });
 }
 
