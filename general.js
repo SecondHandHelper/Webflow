@@ -200,7 +200,10 @@ function closePickupToast() {
 }
 
 function closeFeedbackForm() {
-    location.reload();
+    document.getElementById('triggerFeedbackFormClose').click();
+        setTimeout(function () {
+            location.reload();
+        }, 400);
 }
 
 function emptyListsInnerHTML() {
@@ -366,10 +369,7 @@ async function storeFeedback() {
         feedbackText: value
     }).then(function () {
         console.log(`feedbackText is now set on Firestore item`);
-        document.getElementById('triggerFeedbackFormClose').click();
-        setTimeout(function () {
-            location.reload();
-        }, 500);
+        closeFeedbackForm();
     });
 }
 
