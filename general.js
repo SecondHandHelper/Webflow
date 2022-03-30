@@ -200,10 +200,7 @@ function closePickupToast() {
 }
 
 function closeFeedbackForm() {
-    document.getElementById('triggerFeedbackFormClose').click();
-    setTimeout(function () {
-        location.reload();
-    }, 500);
+    location.reload();
 }
 
 function emptyListsInnerHTML() {
@@ -347,7 +344,6 @@ async function bookPickup() {
         bookPickupToast.style.display = 'none';
         happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
     av ditt plagg?`;
-        document.getElementById('triggerFeedbackFormOpen').click();
     });
 }
 
@@ -370,7 +366,7 @@ async function storeFeedback() {
         feedbackText: value
     }).then(function () {
         console.log(`feedbackText is now set on Firestore item`);
-        document.getElementById('triggerFeedbackFormOpen').click();
+        document.getElementById('triggerFeedbackFormClose').click();
         setTimeout(function () {
             location.reload();
         }, 500);

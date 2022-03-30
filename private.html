@@ -105,11 +105,14 @@
             window.pickupFlowItemId = itemId; // Legacy from before. Bad way of doing it. Should clean up 'pickupFlowItemId' at some point.
             if (method == "Service point") {
                 feedbackFormTitle.innerText = 'Tack, då vet vi att paketet snart lämnas till ett ombud.'
+                document.getElementById('triggerShippingToastClose').click();
+            } else if (method == "Pickup") {
+                closePickupToast();
             }
             happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
 av ditt plagg?`;
+            
             document.getElementById('triggerFeedbackFormOpen').click();
-
         });
     }
 
