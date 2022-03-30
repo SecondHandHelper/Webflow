@@ -196,12 +196,14 @@ function getBookPickupButton(itemId, soldDate, brand) {
 }
 
 function closePickupToast() {
-    bookPickupToast.style.display = 'none';
+    document.getElementById('triggerPickupToastClose').click();
 }
 
 function closeFeedbackForm() {
-    feedbackForm.style.display = 'none';
-    location.reload();
+    document.getElementById('triggerFeedbackFormClose').click();
+    setTimeout(function () {
+        location.reload();
+    }, 500);
 }
 
 function emptyListsInnerHTML() {
@@ -216,7 +218,7 @@ function emptyListsInnerHTML() {
 function openPickupToast(itemId, soldDate) {
     setDatesOfPickupToast(soldDate);
     window.pickupFlowItemId = itemId;
-    if (shippingMethodToast.style.display == 'block'){  
+    if (shippingMethodToast.style.display == 'block') {
         document.getElementById('triggerShippingToastClose').click();
     }
     document.getElementById('triggerPickupAnimation').click();
@@ -231,7 +233,7 @@ function setDatesOfPickupToast(soldDate) {
 
     // Create the 4 first possible pickup dates, starting 4 b-days after soldDate
     var firstDate = new Date(soldDate);
-    firstDate.setTime(firstDate.getTime() + (1*60*60*1000)); // With soldDate on format "yyyy-m-dd" (note one m) the time is set to 00 which resulted in bug, had to add 1 hour, or fix the format.
+    firstDate.setTime(firstDate.getTime() + (1 * 60 * 60 * 1000)); // With soldDate on format "yyyy-m-dd" (note one m) the time is set to 00 which resulted in bug, had to add 1 hour, or fix the format.
     firstDate.setDate(firstDate.getDate() + 4);
     if (firstDate.getDay() == 6 || firstDate.getDay() == 0 || firstDate.getDay() == 1 || firstDate.getDay() == 2) {
         firstDate.setDate(firstDate.getDate() + 2); // If sat, sun, mon, tue => compensate for weekend with 2 days
@@ -343,9 +345,9 @@ async function bookPickup() {
         console.log(`pickupDate is now set on Firestore item`);
         storeShippingMethod(pickupFlowItemId, 'Pickup');
         bookPickupToast.style.display = 'none';
-        feedbackForm.style.display = 'block';
         happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
     av ditt plagg?`;
+        document.getElementById('triggerFeedbackFormOpen').click();
     });
 }
 
@@ -368,8 +370,10 @@ async function storeFeedback() {
         feedbackText: value
     }).then(function () {
         console.log(`feedbackText is now set on Firestore item`);
-        feedbackForm.style.display = 'none';
-        location.reload();
+        document.getElementById('triggerFeedbackFormOpen').click();
+        setTimeout(function () {
+            location.reload();
+        }, 500);
     });
 }
 

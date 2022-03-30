@@ -8,7 +8,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-functions.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.13/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.16/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.1/autocomplete-brands.js"></script>
 
 <script>
@@ -50,7 +50,7 @@
   }
 
   // Temporary redirect from Home to Home Desktop if user is on desktop, and not for the test domain
-  if (!isMobile && !(path == "/home-desktop" || path == "/privacy-policy" || path == "/end-user-agreement" || path == "/private") && !domain.includes("shh-test")) {
+  if (!isMobile && !(path == "/home-desktop" || path == "/privacy-policy" || path == "/end-user-agreement" || path == "/private" || path == "/user-management") && !domain.includes("shh-test")) {
     window.location.replace('./home-desktop');
   }
 
@@ -111,6 +111,7 @@
           var acceptPrice = doc.data().acceptPrice;
           var pricing = doc.data().pricing;
           var pickupDate = doc.data().pickupDate;
+          var shippingMethod = doc.data().shippingMethod;
           var archived = doc.data().archived;
           var frontImageUrl = images.frontImage;
           if (images.frontImageSmall) {
@@ -130,7 +131,6 @@
               daysLeftText = `${daysLeft} dagar kvar`;
             }
           }
-
           if (archived == undefined && status != "Unsold") {
             displayItemCard();
           }
@@ -154,19 +154,7 @@
               }
 
               let itemPageUrl = window.location.origin + `/item?id=${itemId}`;
-              let sellingItemCardHTML = `
-              <div class="div-block-14">
-                  <a id="itemLinkBlock" href="${itemPageUrl}" class="link-block-18 w-inline-block">
-                    <div class="ratio-box _16-9">
-                      <div class="conten-block with-image">
-                        <div class="img-container" style="background-image: url('${frontImageUrl}');"></div>
-                      </div>
-                    </div>
-                    <div class="text-block-14">${brand}</div>
-                    ${textDiv1}
-                    ${textDiv2}
-                  </a>
-              </div>`;
+              let sellingItemCardHTML = `<div class="div-block-14"><a id="itemLinkBlock" href="${itemPageUrl}" class="link-block-18 w-inline-block"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div><div class="text-block-14">${brand}</div>${textDiv1}${textDiv2}</a></div>`;
               itemListSelling.innerHTML += sellingItemCardHTML;
 
               //Display list
@@ -177,28 +165,26 @@
               sellButtonText.innerHTML = "Sälj ett plagg";
 
             } else if (status == "Sold" && shippingStatus != "Sent") {
-              //If buyer info exists, show info
-              var buyerInfoTextHTML = "";
+              var buyerInfoTextHTML = '';
               if (buyerFirstName != null && buyerAddressCity != null) {
                 buyerInfoTextHTML = `<div class="text-block-44">Till ${buyerFirstName} i ${buyerAddressCity}</div>`;
               }
 
-              var pickupTimeInfoDiv = getPickupTimeInfoDiv(pickupDate);
-              var bookPickupButton = getBookPickupButton(itemId, soldDate, brand);
-              var soldNotSentCardHTML = ``;
-
-              if (pickupDate) {
-                soldNotSentCardHTML =
-                  `<div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">Såld för ${soldPrice} kr</div>${buyerInfoTextHTML}<div class="text-block-44">Du får ${sellerGets} kr</div>
-                                    ${pickupTimeInfoDiv}
-                                </div></div></div>`;
+              var bagReceivedCheckbox = '';
+              var shippingInfoDiv = '';
+              if (!shippingMethod) {
+                bagReceivedCheckbox = getBagReceivedCheckbox(itemId, soldDate);
               } else {
-                soldNotSentCardHTML =
-                  `<div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">Såld för ${soldPrice} kr</div>${buyerInfoTextHTML}<div class="text-block-44">Du får ${sellerGets} kr</div>
-                                    ${bookPickupButton}
-                                </div></div></div>`;
+                shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
               }
 
+              //Create card
+              var soldNotSentCardHTML = ``;
+              soldNotSentCardHTML =
+                `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">Såld för ${soldPrice} kr</div>${buyerInfoTextHTML}<div class="text-block-44">Du får ${sellerGets} kr</div>
+                      ${bagReceivedCheckbox}
+                      ${shippingInfoDiv}
+                  </div></div></div></div>`;
               itemListSoldNotSent.innerHTML += soldNotSentCardHTML;
 
               // Display list
@@ -224,9 +210,7 @@
       });
   }
 </script>
-
 <script>
-
   function formatPhoneNumber(str) {
     if (str.slice(0, 1) == 0 && str.length == 10) {
       str = str.substring(1);
@@ -263,24 +247,8 @@
     const lowestAcceptPrice = Number(itemLowestAcceptPrice.value);
     const phoneNumber = itemPhoneNumber.value;
 
-    let defectElements = new Map()
-      .set("hole", hole.checked)
-      .set("stain", stain.checked)
-      .set("lostFit", lostFit.checked)
-      .set("nopprig", nopprig.checked)
-      .set("threadUp", threadUp.checked)
-      .set("colorChange", colorChange.checked)
-      .set("otherDefect", otherDefect.checked);
-
-    let defectsChoicesInSwedish = new Map()
-      .set("hole", "Hål")
-      .set("stain", "Fläck")
-      .set("lostFit", "Tappad passform")
-      .set("nopprig", "Nopprig")
-      .set("threadUp", "Trådsläpp")
-      .set("colorChange", "Färgändring")
-      .set("otherDefect", "Annat");
-
+    let defectElements = new Map().set("hole", hole.checked).set("stain", stain.checked).set("lostFit", lostFit.checked).set("nopprig", nopprig.checked).set("threadUp", threadUp.checked).set("colorChange", colorChange.checked).set("otherDefect", otherDefect.checked);
+    let defectsChoicesInSwedish = new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
     let defects = [];
 
     defectElements.forEach(async (value, key) => {
@@ -377,9 +345,7 @@
 
       // Uploads files and gather URLs in an object "imagePaths"
       const storageRef = storage.ref();
-
       images.forEach(async (value, key) => {
-
         let imagePathReference = `images/${itemId}/${key}`;
         console.log(imagePathReference);
 
