@@ -95,7 +95,9 @@
                         for (let i = 0; i < options.length; i++) {
                             if (age == options[i].attributes.value.value) {
                                 itemAge.selectedIndex = i;
-                                itemAge.style.color = "#333";
+                                if (age != ""){
+                                    itemAge.style.color = "#333";
+                                }
                             }
                         }
                         options = itemCondition.options;
@@ -159,7 +161,7 @@
     elementsArray.forEach(function (elem) {
         elem.addEventListener("input", function () {
             saveChangesButtonText.style.color = "#c24700";
-            saveChangesButtonText.innerHTML = "Sparar...";
+            saveChangesButtonText.innerHTML = "Spara";
             if (elem.id.includes("Image")){
                 changedImages.push(elem.id);
             }
