@@ -95,7 +95,7 @@
                         for (let i = 0; i < options.length; i++) {
                             if (age == options[i].attributes.value.value) {
                                 itemAge.selectedIndex = i;
-                                if (age != ""){
+                                if (age != "") {
                                     itemAge.style.color = "#333";
                                 }
                             }
@@ -105,7 +105,7 @@
                             if (condition == options[i].innerText) {
                                 itemCondition.selectedIndex = i;
                                 itemCondition.style.color = "#333";
-                                if (options[i].innerText == "Använd, tecken på slitage"){
+                                if (options[i].innerText == "Använd, tecken på slitage") {
                                     defectInfoDiv.style.display = 'block';
                                 }
                             }
@@ -132,29 +132,21 @@
         updateItem(params.id, changedImages);
     }
 
-    // Event listeners
-    let frontImageUpload = document.getElementById("frontImage");
-    let frontImagePreviewUploading = document.getElementById("frontImagePreviewUploading");
-    let frontImagePreview = document.getElementById("frontImagePreview");
-    let brandTagImageUpload = document.getElementById("brandTagImage");
-    let brandTagImagePreviewUploading = document.getElementById("brandTagImagePreviewUploading");
-    let brandTagImagePreview = document.getElementById("brandTagImagePreview");
-    frontImageUpload.onchange = function () {
-        let input = this.files[0];
-        if (input) {
-            let src = URL.createObjectURL(input);
-            frontImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-            frontImagePreview.style.backgroundImage = `url('${src}')`;
-        }
-    };
-    brandTagImageUpload.onchange = function () {
-        let input = this.files[0];
-        if (input) {
-            let src = URL.createObjectURL(input);
-            brandTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-            brandTagImagePreview.style.backgroundImage = `url('${src}')`;
-        }
-    };
+    // EVENT LISTENERS
+    let imageElementIds = ['frontImage', 'brandTagImage', 'materialTagImage', 'productImage','defectImage','extraImage'];
+    imageElementIds.forEach(function (id) {
+        let elemUpload = document.getElementById(id);
+        let elemPreviewUploading = document.getElementById(`${id}PreviewUploading`);
+        let elemPreview = document.getElementById(`${id}Preview`);
+        elemUpload.addEventListener("change", function () {
+            let input = this.files[0];
+            if (input) {
+                let src = URL.createObjectURL(input);
+                elemPreviewUploading.style.backgroundImage = `url('${src}')`;
+                elemPreview.style.backgroundImage = `url('${src}')`;
+            }
+        });
+    });
 
     let changedImages = [];
     let elementsArray = document.querySelectorAll("input");
@@ -162,7 +154,7 @@
         elem.addEventListener("input", function () {
             saveChangesButtonText.style.color = "#c24700";
             saveChangesButtonText.innerHTML = "Spara";
-            if (elem.id.includes("Image")){
+            if (elem.id.includes("Image")) {
                 changedImages.push(elem.id);
             }
         });
