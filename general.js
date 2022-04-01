@@ -213,6 +213,100 @@ function emptyListsInnerHTML() {
     itemListSoldByOthers.innerHTML = "";
 }
 
+function getBagReceivedCheckbox(itemId, soldDate) {
+    console.log("getBagReceivedCheckbox");
+    const div = `<div class="w-form">
+        <form method="get" name="wf-form-" id="bagReceivedForm">
+            <label class="w-checkbox checkbox-field-3">
+                <div class="w-checkbox-input w-checkbox-input--inputType-custom checkbox-2"></div>
+                <input type="checkbox" id="bagReceivedCheckbox-${itemId}" style="opacity:0;position:absolute;z-index:-1" onclick="javascript:bagReceivedAction(this, '${itemId}', '${soldDate}');">
+                <span class="checkbox-label-3 w-form-label">Påsen har kommit</span>
+            </label>
+        </form>
+    </div>`;
+    return div;
+}
+
+// SHIPPING FUNCTIONS
+
+function bagReceivedAction(checkbox, itemId, soldDate) {
+    if (checkbox.checked == true) {
+        db.collection('items').doc(itemId).update({ bagReceived: true }).then((docRef) => {
+            console.log(`Stored in DB that bag is received for item with ID: `, itemId);
+        });
+        openShippingToast(itemId, soldDate);
+    } else {
+        db.collection('items').doc(itemId).update({ bagReceived: false }).then((docRef) => {
+            console.log(`Stored in DB that bag is NOT received for item with ID: `, itemId);
+        });
+    }
+}
+
+function openShippingToast(itemId, soldDate) {
+    console.log("openShippingToast");
+    window.pickupFlowItemId = itemId;
+    shippingOptionsDiv.innerHTML = `<a href="javascript:storeShippingMethod('${itemId}', 'Service point');" class="link-block-22 w-inline-block"><div class="div-block-122">
+        <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/62436932a8d26f07254b45e2_parcel.png" loading="lazy" width="45" alt="" class="image-24">
+        <div class="small-button-text">Lämna till ombud</div></div>
+    </a>
+    <a href="javascript:openPickupToast('${itemId}', '${soldDate}');" class="link-block-22 w-inline-block"><div class="div-block-122">
+        <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/608db91c363e28ae251e0998_delivery-truck%204.svg" loading="lazy" width="45" alt="" class="image-24">
+        <div class="small-button-text">Boka upphämtning</div></div>
+    </a>`;
+    document.getElementById('triggerShippingToastOpen').click();
+}
+
+function getShippingInfoDiv(itemId, method, soldDate, pickupDate) {
+    let uniquePart = ``;
+    if (method == "Service point") {
+        uniquePart += `
+        <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/62436932a8d26f07254b45e2_parcel.png" loading="lazy" width="26" alt="" class="image-12">
+            <div class="next-step-text-small">Lämna till ombud</div>
+        `;
+    } else if (method == "Pickup") {
+        if (pickupDate) {
+            var date = new Date(pickupDate);
+            var days = ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'];
+            var months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+            var dateNumber = date.getDate();
+            var monthName = months[date.getMonth()];
+            var dayName = days[date.getDay()];
+            var pickupTimeInfoText = dayName + ", " + dateNumber + " " + monthName + ", kl 9-16";
+            uniquePart += `
+            <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/608db91c363e28ae251e0998_delivery-truck%204.svg" loading="lazy" width="28" alt="" class="image-12">
+            <div class="next-step-text-small">${pickupTimeInfoText}</div>
+        `;
+        }
+    }
+
+    const div = `
+        <div id="shippingInfoDiv" class="div-block-54">
+            ${uniquePart}
+            <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
+                <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
+            </a>
+        </div>`;
+    return div;
+}
+
+async function storeShippingMethod(itemId, method) {
+    await db.collection('items').doc(itemId).update({ shippingMethod: method }).then((docRef) => {
+        console.log(`Shipping method '${method}' stored on item with ID: `, itemId);
+        window.pickupFlowItemId = itemId; // Legacy from before. Bad way of doing it. Should clean up 'pickupFlowItemId' at some point.
+        if (method == "Service point") {
+            feedbackFormTitle.innerText = 'Tack, då vet vi att paketet snart lämnas till ett ombud.'
+            document.getElementById('triggerShippingToastClose').click();
+        } else if (method == "Pickup") {
+            closePickupToast();
+        }
+        happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
+av ditt plagg?`;
+        
+        document.getElementById('triggerFeedbackFormOpen').click();
+    });
+}
+
+
 // PICKUP RELATED FUNCTIONS
 
 function openPickupToast(itemId, soldDate) {
@@ -378,132 +472,6 @@ function signOut() {
     }).catch((error) => {
 
     });
-}
-
-// REFERRAL PROGRAM FUNCTIONS
-async function showReferralSection() {
-    const userCreatedDate = new Date(authUser.metadata.creationTime);
-    const now = new Date();
-    let daysDiff = (now.getTime() - userCreatedDate.getTime()) / (1000 * 3600 * 24);
-    console.log("Days since user registered", daysDiff);
-    let soldItemExist = false;
-
-    // Check if an item is sold
-    await db.collection("items").where("user", "==", userId).where("status", "==", "Sold").get().then((querySnapshot) => {
-        if (querySnapshot.size > 0) {
-            soldItemExist = true;
-        }
-    });
-
-    if (user?.referralData?.referralCode && soldItemExist) {
-        document.getElementById("myReferralCodeText").innerHTML = user.referralData.referralCode;
-        if (user?.referralData?.activatedReferredUsersCount > 0) {
-            console.log("shareCodeState 'block', but should also show the bonus received... TODO");
-            shareCodeState.style.display = 'block';
-        } else {
-            console.log("shareCodeState 'block'");
-            shareCodeState.style.display = 'block';
-        }
-    } else if (user?.referralData?.referredBy && !user?.referralData?.referredByBonusPaid) {
-        console.log("referredByBonusState 'block'");
-        // Get inviters first name
-        const inviter = user?.referralData?.referredBy;
-        console.log("inviter", inviter);
-        await db.collection("users").doc(inviter).get().then((doc) => {
-            if (doc.exists) {
-                const name = doc.data().addressFirstName;
-                document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + name;
-            }
-        });
-        referredByBonusState.style.display = 'block';
-    } else if ((user?.referralData?.referredBy ? false : true) && daysDiff < 3) {
-        console.log("enterCodeState 'block'");
-        enterCodeState.style.display = 'block';
-    }
-    console.log("Showing referral section");
-    referralSection.style.display = 'block';
-}
-
-function createReferralCode() {
-    const fn = user.addressFirstName;
-    const ln = user.addressLastName;
-    let letterCombo = fn.trim() + ln.charAt(0);
-    letterCombo = letterCombo.toUpperCase();
-    let newCode = letterCombo;
-
-    // Check if letterCombo exists and increase number
-    if (!user?.referralData?.referralCode) {
-        db.collection("users")
-            .where("referralData.referralCode", "!=", "")
-            .get()
-            .then((querySnapshot) => {
-                let letterComboExists = false;
-                let highestNumber = 0;
-                console.log("Users with referral code: ", querySnapshot.size);
-                querySnapshot.forEach((doc) => {
-                    const refCode = doc.data().referralData.referralCode.match(/[a-zA-Z]+|[0-9]+/g); //Split letters and numbers. TOBIASR1 -> ["TOBIASR", "1"]
-                    if (refCode[0] == letterCombo) {
-                        letterComboExists = true;
-                        let n = Number(refCode[1]);
-                        if (n > highestNumber) {
-                            highestNumber = n;
-                        }
-                    }
-                });
-
-                // Put together new code
-                if (letterComboExists) {
-                    const number = highestNumber + 1;
-                    newCode = letterCombo + number.toString();
-                }
-
-                // Store referral code
-                db.collection('users').doc(authUser.uid).update({
-                    "referralData.referralCode": newCode
-                }).then(function () {
-                    console.log("New referral code stored: ", newCode);
-                    user.referralData.referralCode = newCode;
-                    showReferralSection();
-                });
-            });
-    }
-}
-
-function connectReferralUsers() {
-    saveRefCodeLoadingDiv.style.display = 'flex';
-    saveReferralCodeButton.style.display = 'none';
-    const inputCode = referralCodeInput.value.toUpperCase();
-
-    // Find user with matching referral code and connect users
-    db.collection("users")
-        .where("referralData.referralCode", "!=", "")
-        .get()
-        .then((querySnapshot) => {
-            let inviterUserId;
-            for (var i in querySnapshot.docs) {
-                const doc = querySnapshot.docs[i];
-                const refCode = doc.data().referralData.referralCode;
-                if (refCode == inputCode) {
-                    inviterUserId = doc.id;
-                    break;
-                }
-            }
-
-            // CONNECT USERS
-            if (inviterUserId && !user?.referralData?.referredBy) {
-                // Add referredBy
-                db.collection('users').doc(authUser.uid).update({
-                    "referralData.referredBy": inviterUserId
-                }).then(() => {
-                    // Update referredUsers of the inviter
-                    db.collection('users').doc(inviterUserId).update({ "referralData.referredUsers": firebase.firestore.FieldValue.arrayUnion(authUser.uid) }).then(() => {
-                        referredByBonusState.style.display = 'block';
-                        enterCodeState.style.display = 'none';
-                        console.log("Referral connection successfully stored");
-                    });
-                });
-            }
-        });
 }
 
 // FUNCTIONS FOR START PAGE (Logged out)
