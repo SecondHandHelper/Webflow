@@ -8,7 +8,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-functions.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.16/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.19/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.1/autocomplete-brands.js"></script>
 
 <script>
@@ -137,6 +137,8 @@
 
           function displayItemCard() {
             //Putting the items in the right list
+
+            // WE SELL RIGHT NOW
             if (status != "Sold") {
               let textDiv1 = "";
               let textDiv2 = "";
@@ -164,6 +166,7 @@
               headerSellItemButton.style.display = "block";
               sellButtonText.innerHTML = "Sälj ett plagg";
 
+              // SOLD - NOT SENT
             } else if (status == "Sold" && shippingStatus != "Sent") {
               var buyerInfoTextHTML = '';
               if (buyerFirstName != null && buyerAddressCity != null) {
@@ -172,8 +175,10 @@
 
               var bagReceivedCheckbox = '';
               var shippingInfoDiv = '';
-              if (!shippingMethod) {
+              if (!shippingMethod && !pickupDate) {
                 bagReceivedCheckbox = getBagReceivedCheckbox(itemId, soldDate);
+              } else if (!shippingMethod && pickupDate) {
+                shippingInfoDiv = getShippingInfoDiv(itemId, 'Pickup', soldDate, pickupDate); // För items under en övergångsperiod
               } else {
                 shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
               }
@@ -194,6 +199,7 @@
               headerSellItemButton.style.display = "block";
               sellButtonText.innerHTML = "Sälj ett plagg";
 
+              // SOLD BEFORE
             } else {
               var soldItemCardHTML = `<div class="div-block-14"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>Du fick ${sellerGets} kr</div></div>`;
               itemListSold.innerHTML += soldItemCardHTML;
