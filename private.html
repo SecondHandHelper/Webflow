@@ -24,99 +24,13 @@
         }
         showReferralSection();
     }
+</script>
+<script>
+    //TEST AREA ===== TEST AREA =====TEST AREA =====TEST AREA =====TEST AREA =====TEST AREA =====TEST AREA =====
+    
+    
 
-    function getBagReceivedCheckbox(itemId, soldDate) {
-        console.log("getBagReceivedCheckbox");
-        const div = `<div class="w-form">
-            <form method="get" name="wf-form-" id="bagReceivedForm">
-                <label class="w-checkbox checkbox-field-3">
-                    <div class="w-checkbox-input w-checkbox-input--inputType-custom checkbox-2"></div>
-                    <input type="checkbox" id="bagReceivedCheckbox-${itemId}" style="opacity:0;position:absolute;z-index:-1" onclick="javascript:bagReceivedAction(this, '${itemId}', '${soldDate}');">
-                    <span class="checkbox-label-3 w-form-label">Påsen har kommit</span>
-                </label>
-            </form>
-        </div>`;
-        return div;
-    }
-
-    function bagReceivedAction(checkbox, itemId, soldDate) {
-        if (checkbox.checked == true) {
-            db.collection('items').doc(itemId).update({ bagReceived: true }).then((docRef) => {
-                console.log(`Stored in DB that bag is received for item with ID: `, itemId);
-            });
-            openShippingToast(itemId, soldDate);
-        } else {
-            db.collection('items').doc(itemId).update({ bagReceived: false }).then((docRef) => {
-                console.log(`Stored in DB that bag is NOT received for item with ID: `, itemId);
-            });
-        }
-    }
-
-    function openShippingToast(itemId, soldDate) {
-        console.log("openShippingToast");
-        window.pickupFlowItemId = itemId;
-        shippingOptionsDiv.innerHTML = `<a href="javascript:storeShippingMethod('${itemId}', 'Service point');" class="link-block-22 w-inline-block"><div class="div-block-122">
-            <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/62436932a8d26f07254b45e2_parcel.png" loading="lazy" width="45" alt="" class="image-24">
-            <div class="small-button-text">Lämna till ombud</div></div>
-        </a>
-        <a href="javascript:openPickupToast('${itemId}', '${soldDate}');" class="link-block-22 w-inline-block"><div class="div-block-122">
-            <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/608db91c363e28ae251e0998_delivery-truck%204.svg" loading="lazy" width="45" alt="" class="image-24">
-            <div class="small-button-text">Boka upphämtning</div></div>
-        </a>`;
-        document.getElementById('triggerShippingToastOpen').click();
-    }
-
-    function getShippingInfoDiv(itemId, method, soldDate, pickupDate) {
-        let uniquePart = ``;
-        if (method == "Service point") {
-            uniquePart += `
-            <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/62436932a8d26f07254b45e2_parcel.png" loading="lazy" width="26" alt="" class="image-12">
-                <div class="next-step-text-small">Lämna till ombud</div>
-            `;
-        } else if (method == "Pickup") {
-            if (pickupDate) {
-                var date = new Date(pickupDate);
-                var days = ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'];
-                var months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
-                var dateNumber = date.getDate();
-                var monthName = months[date.getMonth()];
-                var dayName = days[date.getDay()];
-                var pickupTimeInfoText = dayName + ", " + dateNumber + " " + monthName + ", kl 9-16";
-                uniquePart += `
-                <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/608db91c363e28ae251e0998_delivery-truck%204.svg" loading="lazy" width="28" alt="" class="image-12">
-                <div class="next-step-text-small">${pickupTimeInfoText}</div>
-            `;
-            }
-        }
-
-        const div = `
-            <div id="shippingInfoDiv" class="div-block-54">
-                ${uniquePart}
-                <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
-                    <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
-                </a>
-            </div>`;
-        return div;
-    }
-
-    async function storeShippingMethod(itemId, method) {
-        await db.collection('items').doc(itemId).update({ shippingMethod: method }).then((docRef) => {
-            console.log(`Shipping method '${method}' stored on item with ID: `, itemId);
-            window.pickupFlowItemId = itemId; // Legacy from before. Bad way of doing it. Should clean up 'pickupFlowItemId' at some point.
-            if (method == "Service point") {
-                feedbackFormTitle.innerText = 'Tack, då vet vi att paketet snart lämnas till ett ombud.'
-                document.getElementById('triggerShippingToastClose').click();
-            } else if (method == "Pickup") {
-                closePickupToast();
-            }
-            happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
-av ditt plagg?`;
-            
-            document.getElementById('triggerFeedbackFormOpen').click();
-        });
-    }
-
-
+    //TEST AREA ===== TEST AREA =====TEST AREA =====TEST AREA =====TEST AREA =====TEST AREA =====TEST AREA =====
 </script>
 <script>
     window.addEventListener('load', function () {
@@ -139,10 +53,7 @@ av ditt plagg?`;
             navigator.share({
                 text: text,
                 url: 'https://maiapp.se'
-            }).then(() => {
-                console.log('Thanks for sharing!');
-            })
-                .catch(console.error);
+            }).then(() => { console.log('Thanks for sharing!'); }).catch(console.error);
         } else {
             // fallback
             console.log("Browser doesn't support navigator.share => Copy to clipboard!");
