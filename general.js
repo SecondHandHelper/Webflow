@@ -344,7 +344,6 @@ async function bookPickup() {
     }).then(function () {
         console.log(`pickupDate is now set on Firestore item`);
         storeShippingMethod(pickupFlowItemId, 'Pickup');
-        bookPickupToast.style.display = 'none';
         happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
     av ditt plagg?`;
     });
