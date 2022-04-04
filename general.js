@@ -201,9 +201,9 @@ function closePickupToast() {
 
 function closeFeedbackForm() {
     document.getElementById('triggerFeedbackFormClose').click();
-        setTimeout(function () {
-            location.reload();
-        }, 400);
+    setTimeout(function () {
+        location.reload();
+    }, 400);
 }
 
 function emptyListsInnerHTML() {
@@ -301,7 +301,7 @@ async function storeShippingMethod(itemId, method) {
         }
         happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
 av ditt plagg?`;
-        
+
         document.getElementById('triggerFeedbackFormOpen').click();
     });
 }
@@ -529,7 +529,8 @@ async function addUserDetails() {
     const addressPostalCode = document.getElementById("addressPostalCode").value;
     const addressCity = document.getElementById("addressCity").value;
     const addressDoorCode = document.getElementById("addressDoorCode").value;
-    const personalId = document.getElementById("personalId").value;
+    let personalId = document.getElementById("personalId").value;
+    personalId = await formatPersonalId(personalId);
 
     // Write to Firestore
     const itemRef = db.collection('users').doc(window.uid);
@@ -584,7 +585,8 @@ async function addUserAddress() {
 
 async function addPersonalId() {
     // Grab values from form
-    const personalId = document.getElementById("personalId").value;
+    let personalId = document.getElementById("personalId").value;
+    personalId = await formatPersonalId(personalId);
 
     // Write to Firestore
     if (personalId) {
@@ -603,6 +605,22 @@ async function addPersonalId() {
             });
     } else {
         window.location.href = window.location.origin + "/private";
+    }
+}
+
+async function formatPersonalId(personalId) {
+    if (personalId.length !== 12 && (personalId.substring(0, 2) !== '19' || personalId.substring(0, 2) !== '20')) {
+        console.log("Number(personalId.substring(0, 2)", Number(personalId.substring(0, 2)));
+        if (Number(personalId.substring(0, 2)) <= 99 && Number(personalId.substring(0, 2)) > 25) {
+            personalId = "19" + personalId;
+        } else {
+            personalId = "20" + personalId;
+        }
+    }
+    console.log(personalId);
+    if (personalId.length === 12) {
+        console.log("return ", personalId);
+        return personalId;
     }
 }
 
