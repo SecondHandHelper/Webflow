@@ -15,20 +15,20 @@
         emptyListsInnerHTML();
         loadSoldByOthers(userId);
         buildCardLists(userId);
-        if (!emailVerified && email) {
-            window.location.replace('./user-management?mode=sendEmailVerification');
-        }
-        // Create referral code
-        if (user.addressFirstName && user.addressLastName && !user?.referralData?.referralCode) {
-            createReferralCode();
-        }
+        loadInfoRequests(userId);
+        if (!emailVerified && email) { window.location.replace('./user-management?mode=sendEmailVerification'); }
+        // Create refCode
+        if (user.addressFirstName && user.addressLastName && !user?.referralData?.referralCode) { createReferralCode(); }
         showReferralSection();
     }
 </script>
 <script>
-    //TEST AREA ===== TEST AREA =====TEST AREA =====TEST AREA =====TEST AREA =====TEST AREA =====TEST AREA =====
-
-    //TEST AREA ===== TEST AREA =====TEST AREA =====TEST AREA =====TEST AREA =====TEST AREA =====TEST AREA =====
+    //Disable webflow form submissions
+    Webflow.push(function () {
+        $('form').submit(function () {
+            return false;
+        });
+    });
 </script>
 <script>
     window.addEventListener('load', function () {
@@ -42,6 +42,8 @@
         feedbackForm.addEventListener("submit", storeFeedback);
         saveReferralCodeButton.addEventListener("click", connectReferralUsers);
         referralCodeInput.addEventListener("input", function () { saveReferralCodeButton.style.display = 'inline-block'; });
+        closeMeasurementsToastButton.addEventListener("click", function () { triggerMeasurementsToastClose.click(); });
+        closeNewPriceToastButton.addEventListener("click", function () { triggerNewPriceToastClose.click(); });
     });
 
     shareCodeButton.addEventListener('click', event => {
