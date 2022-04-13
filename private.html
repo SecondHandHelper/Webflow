@@ -39,7 +39,7 @@
         happySmileyButton.addEventListener("click", function () { setHappinessRate(3); }, false);
         neutralSmileyButton.addEventListener("click", function () { setHappinessRate(2); }, false);
         angrySmileyButton.addEventListener("click", function () { setHappinessRate(1); }, false);
-        feedbackForm.addEventListener("submit", storeFeedback);
+        feedbackSubmitButton.addEventListener("click", storeFeedback);
         saveReferralCodeButton.addEventListener("click", connectReferralUsers);
         referralCodeInput.addEventListener("input", function () { saveReferralCodeButton.style.display = 'inline-block'; });
         closeMeasurementsToastButton.addEventListener("click", function () { triggerMeasurementsToastClose.click(); });
