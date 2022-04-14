@@ -449,6 +449,10 @@
         const storageRef = storage.ref();
         images.forEach(async (value, key) => {
           console.log(`${key}: ${value}`);
+          // If images was changed, set photo directions to default, since an 'info request' of images could have been shown
+          photoDirectionsText.style.display = 'block';
+          infoRequestImagesDiv.style.display = 'none';
+
           let imagePathReference = `images/${itemId}/${key}`;
           let fileRef = storageRef.child(imagePathReference);
           await fileRef.put(value);

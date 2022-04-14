@@ -50,6 +50,7 @@
                         const noSmoke = data.noSmoke;
                         const noAnimals = data.noAnimals;
                         const userComment = data.userComment;
+                        const infoRequests = data.infoRequests;
                         const images = data.images;
                         let frontImg = images.frontImage;
                         if (images.frontImageSmall) {
@@ -113,9 +114,16 @@
 
                         // Populate checkboxes and readio-buttons is harder to do with Webflow, so not allowing users to change defects right now
 
+                        // If "info request" for images exist, show the directions
+                        if (infoRequests?.images?.status === "Active" && infoRequests?.images?.description) {
+                            photoDirectionsText.style.display = 'none';
+                            infoRequestImagesText.innerHTML = infoRequests.images.description;
+                            infoRequestImagesDiv.style.display = 'flex';
+                        }
+
                         // Show form
                         updateItemFormDiv.style.display = "block";
-                        pageTitleDiv.style.display = "block";
+                        pageTitleDiv.style.display = "flex";
                         loadingDiv.style.display = "none";
                     }
                 } else {
