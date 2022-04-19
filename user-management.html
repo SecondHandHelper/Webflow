@@ -17,6 +17,7 @@
     const actionCode = getParameterByName('oobCode');
     const continueUrl = getParameterByName('continueUrl');
     const lang = getParameterByName('lang');
+    var accountEmail;
 
     // Handle the user management action.
     switch (mode) {
@@ -47,30 +48,14 @@
 
         // Verify the password reset code is valid.
         auth.verifyPasswordResetCode(actionCode).then((email) => {
-            var accountEmail = email;
-
+            accountEmail = email;
             // TODO: Show the reset screen with the user's email and ask the user for
             // the new password.
-            var newPassword = "...";
-
-            // Save the new password.
-            auth.confirmPasswordReset(actionCode, newPassword).then((resp) => {
-                // Password reset has been confirmed and new password updated.
-
-                // TODO: Display a link back to the app, or sign-in the user directly
-                // if the page belongs to the same domain as the app:
-                // auth.signInWithEmailAndPassword(accountEmail, newPassword);
-
-                // TODO: If a continue URL is available, display a button which on
-                // click redirects the user back to the app via continueUrl with
-                // additional state determined from that URL's parameters.
-            }).catch((error) => {
-                // Error occurred during confirmation. The code might have expired or the
-                // password is too weak.
-            });
+            accountEmailText.innerHTML = `Email: ${accountEmail}`;
+            resetPasswordDiv.style.display = 'block';
+            loadingDiv.style.display = 'none';
         }).catch((error) => {
-            // Invalid or expired action code. Ask user to try to reset the password
-            // again.
+            console.log(error.code, error.message);
         });
     }
     // [END auth_handle_reset_password]
@@ -140,5 +125,25 @@
                     toMaiButton.style.display = 'block';
                 }, 5000);
             });
+    });
+
+    savePasswordAndLoginButton.addEventListener('click', function () {
+        // Save the new password.
+        passwordLoadIcon.style.display = 'block';
+        savePasswordAndLoginButton.style.display = 'none';
+        var password = newPassword.value;
+        auth.confirmPasswordReset(actionCode, password).then((resp) => {
+            console.log("Password reset has been confirmed and new password updated");
+            // Sign in
+            firebase.auth().signInWithEmailAndPassword(accountEmail, password)
+                .then((userCredential) => {
+                    window.location.replace('./private');
+                })
+                .catch((error) => {
+                    console.log("Error message:", error.code, error.message);
+                });
+        }).catch((error) => {
+            console.log("Error message:", error.code, error.message);
+        });
     });
 </script>

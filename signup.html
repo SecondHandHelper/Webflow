@@ -224,17 +224,19 @@
   }
 
   function sendPasswordReset() {
-    const email = "sam@example.com";
+    const email = emailAddress.value;
     // [START auth_send_password_reset]
     firebase.auth().sendPasswordResetEmail(email)
       .then(() => {
+        console.log("Reset password email sent");
+        forgotPasswordText.innerHTML = `Email skickat till ${email}`;
         // Password reset email sent!
         // ..
       })
       .catch((error) => {
         var errorCode = error.code;
         var errorMessage = error.message;
-        // ..
+        console.log(errorCode, errorMessage);
       });
     // [END auth_send_password_reset]
   }
@@ -264,6 +266,7 @@
 
   //Eventlisteners
   emailNextStepButton.addEventListener('click', checkEmail);
+  resetPasswordLink.addEventListener('click', sendPasswordReset);
   emailAndPasswordButton.addEventListener('click', function () {
     chooseEmailDiv.style.display = 'block';
     loginAlternativesDiv.style.display = 'none';
@@ -274,7 +277,6 @@
   window.addEventListener('focus', function () {
     emailVerificationText.innerText += ".";
     const divDisplayed = waitOnVerificationDiv.style.display;
-    console.log("divDisplayed", divDisplayed, typeof divDisplayed);
     if (divDisplayed === "block") {
       window.location.replace('./private');
     }
