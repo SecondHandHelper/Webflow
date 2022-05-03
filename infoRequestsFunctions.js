@@ -16,6 +16,7 @@ async function openMeasurementsToast(itemId, description) {
 
 async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
     // Set toast content
+    motivationDiv.style.display = 'none';
     let text = `Baserat på efterfrågan tror vi att priset för ditt ${brand}-plagg behöver gå under ditt lägsta accepterade pris för att öka chanserna att få det sålt.`;
     if (status === "New") {
         newPriceToastTitle.innerHTML = "Pris";
