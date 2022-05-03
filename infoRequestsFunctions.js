@@ -19,12 +19,12 @@ async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
     motivationDiv.style.display = 'none';
     newPriceToastTitle.innerHTML = "Nytt pris";
     newPriceHeading.innerHTML = "Ny prissättning från Mai";
-    denyNewPriceButton.innerText = "Avböj";
+    denyNewPriceButton.value = "Avböj";
     let text = `Baserat på efterfrågan tror vi att priset för ditt ${brand}-plagg behöver gå under ditt lägsta accepterade pris för att öka chanserna att få det sålt.`;
     if (status === "New") {
         newPriceToastTitle.innerHTML = "Pris";
         newPriceHeading.innerHTML = "Prissättning från Mai";
-        denyNewPriceButton.innerText = "Avböj och avsluta";
+        denyNewPriceButton.value = "Avböj och avsluta";
         text = `Ditt ${brand}-plagg har värderats till något under ditt lägsta accepterade pris, utifrån vad vi tror det kan säljas för just nu. Vill du acceptera värderingen, eller avsluta försäljningen?`;
     }
     newPriceText.innerHTML = text;
