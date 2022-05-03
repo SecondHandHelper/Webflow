@@ -95,16 +95,16 @@ function loadInfoRequests(userId) {
                             buttonTextClass = "text-block-69-copy-copy";
                             buttonText = "Se pris";
                             subText = "Accepterar du den nya prissättningen?";
-                            const itemJSON = JSON.stringify(item);
-                            const requestJSON = JSON.stringify(infoRequests[req]);
-                            href = `javascript:openNewPriceToast('${itemId}', '${itemJSON}', '${requestJSON}');`;
+                            let itemJSON = JSON.stringify(item);
+                            let requestJSON = JSON.stringify(infoRequests[req]);
+                            href = `javascript:openNewPriceToast('${itemId}', ${itemJSON}, ${requestJSON});`;
                             if (status === "New") {
                                 title = "Pris";
                                 buttonClass = "acceptnewpricebutton";
                                 buttonTextClass = "text-block-69-copy-copy";
                                 buttonText = "Se pris";
                                 subText = "Accepterar du prissättningen?";
-                                href = `javascript:openNewPriceToast('${itemId}', '${itemJSON}', '${requestJSON}');`;
+                                href = `javascript:openNewPriceToast('${itemId}', ${itemJSON}, ${requestJSON});`;
                             }
                         }
                         if (req === "measurements") {
