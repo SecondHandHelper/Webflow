@@ -14,7 +14,7 @@ async function openMeasurementsToast(itemId, description) {
     triggerMeasurementsToastOpen.click();
 }
 
-async function openNewPriceToast(itemId, status, max, min, brand) {
+async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
     // Set content of toast
     let text = `Baserat på efterfrågan tror vi att priset för ditt ${brand}-plagg behöver gå under ditt lägsta accepterade pris för att öka chanserna att få det sålt.`;
     if (status === "New") {
@@ -25,8 +25,8 @@ async function openNewPriceToast(itemId, status, max, min, brand) {
         text = `Värderingen för ditt ${brand}-plagg landade under ditt lägsta accepterade pris, därför undrar vi om du vill sälja till denna värdering eller avbryta försäljningen?`;
     }
     newPriceText.innerHTML = text;
-    if (request.description) {
-        motivationText.innerHTML = request.description;
+    if (motivation) {
+        motivationText.innerHTML = motivation;
         motivationDiv.style.display = 'block';
     }
     newPrice.innerHTML = `${min}-${max} kr`;
@@ -99,7 +99,7 @@ function loadInfoRequests(userId) {
                                 buttonTextClass = "text-block-69-copy-copy";
                                 buttonText = "Se pris";
                                 subText = "Accepterar du prissättningen?";
-                                href = `javascript:openNewPriceToast('${itemId}', '${status}', '${max}', '${min}', '${brand}');`;
+                                href = `javascript:openNewPriceToast('${itemId}', '${status}', '${max}', '${min}', '${brand}', '${description}');`;
                             }
                         }
                         if (req === "measurements") {
