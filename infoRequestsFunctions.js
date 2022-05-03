@@ -33,7 +33,9 @@ async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
         motivationDiv.style.display = 'block';
     }
     newPrice.innerHTML = `${min}-${max} kr`;
-    acceptNewPriceButton.addEventListener('click', async function () {
+    acceptNewPriceButton.removeEventListener('click', acceptPrice);
+    acceptNewPriceButton.addEventListener('click', acceptPrice);
+    async function acceptPrice (){
         await db.collection('items').doc(itemId).update({
             "infoRequests.price.status": "Resolved",
             "infoRequests.price.response": "Accepted",
@@ -43,8 +45,10 @@ async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
             triggerNewPriceToastClose.click();
             setTimeout(function () { location.reload(); }, 400);
         });
-    });
-    denyNewPriceButton.addEventListener('click', async function () {
+    }
+    denyNewPriceButton.removeEventListener('click', denyPrice);
+    denyNewPriceButton.addEventListener('click', denyPrice);
+    async function denyPrice (){
         await db.collection('items').doc(itemId).update({
             "infoRequests.price.status": "Resolved",
             "infoRequests.price.response": "Denied"
@@ -52,7 +56,7 @@ async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
             triggerNewPriceToastClose.click();
             setTimeout(function () { location.reload(); }, 400);
         });
-    });
+    }
 
     // Open toast
     triggerNewPriceToastOpen.click();
