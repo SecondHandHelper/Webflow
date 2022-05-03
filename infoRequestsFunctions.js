@@ -99,14 +99,14 @@ function loadInfoRequests(userId) {
                             let requestJSON = JSON.stringify(infoRequests[req]);
                             console.log("itemJSON", itemJSON);
                             console.log("requestJSON", requestJSON);
-                            href = `javascript:openNewPriceToast('${itemId}', ${itemJSON}, ${requestJSON});`;
+                            href = "javascript:openNewPriceToast('" + itemId + "', `" + itemJSON + "`, `" + requestJSON + "`);";
                             if (status === "New") {
                                 title = "Pris";
                                 buttonClass = "acceptnewpricebutton";
                                 buttonTextClass = "text-block-69-copy-copy";
                                 buttonText = "Se pris";
                                 subText = "Accepterar du prissättningen?";
-                                href = `javascript:openNewPriceToast('${itemId}', ${itemJSON}, ${requestJSON});`;
+                                href = `javascript:openNewPriceToast('${itemId}', '${itemJSON}', '${requestJSON}');`;
                             }
                         }
                         if (req === "measurements") {
