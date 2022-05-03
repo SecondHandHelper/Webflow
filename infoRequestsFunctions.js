@@ -99,7 +99,7 @@ function loadInfoRequests(userId) {
                                 buttonTextClass = "text-block-69-copy-copy";
                                 buttonText = "Se pris";
                                 subText = "Accepterar du prissättningen?";
-                                href = `javascript:openNewPriceToast('${itemId}', '${itemJSON}', '${requestJSON}');`;
+                                href = `javascript:openNewPriceToast('${itemId}', '${status}', '${max}', '${min}', '${brand}');`;
                             }
                         }
                         if (req === "measurements") {
