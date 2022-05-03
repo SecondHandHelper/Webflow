@@ -17,13 +17,15 @@ async function openMeasurementsToast(itemId, description) {
 async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
     // Set toast content
     motivationDiv.style.display = 'none';
+    newPriceToastTitle.innerHTML = "Nytt pris";
+    newPriceHeading.innerHTML = "Ny prissättning från Mai";
+    denyNewPriceButton.innerText = "Avböj";
     let text = `Baserat på efterfrågan tror vi att priset för ditt ${brand}-plagg behöver gå under ditt lägsta accepterade pris för att öka chanserna att få det sålt.`;
     if (status === "New") {
         newPriceToastTitle.innerHTML = "Pris";
         newPriceHeading.innerHTML = "Prissättning från Mai";
-        acceptNewPriceButton.innerHTML = "Sälj med detta pris";
-        denyNewPriceButton.innerHTML = "Avböj och avsluta";
-        text = `Ditt ${brand}-plagg har värderats till något under ditt lägsta accepterade pris, utifrån vad vi tror det kan säljas för just nu. Vill du sälja till vår värdering, eller avsluta försäljningen?`;
+        denyNewPriceButton.innerText = "Avböj och avsluta";
+        text = `Ditt ${brand}-plagg har värderats till något under ditt lägsta accepterade pris, utifrån vad vi tror det kan säljas för just nu. Vill du acceptera värderingen, eller avsluta försäljningen?`;
     }
     newPriceText.innerHTML = text;
     if (motivation !== 'undefined') {
