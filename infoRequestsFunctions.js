@@ -97,6 +97,8 @@ function loadInfoRequests(userId) {
                             subText = "Accepterar du den nya prissättningen?";
                             let itemJSON = JSON.stringify(item);
                             let requestJSON = JSON.stringify(infoRequests[req]);
+                            console.log("itemJSON", itemJSON);
+                            console.log("requestJSON", requestJSON);
                             href = `javascript:openNewPriceToast('${itemId}', ${itemJSON}, ${requestJSON});`;
                             if (status === "New") {
                                 title = "Pris";
