@@ -14,8 +14,9 @@ async function openMeasurementsToast(itemId, description) {
     triggerMeasurementsToastOpen.click();
 }
 
-async function openNewPriceToast(itemId, item, infoRequestObject) {
-    const request = infoRequestObject;
+async function openNewPriceToast(itemId, itemJSON, requestJSON) {
+    const request = JSON.parse(requestJSON);
+    const item = JSON.parse(itemJSON);
     const max = request.maxPrice;
     const min = request.minPrice;
 
@@ -94,14 +95,16 @@ function loadInfoRequests(userId) {
                             buttonTextClass = "text-block-69-copy-copy";
                             buttonText = "Se pris";
                             subText = "Accepterar du den nya prissättningen?";
-                            href = `javascript:openNewPriceToast('${itemId}', ${item}, ${infoRequests[req]});`;
+                            const itemJSON = JSON.stringify(item);
+                            const requestJSON = JSON.stringify(infoRequests[req]);
+                            href = `javascript:openNewPriceToast('${itemId}', '${itemJSON}', '${requestJSON}');`;
                             if (status === "New") {
                                 title = "Pris";
                                 buttonClass = "acceptnewpricebutton";
                                 buttonTextClass = "text-block-69-copy-copy";
                                 buttonText = "Se pris";
                                 subText = "Accepterar du prissättningen?";
-                                href = `javascript:openNewPriceToast('${itemId}', ${item}, ${infoRequests[req]});`;
+                                href = `javascript:openNewPriceToast('${itemId}', '${itemJSON}', '${requestJSON}');`;
                             }
                         }
                         if (req === "measurements") {
