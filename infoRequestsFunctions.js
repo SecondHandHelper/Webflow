@@ -55,7 +55,7 @@ async function openNewPriceToast(itemId, item, infoRequestObject) {
         });
     });
 
-    // Open toast
+    // Open toast with animation
     triggerNewPriceToastOpen.click();
 }
 
