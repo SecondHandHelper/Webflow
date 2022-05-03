@@ -14,15 +14,32 @@ async function openMeasurementsToast(itemId, description) {
     triggerMeasurementsToastOpen.click();
 }
 
-async function openNewPriceToast(itemId, minPrice, maxPrice, text) {
+async function openNewPriceToast(itemId, item, infoRequestObject) {
+    const request = infoRequestObject;
+    const max = request.maxPrice;
+    const min = request.minPrice;
+
+    // Set toast content
+    let text = `Baserat på efterfrågan tror vi att priset för ditt ${item.brand}-plagg behöver gå under ditt lägsta accepterade pris för att öka chanserna att få det sålt.`;
+    if (item.status === "New"){
+        newPriceToastTitle.innerHTML = "Pris";
+        newPriceHeading.innerHTML = "Prissättning från Mai";
+        acceptNewPriceButton.innerText = "Sälj med detta pris";
+        denyNewPriceButton.innerText = "Avböj och avsluta";
+        text = `Värderingen för ditt ${item.brand}-plagg landade under ditt lägsta accepterade pris, därför undrar vi om du vill sälja till denna värdering eller avbryta försäljningen?`;
+    }
     newPriceText.innerHTML = text;
-    newPrice.innerHTML = `${minPrice}-${maxPrice} kr`;
+    if (request.description){
+        motivationText.innerHTML = request.description;
+        motivationDiv.style.display = 'block';
+    }
+    newPrice.innerHTML = `${min}-${max} kr`;
     acceptNewPriceButton.addEventListener('click', async function () {
         await db.collection('items').doc(itemId).update({
             "infoRequests.price.status": "Resolved",
             "infoRequests.price.response": "Accepted",
-            "maxPriceEstimate": maxPrice,
-            "minPriceEstimate": minPrice
+            "maxPriceEstimate": max,
+            "minPriceEstimate": min
         }).then(function () {
             triggerNewPriceToastClose.click();
             setTimeout(function () { location.reload(); }, 400);
@@ -37,6 +54,8 @@ async function openNewPriceToast(itemId, minPrice, maxPrice, text) {
             setTimeout(function () { location.reload(); }, 400);
         });
     });
+
+    // Open toast
     triggerNewPriceToastOpen.click();
 }
 
@@ -45,14 +64,12 @@ function loadInfoRequests(userId) {
     db.collection("items").where("user", "==", userId).get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
             var itemId = doc.id;
-            var infoRequests = doc.data().infoRequests;
-            var images = doc.data().images;
-            var status = doc.data().status;
-            var brand = doc.data().brand;
-            var minPriceEstimate = doc.data().minPriceEstimate;
-            var maxPriceEstimate = doc.data().maxPriceEstimate;
-            var acceptPrice = doc.data().acceptPrice;
-            var archived = doc.data().archived;
+            var item = doc.data();
+            var infoRequests = item.infoRequests;
+            var images = item.images;
+            var status = item.status;
+            var brand = item.brand;
+            var archived = item.archived;
             var frontImageUrl = images.frontImage;
             if (images.frontImageSmall) {
                 frontImageUrl = images.frontImageSmall;
@@ -77,10 +94,15 @@ function loadInfoRequests(userId) {
                             buttonTextClass = "text-block-69-copy-copy";
                             buttonText = "Se pris";
                             subText = "Accepterar du den nya prissättningen?";
-                            let max = infoRequests[req].maxPrice;
-                            let min = infoRequests[req].minPrice;
-                            let text = `Baserat på efterfrågan tror vi att priset för ditt ${brand}-plagg behöver gå under ditt lägsta accepterade pris för att öka chanserna att få det sålt.`;
-                            href = `javascript:openNewPriceToast('${itemId}', ${min}, ${max}, '${text}');`;
+                            href = `javascript:openNewPriceToast('${itemId}', '${item}', ${infoRequests[req]});`;
+                            if (status === "New") {
+                                title = "Pris";
+                                buttonClass = "acceptnewpricebutton";
+                                buttonTextClass = "text-block-69-copy-copy";
+                                buttonText = "Se pris";
+                                subText = "Accepterar du prissättningen?";
+                                href = `javascript:openNewPriceToast('${itemId}', '${item}', ${infoRequests[req]});`;
+                            }
                         }
                         if (req === "measurements") {
                             title = "Mått";

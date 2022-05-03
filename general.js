@@ -633,7 +633,6 @@ function writePhoneNumberToFirestore(userID, phoneNumber) {
 
     docRef.get().then((doc) => {
         if (doc.exists) {
-            console.log("Document data:", doc.data());
             console.log("Now adding the phone number to the user document");
             // Update document
             db.collection("users").doc(userID).update({
