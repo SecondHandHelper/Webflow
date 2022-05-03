@@ -14,23 +14,18 @@ async function openMeasurementsToast(itemId, description) {
     triggerMeasurementsToastOpen.click();
 }
 
-async function openNewPriceToast(itemId, itemJSON, requestJSON) {
-    const request = JSON.parse(requestJSON);
-    const item = JSON.parse(itemJSON);
-    const max = request.maxPrice;
-    const min = request.minPrice;
-
+async function openNewPriceToast(itemId, status, max, min, brand) {
     // Set toast content
-    let text = `Baserat på efterfrågan tror vi att priset för ditt ${item.brand}-plagg behöver gå under ditt lägsta accepterade pris för att öka chanserna att få det sålt.`;
-    if (item.status === "New"){
+    let text = `Baserat på efterfrågan tror vi att priset för ditt ${brand}-plagg behöver gå under ditt lägsta accepterade pris för att öka chanserna att få det sålt.`;
+    if (status === "New") {
         newPriceToastTitle.innerHTML = "Pris";
         newPriceHeading.innerHTML = "Prissättning från Mai";
         acceptNewPriceButton.innerText = "Sälj med detta pris";
         denyNewPriceButton.innerText = "Avböj och avsluta";
-        text = `Värderingen för ditt ${item.brand}-plagg landade under ditt lägsta accepterade pris, därför undrar vi om du vill sälja till denna värdering eller avbryta försäljningen?`;
+        text = `Värderingen för ditt ${brand}-plagg landade under ditt lägsta accepterade pris, därför undrar vi om du vill sälja till denna värdering eller avbryta försäljningen?`;
     }
     newPriceText.innerHTML = text;
-    if (request.description){
+    if (request.description) {
         motivationText.innerHTML = request.description;
         motivationDiv.style.display = 'block';
     }
@@ -56,7 +51,7 @@ async function openNewPriceToast(itemId, itemJSON, requestJSON) {
         });
     });
 
-    // Open toast with animation
+    // Open toast
     triggerNewPriceToastOpen.click();
 }
 
@@ -95,11 +90,9 @@ function loadInfoRequests(userId) {
                             buttonTextClass = "text-block-69-copy-copy";
                             buttonText = "Se pris";
                             subText = "Accepterar du den nya prissättningen?";
-                            let itemJSON = JSON.stringify(item);
-                            let requestJSON = JSON.stringify(infoRequests[req]);
-                            console.log("itemJSON", itemJSON);
-                            console.log("requestJSON", requestJSON);
-                            href = "javascript:openNewPriceToast('" + itemId + "', '" + itemJSON + "', '" + requestJSON + "');";
+                            const max = infoRequests[req].maxPrice;
+                            const min = infoRequests[req].minPrice;
+                            href = `javascript:openNewPriceToast('${itemId}', '${status}', '${max}', '${min}', '${brand}');`;
                             if (status === "New") {
                                 title = "Pris";
                                 buttonClass = "acceptnewpricebutton";
@@ -129,7 +122,7 @@ function loadInfoRequests(userId) {
                                                 </div>
                                                 <div class="text-block-73">${title}</div>
                                                 <div class="text-block-72">${subText}</div>
-                                                <a href="${href}" class="link-block-23 w-inline-block">
+                                                <a href="${href}" id="" class="link-block-23 w-inline-block">
                                                     <div class="${buttonClass}">
                                                         <div class="${buttonTextClass}">${buttonText}</div>
                                                     </div>
