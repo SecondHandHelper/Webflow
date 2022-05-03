@@ -94,14 +94,14 @@ function loadInfoRequests(userId) {
                             buttonTextClass = "text-block-69-copy-copy";
                             buttonText = "Se pris";
                             subText = "Accepterar du den nya prissättningen?";
-                            href = `javascript:openNewPriceToast('${itemId}', '${item}', ${infoRequests[req]});`;
+                            href = `javascript:openNewPriceToast('${itemId}', ${item}, ${infoRequests[req]});`;
                             if (status === "New") {
                                 title = "Pris";
                                 buttonClass = "acceptnewpricebutton";
                                 buttonTextClass = "text-block-69-copy-copy";
                                 buttonText = "Se pris";
                                 subText = "Accepterar du prissättningen?";
-                                href = `javascript:openNewPriceToast('${itemId}', '${item}', ${infoRequests[req]});`;
+                                href = `javascript:openNewPriceToast('${itemId}', ${item}, ${infoRequests[req]});`;
                             }
                         }
                         if (req === "measurements") {
