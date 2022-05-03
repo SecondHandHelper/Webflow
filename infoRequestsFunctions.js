@@ -21,12 +21,12 @@ async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
     if (status === "New") {
         newPriceToastTitle.innerHTML = "Pris";
         newPriceHeading.innerHTML = "Prissättning från Mai";
-        acceptNewPriceButton.innerText = "Sälj med detta pris";
-        denyNewPriceButton.innerText = "Avböj och avsluta";
-        text = `Värderingen för ditt ${brand}-plagg landade under ditt lägsta accepterade pris, därför undrar vi om du vill sälja till denna värdering eller avbryta försäljningen?`;
+        acceptNewPriceButton.innerHTML = "Sälj med detta pris";
+        denyNewPriceButton.innerHTML = "Avböj och avsluta";
+        text = `Ditt ${brand}-plagg har värderats till något under ditt lägsta accepterade pris, utifrån vad vi tror det kan säljas för just nu. Vill du sälja till vår värdering, eller avsluta försäljningen?`;
     }
     newPriceText.innerHTML = text;
-    if (motivation) {
+    if (motivation !== 'undefined') {
         motivationText.innerHTML = motivation;
         motivationDiv.style.display = 'block';
     }
@@ -93,15 +93,14 @@ function loadInfoRequests(userId) {
                             subText = "Accepterar du den nya prissättningen?";
                             const max = infoRequests[req].maxPrice;
                             const min = infoRequests[req].minPrice;
-                            href = `javascript:openNewPriceToast('${itemId}', '${status}', '${max}', '${min}', '${brand}');`;
                             if (status === "New") {
                                 title = "Pris";
                                 buttonClass = "acceptnewpricebutton";
                                 buttonTextClass = "text-block-69-copy-copy";
                                 buttonText = "Se pris";
                                 subText = "Accepterar du prissättningen?";
-                                href = `javascript:openNewPriceToast('${itemId}', '${status}', '${max}', '${min}', '${brand}', '${description}');`;
                             }
+                            href = `javascript:openNewPriceToast('${itemId}', '${status}', '${max}', '${min}', '${brand}', '${description}');`;
                         }
                         if (req === "measurements") {
                             title = "Mått";
