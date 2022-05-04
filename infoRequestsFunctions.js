@@ -45,12 +45,16 @@ async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
     // Set toast content
     motivationDiv.style.display = 'none';
     newPriceToastTitle.innerHTML = "Nytt pris";
-    newPriceHeading.innerHTML = "Ny prissättning från Mai";
-    denyNewPriceButton.innerHTML = "Avböj";
-    let text = `Baserat på efterfrågan tror vi att priset för ditt ${brand}-plagg behöver gå under ditt lägsta accepterade pris för att öka chanserna att få det sålt.`;
+    let text = `Då ditt ${brand}-plagg inte sålts inom prisintervallet tror vi att sannolikheten för att få det sålt skulle öka om priset sänks något.`;
+    newPriceHeading.innerHTML = "Nytt pris";
+    newPrice.innerHTML = `${min} kr`;
+    acceptNewPriceButton.innerHTML = "Acceptera nytt pris";
+    denyNewPriceButton.innerHTML = "Sänk ej";
     if (status === "New") {
         newPriceToastTitle.innerHTML = "Pris";
         newPriceHeading.innerHTML = "Prissättning från Mai";
+        newPrice.innerHTML = `${min}-${max} kr`;
+        acceptNewPriceButton.innerHTML = "Acceptera pris";
         denyNewPriceButton.innerHTML = "Avböj och avsluta";
         text = `Ditt ${brand}-plagg har värderats till något under ditt lägsta accepterade pris, utifrån vad vi tror det kan säljas för just nu. Vill du acceptera värderingen, eller avsluta försäljningen?`;
     }
@@ -59,7 +63,6 @@ async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
         motivationText.innerHTML = motivation;
         motivationDiv.style.display = 'block';
     }
-    newPrice.innerHTML = `${min}-${max} kr`;
     acceptNewPriceButton.href = `javascript:storePriceResponse('${itemId}', ${max}, ${min}, 'Accepted');`;
     denyNewPriceButton.href = `javascript:storePriceResponse('${itemId}', ${max}, ${min}, 'Denied');`;
 
