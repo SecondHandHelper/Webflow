@@ -38,9 +38,6 @@ async function storePriceResponse(itemId, max, min, response) {
             //setTimeout(function () { location.reload(); }, 400);
         });
     }
-
-    acceptNewPriceButton.removeEventListener('click', storePriceResponse);
-    denyNewPriceButton.removeEventListener('click', storePriceResponse);
 }
 
 async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
@@ -63,8 +60,32 @@ async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
         motivationDiv.style.display = 'block';
     }
     newPrice.innerHTML = `${min}-${max} kr`;
-    acceptNewPriceButton.addEventListener('click', storePriceResponse(itemId, max, min, 'Accepted'));
-    denyNewPriceButton.addEventListener('click', storePriceResponse(itemId, max, min, 'Denied'));
+    acceptBtn.addEventListener('click', async function () {
+        await db.collection('items').doc(itemId).update({
+            "infoRequests.price.status": "Resolved",
+            "infoRequests.price.response": "Accepted",
+            "maxPriceEstimate": max,
+            "minPriceEstimate": min
+        }).then(function () {
+            // Clear the event listeners when clicked
+            acceptBtn.replaceWith(acceptBtn.cloneNode(true));
+            denyBtn.replaceWith(denyBtn.cloneNode(true));
+            triggerNewPriceToastClose.click();
+            //setTimeout(function () { location.reload(); }, 400);
+        });
+    });
+    denyBtn.addEventListener('click', async function () {
+        await db.collection('items').doc(itemId).update({
+            "infoRequests.price.status": "Resolved",
+            "infoRequests.price.response": "Denied"
+        }).then(function () {
+            // Clear the event listeners when clicked
+            acceptBtn.replaceWith(acceptBtn.cloneNode(true));
+            denyBtn.replaceWith(denyBtn.cloneNode(true));
+            triggerNewPriceToastClose.click();
+            //setTimeout(function () { location.reload(); }, 400);
+        });
+    });
 
     // Open toast
     triggerNewPriceToastOpen.click();
@@ -150,3 +171,13 @@ function loadInfoRequests(userId) {
         });
     });
 }
+
+// Accept and Deny button elements
+const acceptBtn = document.getElementById('acceptNewPriceButton');
+const denyBtn = document.getElementById('denyNewPriceButton');
+closeNewPriceToastButton.addEventListener("click", function () {
+    // Clear the event listeners when toast is cloased
+    acceptBtn.replaceWith(acceptBtn.cloneNode(true));
+    denyBtn.replaceWith(denyBtn.cloneNode(true));
+    triggerNewPriceToastClose.click();
+});
