@@ -45,8 +45,8 @@ async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
     // Set content of toast
     motivationDiv.style.display = 'none';
     newPriceToastTitle.innerHTML = "Nytt pris";
-    let text = `Vi tror att sannolikheten att få ditt ${brand}-plagg sålt sista tiden ökar om du kan tänka dig att sänka priset något?`;
-    newPriceHeading.innerHTML = "Nytt pris";
+    let text = `Vi tror att sannolikheten att få ditt ${brand}-plagg sålt under sista dagarna ökar om du kan tänka dig att sänka priset något?`;
+    newPriceHeading.innerHTML = "Nytt prisförslag";
     newPrice.innerHTML = `${min} kr`;
     acceptNewPriceButton.innerHTML = "Acceptera nytt pris";
     denyNewPriceButton.innerHTML = "Sänk ej";
