@@ -25,7 +25,7 @@ async function storePriceResponse(itemId, max, min, response) {
             "minPriceEstimate": min
         }).then(function () {
             triggerNewPriceToastClose.click();
-            //setTimeout(function () { location.reload(); }, 400);
+            setTimeout(function () { location.reload(); }, 300);
         });
     }
     // Deny price
@@ -35,7 +35,7 @@ async function storePriceResponse(itemId, max, min, response) {
             "infoRequests.price.response": "Denied"
         }).then(function () {
             triggerNewPriceToastClose.click();
-            //setTimeout(function () { location.reload(); }, 400);
+            setTimeout(function () { location.reload(); }, 300);
         });
     }
 }
@@ -61,7 +61,7 @@ async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
     }
     newPrice.innerHTML = `${min}-${max} kr`;
     acceptNewPriceButton.href = `javascript:storePriceResponse('${itemId}', ${max}, ${min}, 'Accepted');`;
-    denyNewPriceButton.href = `javascript:storePriceResponse('${itemId}', ${max}, ${min}, 'Accepted');`;
+    denyNewPriceButton.href = `javascript:storePriceResponse('${itemId}', ${max}, ${min}, 'Denied');`;
 
     // Open toast
     triggerNewPriceToastOpen.click();
