@@ -14,7 +14,7 @@ async function openMeasurementsToast(itemId, description) {
     triggerMeasurementsToastOpen.click();
 }
 
-async function storePriceResponse(itemId, max, min, response) {
+async function storePriceResponse(itemId, max, min, response, status) {
     console.log("storePriceResponse", itemId, max, min, response);
     // Accept price
     if (response === "Accepted") {
@@ -30,10 +30,14 @@ async function storePriceResponse(itemId, max, min, response) {
     }
     // Deny price
     if (response === "Denied") {
-        await db.collection('items').doc(itemId).update({
+        let fields = {
             "infoRequests.price.status": "Resolved",
             "infoRequests.price.response": "Denied"
-        }).then(function () {
+        };
+        if (status === "New"){
+            fields["archived"] = true;
+        }
+        await db.collection('items').doc(itemId).update(fields).then(function () {
             triggerNewPriceToastClose.click();
             setTimeout(function () { location.reload(); }, 300);
         });
@@ -63,8 +67,8 @@ async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
         motivationText.innerHTML = motivation;
         motivationDiv.style.display = 'block';
     }
-    acceptNewPriceButton.href = `javascript:storePriceResponse('${itemId}', ${max}, ${min}, 'Accepted');`;
-    denyNewPriceButton.href = `javascript:storePriceResponse('${itemId}', ${max}, ${min}, 'Denied');`;
+    acceptNewPriceButton.href = `javascript:storePriceResponse('${itemId}', ${max}, ${min}, 'Accepted', '${status}');`;
+    denyNewPriceButton.href = `javascript:storePriceResponse('${itemId}', ${max}, ${min}, 'Denied', '${status}');`;
 
     // Open toast
     triggerNewPriceToastOpen.click();
