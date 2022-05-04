@@ -15,6 +15,7 @@ async function openMeasurementsToast(itemId, description) {
 }
 
 async function storePriceResponse(itemId, max, min, response) {
+    console.log("storePriceResponse", itemId, max, min, response);
     // Accept price
     if (response === "Accepted") {
         await db.collection('items').doc(itemId).update({
@@ -24,7 +25,7 @@ async function storePriceResponse(itemId, max, min, response) {
             "minPriceEstimate": min
         }).then(function () {
             triggerNewPriceToastClose.click();
-            setTimeout(function () { location.reload(); }, 400);
+            //setTimeout(function () { location.reload(); }, 400);
         });
     }
     // Deny price
@@ -34,7 +35,7 @@ async function storePriceResponse(itemId, max, min, response) {
             "infoRequests.price.response": "Denied"
         }).then(function () {
             triggerNewPriceToastClose.click();
-            setTimeout(function () { location.reload(); }, 400);
+            //setTimeout(function () { location.reload(); }, 400);
         });
     }
 
@@ -43,6 +44,7 @@ async function storePriceResponse(itemId, max, min, response) {
 }
 
 async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
+    console.log("openNewPriceToast", itemId, status, max, min, brand, motivation);
     // Set toast content
     motivationDiv.style.display = 'none';
     newPriceToastTitle.innerHTML = "Nytt pris";
