@@ -14,6 +14,34 @@ async function openMeasurementsToast(itemId, description) {
     triggerMeasurementsToastOpen.click();
 }
 
+async function storePriceResponse(itemId, max, min, response) {
+    // Accept price
+    if (response === "Accepted") {
+        await db.collection('items').doc(itemId).update({
+            "infoRequests.price.status": "Resolved",
+            "infoRequests.price.response": "Accepted",
+            "maxPriceEstimate": max,
+            "minPriceEstimate": min
+        }).then(function () {
+            triggerNewPriceToastClose.click();
+            setTimeout(function () { location.reload(); }, 400);
+        });
+    }
+    // Deny price
+    if (response === "Denied") {
+        await db.collection('items').doc(itemId).update({
+            "infoRequests.price.status": "Resolved",
+            "infoRequests.price.response": "Denied"
+        }).then(function () {
+            triggerNewPriceToastClose.click();
+            setTimeout(function () { location.reload(); }, 400);
+        });
+    }
+
+    acceptNewPriceButton.removeEventListener('click', storePriceResponse);
+    denyNewPriceButton.removeEventListener('click', storePriceResponse);
+}
+
 async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
     // Set toast content
     motivationDiv.style.display = 'none';
@@ -33,30 +61,8 @@ async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
         motivationDiv.style.display = 'block';
     }
     newPrice.innerHTML = `${min}-${max} kr`;
-    acceptNewPriceButton.removeEventListener('click', acceptPrice);
-    acceptNewPriceButton.addEventListener('click', acceptPrice);
-    async function acceptPrice (){
-        await db.collection('items').doc(itemId).update({
-            "infoRequests.price.status": "Resolved",
-            "infoRequests.price.response": "Accepted",
-            "maxPriceEstimate": max,
-            "minPriceEstimate": min
-        }).then(function () {
-            triggerNewPriceToastClose.click();
-            setTimeout(function () { location.reload(); }, 400);
-        });
-    }
-    denyNewPriceButton.removeEventListener('click', denyPrice);
-    denyNewPriceButton.addEventListener('click', denyPrice);
-    async function denyPrice (){
-        await db.collection('items').doc(itemId).update({
-            "infoRequests.price.status": "Resolved",
-            "infoRequests.price.response": "Denied"
-        }).then(function () {
-            triggerNewPriceToastClose.click();
-            setTimeout(function () { location.reload(); }, 400);
-        });
-    }
+    acceptNewPriceButton.addEventListener('click', storePriceResponse(itemId, max, min, 'Accepted'));
+    denyNewPriceButton.addEventListener('click', storePriceResponse(itemId, max, min, 'Denied'));
 
     // Open toast
     triggerNewPriceToastOpen.click();
