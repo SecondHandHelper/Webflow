@@ -42,7 +42,7 @@ async function storePriceResponse(itemId, max, min, response) {
 
 async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
     console.log("openNewPriceToast", itemId, status, max, min, brand, motivation);
-    // Set toast content
+    // Set content of toast
     motivationDiv.style.display = 'none';
     newPriceToastTitle.innerHTML = "Nytt pris";
     let text = `Vi tror att sannolikheten att få ditt ${brand}-plagg sålt sista tiden ökar om du kan tänka dig att sänka priset något?`;
