@@ -135,7 +135,7 @@ function loadInfoRequests(userId) {
                                 buttonText = "Se pris";
                                 subText = "Accepterar du prissättningen?";
                             }
-                            href = `javascript:openNewPriceToast('${itemId}', '${status}', '${max}', '${min}', '${brand}', '${description}');`;
+                            href = `javascript:openNewPriceToast('${itemId}', '${status}', ${max}, ${min}, '${brand}', '${description}');`;
                         }
                         if (req === "measurements") {
                             title = "Mått";
@@ -173,11 +173,11 @@ function loadInfoRequests(userId) {
 }
 
 // Accept and Deny button elements
-const acceptBtn = document.getElementById('acceptNewPriceButton');
-const denyBtn = document.getElementById('denyNewPriceButton');
+var acceptBtn = document.getElementById('acceptNewPriceButton');
+var denyBtn = document.getElementById('denyNewPriceButton');
 closeNewPriceToastButton.addEventListener("click", function () {
     // Clear the event listeners when toast is cloased
-    acceptBtn.replaceWith(acceptBtn.cloneNode(true));
-    denyBtn.replaceWith(denyBtn.cloneNode(true));
+    var new_element = acceptBtn.cloneNode(true);
+    acceptBtn.parentNode.replaceChild(new_element, acceptBtn);
     triggerNewPriceToastClose.click();
 });
