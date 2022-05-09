@@ -52,41 +52,44 @@ function updateIC(userId, em, ph) {
 };
 
 function updateFirestoreUserDocument(userId, email, phone) {
-    var fields = {};
-    if (email) {
-        fields["email"] = email;
-    }
-    if (phone) {
-        fields["phoneNumber"] = phone;
-    }
+    let fields = {};
+    if (email) { fields["email"] = email; }
+    if (phone) { fields["phoneNumber"] = phone; }
     console.log(fields);
 
-    var docRef = db.collection("users").doc(userId);
-    docRef.get().then((doc) => {
-        if (doc.exists) {
-            console.log("Document data:", doc.data());
-            // Update document
-            db.collection("users").doc(userId).update(fields)
-                .then((docRef) => {
-                    console.log(`User document ${userId} was successfully updated with these fields: `, fields);
-                })
-                .catch((error) => {
-                    console.error("Error writing document: ", error);
-                });
-        } else {
-            console.log("No such user document exists! Creating it now and adds user details.");
-            // Add a new document in collection "users"
-            db.collection("users").doc(userId).set(fields)
-                .then((docRef) => {
-                    console.log(`User document was created with id ${userId} and these fields: `, fields);
-                })
-                .catch((error) => {
-                    console.error("Error writing document: ", error);
-                });
-        }
-    }).catch((error) => {
-        console.log("Error getting document:", error);
-    });
+    return new Promise(function (resolve, reject) {
+        const docRef = db.collection("users").doc(userId);
+        docRef.get().then((doc) => {
+            if (doc.exists) {
+                console.log("Document data:", doc.data());
+                // Update document
+                db.collection("users").doc(userId).update(fields)
+                    .then((docRef) => {
+                        console.log(`User document ${userId} was successfully updated with these fields: `, fields);
+                        resolve(docRef);
+                    })
+                    .catch((error) => {
+                        console.error("Error writing document: ", error);
+                        reject(error);
+                    });
+            } else {
+                console.log("No such user document exists! Creating it now and adds user details.");
+                // Add a new document in collection "users"
+                db.collection("users").doc(userId).set(fields)
+                    .then((docRef) => {
+                        console.log(`User document was created with id ${userId} and these fields: `, fields);
+                        resolve(docRef);
+                    })
+                    .catch((error) => {
+                        console.error("Error writing document: ", error);
+                        reject(error);
+                    });
+            }
+        }).catch((error) => {
+            console.log("Error getting document:", error);
+            reject(error);
+        });
+    })
 };
 
 async function askForAdditionalUserDetails(userID) {
