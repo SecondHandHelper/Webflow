@@ -160,14 +160,7 @@
         var user = userCredential.user;
         window.userId = user.uid;
         console.log("Logged in user: ", user.uid);
-        const emailVerified = firebase.auth().currentUser.emailVerified;
-        if (!emailVerified) {
-          sendEmailVerification();
-          waitOnVerificationDiv.style.display = 'block';
-          signinWithEmailDiv.style.display = 'none';
-        } else {
-          window.location.replace('./private');
-        }
+        window.location.replace('./private');
       })
       .catch((error) => {
         console.log("Error message:", error.code, error.message);
@@ -195,9 +188,11 @@
         console.log("Logged in user: ", user.uid);
         const emailVerified = firebase.auth().currentUser.emailVerified;
         if (!emailVerified) {
-          sendEmailVerification();
-          waitOnVerificationDiv.style.display = 'block';
-          choosePasswordDiv.style.display = 'none';
+          firebase.auth().currentUser.sendEmailVerification()
+            .then(() => {
+              // Email verification sent!
+              window.location.replace('./private');
+            });
         } else {
           window.location.replace('./private');
         }
@@ -213,25 +208,14 @@
     // [END auth_signup_password]
   }
 
-  function sendEmailVerification() {
-    // [START auth_send_email_verification]
-    firebase.auth().currentUser.sendEmailVerification()
-      .then(() => {
-        // Email verification sent!
-        // ...
-      });
-    // [END auth_send_email_verification]
-  }
-
   function sendPasswordReset() {
     const email = emailAddress.value;
     // [START auth_send_password_reset]
     firebase.auth().sendPasswordResetEmail(email)
       .then(() => {
+        // Password reset email sent!
         console.log("Reset password email sent");
         forgotPasswordText.innerHTML = `Email skickat till ${email}`;
-        // Password reset email sent!
-        // ..
       })
       .catch((error) => {
         var errorCode = error.code;

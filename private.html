@@ -4,14 +4,14 @@
     var phone;
 </script>
 <script>
-    function main() {
+    async function main() {
         userId = authUser.uid;
         email = authUser.email;
         phone = authUser.phoneNumber;
         emailVerified = authUser.emailVerified;
         updateIC(userId, email, phone);
         askForAdditionalUserDetails(userId);
-        updateFirestoreUserDocument(userId, email, phone);
+        
         emptyListsInnerHTML();
         loadSoldByOthers(userId);
         //For testing purposes only - To see what a certain user sees
@@ -21,11 +21,13 @@
         
         buildCardLists(userId);
         loadInfoRequests(userId);
+        showReferralSection();
+        showAccountInfo();
+
+        await updateFirestoreUserDocument(authUser.uid, email, phone);
         if (!emailVerified && email) { window.location.replace('./user-management?mode=sendEmailVerification'); }
         // Create refCode
         if (user.addressFirstName && user.addressLastName && !user?.referralData?.referralCode) { createReferralCode(); }
-        showReferralSection();
-        showAccountInfo();
     }
 
     function showAccountInfo(){
