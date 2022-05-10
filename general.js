@@ -51,45 +51,26 @@ function updateIC(userId, em, ph) {
     });
 };
 
-function updateFirestoreUserDocument(userId, email, phone) {
+async function updateFirestoreUserDocument(userId, email, phone) {
     let fields = {};
     if (email) { fields["email"] = email; }
     if (phone) { fields["phoneNumber"] = phone; }
-    console.log(fields);
+    console.log("Fields: ", fields);
+    const docRef = db.collection("users").doc(userId);
 
-    return new Promise(function (resolve, reject) {
-        const docRef = db.collection("users").doc(userId);
-        docRef.get().then((doc) => {
-            if (doc.exists) {
-                console.log("Document data:", doc.data());
-                // Update document
-                db.collection("users").doc(userId).update(fields)
-                    .then((docRef) => {
-                        console.log(`User document ${userId} was successfully updated with these fields: `, fields);
-                        resolve(docRef);
-                    })
-                    .catch((error) => {
-                        console.error("Error writing document: ", error);
-                        reject(error);
-                    });
-            } else {
-                console.log("No such user document exists! Creating it now and adds user details.");
-                // Add a new document in collection "users"
-                db.collection("users").doc(userId).set(fields)
-                    .then((docRef) => {
-                        console.log(`User document was created with id ${userId} and these fields: `, fields);
-                        resolve(docRef);
-                    })
-                    .catch((error) => {
-                        console.error("Error writing document: ", error);
-                        reject(error);
-                    });
-            }
-        }).catch((error) => {
-            console.log("Error getting document:", error);
-            reject(error);
-        });
-    })
+    try {
+        const doc = await docRef.get();
+        if (doc.exists) {
+            console.log("Document data:", doc.data());
+            await docRef.update(fields);
+            console.log(`User document ${userId} was successfully updated with these fields: `, fields);
+        } else {
+            await docRef.set(fields);
+            console.log(`User document was created with id ${userId} and these fields: `, fields);
+        }
+    } catch (e) {
+        console.log("Something went wrong:", e);
+    }
 };
 
 async function askForAdditionalUserDetails(userID) {
