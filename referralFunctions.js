@@ -34,7 +34,7 @@ async function showReferralSection() {
             }
         });
         referredByBonusState.style.display = 'block';
-    } else if ((user?.referralData?.referredBy ? false : true) && daysDiff < 100) {
+    } else if ((user?.referralData?.referredBy ? false : true) && daysDiff < 7) {
         console.log("enterCodeState 'block'");
         enterCodeState.style.display = 'block';
     }
