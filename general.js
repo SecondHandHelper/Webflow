@@ -10,12 +10,12 @@ for (var i = 0; i < paramPairs.length; i++) {
 // ATTRIBUTION STUFF
 function tryAttribution(){
     const a = {}; // attribution
-    const campaignID = checkCookie("utc_campaign");
-    const contentID = checkCookie("utc_content");
-    const source = checkCookie("utc_source");
-    if (campaignID) { a["campaignID"] = campaignID; }
-    if (contentID) { a["contentID"] = contentID; }
-    if (source) { a["source"] = source; }
+    const utm_campaign = checkCookie("utm_campaign");
+    const utm_content = checkCookie("utm_content");
+    const utm_source = checkCookie("utm_source");
+    if (utm_campaign) { a["utm_campaign"] = utm_campaign; }
+    if (utm_content) { a["utm_content"] = utm_content; }
+    if (utm_source) { a["utm_source"] = utm_source; }
     if (Object.keys(a).length > 0){
         storeAttribution(a, authUser.uid);
     }
@@ -23,9 +23,9 @@ function tryAttribution(){
 
 function storeAttribution(a, uid) {
     let fields = {};
-    if (a.campaignID) { fields["attribution.campaignID"] = a.campaignID; }
-    if (a.contentID) { fields["attribution.contentID"] = a.contentID; }
-    if (a.source) { fields["attribution.source"] = a.source; }
+    if (a.utm_campaign) { fields["attribution.utm_campaign"] = a.utm_campaign; }
+    if (a.utm_content) { fields["attribution.utm_content"] = a.utm_content; }
+    if (a.utm_source) { fields["attribution.utm_source"] = a.utm_source; }
     if (Object.keys(fields).length > 0) {
         db.collection('users').doc(uid).update(fields).catch((error) => {
             console.log("Error storing attribution:", fields, error);
