@@ -8,14 +8,14 @@
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-functions.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.31/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.34/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.30/infoRequestsFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.32/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.34/cookieManagement.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.1/autocomplete-brands.js"></script>
 
 <script>
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  // Firebase config
   var firebaseConfig = {
     apiKey: "AIzaSyCMWv3TzZuGPDg41K8wa_PY10rgtitoCnA",
     authDomain: "second-hand-helper.firebaseapp.com",
@@ -45,13 +45,13 @@
   var path = window.location.pathname;
   var domain = window.location.origin;
 
-  // Temporary redirect from Seconhandhelper.se to Maiapp.se
+  // Redirect from Seconhandhelper.se to Maiapp.se
   if (domain.includes("secondhandhelper")) {
     let newLocation = "https://www.maiapp.se" + path;
     window.location = newLocation;
   }
 
-  // Temporary redirect from Home to Home Desktop if user is on desktop, and not for the test domain
+  // Redirect to Home Desktop if on desktop
   if (!isMobile && !(path == "/home-desktop" || path == "/privacy-policy" || path == "/end-user-agreement" || path == "/private" || path == "/user-management") && !domain.includes("shh-test")) {
     window.location.replace('./home-desktop');
   }
@@ -69,12 +69,13 @@
           user = doc.data();
           console.log("user:", user);
           console.log("window:", window);
+          fbq('init', '681886049842735', {'external_id': authUser.uid});
+          fbq('track', 'PageView');
+          tryAttribution();
         }
-
         if (typeof window.main === "function") {
           main();
         }
-
       }).catch((error) => { console.log("Error getting document:", error); });
     } else {
       console.log('No user');
@@ -432,7 +433,7 @@
       if (changedImages.length > 0) {
         // START - Mark imageRequest as Resolved
         await db.collection("items").doc(itemId).get().then((doc) => {
-          if (doc.data()?.infoRequests?.images?.status === "Active"){
+          if (doc.data()?.infoRequests?.images?.status === "Active") {
             changes["infoRequests.images.status"] = "Resolved";
           }
         });
