@@ -11,14 +11,14 @@
         emailVerified = authUser.emailVerified;
         updateIC(userId, email, phone);
         askForAdditionalUserDetails(userId);
-        
+
         emptyListsInnerHTML();
         loadSoldByOthers(userId);
         //For testing purposes only - To see what a certain user sees
         if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
             userId = "3OkW5av20HP8ScpUDS8ip9fBEZr1";
         }
-        
+
         buildCardLists(userId);
         loadInfoRequests(userId);
         showReferralSection();
@@ -28,16 +28,39 @@
         if (!emailVerified && email) { window.location.replace('./user-management?mode=sendEmailVerification'); }
         // Create refCode
         if (user.addressFirstName && user.addressLastName && !user?.referralData?.referralCode) { createReferralCode(); }
+
+        attribution();
     }
 
-    function showAccountInfo(){
+    function attribution(){
+        ///// TESTING COOKIES
+        const a = {}; // attribution
+        const campaignID = checkCookie("utc_campaign");
+        const adID = checkCookie("utc_content");
+        if (campaignID) { a["campaignID"] = campaignID; }
+        if (adID) { a["adID"] = adID; }
+        storeAttribution(a, authUser.uid);
+    }
+
+    function storeAttribution(a, uid) {
+        let fields = {};
+        if (a.campaignID) { fields["attribution.campaignID"] = a.campaignID; }
+        if (a.adID) { fields["attribution.adID"] = a.adID; }
+        if (Object.keys(fields).length > 0) {
+            db.collection('users').doc(uid).update(fields).catch((error) => {
+                console.log("Error storing attribution:", fields, error);
+            });
+        }
+    }
+
+    function showAccountInfo() {
         let identifier;
-        if (authUser.phoneNumber){
+        if (authUser.phoneNumber) {
             identifier = authUser.phoneNumber;
         } else if (authUser.email) {
             identifier = authUser.email;
         }
-        if (identifier){
+        if (identifier) {
             accountInfoText.innerHTML = `Inloggad med ${identifier}`;
             accountInfoText.style.display = 'block';
         }

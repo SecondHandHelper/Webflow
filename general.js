@@ -1,5 +1,13 @@
-// FUNCTIONS FOR PRIVATE PAGE
+// Get params
+var queryStr = window.location.search;
+var paramPairs = queryStr.substr(1).split('&');
+var params = {};
+for (var i = 0; i < paramPairs.length; i++) {
+    var parts = paramPairs[i].split('=');
+    params[parts[0]] = parts[1];
+}
 
+// FUNCTIONS FOR PRIVATE PAGE
 function updateIC(userId, em, ph) {
     let email = em;
     let phone = ph;
