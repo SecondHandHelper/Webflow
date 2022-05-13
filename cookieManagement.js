@@ -30,6 +30,7 @@ function checkCookie(cname) {
         console.log("No such cookie set: ", cname);
         if (p[cname]) {
             setCookie(cname, p[cname], 7);
+            return p[cname];
         }
     }
     if (c) {
