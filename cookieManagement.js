@@ -34,5 +34,7 @@ function checkCookie(cname) {
     }
     if (c) {
         console.log("Cookie exist: ", cname + "=" + c);
+        return c;
     }
+    return "";
 }
