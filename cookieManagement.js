@@ -1,3 +1,12 @@
+// Get params (Move to a more general file since not only cookies uses params)
+var queryStr = window.location.search;
+var paramPairs = queryStr.substr(1).split('&');
+var params = {};
+for (var i = 0; i < paramPairs.length; i++) {
+    var parts = paramPairs[i].split('=');
+    params[parts[0]] = parts[1];
+}
+
 function setCookie(cname, cvalue, exdays) {
     console.log("setCookie", cname);
     const d = new Date();
@@ -28,9 +37,9 @@ function checkCookie(cname) {
     const c = getCookie(cname);
     if (!c) {
         console.log("No such cookie set: ", cname);
-        if (p[cname]) {
-            setCookie(cname, p[cname], 7);
-            return p[cname];
+        if (params[cname]) {
+            setCookie(cname, params[cname], 7);
+            return params[cname];
         }
     }
     if (c) {
