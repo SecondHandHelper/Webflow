@@ -28,29 +28,6 @@
         if (!emailVerified && email) { window.location.replace('./user-management?mode=sendEmailVerification'); }
         // Create refCode
         if (user.addressFirstName && user.addressLastName && !user?.referralData?.referralCode) { createReferralCode(); }
-
-        attribution();
-    }
-
-    function attribution(){
-        ///// TESTING COOKIES
-        const a = {}; // attribution
-        const campaignID = checkCookie("utc_campaign");
-        const adID = checkCookie("utc_content");
-        if (campaignID) { a["campaignID"] = campaignID; }
-        if (adID) { a["adID"] = adID; }
-        storeAttribution(a, authUser.uid);
-    }
-
-    function storeAttribution(a, uid) {
-        let fields = {};
-        if (a.campaignID) { fields["attribution.campaignID"] = a.campaignID; }
-        if (a.adID) { fields["attribution.adID"] = a.adID; }
-        if (Object.keys(fields).length > 0) {
-            db.collection('users').doc(uid).update(fields).catch((error) => {
-                console.log("Error storing attribution:", fields, error);
-            });
-        }
     }
 
     function showAccountInfo() {

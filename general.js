@@ -7,6 +7,32 @@ for (var i = 0; i < paramPairs.length; i++) {
     params[parts[0]] = parts[1];
 }
 
+// ATTRIBUTION STUFF
+function tryAttribution(){
+    const a = {}; // attribution
+    const campaignID = checkCookie("utc_campaign");
+    const adID = checkCookie("utc_ad");
+    const source = checkCookie("utc_source");
+    if (campaignID) { a["campaignID"] = campaignID; }
+    if (adID) { a["adID"] = adID; }
+    if (source) { a["source"] = source; }
+    if (Object.keys(a).length > 0){
+        storeAttribution(a, authUser.uid);
+    }
+}
+
+function storeAttribution(a, uid) {
+    let fields = {};
+    if (a.campaignID) { fields["attribution.campaignID"] = a.campaignID; }
+    if (a.adID) { fields["attribution.adID"] = a.adID; }
+    if (a.source) { fields["attribution.source"] = a.source; }
+    if (Object.keys(fields).length > 0) {
+        db.collection('users').doc(uid).update(fields).catch((error) => {
+            console.log("Error storing attribution:", fields, error);
+        });
+    }
+}
+
 // FUNCTIONS FOR PRIVATE PAGE
 function updateIC(userId, em, ph) {
     let email = em;
