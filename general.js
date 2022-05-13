@@ -11,10 +11,10 @@ for (var i = 0; i < paramPairs.length; i++) {
 function tryAttribution(){
     const a = {}; // attribution
     const campaignID = checkCookie("utc_campaign");
-    const adID = checkCookie("utc_ad");
+    const contentID = checkCookie("utc_content");
     const source = checkCookie("utc_source");
     if (campaignID) { a["campaignID"] = campaignID; }
-    if (adID) { a["adID"] = adID; }
+    if (contentID) { a["contentID"] = contentID; }
     if (source) { a["source"] = source; }
     if (Object.keys(a).length > 0){
         storeAttribution(a, authUser.uid);
@@ -24,7 +24,7 @@ function tryAttribution(){
 function storeAttribution(a, uid) {
     let fields = {};
     if (a.campaignID) { fields["attribution.campaignID"] = a.campaignID; }
-    if (a.adID) { fields["attribution.adID"] = a.adID; }
+    if (a.contentID) { fields["attribution.contentID"] = a.contentID; }
     if (a.source) { fields["attribution.source"] = a.source; }
     if (Object.keys(fields).length > 0) {
         db.collection('users').doc(uid).update(fields).catch((error) => {
