@@ -643,42 +643,37 @@ async function formatPersonalId(personalId) {
 }
 
 // FUNCTIONS FOR SELL ITEM PAGE
-function writePhoneNumberToFirestore(userID, phoneNumber) {
-    var docRef = db.collection("users").doc(userID);
-    console.log("writePhoneNumberToFirestore function is running!");
+async function writePhoneNumberToFirestore(userID, phoneNumber) {
+  var docRef = db.collection("users").doc(userID);
+  console.log("writePhoneNumberToFirestore function is running!");
 
-    var formattedPhoneNumber = formatPhoneNumber(phoneNumber);
+  var formattedPhoneNumber = formatPhoneNumber(phoneNumber);
 
-    docRef.get().then((doc) => {
-        if (doc.exists) {
-            console.log("Now adding the phone number to the user document");
-            // Update document
-            db.collection("users").doc(userID).update({
-                phoneNumber: formattedPhoneNumber
-            })
-                .then(() => {
-                    console.log("User document successfully updated with phone number: ", formattedPhoneNumber);
-                })
-                .catch((error) => {
-                    console.error("Error writing document: ", error);
-                });
-        } else {
-            // doc.data() will be undefined in this case
-            console.log("No such document! Creating it and adding phone number!");
-            // Add a new document in collection "users"
-            db.collection("users").doc(userID).set({
-                phoneNumber: formattedPhoneNumber
-            })
-                .then(() => {
-                    console.log("User document successfully written!");
-                })
-                .catch((error) => {
-                    console.error("Error writing document: ", error);
-                });
-        }
-    }).catch((error) => {
-        console.log("Error getting document:", error);
-    });
+  var doc = await docRef.get();
+  if (doc.exists) {
+    console.log("Now adding the phone number to the user document");
+    // Update document
+    try {
+      await db.collection("users").doc(userID).update({
+        phoneNumber: formattedPhoneNumber
+      });
+      console.log("User document successfully updated with phone number: ", formattedPhoneNumber);
+    } catch (error) {
+      console.error("Error writing document: ", error);
+    }
+  } else {
+    // doc.data() will be undefined in this case
+    console.log("No such document! Creating it and adding phone number!");
+    // Add a new document in collection "users"
+    try {
+      await db.collection("users").doc(userID).set({
+        phoneNumber: formattedPhoneNumber
+      });
+      console.log("User document successfully written!");
+    } catch (error) {
+      console.error("Error writing document: ", error);
+    }
+  }
 }
 
 function calculateSellerGets(value, elementId, feeElementId) {
