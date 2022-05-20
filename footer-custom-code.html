@@ -13,6 +13,8 @@
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.32/referralFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.34/cookieManagement.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.1/autocomplete-brands.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test31/onPageLoad.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test32/loadCardLists.js"></script>
 
 <script>
   // Firebase config
@@ -40,26 +42,12 @@
 <!-- End Google Tag Manager (noscript) -->
 
 <script>
-  // REDIRECTS
-  var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  var path = window.location.pathname;
-  var domain = window.location.origin;
-
-  // Redirect from Seconhandhelper.se to Maiapp.se
-  if (domain.includes("secondhandhelper")) {
-    let newLocation = "https://www.maiapp.se" + path;
-    window.location = newLocation;
-  }
-
-  // Redirect to Home Desktop if on desktop
-  if (!isMobile && !(path == "/home-desktop" || path == "/privacy-policy" || path == "/end-user-agreement" || path == "/private" || path == "/user-management") && !domain.includes("shh-test")) {
-    window.location.replace('./home-desktop');
-  }
-
   // GET USER
   var user;
   var authUser;
   firebase.auth().onAuthStateChanged((result) => {
+    const now = new Date().toISOString();
+
     if (result) {
       authUser = result;
 
@@ -68,158 +56,60 @@
         if (doc.exists) {
           user = doc.data();
           console.log("user:", user);
-          console.log("window:", window);
-          fbq('init', '681886049842735', {'external_id': authUser.uid});
-          fbq('track', 'PageView');
+          console.log("authUser", authUser);
+
+          // FB Pixel
+          fbq('init', '681886049842735', { 'external_id': authUser.uid }); fbq('track', 'PageView');
+
+          // Own Attribution (Will be removed)
           tryAttribution();
+
+          let createdAt = new Date(authUser.metadata.creationTime).toISOString();
+          let latestLogin = new Date(authUser.metadata.lastSignInTime).toISOString();
+
+          // Segment
+          const firstName = user.addressFirstName ? user.addressFirstName : null ;
+          const lastName = user.addressLastName ? user.addressLastName : null ;
+          const email = user.email ? user.email : null ;
+          const phone = user.phoneNumber ? user.phoneNumber : null ;
+          const street = user.addressStreetAddress ? user.addressStreetAddress : null ;
+          const city = user.addressCity ? user.addressCity : null ;
+          const postalCode = user.addressPostalCode ? user.addressPostalCode : null ;
+          const doorCode = user.addressDoorCode ? user.addressDoorCode : null ;
+          const replace = user.replace ? user.replace : null ;
+          console.log("doorCode", doorCode);
+    
+          analytics.identify(`${authUser.uid}`, { 
+            createdAt,
+            firstName,
+            lastName,
+            email,
+            phone,
+            address: {
+              street,
+              city,
+              postalCode,
+              doorCode
+            },
+            latestLogin,
+            latestPageView: now
+          });
         }
+
         if (typeof window.main === "function") {
           main();
         }
       }).catch((error) => { console.log("Error getting document:", error); });
     } else {
+      analytics.identify({
+        latestPageView: now
+      });
       console.log('No user');
     }
   });
-
-  // FUNCTIONS PRIVATE PAGE
-  function buildCardLists(userId) {
-    db.collection("items")
-      .where("user", "==", userId)
-      .where("createdAt", "!=", false)
-      .orderBy('createdAt', 'desc')
-      .get()
-      .then((querySnapshot) => {
-        loadingDiv.style.display = "none";
-        noItemsDiv.style.display = "block";
-        soldByOthersDiv.style.display = "block";
-        quickInfoDiv.style.display = "block";
-        var youEarned = 0;
-
-        querySnapshot.forEach((doc) => {
-          var itemId = doc.id;
-          var createdDate = doc.data().createdAt;
-          var soldDate = doc.data().soldDate;
-          var images = doc.data().images;
-          var status = doc.data().status;
-          var shippingStatus = doc.data().shippingStatus;
-          var brand = doc.data().brand;
-          var soldPrice = doc.data().soldPrice;
-          var sellerGets = doc.data().sellerGets;
-          var buyerFirstName = doc.data().buyerFirstName;
-          var buyerAddressCity = doc.data().buyerAddressCity;
-          var minPriceEstimate = doc.data().minPriceEstimate;
-          var maxPriceEstimate = doc.data().maxPriceEstimate;
-          var happyPrice = doc.data().happyPrice;
-          var acceptPrice = doc.data().acceptPrice;
-          var pricing = doc.data().pricing;
-          var pickupDate = doc.data().pickupDate;
-          var shippingMethod = doc.data().shippingMethod;
-          var archived = doc.data().archived;
-          var frontImageUrl = images.frontImage;
-          if (images.frontImageSmall) {
-            frontImageUrl = images.frontImageSmall;
-          }
-          let daysLeftText = "";
-          let publishedDate = doc.data().publishedDate;
-          if (publishedDate) {
-            publishedDate = new Date(publishedDate);
-            let nowDate = new Date();
-            let timeDifference = nowDate.getTime() - publishedDate.getTime();
-            let daysDifference = timeDifference / (1000 * 3600 * 24);
-            let daysLeft = Math.round(31 - daysDifference);
-            if (daysLeft <= 0) {
-              daysLeftText = `0 dagar kvar`;
-            } else {
-              daysLeftText = `${daysLeft} dagar kvar`;
-            }
-          }
-          if (archived == undefined && status != "Unsold") {
-            displayItemCard();
-          }
-
-          function displayItemCard() {
-            //Putting the items in the right list
-
-            // WE SELL RIGHT NOW
-            if (status != "Sold") {
-              let textDiv1 = "";
-              let textDiv2 = "";
-
-              //If price-estimate is set, show info
-              if (status == "Published" || status == "New") {
-                if (minPriceEstimate != null && maxPriceEstimate != null) {
-                  textDiv1 = `<div class='text-block-34'>${minPriceEstimate} - ${maxPriceEstimate} kr</div>`;
-                } else {
-                  textDiv1 = `<div class='text-block-34'>Förbereds</div>`;
-                }
-                if (status == "Published") {
-                  textDiv2 = `<div class='text-block-34'>${daysLeftText}</div>`;
-                }
-              }
-
-              let itemPageUrl = window.location.origin + `/item?id=${itemId}`;
-              let sellingItemCardHTML = `<div class="div-block-14"><a id="itemLinkBlock" href="${itemPageUrl}" class="link-block-18 w-inline-block"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div><div class="text-block-14">${brand}</div>${textDiv1}${textDiv2}</a></div>`;
-              itemListSelling.innerHTML += sellingItemCardHTML;
-
-              //Display list
-              myItemsDiv.style.display = "block";
-              //Hide empty state
-              noItemsDiv.style.display = "none";
-              headerSellItemButton.style.display = "block";
-              sellButtonText.innerHTML = "Sälj ett plagg";
-
-              // SOLD - NOT SENT
-            } else if (status == "Sold" && shippingStatus != "Sent") {
-              var buyerInfoTextHTML = '';
-              if (buyerFirstName != null && buyerAddressCity != null) {
-                buyerInfoTextHTML = `<div class="text-block-44">Till ${buyerFirstName} i ${buyerAddressCity}</div>`;
-              }
-
-              var bagReceivedCheckbox = '';
-              var shippingInfoDiv = '';
-              if (!shippingMethod && !pickupDate) {
-                bagReceivedCheckbox = getBagReceivedCheckbox(itemId, soldDate);
-              } else if (!shippingMethod && pickupDate) {
-                shippingInfoDiv = getShippingInfoDiv(itemId, 'Pickup', soldDate, pickupDate); // För items under en övergångsperiod
-              } else {
-                shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
-              }
-
-              //Create card
-              var soldNotSentCardHTML = ``;
-              soldNotSentCardHTML =
-                `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">Såld för ${soldPrice} kr</div>${buyerInfoTextHTML}<div class="text-block-44">Du får ${sellerGets} kr</div>
-                      ${bagReceivedCheckbox}
-                      ${shippingInfoDiv}
-                  </div></div></div></div>`;
-              itemListSoldNotSent.innerHTML += soldNotSentCardHTML;
-
-              // Display list
-              soldNotSentDiv.style.display = "block";
-              // Hide empty state
-              noItemsDiv.style.display = "none";
-              headerSellItemButton.style.display = "block";
-              sellButtonText.innerHTML = "Sälj ett plagg";
-
-              // SOLD BEFORE
-            } else {
-              var soldItemCardHTML = `<div class="div-block-14"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>Du fick ${sellerGets} kr</div></div>`;
-              itemListSold.innerHTML += soldItemCardHTML;
-
-              // Display list, hide empty state
-              soldItemsDiv.style.display = "block";
-              itemListSoldContainer.style.display = "block";
-              sellButtonText.innerHTML = "Sälj ett plagg";
-              youEarned = youEarned + sellerGets;
-              youEarnedDiv.innerHTML = `Du har tjänat ${youEarned} kr`;
-            }
-          }
-        });
-      });
-  }
 </script>
 <script>
+  // FUNCTIONS PRIVATE PAGE
   function formatPhoneNumber(str) {
     if (str.slice(0, 1) == 0 && str.length == 10) {
       str = str.substring(1);
@@ -233,7 +123,6 @@
 
   // FUNCTIONS - SELL ITEM
   async function addItem() {
-    console.log("addItem function is running!");
     let sex = "";
     let pricing = "";
     const now = new Date();
@@ -356,11 +245,8 @@
       const storageRef = storage.ref();
       images.forEach(async (value, key) => {
         let imagePathReference = `images/${itemId}/${key}`;
-        console.log(imagePathReference);
-
         let fileRef = storageRef.child(imagePathReference);
         await fileRef.put(value);
-
         const imageDownloadUrl = await fileRef.getDownloadURL();
         imageUrls[key] = imageDownloadUrl;
         imagePaths[key] = imagePathReference;
@@ -389,7 +275,7 @@
         images: imageUrls,
         imageStoragePaths: imagePaths
       }).then(function () {
-        console.log(`imagePaths of ${itemId} is now updated`);
+        console.log(`Images of ${itemId} updated`);
 
         if (addressFirstName == "") {
           addressFormDiv.style.display = 'block';
@@ -402,7 +288,6 @@
   }
 
   async function updateItem(itemId, changedImages) {
-    console.log("updateItem()");
     const now = new Date();
     const size = itemSize.value;
     const material = itemMaterial.value;
