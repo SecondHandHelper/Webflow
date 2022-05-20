@@ -130,7 +130,7 @@ async function uploadImages(itemId) {
   }, {}); // { frontImage: <file object>, ... }
 
   const storageRef = storage.ref();
-  const promises = imageData.keys().map(async (key) => {
+  const promises = Object.keys(imageData).map(async (key) => {
     const imagePathReference = `images/${itemId}/${key}`;
     const file = imageData[key];
     let fileRef = storageRef.child(imagePathReference);
