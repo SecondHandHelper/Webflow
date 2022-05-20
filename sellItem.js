@@ -122,9 +122,8 @@ async function addItemInner(id) {
   }
 }
 
-const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
-
 async function uploadImages(itemId) {
+  const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
   const imageData = imageElements.reduce((prev, current) => {
     const file = document.getElementById(current).files[0];
     if (!file) return prev;
