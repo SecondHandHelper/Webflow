@@ -108,9 +108,12 @@ async function addItemInner(id) {
   console.log("addItemInner called");
 
   const pageData = collect();
-  const imageData = await uploadImages(id);
+  const images = await uploadImages(id);
+  const item = { ...pageData, images };
 
-  await db.collection('items').doc(id).set({ ...pageData, ...imageData });
+  console.log('Storing item: ', item);
+
+  await db.collection('items').doc(id).set(item);
 
   // TODO: Should this be here?
   const phoneNumber = itemPhoneNumber.value;
@@ -121,7 +124,6 @@ async function addItemInner(id) {
 
 const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
 
-// Uploads images
 async function uploadImages(itemId) {
   const imageData = imageElements.reduce((prev, current) => {
     const file = document.getElementById(current).files[0];
@@ -135,40 +137,12 @@ async function uploadImages(itemId) {
     const file = imageData[key];
     let fileRef = storageRef.child(imagePathReference);
     await fileRef.put(file);
-    return await fileRef.getDownloadURL();
-
-    // Not sure what this is about?
-    // if (Object.keys(imagePaths).length === images.size) {
-    //   await writeImagePathToFirestore(itemId, imageUrls, imagePaths);
-    // }
+    return { key, url: await fileRef.getDownloadURL() };
   });
-  return await Promise.all(promises);
-}
-
-// Don't think we need this one
-async function writeImagePathToFirestore(itemId, imageUrls, imagePaths) {
-  // Check if seller has added address first
-  // var addressFirstName = "";
-  // var docRef = db.collection("users").doc(window.uid);
-  // const doc = await docRef.get();
-  // if (doc.data().addressFirstName) {
-  //   addressFirstName = doc.data().addressFirstName;
-  // }
-
-  // Set the imagePaths of the item
-  const itemRef = db.collection('items').doc(itemId);
-  await itemRef.update({
-    images: imageUrls,
-    imageStoragePaths: imagePaths
-  });
-  console.log(`imagePaths of ${itemId} is now updated`);
-
-  // if (addressFirstName) {
-  //   addressFormDiv.style.display = 'block';
-  //   addItemFormDiv.style.display = 'none';
-  // } else {
-  //   window.location.href = window.location.origin + "/private";
-  // }
+  const imageUrls = await Promise.all(promises);
+  return imageUrls.reduce((prev, curr) => {
+    return { ...prev, [curr.key]: curr.url };
+  }, {});
 }
 
 async function firstNameSet() {
@@ -182,8 +156,6 @@ async function firstNameSet() {
     window.location.href = window.location.origin + "/private";
   }
 }
-
-
 
 async function updateItem(itemId, changedImages) {
   console.log("updateItem()");
