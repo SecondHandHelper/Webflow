@@ -8,6 +8,7 @@
 
             // Om användare ej har document i users -> skapa dokument och lägg till telefonnummer
             if (user.phoneNumber) {
+                document.getElementById("itemPhoneNumber").required = false;
                 writePhoneNumberToFirestore(user.uid, user.phoneNumber);
                 phoneNumberDiv.style.display = "none"; // Be inte om telefonnummer om användaren redan har ett
             }
@@ -16,6 +17,7 @@
             var docRef = db.collection("users").doc(user.uid);
             docRef.get().then((doc) => {
                 if (doc.data().phoneNumber) {
+                    document.getElementById("itemPhoneNumber").required = false;
                     phoneNumberDiv.style.display = "none"; // Be inte om telefonnummer om användaren redan har ett
                 }
             });
@@ -191,7 +193,7 @@
     // Initially hide this form
     addressFormDiv.style.display = 'none';
     itemConfirmationDiv.style.display = 'none';
-    addItemForm.addEventListener("submit", addItem);
+    addItemForm.addEventListener("submit", addItem2);
     userAddressForm.addEventListener("submit", addUserDetails);
     closeAddressFormButton.addEventListener("click", closeAddressForm);
     /*initiate the autocomplete function on the "itemBrand" element, and pass along the brands array as possible autocomplete values:*/
