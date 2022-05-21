@@ -547,7 +547,9 @@ async function addUserDetails() {
     const addressCity = document.getElementById("addressCity").value;
     const addressDoorCode = document.getElementById("addressDoorCode").value;
     let personalId = document.getElementById("personalId").value;
-    personalId = await formatPersonalId(personalId);
+    console.log('personalId1: ', personalId);
+    personalId = personalId ? await formatPersonalId(personalId) : null ;
+    console.log('personalId2: ', personalId);
 
     // Write to Firestore
     const itemRef = db.collection('users').doc(authUser.uid);
