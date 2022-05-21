@@ -494,7 +494,6 @@ function signOut() {
 
 // FUNCTIONS FOR START PAGE (Logged out)
 function loadRecentlySold() {
-    console.log("Funktionen loadRecentlySold påbörjad!");
     var data = {};
 
     // [START fb_functions_call_add_message_error]
@@ -551,7 +550,7 @@ async function addUserDetails() {
     personalId = await formatPersonalId(personalId);
 
     // Write to Firestore
-    const itemRef = db.collection('users').doc(window.uid);
+    const itemRef = db.collection('users').doc(authUser.uid);
     itemRef.update({
         addressFirstName: addressFirstName,
         addressLastName: addressLastName,
@@ -582,7 +581,7 @@ async function addUserAddress() {
     const addressDoorCode = document.getElementById("addressDoorCode").value;
 
     // Write to Firestore
-    const itemRef = db.collection('users').doc(window.uid);
+    const itemRef = db.collection('users').doc(authUser.uid);
     itemRef.update({
         addressFirstName: addressFirstName,
         addressLastName: addressLastName,
@@ -608,7 +607,7 @@ async function addPersonalId() {
 
     // Write to Firestore
     if (personalId) {
-        const itemRef = db.collection('users').doc(window.uid);
+        const itemRef = db.collection('users').doc(authUser.uid);
         itemRef.update({
             personalId: personalId
         })
