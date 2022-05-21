@@ -563,7 +563,7 @@ async function addUserDetails() {
         personalId: personalId
     })
         .then(() => {
-            console.log(`User address of ${uid} is now updated`);
+            console.log(`User address of ${authUser.uid} is now updated`);
             itemConfirmationDiv.style.display = 'block';
             addressFormDiv.style.display = 'none';
         })
@@ -593,7 +593,7 @@ async function addUserAddress() {
         addressDoorCode: addressDoorCode
     })
         .then(() => {
-            console.log(`User address of ${uid} is now updated`);
+            console.log(`User address of ${authUser.uid} is now updated`);
             window.location.href = window.location.origin + "/private";
         })
         .catch((error) => {
@@ -614,7 +614,7 @@ async function addPersonalId() {
             personalId: personalId
         })
             .then(() => {
-                console.log(`PersonalId of ${uid} is now updated`);
+                console.log(`PersonalId of ${authUser.uid} is now updated`);
                 personalIdConfirmationDiv.style.display = 'block';
                 personalIdFormDiv.style.display = 'none';
             })
