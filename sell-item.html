@@ -1,33 +1,4 @@
 <script>
-    firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            console.log('Mobilnummer: ' + user.phoneNumber);
-            console.log('UID: ' + user.uid);
-            window.uid = user.uid;
-            console.log("window:", window);
-
-            // Om användare ej har document i users -> skapa dokument och lägg till telefonnummer
-            if (user.phoneNumber) {
-                document.getElementById("itemPhoneNumber").required = false;
-                writePhoneNumberToFirestore(user.uid, user.phoneNumber);
-                phoneNumberDiv.style.display = "none"; // Be inte om telefonnummer om användaren redan har ett
-            }
-
-            // Om användare har telefonnummer, be inte om telefonnummer i formuläret
-            var docRef = db.collection("users").doc(user.uid);
-            docRef.get().then((doc) => {
-                if (doc.data().phoneNumber) {
-                    document.getElementById("itemPhoneNumber").required = false;
-                    phoneNumberDiv.style.display = "none"; // Be inte om telefonnummer om användaren redan har ett
-                }
-            });
-        } else {
-            console.log('No user is logged in')
-        }
-    });
-</script>
-
-<script>
     // Go back arrow
     $(document).ready(function () {
         $(".goback").click(function () {
@@ -186,16 +157,21 @@
 </script>
 
 <script>
-    function closeAddressForm() {
-        window.location.href = window.location.origin + "/private";
+    async function main() {
+        // Om användare inte har telefonnummer, be om telefonnummer i formuläret
+        console.log(user);
+        console.log("phone: ", user.phoneNumber);
+        if (!user.phoneNumber) {
+            phoneNumberDiv.style.display = "block";
+            document.getElementById("itemPhoneNumber").required = true;
+        }
     }
 
-    // Initially hide this form
+    // Initial state
     addressFormDiv.style.display = 'none';
     itemConfirmationDiv.style.display = 'none';
-    addItemForm.addEventListener("submit", addItem2);
+    addItemForm.addEventListener("submit", addItem);
     userAddressForm.addEventListener("submit", addUserDetails);
-    closeAddressFormButton.addEventListener("click", closeAddressForm);
     /*initiate the autocomplete function on the "itemBrand" element, and pass along the brands array as possible autocomplete values:*/
     autocomplete(document.getElementById("itemBrand"), brands);
 </script>

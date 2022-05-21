@@ -1,26 +1,10 @@
-// Backlog
-//
-// DONE - refactor writePhoneNumberToFirestore (make async)
-// DONE - create synchronous addItem to be called as dom event handler
-// DONE - create item id
-// DONE - collect data from page (pageData)
-// - test?
-// DONE - update user document with phone number...why here?
-// DONE - upload images returning the images item property (i.e. containing the image urls)
-// DONE -- extract image information from page
-// NOPE -- write image paths to firestore (?)
-// DONE -- collect image urls (imageData)
-// DONE(?) addressFirstName based view and navigation changes (should probably not be here)
-// - also fix updateItem
-
-
-function addItem2() {
+function addItem() {
   const id = uuidv4();
   console.log(`addItem called, new id: ${id}`);
   addItemInner(id)
     .then(() => {
       console.log('addItem completed');
-      return firstNameSet();
+      firstNameSet().then(() => console.log('firstNameSet completed'));
     })
     .catch((e) => {
       console.error('addItem failed', e);
@@ -81,7 +65,7 @@ function collect() {
   }
 
   return {
-    user: window.uid,
+    user: authUser.uid,
     createdAt: now,
     status,
     shippingStatus,
@@ -118,7 +102,7 @@ async function addItemInner(id) {
   // TODO: Should this be here?
   const phoneNumber = itemPhoneNumber.value;
   if (phoneNumber) {
-    await writePhoneNumberToFirestore(window.uid, phoneNumber);
+    await writePhoneNumberToFirestore(authUser.uid, phoneNumber);
   }
 }
 
@@ -145,10 +129,12 @@ async function uploadImages(itemId) {
 }
 
 async function firstNameSet() {
-  const docRef = db.collection("users").doc(window.uid);
+  console.log('in firstNameSet');
+  const docRef = db.collection("users").doc(authUser.uid);
   const doc = await docRef.get();
-  const firstNameSet = !!doc.data().addressFirstName;
-  if (firstNameSet) {
+  const firstNameSet = doc.data().addressFirstName;
+  console.log('firstNameSet', firstNameSet);
+  if (!firstNameSet) {
     addressFormDiv.style.display = 'block';
     addItemFormDiv.style.display = 'none';
   } else {

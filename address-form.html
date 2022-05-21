@@ -1,15 +1,3 @@
 <script>
-    firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            console.log('UID: ' + user.uid);
-            window.uid = user.uid;
-        } else {
-            console.log('No user is logged in');
-            window.location.href = window.location.origin;
-        }
-    });
-</script>
-
-<script>
     userAddressForm.addEventListener("submit", addUserAddress);
 </script>
