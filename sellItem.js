@@ -93,7 +93,7 @@ async function addItemInner(id) {
 
   const pageData = collect();
   const images = await uploadImages(id);
-  const item = { ...pageData, images };
+  const item = { ...pageData, images, version: "2" };
 
   console.log('Storing item: ', item);
 
