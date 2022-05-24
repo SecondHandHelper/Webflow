@@ -16,7 +16,7 @@
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.37/onPageLoad.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.37/loadCardLists.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuidv4.min.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.37/sellItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test39/sellItem.js"></script>
 
 <script>
   // Firebase config
@@ -62,15 +62,12 @@
           console.log("user:", user);
           console.log("authUser", authUser);
 
-          // FB Pixel
-          fbq('init', '681886049842735', { 'external_id': authUser.uid });
-          fbq('track', 'PageView');
-
           // Own Attribution (Will be removed)
           tryAttribution();
 
           let createdAt = new Date(authUser.metadata.creationTime).toISOString();
           let latestLogin = new Date(authUser.metadata.lastSignInTime).toISOString();
+          let signInMethod = authUser.providerData[0].providerId;
 
           // Segment
           const firstName = user.addressFirstName ? user.addressFirstName : null;
@@ -96,7 +93,8 @@
               doorCode
             },
             latestLogin,
-            latestPageView: now
+            latestPageView: now,
+            signInMethod
           });
         }
 
