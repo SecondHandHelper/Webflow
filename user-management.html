@@ -1,13 +1,4 @@
 <script>
-    // Get params
-    const queryStr = window.location.search;
-    const paramPairs = queryStr.substr(1).split('&');
-    let params = {};
-    for (var i = 0; i < paramPairs.length; i++) {
-        let parts = paramPairs[i].split('=');
-        params[parts[0]] = parts[1];
-    }
-
     function getParameterByName(name) {
         return params[name];
     }

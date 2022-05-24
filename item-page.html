@@ -7,17 +7,6 @@
 </script>
 
 <script>
-    // Get params
-    var queryStr = window.location.search; // will give ?id=fg6Hjkads8dsjklnas9
-    var paramPairs = queryStr.substr(1).split('&');
-    var params = {};
-    for (var i = 0; i < paramPairs.length; i++) {
-        var parts = paramPairs[i].split('=');
-        params[parts[0]] = parts[1];
-    }
-</script>
-
-<script>
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
             console.log('UID: ' + user.uid);
