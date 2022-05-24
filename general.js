@@ -8,7 +8,7 @@ for (var i = 0; i < paramPairs.length; i++) {
 }
 
 // ATTRIBUTION STUFF
-function tryAttribution(){
+function tryAttribution() {
     const a = {}; // attribution
     const utm_campaign = checkCookie("utm_campaign");
     const utm_content = checkCookie("utm_content");
@@ -16,7 +16,7 @@ function tryAttribution(){
     if (utm_campaign) { a["utm_campaign"] = utm_campaign; }
     if (utm_content) { a["utm_content"] = utm_content; }
     if (utm_source) { a["utm_source"] = utm_source; }
-    if (Object.keys(a).length > 0){
+    if (Object.keys(a).length > 0) {
         storeAttribution(a, authUser.uid);
     }
 }
@@ -547,9 +547,7 @@ async function addUserDetails() {
     const addressCity = document.getElementById("addressCity").value;
     const addressDoorCode = document.getElementById("addressDoorCode").value;
     let personalId = document.getElementById("personalId").value;
-    console.log('personalId1: ', personalId);
-    personalId = personalId ? await formatPersonalId(personalId) : null ;
-    console.log('personalId2: ', personalId);
+    personalId = personalId ? await formatPersonalId(personalId) : null;
 
     // Write to Firestore
     const itemRef = db.collection('users').doc(authUser.uid);
@@ -568,7 +566,6 @@ async function addUserDetails() {
             addressFormDiv.style.display = 'none';
         })
         .catch((error) => {
-            // The document probably doesn't exist.
             console.error("Error updating document: ", error);
         });
 }
@@ -645,36 +642,36 @@ async function formatPersonalId(personalId) {
 
 // FUNCTIONS FOR SELL ITEM PAGE
 async function writePhoneNumberToFirestore(userID, phoneNumber) {
-  var docRef = db.collection("users").doc(userID);
-  console.log("writePhoneNumberToFirestore function is running!");
+    var docRef = db.collection("users").doc(userID);
+    console.log("writePhoneNumberToFirestore function is running!");
 
-  var formattedPhoneNumber = formatPhoneNumber(phoneNumber);
+    var formattedPhoneNumber = formatPhoneNumber(phoneNumber);
 
-  var doc = await docRef.get();
-  if (doc.exists) {
-    console.log("Now adding the phone number to the user document");
-    // Update document
-    try {
-      await db.collection("users").doc(userID).update({
-        phoneNumber: formattedPhoneNumber
-      });
-      console.log("User document successfully updated with phone number: ", formattedPhoneNumber);
-    } catch (error) {
-      console.error("Error writing document: ", error);
+    var doc = await docRef.get();
+    if (doc.exists) {
+        console.log("Now adding the phone number to the user document");
+        // Update document
+        try {
+            await db.collection("users").doc(userID).update({
+                phoneNumber: formattedPhoneNumber
+            });
+            console.log("User document successfully updated with phone number: ", formattedPhoneNumber);
+        } catch (error) {
+            console.error("Error writing document: ", error);
+        }
+    } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document! Creating it and adding phone number!");
+        // Add a new document in collection "users"
+        try {
+            await db.collection("users").doc(userID).set({
+                phoneNumber: formattedPhoneNumber
+            });
+            console.log("User document successfully written!");
+        } catch (error) {
+            console.error("Error writing document: ", error);
+        }
     }
-  } else {
-    // doc.data() will be undefined in this case
-    console.log("No such document! Creating it and adding phone number!");
-    // Add a new document in collection "users"
-    try {
-      await db.collection("users").doc(userID).set({
-        phoneNumber: formattedPhoneNumber
-      });
-      console.log("User document successfully written!");
-    } catch (error) {
-      console.error("Error writing document: ", error);
-    }
-  }
 }
 
 function calculateSellerGets(value, elementId, feeElementId) {
