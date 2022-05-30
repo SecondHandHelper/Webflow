@@ -8,14 +8,14 @@
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-functions.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.37/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.38/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.30/infoRequestsFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.32/referralFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.34/cookieManagement.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.1/autocomplete-brands.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.37/loadCardLists.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuidv4.min.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test39/sellItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.38/sellItem.js"></script>
 
 <script>
   // Firebase config
@@ -54,47 +54,13 @@
     if (result) {
       authUser = result;
 
-      // Get and set currentUser
+      // Get and set current user
       db.collection("users").doc(authUser.uid).get().then((doc) => {
         if (doc.exists) {
           user = doc.data();
           console.log("user:", user);
           console.log("authUser", authUser);
-
-          // Own Attribution (Will be removed)
-          tryAttribution();
-
-          let createdAt = new Date(authUser.metadata.creationTime).toISOString();
-          let latestLogin = new Date(authUser.metadata.lastSignInTime).toISOString();
-          let signInMethod = authUser.providerData[0].providerId;
-
-          // Segment
-          const firstName = user.addressFirstName ? user.addressFirstName : null;
-          const lastName = user.addressLastName ? user.addressLastName : null;
-          const email = user.email ? user.email : null;
-          const phone = user.phoneNumber ? user.phoneNumber : null;
-          const street = user.addressStreetAddress ? user.addressStreetAddress : null;
-          const city = user.addressCity ? user.addressCity : null;
-          const postalCode = user.addressPostalCode ? user.addressPostalCode : null;
-          const doorCode = user.addressDoorCode ? user.addressDoorCode : null;
-          const replace = user.replace ? user.replace : null;
-
-          analytics.identify(`${authUser.uid}`, {
-            createdAt,
-            firstName,
-            lastName,
-            email,
-            phone,
-            address: {
-              street,
-              city,
-              postalCode,
-              doorCode
-            },
-            latestLogin,
-            latestPageView: now,
-            signInMethod
-          });
+          identify();
         }
 
         if (typeof window.main === "function") {
@@ -118,17 +84,61 @@
   // GO BACK LINKS
   $(document).ready(function () {
     $(".goback").click(function () {
-      if(document.referrer.includes(window.location.origin)){
+      if (document.referrer.includes(window.location.origin)) {
         window.history.back();
       } else {
-        if (user){
+        if (user) {
           window.location.href = window.location.origin + "/private";
-        } else{
+        } else {
           window.location.href = window.location.origin;
         }
       }
     });
   });
+
+  // SEGMENT IDENTIFY
+  function identify() {
+    const now = new Date().toISOString();
+    let createdAt = new Date(authUser.metadata.creationTime).toISOString();
+    let latestLogin = new Date(authUser.metadata.lastSignInTime).toISOString();
+    let signInMethod = authUser.providerData[0].providerId;
+    const firstName = user.addressFirstName ? user.addressFirstName : null;
+    const lastName = user.addressLastName ? user.addressLastName : null;
+    const email = user.email ? user.email : null;
+    const phone = user.phoneNumber ? user.phoneNumber : null;
+    const street = user.addressStreetAddress ? user.addressStreetAddress : null;
+    const city = user.addressCity ? user.addressCity : null;
+    const postalCode = user.addressPostalCode ? user.addressPostalCode : null;
+    const doorCode = user.addressDoorCode ? user.addressDoorCode : null;
+    const replace = user.replace ? user.replace : null;
+    let campaign = {};
+    if (user.attribution) {
+      campaign["name"] = user.attribution.utm_campaign ? user.attribution.utm_campaign : null;
+      campaign["source"] = user.attribution.utm_source ? user.attribution.utm_source : null;
+      campaign["medium"] = user.attribution.utm_medium ? user.attribution.utm_medium : null;
+      campaign["term"] = user.attribution.utm_term ? user.attribution.utm_term : null;
+      campaign["content"] = user.attribution.utm_content ? user.attribution.utm_content : null;
+    }
+    campaign = Object.keys(campaign).length > 0 ? campaign : null;
+
+    analytics.identify(`${authUser.uid}`, {
+      createdAt,
+      firstName,
+      lastName,
+      email,
+      phone,
+      address: {
+        street,
+        city,
+        postalCode,
+        doorCode
+      },
+      latestLogin,
+      latestPageView: now,
+      signInMethod,
+      campaign
+    });
+  }
 
   // FUNCTIONS PRIVATE PAGE
   function formatPhoneNumber(str) {
