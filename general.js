@@ -77,11 +77,14 @@ async function updateFirestoreUserDocument(userId, email, phone) {
             const utm_medium = checkCookie("utm_medium");
             const utm_term = checkCookie("utm_term");
             const utm_content = checkCookie("utm_content");
-            if (utm_campaign) { fields["attribution.utm_campaign"] = utm_campaign; }
-            if (utm_source) { fields["attribution.utm_source"] = utm_source; }
-            if (utm_medium) { fields["attribution.utm_medium"] = utm_medium; }
-            if (utm_term) { fields["attribution.utm_term"] = utm_term; }
-            if (utm_content) { fields["attribution.utm_content"] = utm_content; }
+            let a = {};
+            if (utm_campaign) { a["utm_campaign"] = utm_campaign; }
+            if (utm_source) { a["utm_source"] = utm_source; }
+            if (utm_medium) { a["utm_medium"] = utm_medium; }
+            if (utm_term) { a["utm_term"] = utm_term; }
+            if (utm_content) { a["utm_content"] = utm_content; }
+            a = Objects.keys(a).length > 0 ? a : null ;
+            if (a) { fields["attribution"] = a}
             await docRef.set(fields);
             console.log(`User document was created with id ${userId} and these fields: `, fields);
         }
