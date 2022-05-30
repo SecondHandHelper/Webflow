@@ -7,32 +7,6 @@ for (var i = 0; i < paramPairs.length; i++) {
     params[parts[0]] = parts[1];
 }
 
-// ATTRIBUTION STUFF
-function tryAttribution() {
-    const a = {}; // attribution
-    const utm_campaign = checkCookie("utm_campaign");
-    const utm_content = checkCookie("utm_content");
-    const utm_source = checkCookie("utm_source");
-    if (utm_campaign) { a["utm_campaign"] = utm_campaign; }
-    if (utm_content) { a["utm_content"] = utm_content; }
-    if (utm_source) { a["utm_source"] = utm_source; }
-    if (Object.keys(a).length > 0) {
-        storeAttribution(a, authUser.uid);
-    }
-}
-
-function storeAttribution(a, uid) {
-    let fields = {};
-    if (a.utm_campaign) { fields["attribution.utm_campaign"] = a.utm_campaign; }
-    if (a.utm_content) { fields["attribution.utm_content"] = a.utm_content; }
-    if (a.utm_source) { fields["attribution.utm_source"] = a.utm_source; }
-    if (Object.keys(fields).length > 0) {
-        db.collection('users').doc(uid).update(fields).catch((error) => {
-            console.log("Error storing attribution:", fields, error);
-        });
-    }
-}
-
 // FUNCTIONS FOR PRIVATE PAGE
 function updateIC(userId, em, ph) {
     let email = em;
@@ -83,29 +57,38 @@ function updateIC(userId, em, ph) {
     }).catch((error) => {
         console.log("Error getting document:", error);
     });
-};
+}
 
 async function updateFirestoreUserDocument(userId, email, phone) {
     let fields = {};
     if (email) { fields["email"] = email; }
     if (phone) { fields["phoneNumber"] = phone; }
-    console.log("Fields: ", fields);
     const docRef = db.collection("users").doc(userId);
 
     try {
         const doc = await docRef.get();
         if (doc.exists) {
-            console.log("Document data:", doc.data());
             await docRef.update(fields);
             console.log(`User document ${userId} was successfully updated with these fields: `, fields);
         } else {
+            // Get and set attribution utm parameters only when creating user doc
+            const utm_campaign = checkCookie("utm_campaign");
+            const utm_source = checkCookie("utm_source");
+            const utm_medium = checkCookie("utm_medium");
+            const utm_term = checkCookie("utm_term");
+            const utm_content = checkCookie("utm_content");
+            if (utm_campaign) { fields["attribution.utm_campaign"] = utm_campaign; }
+            if (utm_source) { fields["attribution.utm_source"] = utm_source; }
+            if (utm_medium) { fields["attribution.utm_medium"] = utm_medium; }
+            if (utm_term) { fields["attribution.utm_term"] = utm_term; }
+            if (utm_content) { fields["attribution.utm_content"] = utm_content; }
             await docRef.set(fields);
             console.log(`User document was created with id ${userId} and these fields: `, fields);
         }
     } catch (e) {
         console.log("Something went wrong:", e);
     }
-};
+}
 
 async function askForAdditionalUserDetails(userID) {
     let status = "";
