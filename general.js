@@ -87,6 +87,7 @@ async function updateFirestoreUserDocument(userId, email, phone) {
             await docRef.set(fields).then((doc) => {
                 console.log(`User document was created with id ${doc.id} and these fields: `, doc.data());
                 user = doc.data();
+                identify();
             });
         }
     } catch (e) {
