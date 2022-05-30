@@ -84,8 +84,10 @@ async function updateFirestoreUserDocument(userId, email, phone) {
             if (utm_term) { a["utm_term"] = utm_term; }
             if (utm_content) { a["utm_content"] = utm_content; }
             if (Object.keys(a).length > 0) { fields["attribution"] = a}
-            await docRef.set(fields);
-            console.log(`User document was created with id ${userId} and these fields: `, fields);
+            await docRef.set(fields).then((doc) => {
+                console.log(`User document was created with id ${doc.id} and these fields: `, doc.data());
+                user = doc.data();
+            });
         }
     } catch (e) {
         console.log("Something went wrong:", e);
