@@ -115,6 +115,21 @@
   });
 </script>
 <script>
+  // GO BACK LINKS
+  $(document).ready(function () {
+    $(".goback").click(function () {
+      if(document.referrer.includes(window.location.origin)){
+        window.history.back();
+      } else {
+        if (user){
+          window.location.href = window.location.origin + "/private";
+        } else{
+          window.location.href = window.location.origin;
+        }
+      }
+    });
+  });
+
   // FUNCTIONS PRIVATE PAGE
   function formatPhoneNumber(str) {
     if (str.slice(0, 1) == 0 && str.length == 10) {

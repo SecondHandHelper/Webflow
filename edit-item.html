@@ -1,11 +1,4 @@
 <script>
-    $(document).ready(function () {
-        $(".goback").click(function () {
-            window.history.back();
-        });
-    });
-</script>
-<script>
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
             console.log('UID: ' + user.uid);
