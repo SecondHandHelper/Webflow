@@ -13,7 +13,6 @@
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.32/referralFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.34/cookieManagement.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.1/autocomplete-brands.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.37/onPageLoad.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.37/loadCardLists.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuidv4.min.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test39/sellItem.js"></script>
@@ -104,7 +103,7 @@
       }).catch((error) => { console.log("Error getting document:", error); });
     } else {
       // Go to landing page if no user and on logged in pages
-      const path = window.location.pathname
+      const path = window.location.pathname;
       if (path === "/private" || path === "/personal-id-form" || path === "/address-form" || path === "/item" || path === "/sell-item") {
         window.location.href = window.location.origin;
       }
