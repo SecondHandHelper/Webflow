@@ -103,26 +103,26 @@ function loadInfoRequests(userId) {
                         let buttonTextClass = "text-block-69";
                         let description = infoRequests[req].description;
                         if (req === "price") {
-                            title = "Nytt pris";
+                            title = "Lägre pris";
                             buttonClass = "acceptnewpricebutton";
                             buttonTextClass = "text-block-69-copy-copy";
-                            buttonText = "Se pris";
-                            subText = "Accepterar du den nya prissättningen?";
+                            buttonText = "Se mer";
+                            subText = "Vill du sänka priset och få det sålt?";
                             const max = infoRequests[req].maxPrice;
                             const min = infoRequests[req].minPrice;
                             if (status === "New") {
                                 title = "Pris";
                                 buttonClass = "acceptnewpricebutton";
                                 buttonTextClass = "text-block-69-copy-copy";
-                                buttonText = "Se pris";
-                                subText = "Accepterar du prissättningen?";
+                                buttonText = "Se mer";
+                                subText = "Vill du sälja till vår värdering?";
                             }
                             href = `javascript:openNewPriceToast('${itemId}', '${status}', ${max}, ${min}, '${brand}', '${description}', '${category}');`;
                         }
                         if (req === "measurements") {
                             title = "Mått";
                             subText = "Vi behöver mått för detta plagg";
-                            buttonText = "Ange mått";
+                            buttonText = "Se mer";
                             href = `javascript:openMeasurementsToast('${itemId}', '${description}');`;
                         }
                         if (req === "images") {
