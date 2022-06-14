@@ -34,7 +34,7 @@ async function storePriceResponse(itemId, max, min, response, status) {
             "infoRequests.price.status": "Resolved",
             "infoRequests.price.response": "Denied"
         };
-        if (status === "New"){
+        if (status === "New") {
             fields["archived"] = true;
         }
         await db.collection('items').doc(itemId).update(fields).then(function () {
@@ -44,28 +44,23 @@ async function storePriceResponse(itemId, max, min, response, status) {
     }
 }
 
-async function openNewPriceToast(itemId, status, max, min, brand, motivation) {
-    console.log("openNewPriceToast", itemId, status, max, min, brand, motivation);
+async function openNewPriceToast(itemId, status, max, min, brand, description, category) {
+    console.log("openNewPriceToast", itemId, status, max, min, brand, description, category);
     // Set content of toast
-    motivationDiv.style.display = 'none';
-    newPriceToastTitle.innerHTML = "Nytt pris";
-    let text = `Vi tror att sannolikheten att få ditt ${brand}-plagg sålt under sista dagarna ökar om du kan tänka dig att sänka priset något?`;
-    newPriceHeading.innerHTML = "Nytt prisförslag";
+    newPriceToastTitle.innerHTML = "Nytt lägsta pris";
+    newPriceHeading.innerHTML = `${brand}-${category}`;
     newPrice.innerHTML = `${min} kr`;
-    acceptNewPriceButton.innerHTML = "Acceptera nytt pris";
+    acceptNewPriceButton.innerHTML = "Sälj med nytt pris";
     denyNewPriceButton.innerHTML = "Sänk ej";
     if (status === "New") {
-        newPriceToastTitle.innerHTML = "Pris";
-        newPriceHeading.innerHTML = "Prissättning från Mai";
+        newPriceToastTitle.innerHTML = "Värdering";
         newPrice.innerHTML = `${min}-${max} kr`;
-        acceptNewPriceButton.innerHTML = "Acceptera pris";
+        acceptNewPriceButton.innerHTML = "Sälj till värdering";
         denyNewPriceButton.innerHTML = "Avböj och avsluta";
-        text = `Ditt ${brand}-plagg har värderats till något under ditt lägsta accepterade pris. Vill du acceptera värderingen, eller avsluta försäljningen?`;
     }
-    newPriceText.innerHTML = text;
-    if (motivation !== 'undefined') {
-        motivationText.innerHTML = motivation;
-        motivationDiv.style.display = 'block';
+    if (description !== 'undefined') {
+        newPriceText.innerHTML = description;
+        descriptionDiv.style.display = 'block';
     }
     acceptNewPriceButton.href = `javascript:storePriceResponse('${itemId}', ${max}, ${min}, 'Accepted', '${status}');`;
     denyNewPriceButton.href = `javascript:storePriceResponse('${itemId}', ${max}, ${min}, 'Denied', '${status}');`;
@@ -85,6 +80,7 @@ function loadInfoRequests(userId) {
             var status = item.status;
             var brand = item.brand;
             var archived = item.archived;
+            var category = item.category;
             var frontImageUrl = images.frontImage;
             if (images.frontImageSmall) {
                 frontImageUrl = images.frontImageSmall;
@@ -118,7 +114,7 @@ function loadInfoRequests(userId) {
                                 buttonText = "Se pris";
                                 subText = "Accepterar du prissättningen?";
                             }
-                            href = `javascript:openNewPriceToast('${itemId}', '${status}', ${max}, ${min}, '${brand}', '${description}');`;
+                            href = `javascript:openNewPriceToast('${itemId}', '${status}', ${max}, ${min}, '${brand}', '${description}', '${category}');`;
                         }
                         if (req === "measurements") {
                             title = "Mått";
