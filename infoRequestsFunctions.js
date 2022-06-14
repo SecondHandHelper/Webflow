@@ -48,9 +48,9 @@ async function openNewPriceToast(itemId, status, max, min, brand, description, c
     console.log("openNewPriceToast", itemId, status, max, min, brand, description, category);
     // Set content of toast
     newPriceToastTitle.innerHTML = "Nytt lägsta pris";
+    newPriceHeading.innerHTML = `${brand}-plagg`;
     const c = category.toLowerCase();
-    if (c){newPriceHeading.innerHTML = `${brand}-${c}`;}
-    else {newPriceHeading.innerHTML = `${brand}-plagg`;}
+    if (c && c !== "null"){newPriceHeading.innerHTML = `${brand}-${c}`;}
     newPrice.innerHTML = `${min} kr`;
     acceptNewPriceButton.innerHTML = "Sälj med nytt pris";
     denyNewPriceButton.innerHTML = "Sänk ej";
@@ -61,7 +61,7 @@ async function openNewPriceToast(itemId, status, max, min, brand, description, c
         denyNewPriceButton.innerHTML = "Avböj och avsluta";
         extraInfoText.style.display = 'block';
     }
-    if (description !== 'undefined') {
+    if (description !== 'undefined' && description !== '' && description !== 'null') {
         newPriceText.innerHTML = description;
         descriptionDiv.style.display = 'block';
     }
