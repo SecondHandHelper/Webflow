@@ -106,15 +106,15 @@ function loadInfoRequests(userId) {
                             title = "Lägre pris";
                             buttonClass = "acceptnewpricebutton";
                             buttonTextClass = "text-block-69-copy-copy";
-                            buttonText = "Se mer";
+                            buttonText = "Se pris";
                             subText = "Vill du sänka priset och få det sålt?";
                             const max = infoRequests[req].maxPrice;
                             const min = infoRequests[req].minPrice;
                             if (status === "New") {
-                                title = "Pris";
+                                title = "Värdering";
                                 buttonClass = "acceptnewpricebutton";
                                 buttonTextClass = "text-block-69-copy-copy";
-                                buttonText = "Se mer";
+                                buttonText = "Se värdering";
                                 subText = "Vill du sälja till vår värdering?";
                             }
                             href = `javascript:openNewPriceToast('${itemId}', '${status}', ${max}, ${min}, '${brand}', '${description}', '${category}');`;
