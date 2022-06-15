@@ -36,6 +36,7 @@ async function storePriceResponse(itemId, max, min, response, status) {
         };
         if (status === "New") {
             fields["archived"] = true;
+            fields["willNotSell"] = true;
         }
         await db.collection('items').doc(itemId).update(fields).then(function () {
             triggerNewPriceToastClose.click();
