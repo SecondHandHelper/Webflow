@@ -67,24 +67,8 @@
         }
     };
 
-    // Calculate their share and display to user
-
-    let itemHappyPrice = document.getElementById("itemHappyPrice");
-    let itemAcceptPrice = document.getElementById("itemAcceptPrice");
-
-    itemHappyPrice.oninput = function () {
-        console.log("this.value", this.value);
-        calculateSellerGets(this.value, "youGetDivHappyPrice", "feeDivHappyPrice");
-    };
-
-    itemAcceptPrice.oninput = function () {
-        console.log("this.value", this.value);
-        calculateSellerGets(this.value, "youGetDivAcceptPrice", "feeDivAcceptPrice");
-    };
-
     // Change text color of dropdown itemAge when user selects a value
     let itemAge = document.getElementById("itemAge");
-
     itemAge.onchange = function () {
         let input = this.value;
         if (input != "") {
@@ -126,25 +110,6 @@
             itemCondition.style.color = "#333";
         }
     };
-
-    // Hide / Show price input fields
-    let setPriceDiv = document.getElementById("setPriceDiv");
-    setPriceDiv.style.display = 'none';
-
-    var radios = document.querySelectorAll('input[type=radio][name="Pricing"]');
-    radios.forEach(radio => radio.addEventListener('change', () => {
-        if (radio.value == "Seller sets price") {
-            setPriceDiv.style.display = 'block';
-            setLowestPriceDiv.style.display = 'none';
-            document.getElementById("itemHappyPrice").required = true;
-            document.getElementById("itemAcceptPrice").required = true;
-        } else {
-            setPriceDiv.style.display = 'none';
-            setLowestPriceDiv.style.display = 'block';
-            document.getElementById("itemHappyPrice").required = false;
-            document.getElementById("itemAcceptPrice").required = false;
-        }
-    }));
 </script>
 
 <script>
