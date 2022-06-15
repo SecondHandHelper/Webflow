@@ -13,7 +13,6 @@ function addItem() {
 
 function collect() {
   let sex = "";
-  let pricing = "";
   const now = new Date();
   let status = "New";
   let shippingStatus = "Not sent";
@@ -23,20 +22,18 @@ function collect() {
   const model = itemModel.value;
   const originalPrice = Number(itemOriginalPrice.value);
   const age = itemAge.value;
-
   const condition = itemCondition.value;
   const defectDescription = itemDefectDescription.value;
   const noAnimals = itemNoAnimals.checked;
   const noSmoke = itemNoSmoke.checked;
   const userComment = itemUserComment.value;
-  let happyPrice = Number(itemHappyPrice.value);
-  let acceptPrice = Number(itemAcceptPrice.value);
-  const lowestAcceptPrice = Number(itemLowestAcceptPrice.value);
+  const acceptPrice = Number(itemLowestAcceptPrice.value);
+  const userValuationApproval = itemUserValuationApproval.checked;
 
+  // Get defects list
   let defectElements = new Map().set("hole", hole.checked).set("stain", stain.checked).set("lostFit", lostFit.checked).set("nopprig", nopprig.checked).set("threadUp", threadUp.checked).set("colorChange", colorChange.checked).set("otherDefect", otherDefect.checked);
   let defectsChoicesInSwedish = new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
   let defects = [];
-
   defectElements.forEach((value, key) => {
     if (value) {
       let string = defectsChoicesInSwedish.get(key);
@@ -49,18 +46,6 @@ function collect() {
   for (var x = 0; x < sexRadioButtons.length; x++) {
     if (sexRadioButtons[x].checked) {
       sex = sexRadioButtons[x].id;
-    }
-  }
-
-  // Get who sets price
-  var pricingRadioButtons = document.getElementsByName("Pricing");
-  for (var x = 0; x < pricingRadioButtons.length; x++) {
-    if (pricingRadioButtons[x].checked) {
-      pricing = pricingRadioButtons[x].id;
-      if (pricing === "We set price") {
-        acceptPrice = lowestAcceptPrice;
-        happyPrice = 0;
-      }
     }
   }
 
@@ -82,9 +67,8 @@ function collect() {
     noAnimals,
     noSmoke,
     userComment,
-    pricing,
-    happyPrice,
     acceptPrice,
+    userValuationApproval
   };
 }
 
