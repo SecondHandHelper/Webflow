@@ -68,7 +68,7 @@ function collect() {
     noSmoke,
     userComment,
     acceptPrice,
-    "preferences.userValuationApproval": userValuationApproval
+    preferences: { userValuationApproval }
   };
 }
 
