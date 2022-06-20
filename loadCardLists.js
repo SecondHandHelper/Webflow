@@ -80,19 +80,6 @@ function loadCardLists(userId) {
               textDiv2 = `<div class='text-block-34'>${daysLeftText}</div>`;
             }
 
-
-
-            if (status === "Published" || status === "New") {
-              if (minPriceEstimate != null && maxPriceEstimate != null) {
-                textDiv1 = `<div class='text-block-34'>${minPriceEstimate} - ${maxPriceEstimate} kr</div>`;
-              } else {
-                textDiv1 = `<div class='text-block-34'>Förbereds</div>`;
-              }
-              if (status == "Published") {
-                textDiv2 = `<div class='text-block-34'>${daysLeftText}</div>`;
-              }
-            }
-
             let itemPageUrl = window.location.origin + `/item?id=${itemId}`;
             let sellingItemCardHTML = `<div class="div-block-14"><a id="itemLinkBlock" href="${itemPageUrl}" class="link-block-18 w-inline-block"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div><div class="text-block-14">${brand}</div>${textDiv1}${textDiv2}</a></div>`;
             itemListSelling.innerHTML += sellingItemCardHTML;
