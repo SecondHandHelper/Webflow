@@ -66,11 +66,7 @@ function loadCardLists(userId) {
 
             //If price-estimate is set, show info
             if (status === "New") {
-              console.log("Brand: ", brand);
-              console.log("infoRequests", infoRequests);
-              console.log("infoRequests?.price?.status", infoRequests?.price?.status);
-              console.log(`infoRequests?.price?.status === "Active"`, (infoRequests?.price?.status === "Active"));
-              if (infoRequests && infoRequests?.price?.status === "Active") {
+              if (infoRequests?.price?.status === "Active") {
                 textDiv1 = `<div class='text-block-34'>Inväntar ditt svar</div>`;
               } else if (minPriceEstimate && maxPriceEstimate) {
                 textDiv1 = `<div class='text-block-34'>${minPriceEstimate} - ${maxPriceEstimate} kr</div>`;
