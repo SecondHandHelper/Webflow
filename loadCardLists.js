@@ -68,7 +68,7 @@ function loadCardLists(userId) {
 
             //If price-estimate is set, show info
             if (status === "New") {
-              if (infoRequests?.price?.status === "Active") {
+              if (infoRequests && infoRequests?.price?.status === "Active") {
                 textDiv1 = `<div class='text-block-34'>Inväntar ditt svar</div>`;
               } if (minPriceEstimate && maxPriceEstimate) {
                 textDiv1 = `<div class='text-block-34'>${minPriceEstimate} - ${maxPriceEstimate} kr</div>`;
