@@ -107,7 +107,7 @@ function loadInfoRequests(userId) {
                             title = "Lägre pris";
                             buttonClass = "acceptnewpricebutton";
                             buttonTextClass = "text-block-69-copy-copy";
-                            buttonText = "Se pris";
+                            buttonText = "Se prisförslag";
                             subText = "Vill du sänka priset och få det sålt?";
                             const max = infoRequests[req].maxPrice;
                             const min = infoRequests[req].minPrice;
