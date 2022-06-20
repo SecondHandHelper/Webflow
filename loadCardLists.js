@@ -30,9 +30,7 @@ function loadCardLists(userId) {
         var buyerAddressCity = doc.data().buyerAddressCity;
         var minPriceEstimate = doc.data().minPriceEstimate;
         var maxPriceEstimate = doc.data().maxPriceEstimate;
-        var happyPrice = doc.data().happyPrice;
-        var acceptPrice = doc.data().acceptPrice;
-        var pricing = doc.data().pricing;
+        var infoRequests = doc.data().infoRequests;
         var pickupDate = doc.data().pickupDate;
         var shippingMethod = doc.data().shippingMethod;
         var archived = doc.data().archived;
