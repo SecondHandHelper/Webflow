@@ -72,7 +72,7 @@ function loadCardLists(userId) {
                 textDiv1 = `<div class='text-block-34'>${minPriceEstimate} - ${maxPriceEstimate} kr</div>`;
                 textDiv2 = `<div class='text-block-34'>Förbereds</div>`;
               } else {
-                textDiv1 = `<div class='text-block-34'>Värderas</div>`;
+                textDiv1 = `<div class='text-block-34'>Värdering pågår</div>`;
               }
             }
             if (status === "Published" && minPriceEstimate && maxPriceEstimate) {
