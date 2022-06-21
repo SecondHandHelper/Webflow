@@ -1,16 +1,4 @@
 <script>
-    firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            console.log('UID: ' + user.uid);
-            userId = user.uid;
-        } else {
-            console.log('No user is logged in');
-            window.location.href = window.location.origin;
-        }
-    });
-</script>
-
-<script>
     function loadItem(itemId) {
         console.log(`loadItem(${itemId})`);
         db.collection("items").doc(itemId)
@@ -18,23 +6,25 @@
                 if (doc.exists) {
                     console.log("Item data:", doc.data());
                     data = doc.data();
-                    if (userId === data.user) {
+                    if (authUser.uid === data.user) {
                         const brand = data.brand;
                         const images = data.images;
+                        const infoRequests = data.infoRequests;
                         let imgUrl = images.frontImage;
-                        if (images.frontImageSmall){
+                        if (images.frontImageSmall) {
                             imgUrl = images.frontImageSmall;
                         }
                         const status = data.status;
-                        let statusText = "Försäljning pågår"
-                        let daysLeftText = "";
+                        const category = data.category ? data.category : "";
+                        let statusText = ""
                         let publishedDate = data.publishedDate;
+                        let daysLeftText = "";
                         if (data.publishedDate) {
                             publishedDate = new Date(publishedDate);
                             let nowDate = new Date();
                             let timeDifference = nowDate.getTime() - publishedDate.getTime();
                             let daysDifference = timeDifference / (1000 * 3600 * 24);
-                            let daysLeft = Math.round(31 - daysDifference);
+                            let daysLeft = Math.round(30 - daysDifference);
                             if (daysLeft <= 0) {
                                 daysLeftText = `0 dagar kvar`;
                             } else {
@@ -43,19 +33,30 @@
                         }
                         let min = data.minPriceEstimate;
                         let max = data.maxPriceEstimate;
-                        let valuation = "";
-                        if (min && max) {
-                            valuation = `${min}-${max} kr`;
+                        const valuationText = min && max ? `${min}-${max} kr` : "";
+
+                        let text1 = "";
+                        let text2 = "";
+
+                        if (status === "New") {
+                            if (infoRequests?.price?.status === "Active") {
+                                statusText = `Inväntar ditt svar`;
+                                text1 = "På huvudsidan kan du se plaggets värdering och<br>välja om du vill sälja till värderingen eller inte.";
+                            } else if (min && max) {
+                                statusText = `Förbereds`;
+                                text1 = "Förbereder det sista inför publicering.<br>Du får ett SMS när försäljningen påbörjas.";
+                                text2 = valuationText;
+                            } else {
+                                statusText = `Värdering pågår`;
+                                text1 = "Du får ett SMS när värderingen är klar.<br>Värderingen tar normalt 2 vardagar.";
+                            }
                         }
-                        let category = "";
-                        if (data.category) {
-                            category = data.category;
+                        if (status === "Published" && min && max) {
+                            statusText = `Försäljning pågår`;
+                            text1 = daysLeftText;
+                            text2 = valuationText;
                         }
-                        if (status == "New") {
-                            statusText = "Förbereds";
-                            daysLeftText = "";
-                            valuation = "Värdering pågår"
-                        }
+
 
                         var pageTitleComponentHTML = `
                             <div class="div-block-102">
@@ -78,8 +79,8 @@
                             </div>
                             <div class="div-block-105">
                                 <div id="itemStatusText" class="text-block-16-copy">${statusText}</div>
-                                <div id="itemDaysLeftText" class="text-block-63">${daysLeftText}</div>
-                                <div id="itemValuationText" class="text-block-63">${valuation}</div>
+                                <div id="itemText1" class="text-block-63">${text1}</div>
+                                <div id="itemText2" class="text-block-63">${text2}</div>
                             </div>`;
                         itemDiv.innerHTML = itemComponentHTML;
                         itemDiv.style.display = "block";

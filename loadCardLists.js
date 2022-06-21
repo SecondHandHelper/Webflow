@@ -64,7 +64,6 @@ function loadCardLists(userId) {
             let textDiv1 = "";
             let textDiv2 = "";
 
-            //If price-estimate is set, show info
             if (status === "New") {
               if (infoRequests?.price?.status === "Active") {
                 textDiv1 = `<div class='text-block-34'>Inväntar ditt svar</div>`;
