@@ -220,7 +220,6 @@ function emptyListsInnerHTML() {
 }
 
 function getBagReceivedCheckbox(itemId, soldDate) {
-    console.log("getBagReceivedCheckbox");
     const div = `<div class="w-form">
         <form method="get" name="wf-form-" id="bagReceivedForm">
             <label class="w-checkbox checkbox-field-3">
@@ -532,6 +531,7 @@ async function addUserDetails() {
     const addressFirstName = document.getElementById("addressFirstName").value;
     const addressLastName = document.getElementById("addressLastName").value;
     const addressStreetAddress = document.getElementById("addressStreetAddress").value;
+    const addressCO = document.getElementById("addressCO").value;
     const addressPostalCode = document.getElementById("addressPostalCode").value;
     const addressCity = document.getElementById("addressCity").value;
     const addressDoorCode = document.getElementById("addressDoorCode").value;
@@ -541,12 +541,13 @@ async function addUserDetails() {
     // Write to Firestore
     const itemRef = db.collection('users').doc(authUser.uid);
     itemRef.update({
-        addressFirstName: addressFirstName,
-        addressLastName: addressLastName,
-        addressStreetAddress: addressStreetAddress,
-        addressPostalCode: addressPostalCode,
-        addressCity: addressCity,
-        addressDoorCode: addressDoorCode,
+        addressFirstName,
+        addressLastName,
+        addressStreetAddress,
+        addressCO,
+        addressPostalCode,
+        addressCity,
+        addressDoorCode,
         personalId: personalId
     })
         .then(() => {
@@ -564,6 +565,7 @@ async function addUserAddress() {
     const addressFirstName = document.getElementById("addressFirstName").value;
     const addressLastName = document.getElementById("addressLastName").value;
     const addressStreetAddress = document.getElementById("addressStreetAddress").value;
+    const addressCO = document.getElementById("addressCO").value;
     const addressPostalCode = document.getElementById("addressPostalCode").value;
     const addressCity = document.getElementById("addressCity").value;
     const addressDoorCode = document.getElementById("addressDoorCode").value;
@@ -571,12 +573,13 @@ async function addUserAddress() {
     // Write to Firestore
     const itemRef = db.collection('users').doc(authUser.uid);
     itemRef.update({
-        addressFirstName: addressFirstName,
-        addressLastName: addressLastName,
-        addressStreetAddress: addressStreetAddress,
-        addressPostalCode: addressPostalCode,
-        addressCity: addressCity,
-        addressDoorCode: addressDoorCode
+        addressFirstName,
+        addressLastName,
+        addressStreetAddress,
+        addressCO,
+        addressPostalCode,
+        addressCity,
+        addressDoorCode
     })
         .then(() => {
             console.log(`User address of ${authUser.uid} is now updated`);
