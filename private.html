@@ -23,7 +23,13 @@
         showAccountInfo();
 
         await updateFirestoreUserDocument(authUser.uid, email, phone);
-        if (!emailVerified && email) { window.location.replace('./user-management?mode=sendEmailVerification'); }
+        if (!emailVerified && email) {
+            let res = getCookie('viewedVerifyEmailDiv');
+            viewedVerifyEmailDiv = res === 'true' ? true : false;
+            if (!viewedVerifyEmailDiv) {
+                window.location.replace('./user-management?mode=sendEmailVerification');
+            }
+        }
         // Create refCode
         if (user.addressFirstName && user.addressLastName && !user?.referralData?.referralCode) { createReferralCode(); }
     }

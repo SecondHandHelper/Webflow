@@ -102,8 +102,14 @@
     // [END auth_handle_verify_email]
 
     function sendEmailVerification(auth) {
-        verifyEmailDiv.style.display = 'block';
-        loadingDiv.style.display = 'none';
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                emailVerificationText.innerHTML = `Klicka på länken i mailet vi skickat till ${user.email} för att verifiera din email.`;
+            }
+            verifyEmailDiv.style.display = 'block';
+            loadingDiv.style.display = 'none';
+            setCookie('viewedVerifyEmailDiv', 'true', 2);
+        });
     }
 
     sendEmailVerificationButton.addEventListener('click', function sendEmail() {
@@ -114,7 +120,8 @@
                 sendEmailVerificationButton.style.display = 'none';
                 setTimeout(function showButton() {
                     toMaiButton.style.display = 'block';
-                }, 5000);
+                    closeVerifyEmailButton.style.display = 'none';
+                }, 10000);
             });
     });
 
@@ -137,6 +144,4 @@
             console.log("Error message:", error.code, error.message);
         });
     });
-
-    signOutLink.addEventListener('click', signOut);
 </script>
