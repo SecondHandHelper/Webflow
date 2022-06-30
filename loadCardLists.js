@@ -34,6 +34,7 @@ function loadCardLists(userId) {
         var pickupDate = doc.data().pickupDate;
         var shippingMethod = doc.data().shippingMethod;
         var archived = doc.data().archived;
+        var holidayMode = doc.data().holidayMode;
         var frontImageUrl = images.frontImage;
         if (images.frontImageSmall) {
           frontImageUrl = images.frontImageSmall;
@@ -76,7 +77,8 @@ function loadCardLists(userId) {
             }
             if (status === "Published" && minPriceEstimate && maxPriceEstimate) {
               textDiv1 = `<div class='text-block-34'>${minPriceEstimate} - ${maxPriceEstimate} kr</div>`;
-              textDiv2 = `<div class='text-block-34'>${daysLeftText}</div>`;
+              const text2 = holidayMode ? "Pausad" : daysLeftText ;
+              textDiv2 = `<div class='text-block-34'>${text2}</div>`;
             }
 
             let itemPageUrl = window.location.origin + `/item?id=${itemId}`;
@@ -85,6 +87,7 @@ function loadCardLists(userId) {
 
             //Display list
             myItemsDiv.style.display = "block";
+            holidayModeDiv.style.display = "block"; // Temporary during holiday times
             //Hide empty state
             noItemsDiv.style.display = "none";
             headerSellItemButton.style.display = "block";
