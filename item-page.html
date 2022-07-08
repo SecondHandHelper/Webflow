@@ -94,10 +94,108 @@
             });
     }
 
+    async function loadItemEvents(itemId) {
+        itemEventsDiv.innerHTML = '';
+        let response = await fetch(`https://europe-west3-second-hand-helper.cloudfunctions.net/itemEvents/${itemId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        const events = await response.json();
+        console.log(events);
+        itemAddedEventExists = false;
+
+        if (events) {
+            for (let i = 0; i < events.length; i++) {
+                const event = events[i];
+                if (event.type === 'itemAdded') { itemAddedEventExists = true; }
+
+                // Build lists...
+                let style = i === events.length - 1 ? 'highlighted' : '';
+                const component = getEventComponent(event, style);
+                if (component) {
+                    let content = itemEventsDiv.innerHTML;
+                    itemEventsDiv.innerHTML = component.concat(content);
+                }
+            }
+
+            // Show list if itemAdded exists
+            if (itemAddedEventExists) { sellingProcessDiv.style.display = 'block'; console.log("Showing events list"); }
+        }
+    }
+
+    function getEventComponent(event, style) {
+        let component = '';
+        let text = '';
+        let time = '';
+        let className = '';
+        let icon = '<div class="div-block-143"></div>';
+        let displayLine = 'block';
+
+        // Highlighted event styling
+        if (style === 'highlighted') {
+            className = 'highlighted-event';
+            icon = '<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/62c53fa9db6d0f383ee430f9_check-mark%202%20(1).svg" loading="lazy" width="auto" alt="">';
+        }
+
+        // Set time
+        const weekdays = ['Sön', 'Mån', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör', 'Sön']
+        const date = new Date(event.timestamp);
+        time = weekdays[date.getDay()] + " " + (date.getHours() + 2) + ":" + date.getMinutes();
+
+        // Set text
+        if (event.type === 'itemAdded') {
+            text = 'Plagg lades upp på Mai';
+            displayLine = 'none';
+        }
+        if (event.type === 'valuationCompleted') {text = `Värderades till ${event.data.min}-${event.data.max} kr`;}
+        if (event.type === 'valuationAccepted') {text = `Du accepterade värderingen`;}
+        if (event.type === 'itemPublished') {text = `Försäljning påbörjades`;}
+        if (event.type === 'priceAdjusted') {text = `Pris sänktes till ${event.data.newPrice} kr`;}
+        if (event.type === 'priceRequestSent') {text = `Nytt prisförslag på ${event.data.min}-${event.data.max} kr`;}
+        if (event.type === 'priceRequestResponse') {
+            if (event.data.response === 'Accepted') {
+                text = `Du accepterade prisförslaget`;
+            } else if (event.data.response === 'Denied') {
+                text = `Du avböjde prisförslaget`;
+            }
+        }
+        if (event.type === 'listingRenewal') { text = `Annonser förnyades`; }
+        if (event.type === 'platformAdded') { text = `Publicerades på en till plattform`; }
+        if (event.type === 'itemSold') { text = `Såld för ${event.data.soldPrice} kr till ${event.data.buyerFirstName} i ${event.data.buyerAddressCity}`; }
+        if (event.type === 'bagSentToSeller') { text = `Fraktpåse skickades till dig`; }
+        if (event.type === 'itemSent') {
+            text = `Plagget skickades iväg`;
+        }
+        if (event.type === 'payoutCompleted') { text = `Du fick ${event.data.amount} kr utbetalt`; }
+
+        if (text) {
+            component = `
+                <div class="div-block-135">
+                    <div class="div-block-144">
+                        <div class="div-block-142">
+                            <div class="div-block-139" style="display: ${displayLine};"></div>
+                        </div>
+                        <div class="div-block-138">
+                            ${icon}
+                        </div>
+                    </div>
+                    <div class="div-block-136">
+                        <div class="item-event-text ${className}">${text}</div>
+                        <div class="text-block-82">${time}</div>
+                    </div>
+                </div>`;
+        }
+
+        const response = component ? component : false;
+        return response;
+    }
+
     editItemLink.addEventListener('click', function () {
         window.location.href = window.location.origin + `/edit-item?id=${params.id}`;
     });
 
     // Load item
     loadItem(params.id);
+    loadItemEvents(params.id);
+    //loadItemEvents('3fb6b9eb-48b9-486d-a432-67aeac630ead');
 </script>
