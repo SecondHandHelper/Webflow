@@ -46,7 +46,6 @@ async function storePriceResponse(itemId, max, min, response, status) {
 }
 
 async function openNewPriceToast(itemId, status, max, min, brand, description, category) {
-    console.log("openNewPriceToast", itemId, status, max, min, brand, description, category);
     // Set content of toast
     newPriceToastTitle.innerHTML = "Nytt lägsta pris";
     newPriceHeading.innerHTML = `${brand}-plagg`;
