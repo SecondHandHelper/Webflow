@@ -46,6 +46,8 @@ async function storePriceResponse(itemId, max, min, response, status) {
 }
 
 async function openNewPriceToast(itemId, status, max, min, brand, description, category) {
+    brand = str
+
     // Set content of toast
     newPriceToastTitle.innerHTML = "Nytt lägsta pris";
     newPriceHeading.innerHTML = `${brand}-plagg`;
@@ -139,7 +141,7 @@ function loadInfoRequests(userId) {
                                                 </div>
                                                 <div class="text-block-73">${title}</div>
                                                 <div class="text-block-72">${subText}</div>
-                                                <a href="${href}" id="" class="link-block-23 w-inline-block">
+                                                <a href='${href}' id="" class="link-block-23 w-inline-block">
                                                     <div class="${buttonClass}">
                                                         <div class="${buttonTextClass}">${buttonText}</div>
                                                     </div>
