@@ -117,7 +117,7 @@ function loadInfoRequests(userId) {
                                 buttonText = "Se värdering";
                                 subText = "Vill du sälja till vår värdering?";
                             }
-                            href = `javascript:openNewPriceToast("${itemId}", "${status}", ${max}, ${min}, "${brand}", "${description}", "${category}");`;
+                            href = `javascript:openNewPriceToast('${itemId}', '${status}', ${max}, ${min}, '${brand}', '${description}', '${category}');`;
                         }
                         if (req === "measurements") {
                             title = "Mått";
