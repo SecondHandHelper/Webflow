@@ -68,15 +68,13 @@
                         pageTitleDiv.style.display = "flex";
 
                         var itemComponentHTML = `
-                            <div class="div-block-104">
-                                <div class="div-block-103">
+                            <div class="div-block-104"><div class="div-block-103">
                                     <div class="ratio-box _16-9">
                                         <div class="content-block with-image">
                                             <div class="img-container" style="background-image: url('${imgUrl}');"></div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                            </div></div>
                             <div class="div-block-105">
                                 <div id="itemStatusText" class="text-block-16-copy">${statusText}</div>
                                 <div id="itemText1" class="text-block-63">${text1}</div>
@@ -139,19 +137,23 @@
 
         // Set time
         const weekdays = ['Sön', 'Mån', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör', 'Sön']
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
         const date = new Date(event.timestamp);
-        time = weekdays[date.getDay()] + " " + (date.getHours() + 2) + ":" + date.getMinutes();
+        time = weekdays[date.getDay()] + " " + date.getHours() + ":" + date.getMinutes();
+        let now = new Date();
+        let daysDiff = Math.round((now.getTime() - date.getTime()) / (1000 * 3600 * 24));console.log("D:", daysDiff);
+        if (daysDiff > 6) {time = date.getDate() + " " + months[date.getMonth()] + " " + date.getHours() + ":" + date.getMinutes();}
 
         // Set text
         if (event.type === 'itemAdded') {
             text = 'Plagg lades upp på Mai';
             displayLine = 'none';
         }
-        if (event.type === 'valuationCompleted') {text = `Värderades till ${event.data.min}-${event.data.max} kr`;}
-        if (event.type === 'valuationAccepted') {text = `Du accepterade värderingen`;}
-        if (event.type === 'itemPublished') {text = `Försäljning påbörjades`;}
-        if (event.type === 'priceAdjusted') {text = `Pris sänktes till ${event.data.newPrice} kr`;}
-        if (event.type === 'priceRequestSent') {text = `Nytt prisförslag på ${event.data.min}-${event.data.max} kr`;}
+        if (event.type === 'valuationCompleted') { text = `Värderades till ${event.data.min}-${event.data.max} kr`; }
+        if (event.type === 'valuationAccepted') { text = `Du accepterade värderingen`; }
+        if (event.type === 'itemPublished') { text = `Försäljning påbörjades`; }
+        if (event.type === 'priceAdjusted') { text = `Pris sänktes till ${event.data.newPrice} kr`; }
+        if (event.type === 'priceRequestSent') { text = `Nytt prisförslag på ${event.data.min}-${event.data.max} kr`; }
         if (event.type === 'priceRequestResponse') {
             if (event.data.response === 'Accepted') {
                 text = `Du accepterade prisförslaget`;
