@@ -87,7 +87,6 @@ function loadCardLists(userId) {
 
             //Display list
             myItemsDiv.style.display = "block";
-            holidayModeDiv.style.display = "block"; // Temporary during holiday times
             //Hide empty state
             noItemsDiv.style.display = "none";
             headerSellItemButton.style.display = "block";
