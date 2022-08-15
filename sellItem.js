@@ -138,7 +138,6 @@ async function updateItem(itemId, changedImages) {
   const condition = itemCondition.value;
   const defectDescription = itemDefectDescription.value;
   const userComment = itemUserComment.value;
-  const lowestAcceptPrice = Number(itemLowestAcceptPrice.value);
   let changes = {
     updatedAt: now,
     size: size,
@@ -149,8 +148,7 @@ async function updateItem(itemId, changedImages) {
     age: age,
     condition: condition,
     defectDescription: defectDescription,
-    userComment: userComment,
-    acceptPrice: lowestAcceptPrice
+    userComment: userComment
   }
 
   async function uploadImages(itemId) {
