@@ -6,68 +6,67 @@
                 if (doc.exists) {
                     console.log("Item data:", doc.data());
                     data = doc.data();
-                    if (authUser.uid === data.user) {
-                        const brand = data.brand;
-                        const images = data.images;
-                        const infoRequests = data.infoRequests;
-                        let imgUrl = images.frontImage;
-                        if (images.frontImageSmall) {
-                            imgUrl = images.frontImageSmall;
+                    const brand = data.brand;
+                    const images = data.images;
+                    const infoRequests = data.infoRequests;
+                    let imgUrl = images.frontImage;
+                    if (images.frontImageSmall) {
+                        imgUrl = images.frontImageSmall;
+                    }
+                    const status = data.status;
+                    const category = data.category ? data.category : "";
+                    let statusText = ""
+                    let publishedDate = data.publishedDate;
+                    let daysLeftText = "";
+                    if (data.publishedDate) {
+                        publishedDate = new Date(publishedDate);
+                        let nowDate = new Date();
+                        let timeDifference = nowDate.getTime() - publishedDate.getTime();
+                        let daysDifference = timeDifference / (1000 * 3600 * 24);
+                        let daysLeft = Math.round(30 - daysDifference);
+                        if (daysLeft <= 0) {
+                            daysLeftText = `0 dagar kvar`;
+                        } else {
+                            daysLeftText = `${daysLeft} dagar kvar`;
                         }
-                        const status = data.status;
-                        const category = data.category ? data.category : "";
-                        let statusText = ""
-                        let publishedDate = data.publishedDate;
-                        let daysLeftText = "";
-                        if (data.publishedDate) {
-                            publishedDate = new Date(publishedDate);
-                            let nowDate = new Date();
-                            let timeDifference = nowDate.getTime() - publishedDate.getTime();
-                            let daysDifference = timeDifference / (1000 * 3600 * 24);
-                            let daysLeft = Math.round(30 - daysDifference);
-                            if (daysLeft <= 0) {
-                                daysLeftText = `0 dagar kvar`;
-                            } else {
-                                daysLeftText = `${daysLeft} dagar kvar`;
-                            }
-                        }
-                        let min = data.minPriceEstimate;
-                        let max = data.maxPriceEstimate;
-                        const valuationText = min && max ? `${min}-${max} kr` : "";
+                    }
+                    let min = data.minPriceEstimate;
+                    let max = data.maxPriceEstimate;
+                    const valuationText = min && max ? `${min}-${max} kr` : "";
 
-                        let text1 = "";
-                        let text2 = "";
+                    let text1 = "";
+                    let text2 = "";
 
-                        if (status === "New") {
-                            if (infoRequests?.price?.status === "Active") {
-                                statusText = `Inväntar ditt svar`;
-                                text1 = "På huvudsidan kan du se plaggets värdering och<br>välja om du vill sälja till värderingen eller inte.";
-                            } else if (min && max) {
-                                statusText = `Förbereds`;
-                                text1 = "Förbereder det sista inför publicering.<br>Du får ett SMS när försäljningen påbörjas.";
-                                text2 = valuationText;
-                            } else {
-                                statusText = `Värdering pågår`;
-                                text1 = "Du får ett SMS när värderingen är klar.<br>Värderingen tar normalt 2 vardagar.";
-                            }
-                        }
-                        if (status === "Published" && min && max) {
-                            statusText = `Försäljning pågår`;
-                            text1 = daysLeftText;
+                    if (status === "New") {
+                        if (infoRequests?.price?.status === "Active") {
+                            statusText = `Inväntar ditt svar`;
+                            text1 = "På huvudsidan kan du se plaggets värdering och<br>välja om du vill sälja till värderingen eller inte.";
+                        } else if (min && max) {
+                            statusText = `Förbereds`;
+                            text1 = "Förbereder det sista inför publicering.<br>Du får ett SMS när försäljningen påbörjas.";
                             text2 = valuationText;
+                        } else {
+                            statusText = `Värdering pågår`;
+                            text1 = "Du får ett SMS när värderingen är klar.<br>Värderingen tar normalt 2 vardagar.";
                         }
+                    }
+                    if (status === "Published" && min && max) {
+                        statusText = `Försäljning pågår`;
+                        text1 = daysLeftText;
+                        text2 = valuationText;
+                    }
 
 
-                        var pageTitleComponentHTML = `
+                    var pageTitleComponentHTML = `
                             <div class="div-block-102">
                                 <div id="itemBrandText" class="text-block-16-copy">${brand}</div>
                                 <div id="itemCategoryText" class="text-block-62">${category}</div>
                             </div>`;
 
-                        pageTitleDiv.innerHTML = pageTitleComponentHTML;
-                        pageTitleDiv.style.display = "flex";
+                    pageTitleDiv.innerHTML = pageTitleComponentHTML;
+                    pageTitleDiv.style.display = "flex";
 
-                        var itemComponentHTML = `
+                    var itemComponentHTML = `
                             <div class="div-block-104"><div class="div-block-103">
                                     <div class="ratio-box _16-9">
                                         <div class="content-block with-image">
@@ -80,10 +79,9 @@
                                 <div id="itemText1" class="text-block-63">${text1}</div>
                                 <div id="itemText2" class="text-block-63">${text2}</div>
                             </div>`;
-                        itemDiv.innerHTML = itemComponentHTML;
-                        itemDiv.style.display = "block";
-                        loadingDiv.style.display = "none";
-                    }
+                    itemDiv.innerHTML = itemComponentHTML;
+                    itemDiv.style.display = "block";
+                    loadingDiv.style.display = "none";
                 } else {
                     console.log("No such document!");
                 }
@@ -141,8 +139,8 @@
         const date = new Date(event.timestamp);
         time = weekdays[date.getDay()] + " " + date.getHours() + ":" + date.getMinutes();
         let now = new Date();
-        let daysDiff = Math.round((now.getTime() - date.getTime()) / (1000 * 3600 * 24));console.log("D:", daysDiff);
-        if (daysDiff > 6) {time = date.getDate() + " " + months[date.getMonth()] + " " + date.getHours() + ":" + date.getMinutes();}
+        let daysDiff = Math.round((now.getTime() - date.getTime()) / (1000 * 3600 * 24)); console.log("D:", daysDiff);
+        if (daysDiff > 6) { time = date.getDate() + " " + months[date.getMonth()] + " " + date.getHours() + ":" + date.getMinutes(); }
 
         // Set text
         if (event.type === 'itemAdded') {
