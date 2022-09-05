@@ -1,10 +1,10 @@
 // Get params
 var queryStr = window.location.search;
-var paramPairs = queryStr.substr(1).split('&');
+var paramPairs = queryStr.substring(1).split('&');
 var params = {};
 for (var i = 0; i < paramPairs.length; i++) {
     var parts = paramPairs[i].split('=');
-    params[parts[0]] = parts[1];
+    params[parts[0]] = decodeURIComponent(parts[1]);
 }
 
 // FUNCTIONS FOR PRIVATE PAGE
