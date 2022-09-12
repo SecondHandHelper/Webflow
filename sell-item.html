@@ -114,12 +114,14 @@
 
 <script>
     async function main() {
-        // Om användare inte har telefonnummer, be om telefonnummer i formuläret
-        console.log(user);
-        console.log("phone: ", user.phoneNumber);
-        if (!user.phoneNumber) {
-            phoneNumberDiv.style.display = "block";
-            document.getElementById("itemPhoneNumber").required = true;
+        if (authUser) {
+            // Om användare inte har telefonnummer, be om telefonnummer i formuläret
+            console.log(user);
+            console.log("phone: ", user.phoneNumber);
+            if (!user.phoneNumber) {
+                phoneNumberDiv.style.display = "block";
+                document.getElementById("itemPhoneNumber").required = true;
+            }
         }
     }
 

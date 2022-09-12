@@ -5,33 +5,35 @@
 </script>
 <script>
     async function main() {
-        userId = authUser.uid;
-        email = authUser.email;
-        phone = authUser.phoneNumber;
-        emailVerified = authUser.emailVerified;
-        updateIC(userId, email, phone);
-        askForAdditionalUserDetails(userId);
-        loadSoldByOthers(userId);
-        //For testing purposes only - To see what a certain user sees
-        if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
-            userId = "3OkW5av20HP8ScpUDS8ip9fBEZr1";
-        }
-
-        loadCardLists(userId);
-        loadInfoRequests(userId);
-        showReferralSection();
-        showAccountInfo();
-
-        await updateFirestoreUserDocument(authUser.uid, email, phone);
-        if (!emailVerified && email) {
-            let res = getCookie('viewedVerifyEmailDiv');
-            viewedVerifyEmailDiv = res === 'true' ? true : false;
-            if (!viewedVerifyEmailDiv) {
-                window.location.replace('./user-management?mode=sendEmailVerification');
+        if (authUser) {
+            userId = authUser.uid;
+            email = authUser.email;
+            phone = authUser.phoneNumber;
+            emailVerified = authUser.emailVerified;
+            updateIC(userId, email, phone);
+            askForAdditionalUserDetails(userId);
+            loadSoldByOthers(userId);
+            //For testing purposes only - To see what a certain user sees
+            if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
+                userId = "3OkW5av20HP8ScpUDS8ip9fBEZr1";
             }
+
+            loadCardLists(userId);
+            loadInfoRequests(userId);
+            showReferralSection();
+            showAccountInfo();
+
+            await updateFirestoreUserDocument(authUser.uid, email, phone);
+            if (!emailVerified && email) {
+                let res = getCookie('viewedVerifyEmailDiv');
+                viewedVerifyEmailDiv = res === 'true' ? true : false;
+                if (!viewedVerifyEmailDiv) {
+                    window.location.replace('./user-management?mode=sendEmailVerification');
+                }
+            }
+            // Create refCode
+            if (user.addressFirstName && user.addressLastName && !user?.referralData?.referralCode) { createReferralCode(); }
         }
-        // Create refCode
-        if (user.addressFirstName && user.addressLastName && !user?.referralData?.referralCode) { createReferralCode(); }
     }
 
     function showAccountInfo() {
