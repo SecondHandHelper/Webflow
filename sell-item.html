@@ -81,17 +81,32 @@
     // Hide / Show warning about difficulty to sell certain brands
     let brand = document.getElementById("itemBrand");
     let hardToSellDiv = document.getElementById("hardToSellDiv");
-    hardToSellDiv.style.display = 'none'; // Initially hide this div
-    let words = ["H&M", "HM", "Zara", "ASOS", "Nelly", "Gina Tricot", "BikBok", "Lindex", "Kappahl", "Cubus", "NA-KD", "NAKD", "Mango", "Ellos"];
+    let words = ["H&M", "HM", "Zara", "ASOS", "Nelly", "Gina Tricot", "BikBok", "Bik Bok" , "Lindex", "Kappahl", "Cubus", "NA-KD", "NAKD", "Mango", "Ellos", "Primark", "Shein", "Vila", "Forever 21", "Pull & Bear", "Bershka", "Stradivarius"];
+    
 
     brand.onchange = function () {
-        let input = this.value;
-        if (words.some(words => input.toLowerCase().includes(words.toLowerCase()))) {
+        let value = this.value;
+        setTimeout(function () {
+            value = brand.value;
+            checkBrand(value);
+        }, 10);
+    };
+    brand.oninput = function () {
+        let value = this.value;
+        checkBrand(value);
+    };
+
+    function checkBrand(value) {
+        if (words.some(words => value.toLowerCase().includes(words.toLowerCase()))) {
+            hardToSellText.innerHTML = `Vi säljer i regel inte ${value}-plagg på grund av för lågt andrahandsvärde. Undantag kan finnas.`;
             hardToSellDiv.style.display = 'block';
+            //warningText.innerHTML = `Vi säljer i regel inte ${value}-plagg på grund av för lågt andrahandsvärde. Undantag kan finnas.`;
+            //brandWarningBanner.style.display = 'block';
         } else {
             hardToSellDiv.style.display = 'none';
+            //brandWarningBanner.style.display = 'none';
         }
-    };
+    }
 
     // Hide / Show extra fields for defects
     let itemCondition = document.getElementById("itemCondition");
