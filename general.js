@@ -299,7 +299,7 @@ async function storeShippingMethod(itemId, method) {
         console.log(`Shipping method '${method}' stored on item with ID: `, itemId);
         window.pickupFlowItemId = itemId; // Legacy from before. Bad way of doing it. Should clean up 'pickupFlowItemId' at some point.
         if (method == "Service point") {
-            feedbackFormTitle.innerText = 'Tack, då vet vi att paketet snart lämnas till ett ombud.'
+            feedbackFormTitle.innerText = 'Tack, då vet vi att paketet snart lämnas till ett ombud.';
             document.getElementById('triggerShippingToastClose').click();
         } else if (method == "Pickup") {
             closePickupToast();
