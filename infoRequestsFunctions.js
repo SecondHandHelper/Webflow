@@ -81,7 +81,7 @@ function loadInfoRequests(userId) {
             var infoRequests = item.infoRequests;
             var images = item.images;
             var status = item.status;
-            var brand = brand.replaceAll("'", ""); //Because of error in strings when opening the price toast - Can't open it
+            var brand = item.brand.replaceAll("'", ""); //Because of error in strings when opening the price toast - Can't open it
             var archived = item.archived;
             var category = item.category;
             var frontImageUrl = images.frontImage;
