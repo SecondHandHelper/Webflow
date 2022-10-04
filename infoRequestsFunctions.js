@@ -46,6 +46,7 @@ async function storePriceResponse(itemId, max, min, response, status) {
 }
 
 async function openNewPriceToast(itemId, status, max, min, brand, description, category) {
+    console.log("openNewPriceToast", itemId, status, max, min, brand, description, category);
     // Set content of toast
     newPriceToastTitle.innerHTML = "Nytt lägsta pris";
     newPriceHeading.innerHTML = `${brand}-plagg`;
@@ -81,8 +82,7 @@ function loadInfoRequests(userId) {
             var infoRequests = item.infoRequests;
             var images = item.images;
             var status = item.status;
-            var brand = item.brand.replace(/'/g, ""); //Because of error in strings when opening the price toast - Can't open it
-            console.log("Brand:", brand);
+            var brand = item.brand.replace(/'/g, '');
             var archived = item.archived;
             var category = item.category;
             var frontImageUrl = images.frontImage;
@@ -102,8 +102,8 @@ function loadInfoRequests(userId) {
                         let buttonText = `Komplettera`;
                         let buttonClass = "completerequestbutton";
                         let buttonTextClass = "text-block-69";
-                        let description = infoRequests[req].description.replace(/'/g, ""); //Because of error in strings when opening the price toast - Can't open it
-                        console.log("Description: ", description);
+                        let description = infoRequests[req].description.replace(/'/g, '');
+                        console.log(description);
                         if (req === "price") {
                             title = "Lägre pris";
                             buttonClass = "acceptnewpricebutton";
@@ -141,7 +141,7 @@ function loadInfoRequests(userId) {
                                                 </div>
                                                 <div class="text-block-73">${title}</div>
                                                 <div class="text-block-72">${subText}</div>
-                                                <a href='${href}' id="" class="link-block-23 w-inline-block">
+                                                <a href="${href}" id="" class="link-block-23 w-inline-block">
                                                     <div class="${buttonClass}">
                                                         <div class="${buttonTextClass}">${buttonText}</div>
                                                     </div>
