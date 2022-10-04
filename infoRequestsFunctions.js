@@ -47,8 +47,6 @@ async function storePriceResponse(itemId, max, min, response, status) {
 
 async function openNewPriceToast(itemId, status, max, min, brand, description, category) {
     // Set content of toast
-    brand = brand.replaceAll("'", "");
-    description = description.replaceAll("'", "");
     newPriceToastTitle.innerHTML = "Nytt lägsta pris";
     newPriceHeading.innerHTML = `${brand}-plagg`;
     const c = category.toLowerCase();
@@ -83,7 +81,7 @@ function loadInfoRequests(userId) {
             var infoRequests = item.infoRequests;
             var images = item.images;
             var status = item.status;
-            var brand = item.brand;
+            var brand = brand.replaceAll("'", ""); //Because of error in strings when opening the price toast - Can't open it
             var archived = item.archived;
             var category = item.category;
             var frontImageUrl = images.frontImage;
@@ -103,7 +101,7 @@ function loadInfoRequests(userId) {
                         let buttonText = `Komplettera`;
                         let buttonClass = "completerequestbutton";
                         let buttonTextClass = "text-block-69";
-                        let description = infoRequests[req].description;
+                        let description = infoRequests[req].description.replaceAll("'", ""); //Because of error in strings when opening the price toast - Can't open it
                         if (req === "price") {
                             title = "Lägre pris";
                             buttonClass = "acceptnewpricebutton";
