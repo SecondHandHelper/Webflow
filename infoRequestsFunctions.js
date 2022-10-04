@@ -47,6 +47,8 @@ async function storePriceResponse(itemId, max, min, response, status) {
 
 async function openNewPriceToast(itemId, status, max, min, brand, description, category) {
     // Set content of toast
+    brand = brand.replaceAll("'", "");
+    description = description.replaceAll("'", "");
     newPriceToastTitle.innerHTML = "Nytt lägsta pris";
     newPriceHeading.innerHTML = `${brand}-plagg`;
     const c = category.toLowerCase();
