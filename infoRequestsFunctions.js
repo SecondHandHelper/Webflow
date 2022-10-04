@@ -81,7 +81,8 @@ function loadInfoRequests(userId) {
             var infoRequests = item.infoRequests;
             var images = item.images;
             var status = item.status;
-            var brand = item.brand.replaceAll("'", ""); //Because of error in strings when opening the price toast - Can't open it
+            var brand = item.brand.replace(/'/g, ""); //Because of error in strings when opening the price toast - Can't open it
+            console.log("Brand:", brand);
             var archived = item.archived;
             var category = item.category;
             var frontImageUrl = images.frontImage;
@@ -101,7 +102,8 @@ function loadInfoRequests(userId) {
                         let buttonText = `Komplettera`;
                         let buttonClass = "completerequestbutton";
                         let buttonTextClass = "text-block-69";
-                        let description = infoRequests[req].description.replaceAll("'", ""); //Because of error in strings when opening the price toast - Can't open it
+                        let description = infoRequests[req].description.replace(/'/g, ""); //Because of error in strings when opening the price toast - Can't open it
+                        console.log("Description: ", description);
                         if (req === "price") {
                             title = "Lägre pris";
                             buttonClass = "acceptnewpricebutton";
