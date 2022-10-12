@@ -34,7 +34,7 @@ async function showReferralSection() {
             }
         });
         referredByBonusState.style.display = 'block';
-    } else if ((user?.referralData?.referredBy ? false : true) && daysDiff < 7) {
+    } else if ((user?.referralData?.referredBy ? false : true) && daysDiff < 100) {
         console.log("enterCodeState 'block'");
         enterCodeState.style.display = 'block';
     }
@@ -100,7 +100,7 @@ function connectReferralUsers() {
             let inviterUserId;
             for (var i in querySnapshot.docs) {
                 const doc = querySnapshot.docs[i];
-                const refCode = doc.data().referralData.referralCode;
+                const refCode = doc.data().referralData.referralCode.toUpperCase();
                 if (refCode == inputCode) {
                     inviterUserId = doc.id;
                     break;
