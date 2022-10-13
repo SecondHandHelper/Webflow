@@ -1,7 +1,7 @@
 async function openMeasurementsToast(itemId, description) {
     measurementDescriptionText.innerHTML = description;
     measurementsSubmitButton.addEventListener('click', async function () {
-        const input = measurementsIput.value;
+        const input = measurementsInput.value;
         if (input.length > 0 && input !== " ") {
             await db.collection('items').doc(itemId).update({
                 measurements: input,
@@ -14,7 +14,7 @@ async function openMeasurementsToast(itemId, description) {
     triggerMeasurementsToastOpen.click();
 }
 
-async function openLongerPeriodToast(itemId, brand) {
+async function openLongerPeriodToast(itemId, brand, currentMinPrice) {
     longerPeriodDescriptionText.innerHTML = `Säljperioden för ditt ${brand}-plagg har nu nått sitt slut efter 30 dagar. Vill du låta plagget ligga ute till försäljning i 30 dagar till?`;
     longerPeriodAcceptButton.addEventListener('click', async function () {
         const today = new Date();
@@ -25,6 +25,7 @@ async function openLongerPeriodToast(itemId, brand) {
             "infoRequests.longerPeriod.response": "Accepted",
         });
         triggerLongerPeriodToastClose.click();
+        openDiscountToast(itemId, currentMinPrice);
         triggerDiscountToastOpen.click();
     });
     longerPeriodDenyButton.addEventListener('click', async function () {
@@ -36,6 +37,42 @@ async function openLongerPeriodToast(itemId, brand) {
         setTimeout(function () { location.reload(); }, 400);
     });
     triggerLongerPeriodToastOpen.click();
+}
+
+async function openDiscountToast(itemId, price) {
+    // Set values of radiobuttons
+    const priceWithDiscount30 = Math.ceil((price * 0.7) / 10) * 10;
+    const priceWithDiscount20 = Math.ceil((price * 0.8) / 10) * 10;
+    priceAfterDiscount30.innerHTML = `(Priset blir ${priceWithDiscount30} kr)`;
+    priceAfterDiscount20.innerHTML = `(Priset blir ${priceWithDiscount20} kr)`;
+    priceNoDiscount.innerHTML = `(${price} kr)`;
+    $('#radioFieldDiscount30').val(30);
+    $('#radioFieldDiscount20').val(20);
+    // 
+    discountDoneButton.addEventListener('click', async function () {
+        let newPrice = 0;
+        let discount = 0
+        var discountRadioButtons = document.getElementsByName("Discount");
+        for (var x = 0; x < discountRadioButtons.length; x++) {
+            if (discountRadioButtons[x].checked) {
+                if (discountRadioButtons[x].value === 30){
+                    newPrice = priceWithDiscount30;
+                    discount = 30;
+                }
+                if (discountRadioButtons[x].value === 20){
+                    newPrice = priceWithDiscount20;
+                    discount = 20;
+                }
+            }
+        }
+        if (newPrice !== 0){
+            await db.collection('items').doc(itemId).update({
+                minPriceEstimate: newPrice,
+                longerPeriodAcceptedDiscount: discount
+            });
+        }
+        triggerDiscountToastClose.click();
+    });
 }
 
 async function storePriceResponse(itemId, max, min, response, status) {
@@ -107,6 +144,7 @@ function loadInfoRequests(userId) {
             var images = item.images;
             var status = item.status;
             var brand = item.brand.replace(/'/g, '');
+            var currentMinPrice = item.minPriceEstimate;
             var archived = item.archived;
             var category = item.category;
             var frontImageUrl = images.frontImage;
@@ -127,7 +165,7 @@ function loadInfoRequests(userId) {
                         let buttonClass = "completerequestbutton";
                         let buttonTextClass = "text-block-69";
                         let description = infoRequests[req].description;
-                        if (description){ description = description.replace(/'/g, '');}
+                        if (description) { description = description.replace(/'/g, ''); }
                         console.log(description);
                         // PRICE REQUEST
                         if (req === "price") {
@@ -166,7 +204,7 @@ function loadInfoRequests(userId) {
                             title = "Förläng";
                             subText = "Vill du förlänga med 30 dagar till?";
                             buttonText = "Svara";
-                            href = `javascript:openLongerPeriodToast('${itemId}', '${brand}');`;
+                            href = `javascript:openLongerPeriodToast('${itemId}', '${brand}', ${currentMinPrice});`;
                         }
                         // CARD
                         let card = `<div class="div-block-126">
