@@ -17,15 +17,15 @@ async function openMeasurementsToast(itemId, description) {
 async function openLongerPeriodToast(itemId, brand) {
     longerPeriodDescriptionText.innerHTML = `Säljperioden för ditt ${brand}-plagg har nu nått sitt slut efter 30 dagar. Vill du låta plagget ligga ute till försäljning i 30 dagar till?`;
     longerPeriodAcceptButton.addEventListener('click', async function () {
-        let today = new Date();
-        today.toISOString().split('T')[0];
+        const today = new Date();
+        const todayDate = today.toISOString().split('T')[0];
         await db.collection('items').doc(itemId).update({
-            longerPeriodAcceptedDate: today,
+            longerPeriodAcceptedDate: todayDate,
             "infoRequests.longerPeriod.status": "Resolved",
             "infoRequests.longerPeriod.response": "Accepted",
         });
         triggerLongerPeriodToastClose.click();
-        triggerDiscountToastClose.click();
+        triggerDiscountToastOpen.click();
     });
     longerPeriodDenyButton.addEventListener('click', async function () {
         await db.collection('items').doc(itemId).update({
