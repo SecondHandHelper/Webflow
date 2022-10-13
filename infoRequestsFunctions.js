@@ -55,16 +55,19 @@ async function openDiscountToast(itemId, price) {
         var discountRadioButtons = document.getElementsByName("Discount");
         for (var x = 0; x < discountRadioButtons.length; x++) {
             if (discountRadioButtons[x].checked) {
-                if (discountRadioButtons[x].value === 30){
+                const input = discountRadioButtons[x].value;
+                console.log(input, typeof input);
+                if (input === '30'){
                     newPrice = priceWithDiscount30;
                     discount = 30;
                 }
-                if (discountRadioButtons[x].value === 20){
+                if (input === '20'){
                     newPrice = priceWithDiscount20;
                     discount = 20;
                 }
             }
         }
+        console.log('newPrice', newPrice);
         if (newPrice !== 0){
             await db.collection('items').doc(itemId).update({
                 minPriceEstimate: newPrice,
@@ -72,6 +75,7 @@ async function openDiscountToast(itemId, price) {
             });
         }
         triggerDiscountToastClose.click();
+        //setTimeout(function () { location.reload(); }, 400);
     });
 }
 
