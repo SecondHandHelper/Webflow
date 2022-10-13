@@ -126,7 +126,8 @@ function loadInfoRequests(userId) {
                         let buttonText = `Komplettera`;
                         let buttonClass = "completerequestbutton";
                         let buttonTextClass = "text-block-69";
-                        let description = infoRequests[req].description.replace(/'/g, '');
+                        let description = infoRequests[req].description;
+                        if (description){ description = description.replace(/'/g, '');}
                         console.log(description);
                         // PRICE REQUEST
                         if (req === "price") {
