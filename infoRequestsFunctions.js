@@ -40,15 +40,11 @@ async function openLongerPeriodToast(itemId, brand, currentMinPrice) {
 }
 
 async function openDiscountToast(itemId, price) {
-    // Set values of radiobuttons
     const priceWithDiscount30 = Math.ceil((price * 0.7) / 10) * 10;
     const priceWithDiscount20 = Math.ceil((price * 0.8) / 10) * 10;
     priceAfterDiscount30.innerHTML = `(Priset blir ${priceWithDiscount30} kr)`;
     priceAfterDiscount20.innerHTML = `(Priset blir ${priceWithDiscount20} kr)`;
     priceNoDiscount.innerHTML = `(${price} kr)`;
-    $('#radioFieldDiscount30').val(30);
-    $('#radioFieldDiscount20').val(20);
-    // 
     discountDoneButton.addEventListener('click', async function () {
         let newPrice = 0;
         let discount = 0
@@ -56,7 +52,6 @@ async function openDiscountToast(itemId, price) {
         for (var x = 0; x < discountRadioButtons.length; x++) {
             if (discountRadioButtons[x].checked) {
                 const input = discountRadioButtons[x].value;
-                console.log(input, typeof input);
                 if (input === '30'){
                     newPrice = priceWithDiscount30;
                     discount = 30;
@@ -67,7 +62,6 @@ async function openDiscountToast(itemId, price) {
                 }
             }
         }
-        console.log('newPrice', newPrice);
         if (newPrice !== 0){
             await db.collection('items').doc(itemId).update({
                 minPriceEstimate: newPrice,
@@ -75,7 +69,7 @@ async function openDiscountToast(itemId, price) {
             });
         }
         triggerDiscountToastClose.click();
-        //setTimeout(function () { location.reload(); }, 400);
+        setTimeout(function () { location.reload(); }, 400);
     });
 }
 
