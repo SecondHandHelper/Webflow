@@ -2,7 +2,7 @@ async function openMeasurementsToast(itemId, description) {
     measurementDescriptionText.innerHTML = description;
     measurementsSubmitButton.addEventListener('click', async function () {
         const input = measurementsIput.value;
-        if (input.length > 0) {
+        if (input.length > 0 && input !== " ") {
             await db.collection('items').doc(itemId).update({
                 measurements: input,
                 "infoRequests.measurements.status": "Resolved"
@@ -12,6 +12,30 @@ async function openMeasurementsToast(itemId, description) {
         setTimeout(function () { location.reload(); }, 400);
     });
     triggerMeasurementsToastOpen.click();
+}
+
+async function openLongerPeriodToast(itemId, brand) {
+    longerPeriodDescriptionText.innerHTML = `Säljperioden för ditt ${brand}-plagg på 30 dagar har nått sitt slut. Om du väljer att förlänga så låter vi plagget ligga ute i 30 dagar till.`;
+    longerPeriodAcceptButton.addEventListener('click', async function () {
+        let today = new Date();
+        yourDate.toISOString().split('T')[0];
+        await db.collection('items').doc(itemId).update({
+            longerPeriodAcceptedDate: today,
+            "infoRequests.longerPeriod.status": "Resolved",
+            "infoRequests.longerPeriod.response": "Accepted",
+        });
+        triggerLongerPeriodToastClose.click();
+        triggerDiscountToastClose.click();
+    });
+    longerPeriodDenyButton.addEventListener('click', async function () {
+        await db.collection('items').doc(itemId).update({
+            "infoRequests.longerPeriod.status": "Resolved",
+            "infoRequests.longerPeriod.response": "Denied",
+        });
+        triggerLongerPeriodToastClose.click();
+        setTimeout(function () { location.reload(); }, 400);
+    });
+    triggerLongerPeriodToastOpen.click();
 }
 
 async function storePriceResponse(itemId, max, min, response, status) {
@@ -51,7 +75,7 @@ async function openNewPriceToast(itemId, status, max, min, brand, description, c
     newPriceToastTitle.innerHTML = "Nytt lägsta pris";
     newPriceHeading.innerHTML = `${brand}-plagg`;
     const c = category.toLowerCase();
-    if (c && c !== "null"){newPriceHeading.innerHTML = `${brand}-${c}`;}
+    if (c && c !== "null") { newPriceHeading.innerHTML = `${brand}-${c}`; }
     newPrice.innerHTML = `${min} kr`;
     acceptNewPriceButton.innerHTML = "Sälj med nytt pris";
     denyNewPriceButton.innerHTML = "Sänk ej";
@@ -104,6 +128,7 @@ function loadInfoRequests(userId) {
                         let buttonTextClass = "text-block-69";
                         let description = infoRequests[req].description.replace(/'/g, '');
                         console.log(description);
+                        // PRICE REQUEST
                         if (req === "price") {
                             title = "Lägre pris";
                             buttonClass = "acceptnewpricebutton";
@@ -121,18 +146,28 @@ function loadInfoRequests(userId) {
                             }
                             href = `javascript:openNewPriceToast('${itemId}', '${status}', ${max}, ${min}, '${brand}', '${description}', '${category}');`;
                         }
+                        // MEASUREMENTS REQUEST
                         if (req === "measurements") {
                             title = "Mått";
                             subText = "Vi behöver mått för detta plagg";
                             buttonText = "Se mer";
                             href = `javascript:openMeasurementsToast('${itemId}', '${description}');`;
                         }
+                        // IMAGES REQUEST
                         if (req === "images") {
                             title = "Bilder";
                             subText = "Bilderna behöver kompletteras";
                             buttonText = "Ändra bilder";
                             href = window.location.origin + `/edit-item?id=${itemId}`;
                         }
+                        // LONGER PERIOD REQUEST
+                        if (req === "longerPeriod") {
+                            title = "Förläng";
+                            subText = "Vill du förlänga med 30 dagar till?";
+                            buttonText = "Svara";
+                            href = `javascript:openLongerPeriodToast('${itemId}', '${brand}');`;
+                        }
+                        // CARD
                         let card = `<div class="div-block-126">
                                                 <div class="ratio-box _16-9">
                                                     <div class="content-block with-image">
