@@ -32,9 +32,10 @@ async function openLongerPeriodToast(itemId, brand, currentMinPrice) {
         await db.collection('items').doc(itemId).update({
             "infoRequests.longerPeriod.status": "Resolved",
             "infoRequests.longerPeriod.response": "Denied",
+            "status": "Unsold" // This field is normally mastered by AT - I do this for the user to see the effect immediately (the card is removed)
         });
         triggerLongerPeriodToastClose.click();
-        setTimeout(function () { location.reload(); }, 400);
+        setTimeout(function () { location.reload(); }, 300);
     });
     triggerLongerPeriodToastOpen.click();
 }
