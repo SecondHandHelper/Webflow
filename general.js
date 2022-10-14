@@ -295,6 +295,7 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate) {
 }
 
 async function storeShippingMethod(itemId, method) {
+    console.log(`storeShippingMethod(${itemId}, ${method}) is running`);
     await db.collection('items').doc(itemId).update({ shippingMethod: method }).then((docRef) => {
         console.log(`Shipping method '${method}' stored on item with ID: `, itemId);
         window.pickupFlowItemId = itemId; // Legacy from before. Bad way of doing it. Should clean up 'pickupFlowItemId' at some point.
@@ -311,10 +312,8 @@ av ditt plagg?`;
     });
 }
 
-
-// PICKUP RELATED FUNCTIONS
-
 function openPickupToast(itemId, soldDate) {
+    console.log(`openPickupToast(${itemId}, ${soldDate}) is running`);
     triggerShippingToastClose.click();
     setDatesOfPickupToast(soldDate);
     window.pickupFlowItemId = itemId;
@@ -322,6 +321,7 @@ function openPickupToast(itemId, soldDate) {
 }
 
 function setDatesOfPickupToast(soldDate) {
+    console.log(`setDatesOfPickupToast(${soldDate}) is running`);
     // Hide all options first, to later determine which ones to show
     radioFieldOne.style.display = 'none';
     radioFieldTwo.style.display = 'none';
