@@ -35,6 +35,7 @@ function loadCardLists(userId) {
         var shippingMethod = doc.data().shippingMethod;
         var archived = doc.data().archived;
         var holidayMode = doc.data().holidayMode;
+        var longerPeriodAcceptedDate = doc.data().longerPeriodAcceptedDate;
         var frontImageUrl = images.frontImage;
         if (images.frontImageSmall) {
           frontImageUrl = images.frontImageSmall;
@@ -46,7 +47,8 @@ function loadCardLists(userId) {
           let nowDate = new Date();
           let timeDifference = nowDate.getTime() - publishedDate.getTime();
           let daysDifference = timeDifference / (1000 * 3600 * 24);
-          let daysLeft = Math.round(30 - daysDifference);
+          let sellingPeriodLength = longerPeriodAcceptedDate ? 60 : 30 ;
+          let daysLeft = Math.round(sellingPeriodLength - daysDifference);
           if (daysLeft <= 0) {
             daysLeftText = `0 dagar kvar`;
           } else {
