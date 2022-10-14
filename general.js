@@ -250,7 +250,7 @@ function bagReceivedAction(checkbox, itemId, soldDate) {
 function openShippingToast(itemId, soldDate) {
     console.log("openShippingToast");
     window.pickupFlowItemId = itemId;
-    shippingOptionsDiv.innerHTML = `<a href="javascript:storeShippingMethod('${itemId}', 'Service point');" class="link-block-22 w-inline-block"><div class="div-block-122">
+    document.getElementById('shippingOptionsDiv').innerHTML = `<a href="javascript:storeShippingMethod('${itemId}', 'Service point');" class="link-block-22 w-inline-block"><div class="div-block-122">
         <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/62436932a8d26f07254b45e2_parcel.png" loading="lazy" width="45" alt="" class="image-24">
         <div class="small-button-text">Lämna till ombud</div></div>
     </a>
