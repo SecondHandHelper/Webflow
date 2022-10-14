@@ -15,7 +15,8 @@ async function openMeasurementsToast(itemId, description) {
 }
 
 async function openLongerPeriodToast(itemId, brand, currentMinPrice, deniedBefore) {
-    longerPeriodDescriptionText.innerHTML = `Säljperioden för ditt ${brand}-plagg har nu nått sitt slut efter 30 dagar. Vill du låta plagget ligga ute till försäljning i 30 dagar till?`;
+    longerPeriodDescriptionText.innerHTML = `Säljperioden för ditt ${brand}-plagg har nått sitt slut efter 30 dagar. Vill du låta plagget ligga ute till försäljning i 30 dagar till?`;
+    // Accept longer selling period and ask if they want to lower the price
     longerPeriodAcceptButton.addEventListener('click', async function () {
         const today = new Date();
         const todayDate = today.toISOString().split('T')[0];
@@ -27,8 +28,11 @@ async function openLongerPeriodToast(itemId, brand, currentMinPrice, deniedBefor
         triggerLongerPeriodToastClose.click();
         if (currentMinPrice >= 140 && !deniedBefore){
             openDiscountToast(itemId, currentMinPrice);
+        } else {
+            setTimeout(function () { location.reload(); }, 300);
         }
     });
+    // Decline longer selling period and quit sales
     longerPeriodDenyButton.addEventListener('click', async function () {
         await db.collection('items').doc(itemId).update({
             "infoRequests.longerPeriod.status": "Resolved",
