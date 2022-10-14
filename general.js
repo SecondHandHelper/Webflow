@@ -315,12 +315,10 @@ av ditt plagg?`;
 // PICKUP RELATED FUNCTIONS
 
 function openPickupToast(itemId, soldDate) {
+    triggerShippingToastClose.click();
     setDatesOfPickupToast(soldDate);
     window.pickupFlowItemId = itemId;
-    if (shippingMethodToast.style.display == 'block') {
-        document.getElementById('triggerShippingToastClose').click();
-    }
-    document.getElementById('triggerPickupAnimation').click();
+    triggerPickupAnimation.click();
 }
 
 function setDatesOfPickupToast(soldDate) {
