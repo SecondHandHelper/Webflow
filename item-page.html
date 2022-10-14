@@ -15,6 +15,7 @@
                     }
                     const status = data.status;
                     const category = data.category ? data.category : "";
+                    const longerPeriodAcceptedDate = data.longerPeriodAcceptedDate;
                     let statusText = ""
                     let publishedDate = data.publishedDate;
                     let daysLeftText = "";
@@ -23,7 +24,8 @@
                         let nowDate = new Date();
                         let timeDifference = nowDate.getTime() - publishedDate.getTime();
                         let daysDifference = timeDifference / (1000 * 3600 * 24);
-                        let daysLeft = Math.round(30 - daysDifference);
+                        let sellingPeriodLength = longerPeriodAcceptedDate ? 60 : 30;
+                        let daysLeft = Math.round(sellingPeriodLength - daysDifference);
                         if (daysLeft <= 0) {
                             daysLeftText = `0 dagar kvar`;
                         } else {

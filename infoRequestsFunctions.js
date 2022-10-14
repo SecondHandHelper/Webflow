@@ -14,7 +14,7 @@ async function openMeasurementsToast(itemId, description) {
     triggerMeasurementsToastOpen.click();
 }
 
-async function openLongerPeriodToast(itemId, brand, currentMinPrice) {
+async function openLongerPeriodToast(itemId, brand, currentMinPrice, deniedBefore) {
     longerPeriodDescriptionText.innerHTML = `Säljperioden för ditt ${brand}-plagg har nu nått sitt slut efter 30 dagar. Vill du låta plagget ligga ute till försäljning i 30 dagar till?`;
     longerPeriodAcceptButton.addEventListener('click', async function () {
         const today = new Date();
@@ -25,8 +25,9 @@ async function openLongerPeriodToast(itemId, brand, currentMinPrice) {
             "infoRequests.longerPeriod.response": "Accepted",
         });
         triggerLongerPeriodToastClose.click();
-        openDiscountToast(itemId, currentMinPrice);
-        triggerDiscountToastOpen.click();
+        if (currentMinPrice >= 140 && !deniedBefore){
+            openDiscountToast(itemId, currentMinPrice);
+        }
     });
     longerPeriodDenyButton.addEventListener('click', async function () {
         await db.collection('items').doc(itemId).update({
@@ -72,6 +73,7 @@ async function openDiscountToast(itemId, price) {
         triggerDiscountToastClose.click();
         setTimeout(function () { location.reload(); }, 400);
     });
+    triggerDiscountToastOpen.click();
 }
 
 async function storePriceResponse(itemId, max, min, response, status) {
@@ -144,6 +146,7 @@ function loadInfoRequests(userId) {
             var status = item.status;
             var brand = item.brand.replace(/'/g, '');
             var currentMinPrice = item.minPriceEstimate;
+            var deniedBefore = item?.infoRequests?.price?.response === "Denied" ? true : false ;
             var archived = item.archived;
             var category = item.category;
             var frontImageUrl = images.frontImage;
@@ -203,7 +206,7 @@ function loadInfoRequests(userId) {
                             title = "Förläng";
                             subText = "Vill du förlänga med 30 dagar till?";
                             buttonText = "Svara";
-                            href = `javascript:openLongerPeriodToast('${itemId}', '${brand}', ${currentMinPrice});`;
+                            href = `javascript:openLongerPeriodToast('${itemId}', '${brand}', ${currentMinPrice}, ${deniedBefore});`;
                         }
                         // CARD
                         let card = `<div class="div-block-126">
