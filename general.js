@@ -368,6 +368,12 @@ function setDatesOfPickupToast(soldDate) {
     console.log("secondDate > today", (secondDate > today));
     console.log("thirdDate > today", (thirdDate > today));
     console.log("forthDate > today", (forthDate > today));
+
+    const pickupDateOne = document.getElementById('pickupDateOne');
+    const pickupDateTwo = document.getElementById('pickupDateTwo');
+    const pickupDateThree = document.getElementById('pickupDateThree');
+    const pickupDateFour = document.getElementById('pickupDateFour');
+
     if (firstDate > today) {
         $('#radioButtonOne').val(firstDate.toISOString().split('T')[0]); //yyyy-mm-dd
         pickupDateOne.innerHTML = days[firstDate.getDay()] + ", " + firstDate.getDate() + " " + months[firstDate.getMonth()] + ", kl 9-16";
