@@ -2,6 +2,7 @@
     var userId;
     var email;
     var phone;
+    var items;
 </script>
 <script>
     async function main() {
@@ -22,6 +23,7 @@
             loadInfoRequests(userId);
             showReferralSection();
             showAccountInfo();
+            showInviteToast();
 
             await updateFirestoreUserDocument(authUser.uid, email, phone);
             if (!emailVerified && email) {
@@ -48,6 +50,42 @@
             accountInfoText.style.display = 'block';
         }
     }
+
+    function showInviteToast() {
+        let daysSinceLatestSold = 10;
+        let soldItemsCount = 0;
+        let oneSoldNotSentItemExist = false;
+
+        items.forEach((doc) => { // Items is a global variable that equals to querySnapshot from loadCardLists.js
+            var itemId = doc.id;
+            var i = doc.data();
+            const soldDate = i.soldDate;
+            const status = i.status;
+            const shippingStatus = i.shippingStatus;
+            const shippingMethod = i.shippingMethod;
+            const archived = i.archived;
+
+            if (!archived && status === 'Sold' && soldDate) {
+                soldItemsCount++;
+                if (soldDate) {
+                    soldDate = new Date(soldDate);
+                    let nowDate = new Date();
+                    let timeDifference = nowDate.getTime() - soldDate.getTime();
+                    let daysDiff = Math.round(timeDifference / (1000 * 3600 * 24));
+                    if (daysDiff <= daysSinceLatestSold) { daysSinceLatestSold = daysDiff; }
+                }
+                if (shippingStatus !== 'Sent' && !shippingMethod) {
+                    oneSoldNotSentItemExist = true;
+                }
+            }
+        });
+
+        // TODO: Add to database that the user has seen the toast and make sure to not show it again
+        if (daysSinceLatestSold <= 3 && soldItemsCount >= 2 && oneSoldNotSentItemExist && user?.referralData?.referralCode) {
+            triggerInviteToastOpen.click();
+        }
+    }
+
 </script>
 <script>
     //Disable webflow form submissions
@@ -71,29 +109,30 @@
         referralCodeInput.addEventListener("input", function () { saveReferralCodeButton.style.display = 'inline-block'; });
         closeMeasurementsToastButton.addEventListener("click", function () { triggerMeasurementsToastClose.click(); });
         closeNewPriceToastButton.addEventListener("click", function () { triggerNewPriceToastClose.click(); });
+        shareCodeButton.addEventListener('click', shareCode);
+        sharePersonalLinkButton.addEventListener('click', shareCode);
     });
 
-    shareCodeButton.addEventListener('click', event => {
+    function shareCode() {
         const code = user.referralData.referralCode;
         const text = `Hej, jag vill tipsa om Mai för att rensa ur garderoben. Mai är en tjänst som hjälper dig att sälja dina kläder på ett enkelt sätt. Man tar bilder på sina plagg, sedan sköter Mai resten, såsom värdering, publicering på plattformar, kontakt med köpare och frakt när det blir sålt. Man får själv behålla 80% av slutpriset, och blir det inte sålt kostar det ingenting.
 
 Som en uppmuntran till att komma igång ger Mai dig 100kr i välkomstgåva, när du registrerar dig med min kod ${code}.
 
-Läs mer här:`
+Läs mer och registrera dig här:`
         if (navigator.share) {
             navigator.share({
                 text: text,
                 url: `https://maiapp.se/?invite=${code}`
             }).then(() => { console.log('Thanks for sharing!'); }).catch(console.error);
         } else {
-            // fallback
             console.log("Browser doesn't support navigator.share => Copy to clipboard!");
             const shareText = text + "\n" + `https://maiapp.se/?invite=${code}`;
             navigator.clipboard.writeText(shareText);
             linkCopiedText.style.display = 'flex';
             shareCodeButton.style.display = 'none';
         }
-    });
+    }
 
     window.intercomSettings = {
         app_id: "klyy0le5"

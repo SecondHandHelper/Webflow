@@ -15,6 +15,7 @@ function loadCardLists(userId) {
       soldByOthersDiv.style.display = "block";
       quickInfoDiv.style.display = "block";
       var youEarned = 0;
+      items = querySnapshot; // Global variable to be able to get things from item data from other places
 
       querySnapshot.forEach((doc) => {
         var itemId = doc.id;
