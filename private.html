@@ -2,7 +2,6 @@
     var userId;
     var email;
     var phone;
-    var items;
 </script>
 <script>
     async function main() {
@@ -23,7 +22,7 @@
             loadInfoRequests(userId);
             showReferralSection();
             showAccountInfo();
-            showInviteToast();
+
 
             await updateFirestoreUserDocument(authUser.uid, email, phone);
             if (!emailVerified && email) {
@@ -35,6 +34,9 @@
             }
             // Create refCode
             if (user.addressFirstName && user.addressLastName && !user?.referralData?.referralCode) { createReferralCode(); }
+
+            // When all else is done - Check if it is time to show the invite friends toast
+            showInviteToast();
         }
     }
 
@@ -56,29 +58,34 @@
         let soldItemsCount = 0;
         let oneSoldNotSentItemExist = false;
 
-        items.forEach((doc) => { // Items is a global variable that equals to querySnapshot from loadCardLists.js
-            var itemId = doc.id;
-            var i = doc.data();
-            const soldDate = i.soldDate;
-            const status = i.status;
-            const shippingStatus = i.shippingStatus;
-            const shippingMethod = i.shippingMethod;
-            const archived = i.archived;
+        if (items) {
+            items.forEach((doc) => { // Items is a global variable that equals to querySnapshot from loadCardLists.js
+                var itemId = doc.id;
+                var i = doc.data();
+                const soldDate = i.soldDate;
+                const status = i.status;
+                const shippingStatus = i.shippingStatus;
+                const shippingMethod = i.shippingMethod;
+                const archived = i.archived;
 
-            if (!archived && status === 'Sold' && soldDate) {
-                soldItemsCount++;
-                if (soldDate) {
-                    soldDate = new Date(soldDate);
-                    let nowDate = new Date();
-                    let timeDifference = nowDate.getTime() - soldDate.getTime();
-                    let daysDiff = Math.round(timeDifference / (1000 * 3600 * 24));
-                    if (daysDiff <= daysSinceLatestSold) { daysSinceLatestSold = daysDiff; }
+                if (!archived && status === 'Sold' && soldDate) {
+                    soldItemsCount++;
+                    if (soldDate) {
+                        soldDate = new Date(soldDate);
+                        let nowDate = new Date();
+                        let timeDifference = nowDate.getTime() - soldDate.getTime();
+                        let daysDiff = Math.round(timeDifference / (1000 * 3600 * 24));
+                        if (daysDiff <= daysSinceLatestSold) { daysSinceLatestSold = daysDiff; }
+                    }
+                    if (shippingStatus !== 'Sent' && !shippingMethod) {
+                        oneSoldNotSentItemExist = true;
+                    }
                 }
-                if (shippingStatus !== 'Sent' && !shippingMethod) {
-                    oneSoldNotSentItemExist = true;
-                }
-            }
-        });
+            });
+        } else {
+            console.log("Items are not loaded yet OR there are none: ", items);
+        }
+
 
         // TODO: Add to database that the user has seen the toast and make sure to not show it again
         if (daysSinceLatestSold <= 3 && soldItemsCount >= 2 && oneSoldNotSentItemExist && user?.referralData?.referralCode) {

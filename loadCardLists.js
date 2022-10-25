@@ -1,3 +1,5 @@
+var items;
+
 function loadCardLists(userId) {
   itemListSelling.innerHTML = "";
   itemListSoldNotSent.innerHTML = "";
@@ -16,6 +18,7 @@ function loadCardLists(userId) {
       quickInfoDiv.style.display = "block";
       var youEarned = 0;
       items = querySnapshot; // Global variable to be able to get things from item data from other places
+      console.log(items);
 
       querySnapshot.forEach((doc) => {
         var itemId = doc.id;
