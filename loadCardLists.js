@@ -6,7 +6,7 @@ async function loadCardLists(userId) {
   itemListSold.innerHTML = "";
   itemListSoldByOthers.innerHTML = "";
 
-  db.collection("items")
+  await db.collection("items")
     .where("user", "==", userId)
     .where("createdAt", "!=", false)
     .orderBy('createdAt', 'desc')
