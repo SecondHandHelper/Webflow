@@ -8,12 +8,12 @@
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-functions.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.62/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.63/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.61/infoRequestsFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.59/referralFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.52/cookieManagement.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.54/autocomplete-brands.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.61/loadCardLists.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.64/autocomplete-brands.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.65/loadCardLists.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuidv4.min.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.49/sellItem.js"></script>
 
@@ -82,9 +82,18 @@
         main();
       }
     }
-
-
   });
+
+  // GET ITEMS
+  // This function returns all the users items from DB in the form of a firestore "querySnapshot"
+  async function getItems(userId) {
+    return db.collection("items")
+      .where("user", "==", userId)
+      .where("createdAt", "!=", false)
+      .orderBy('createdAt', 'desc')
+      .get();
+  }
+
 </script>
 <script>
   // GO BACK LINKS

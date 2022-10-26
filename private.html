@@ -18,10 +18,12 @@
                 userId = "3OkW5av20HP8ScpUDS8ip9fBEZr1";
             }
 
+            const items = await getItems(userId);
+            showInviteToast(items);
+            loadItemCards(items);
             loadInfoRequests(userId);
             showReferralSection();
             showAccountInfo();
-
 
             await updateFirestoreUserDocument(authUser.uid, email, phone);
             if (!emailVerified && email) {
@@ -33,10 +35,6 @@
             }
             // Create refCode
             if (user.addressFirstName && user.addressLastName && !user?.referralData?.referralCode) { createReferralCode(); }
-
-            // When all else is done - Check if it is time to show the invite friends toast
-            loadCardLists(userId);
-            showInviteToast();
         }
     }
 
@@ -53,7 +51,7 @@
         }
     }
 
-    function showInviteToast() {
+    function showInviteToast(items) {
         let daysSinceLatestSold = 10;
         let soldItemsCount = 0;
         let oneSoldNotSentItemExist = false;
@@ -92,6 +90,11 @@
             db.collection('users').doc(authUser.uid).update({elementViews: firebase.firestore.FieldValue.arrayUnion({elementID: "inviteToast", timestamp: new Date()})});
         } else {
             console.log("Open invite toast: ", false);
+            console.log("[No invite toast] daysSinceLatestSold: ", daysSinceLatestSold);
+            console.log("[No invite toast] soldItemsCount: ", soldItemsCount);
+            console.log("[No invite toast] oneSoldNotSentItemExist: ", oneSoldNotSentItemExist);
+            console.log("[No invite toast] referralCode: ", user?.referralData?.referralCode);
+            console.log("[No invite toast] viewedToastBefore: ", viewedToastBefore);
         }
     }
 
