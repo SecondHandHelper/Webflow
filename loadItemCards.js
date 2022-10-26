@@ -2,7 +2,6 @@ async function loadItemCards(items) {
   itemListSelling.innerHTML = "";
   itemListSoldNotSent.innerHTML = "";
   itemListSold.innerHTML = "";
-  itemListSoldByOthers.innerHTML = "";
   var youEarned = 0;
 
   items.forEach((doc) => {

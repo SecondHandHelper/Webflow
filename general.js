@@ -83,7 +83,7 @@ async function updateFirestoreUserDocument(userId, email, phone) {
             if (utm_medium) { a["utm_medium"] = utm_medium; }
             if (utm_term) { a["utm_term"] = utm_term; }
             if (utm_content) { a["utm_content"] = utm_content; }
-            if (Object.keys(a).length > 0) { fields["attribution"] = a}
+            if (Object.keys(a).length > 0) { fields["attribution"] = a }
             await docRef.set(fields).then((doc) => {
                 console.log(`User document was created with id ${doc.id} and these fields: `, doc.data());
                 user = doc.data();
@@ -150,7 +150,7 @@ async function askForAdditionalUserDetails(userID) {
 
 function loadSoldByOthers(userID) {
     var itemListSoldByOthers = document.getElementById('itemListSoldByOthers');
-    console.log("loadSoldByOthers()");
+    itemListSoldByOthers.innerHTML = "";
 
     // SOLD BY OTHERS QUERY + Add cards to list
     db.collection("items")
@@ -169,16 +169,15 @@ function loadSoldByOthers(userID) {
                     imageUrl = images.frontImageSmall;
                 }
 
-                console.log(brand);
-
                 // Add card to list if seller is other than myself
                 if (sellerId != userID && soldPrice >= 200) {
                     var soldByOthersItemCardHTML = `<div class="div-block-14"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>${brand}</div></div>`;
-                    document.getElementById('itemListSoldByOthers').innerHTML += soldByOthersItemCardHTML;
-                    console.log("CARD ADDED TO LIST");
+                    itemListSoldByOthers.innerHTML += soldByOthersItemCardHTML;
                 }
             });
         });
+
+    soldByOthersDiv.style.display = "block";
 }
 
 function getPickupTimeInfoDiv(pickupDate) {
@@ -214,13 +213,6 @@ function closeFeedbackForm() {
     setTimeout(function () {
         location.reload();
     }, 400);
-}
-
-function emptyListsInnerHTML() {
-    itemListSelling.innerHTML = "";
-    itemListSoldNotSent.innerHTML = "";
-    itemListSold.innerHTML = "";
-    itemListSoldByOthers.innerHTML = "";
 }
 
 function getBagReceivedCheckbox(itemId, soldDate) {

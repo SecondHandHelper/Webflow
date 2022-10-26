@@ -13,6 +13,7 @@
             updateIC(userId, email, phone);
             askForAdditionalUserDetails(userId);
             loadSoldByOthers(userId);
+            
             //For testing purposes only - To see what a certain user sees
             if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
                 userId = "3OkW5av20HP8ScpUDS8ip9fBEZr1";
@@ -87,7 +88,9 @@
             triggerInviteToastOpen.click();
             console.log("Viewed element: inviteToast");
             // Store elementViews to be able to not show it again
-            db.collection('users').doc(authUser.uid).update({elementViews: firebase.firestore.FieldValue.arrayUnion({elementID: "inviteToast", timestamp: new Date()})});
+            db.collection('users').doc(authUser.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "inviteToast", timestamp: new Date() }) });
+            // Track with segment
+            analytics.track("Element Viewed", {elementID: "inviteToast"});
         } else {
             console.log("Open invite toast: ", false);
             console.log("[No invite toast] daysSinceLatestSold: ", daysSinceLatestSold);
@@ -122,8 +125,14 @@
         closeMeasurementsToastButton.addEventListener("click", function () { triggerMeasurementsToastClose.click(); });
         closeNewPriceToastButton.addEventListener("click", function () { triggerNewPriceToastClose.click(); });
         closeInviteToastButton.addEventListener("click", function () { triggerInviteToastClose.click(); });
-        shareCodeButton.addEventListener('click', shareCode);
-        sharePersonalLinkButton.addEventListener('click', shareCode);
+        shareCodeButton.addEventListener('click', function () { 
+            shareCode();
+            analytics.track("Click", {elementID: "shareCodeButton"});
+        });
+        sharePersonalLinkButton.addEventListener('click', function () { 
+            shareCode();
+            analytics.track("Click", {elementID: "sharePersonalLinkButton"});
+        });
     });
 
     function shareCode() {
@@ -142,8 +151,8 @@ Läs mer och registrera dig här:`
             console.log("Browser doesn't support navigator.share => Copy to clipboard!");
             const shareText = text + "\n" + `https://maiapp.se/?invite=${code}`;
             navigator.clipboard.writeText(shareText);
-            linkCopiedText.style.display = 'flex';
-            shareCodeButton.style.display = 'none';
+            linkCopiedBanner.style.display = 'flex';
+            setTimeout(function () { linkCopiedBanner.style.display = 'none'; }, 1500);
         }
     }
 
