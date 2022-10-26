@@ -66,7 +66,7 @@ async function updateFirestoreUserDocument(userId, email, phone) {
     const docRef = db.collection("users").doc(userId);
 
     try {
-        let doc = await docRef.get();
+        const doc = await docRef.get();
         if (doc.exists) {
             await docRef.update(fields);
             console.log(`User document ${userId} was successfully updated with these fields: `, fields);
@@ -86,10 +86,11 @@ async function updateFirestoreUserDocument(userId, email, phone) {
             if (Object.keys(a).length > 0) { fields["attribution"] = a }
 
             // Create User Document
-            doc = await docRef.set(fields); 
-            if (doc.exists){
-                console.log(`User document was created with id ${doc.id} and these fields: `, doc.data());
-                user = doc.data();
+            const userDoc = await docRef.set(fields); 
+            console.log("userDoc", userDoc);
+            if (userDoc.exists){
+                console.log(`User document was created with id ${userDoc.id} and these fields: `, userDoc.data());
+                user = userDoc.data();
                 identify();
 
                 // Connect referral user from invite cookie only when creating user doc
