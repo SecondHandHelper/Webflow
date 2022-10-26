@@ -3,14 +3,7 @@ async function loadItemCards(items) {
   itemListSoldNotSent.innerHTML = "";
   itemListSold.innerHTML = "";
   itemListSoldByOthers.innerHTML = "";
-
-  if (items) {
-    loadingDiv.style.display = "none";
-    noItemsDiv.style.display = "block";
-    soldByOthersDiv.style.display = "block";
-    quickInfoDiv.style.display = "block";
-    var youEarned = 0;
-  }
+  var youEarned = 0;
 
   items.forEach((doc) => {
     var itemId = doc.id;
@@ -137,4 +130,6 @@ async function loadItemCards(items) {
       }
     }
   });
+
+  loadingDiv.style.display = "none";
 }
