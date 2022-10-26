@@ -10,6 +10,7 @@
             email = authUser.email;
             phone = authUser.phoneNumber;
             emailVerified = authUser.emailVerified;
+            await updateFirestoreUserDocument(authUser.uid, email, phone); //Important that this happen first, since many other functions depend on an existing user document
             updateIC(userId, email, phone);
             askForAdditionalUserDetails(userId);
             loadSoldByOthers(userId);
@@ -26,8 +27,7 @@
             loadInfoRequests(userId);
             showReferralSection();
             showAccountInfo();
-
-            await updateFirestoreUserDocument(authUser.uid, email, phone);
+            
             if (!emailVerified && email) {
                 let res = getCookie('viewedVerifyEmailDiv');
                 viewedVerifyEmailDiv = res === 'true' ? true : false;
@@ -36,7 +36,7 @@
                 }
             }
             // Create refCode
-            if (user.addressFirstName && user.addressLastName && !user?.referralData?.referralCode) { createReferralCode(); }
+            if (user && user.addressFirstName && user.addressLastName && !user?.referralData?.referralCode) { createReferralCode(); }
         }
     }
 
