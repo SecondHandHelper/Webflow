@@ -96,11 +96,15 @@ function connectReferralUsers(inputCode) {
         .get()
         .then((querySnapshot) => {
             let inviterUserId;
+            let inviterName;
+            let inviterCode;
             for (var i in querySnapshot.docs) {
                 const doc = querySnapshot.docs[i];
                 const refCode = doc.data().referralData.referralCode.toUpperCase();
                 if (refCode == inputCode) {
                     inviterUserId = doc.id;
+                    inviterName = doc.data().addressFirstName;
+                    inviterCode = refCode;
                     break;
                 }
             }
@@ -113,6 +117,7 @@ function connectReferralUsers(inputCode) {
                 }).then(() => {
                     // Update referredUsers of the inviter
                     db.collection('users').doc(inviterUserId).update({ "referralData.referredUsers": firebase.firestore.FieldValue.arrayUnion(authUser.uid) }).then(() => {
+                        document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + inviterName;
                         referredByBonusState.style.display = 'block';
                         enterCodeState.style.display = 'none';
                         console.log("Referral connection successfully stored");
