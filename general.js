@@ -86,9 +86,24 @@ async function updateFirestoreUserDocument(userId, email, phone) {
             if (Object.keys(a).length > 0) { fields["attribution"] = a }
 
             // Create User Document
-            const userDoc = await docRef.set(fields); 
+
+            console.log("userId", userId);
+            db.collection("users").doc(userId).set(fields)
+                .then(() => {
+                    console.log(`User document was created with id ${userId} and these fields: `, fields);
+
+                    // Connect referral user from invite cookie only when creating user doc
+                    const inputCode = checkCookie("invite");
+                    if (inputCode) { connectReferralUsers(inputCode); }
+                })
+                .catch((error) => {
+                    console.error("Error writing document: ", error);
+                });
+
+            /*
+            const userDoc = await db.collection("users").doc(userId).set(fields);
             console.log("userDoc", userDoc);
-            if (userDoc.exists){
+            if (userDoc.exists) {
                 console.log(`User document was created with id ${userDoc.id} and these fields: `, userDoc.data());
                 user = userDoc.data();
                 identify();
@@ -97,6 +112,7 @@ async function updateFirestoreUserDocument(userId, email, phone) {
                 const inputCode = checkCookie("invite");
                 if (inputCode) { connectReferralUsers(inputCode); }
             }
+            */
         }
     } catch (e) {
         console.log("Something went wrong:", e);
