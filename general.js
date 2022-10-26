@@ -92,7 +92,7 @@ async function updateFirestoreUserDocument(userId, email, phone) {
 
                 // Connect referral user from invite cookie only when creating user doc
                 const inputCode = checkCookie("invite");
-                connectReferralUsers(inputCode);
+                if (inputCode) { connectReferralUsers(inputCode); }
             });
         }
     } catch (e) {

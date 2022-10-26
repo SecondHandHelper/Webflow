@@ -19,14 +19,11 @@ async function showReferralSection() {
             console.log("shareCodeState 'block', but should also show the bonus received... TODO");
             shareCodeState.style.display = 'block';
         } else {
-            console.log("shareCodeState 'block'");
             shareCodeState.style.display = 'block';
         }
     } else if (user?.referralData?.referredBy && !user?.referralData?.referredByBonusPaid) {
-        console.log("referredByBonusState 'block'");
         // Get inviters first name
         const inviter = user?.referralData?.referredBy;
-        console.log("inviter", inviter);
         await db.collection("users").doc(inviter).get().then((doc) => {
             if (doc.exists) {
                 const name = doc.data().addressFirstName;
@@ -35,10 +32,8 @@ async function showReferralSection() {
         });
         referredByBonusState.style.display = 'block';
     } else if ((user?.referralData?.referredBy ? false : true) && daysDiff < 100) {
-        console.log("enterCodeState 'block'");
         enterCodeState.style.display = 'block';
     }
-    console.log("Showing referral section");
     referralSection.style.display = 'block';
 }
 

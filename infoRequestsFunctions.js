@@ -172,7 +172,6 @@ function loadInfoRequests(userId) {
                         let buttonTextClass = "text-block-69";
                         let description = infoRequests[req].description;
                         if (description) { description = description.replace(/'/g, ''); }
-                        console.log(description);
                         // PRICE REQUEST
                         if (req === "price") {
                             title = "Lägre pris";

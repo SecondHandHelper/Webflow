@@ -20,6 +20,7 @@
             }
 
             const items = await getItems(userId);
+            if (items.empty) {noItemsDiv.style.display = "block";}
             showInviteToast(items);
             loadItemCards(items);
             loadInfoRequests(userId);
@@ -86,18 +87,10 @@
 
         if (daysSinceLatestSold <= 3 && soldItemsCount >= 2 && oneSoldNotSentItemExist && user?.referralData?.referralCode && !viewedToastBefore) {
             triggerInviteToastOpen.click();
-            console.log("Viewed element: inviteToast");
             // Store elementViews to be able to not show it again
             db.collection('users').doc(authUser.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "inviteToast", timestamp: new Date() }) });
             // Track with segment
             analytics.track("Element Viewed", { elementID: "inviteToast" });
-        } else {
-            console.log("Open invite toast: ", false);
-            console.log("[No invite toast] daysSinceLatestSold: ", daysSinceLatestSold);
-            console.log("[No invite toast] soldItemsCount: ", soldItemsCount);
-            console.log("[No invite toast] oneSoldNotSentItemExist: ", oneSoldNotSentItemExist);
-            console.log("[No invite toast] referralCode: ", user?.referralData?.referralCode);
-            console.log("[No invite toast] viewedToastBefore: ", viewedToastBefore);
         }
     }
 

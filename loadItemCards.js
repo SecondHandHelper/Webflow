@@ -130,7 +130,6 @@ async function loadItemCards(items) {
     }
   });
 
-  if (!items) {noItemsDiv.style.display = "block";}
   loadingDiv.style.display = "none";
   quickInfoDiv.style.display = "block";
 }
