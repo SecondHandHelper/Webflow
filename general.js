@@ -168,10 +168,13 @@ function loadSoldByOthers(userID) {
                     imageUrl = images.frontImageSmall;
                 }
 
+                console.log(brand);
+
                 // Add card to list if seller is other than myself
                 if (sellerId != userID && soldPrice >= 200) {
                     var soldByOthersItemCardHTML = `<div class="div-block-14"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>${brand}</div></div>`;
                     itemListSoldByOthers.innerHTML += soldByOthersItemCardHTML;
+                    console.log("CARD ADDED TO LIST");
                 }
             });
         });
