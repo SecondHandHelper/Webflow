@@ -13,7 +13,7 @@
             updateIC(userId, email, phone);
             askForAdditionalUserDetails(userId);
             loadSoldByOthers(userId);
-            
+
             //For testing purposes only - To see what a certain user sees
             if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
                 userId = "3OkW5av20HP8ScpUDS8ip9fBEZr1";
@@ -90,7 +90,7 @@
             // Store elementViews to be able to not show it again
             db.collection('users').doc(authUser.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "inviteToast", timestamp: new Date() }) });
             // Track with segment
-            analytics.track("Element Viewed", {elementID: "inviteToast"});
+            analytics.track("Element Viewed", { elementID: "inviteToast" });
         } else {
             console.log("Open invite toast: ", false);
             console.log("[No invite toast] daysSinceLatestSold: ", daysSinceLatestSold);
@@ -120,18 +120,23 @@
         neutralSmileyButton.addEventListener("click", function () { setHappinessRate(2); }, false);
         angrySmileyButton.addEventListener("click", function () { setHappinessRate(1); }, false);
         feedbackSubmitButton.addEventListener("click", storeFeedback);
-        saveReferralCodeButton.addEventListener("click", connectReferralUsers);
+        saveReferralCodeButton.addEventListener("click", function () {
+            saveRefCodeLoadingDiv.style.display = 'flex';
+            saveReferralCodeButton.style.display = 'none';
+            const inputCode = referralCodeInput.value;
+            connectReferralUsers(inputCode);
+        });
         referralCodeInput.addEventListener("input", function () { saveReferralCodeButton.style.display = 'inline-block'; });
         closeMeasurementsToastButton.addEventListener("click", function () { triggerMeasurementsToastClose.click(); });
         closeNewPriceToastButton.addEventListener("click", function () { triggerNewPriceToastClose.click(); });
         closeInviteToastButton.addEventListener("click", function () { triggerInviteToastClose.click(); });
-        shareCodeButton.addEventListener('click', function () { 
+        shareCodeButton.addEventListener('click', function () {
             shareCode();
-            analytics.track("Click", {elementID: "shareCodeButton"});
+            analytics.track("Click", { elementID: "shareCodeButton" });
         });
-        sharePersonalLinkButton.addEventListener('click', function () { 
+        sharePersonalLinkButton.addEventListener('click', function () {
             shareCode();
-            analytics.track("Click", {elementID: "sharePersonalLinkButton"});
+            analytics.track("Click", { elementID: "sharePersonalLinkButton" });
         });
     });
 

@@ -87,12 +87,10 @@ function createReferralCode() {
     }
 }
 
-function connectReferralUsers() {
-    saveRefCodeLoadingDiv.style.display = 'flex';
-    saveReferralCodeButton.style.display = 'none';
-    const inputCode = referralCodeInput.value.toUpperCase();
-
+function connectReferralUsers(inputCode) {
     // Find user with matching referral code and connect users
+    
+    inputCode = inputCode.trim().toUpperCase();
     db.collection("users")
         .where("referralData.referralCode", "!=", "")
         .get()

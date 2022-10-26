@@ -84,10 +84,15 @@ async function updateFirestoreUserDocument(userId, email, phone) {
             if (utm_term) { a["utm_term"] = utm_term; }
             if (utm_content) { a["utm_content"] = utm_content; }
             if (Object.keys(a).length > 0) { fields["attribution"] = a }
+
             await docRef.set(fields).then((doc) => {
                 console.log(`User document was created with id ${doc.id} and these fields: `, doc.data());
                 user = doc.data();
                 identify();
+
+                // Connect referral user from invite cookie only when creating user doc
+                const inputCode = checkCookie("invite");
+                connectReferralUsers(inputCode);
             });
         }
     } catch (e) {
