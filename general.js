@@ -150,6 +150,7 @@ async function askForAdditionalUserDetails(userID) {
 
 function loadSoldByOthers(userID) {
     var itemListSoldByOthers = document.getElementById('itemListSoldByOthers');
+    console.log("loadSoldByOthers()");
 
     // SOLD BY OTHERS QUERY + Add cards to list
     db.collection("items")
