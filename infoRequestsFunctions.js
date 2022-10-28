@@ -26,7 +26,7 @@ async function openLongerPeriodToast(itemId, brand, currentMinPrice, deniedBefor
             "infoRequests.longerPeriod.response": "Accepted",
         });
         triggerLongerPeriodToastClose.click();
-        if (currentMinPrice >= 140 && !deniedBefore){
+        if (currentMinPrice >= 140 && !deniedBefore) {
             openDiscountToast(itemId, currentMinPrice);
         } else {
             setTimeout(function () { location.reload(); }, 300);
@@ -53,30 +53,38 @@ async function openDiscountToast(itemId, price) {
     priceNoDiscount.innerHTML = `(${price} kr)`;
     discountDoneButton.addEventListener('click', async function () {
         let newPrice = 0;
-        let discount = 0
+        let discount = 0;
         var discountRadioButtons = document.getElementsByName("Discount");
         for (var x = 0; x < discountRadioButtons.length; x++) {
             if (discountRadioButtons[x].checked) {
                 const input = discountRadioButtons[x].value;
-                if (input === '30'){
+                if (input === '30') {
                     newPrice = priceWithDiscount30;
                     discount = 30;
                 }
-                if (input === '20'){
+                if (input === '20') {
                     newPrice = priceWithDiscount20;
                     discount = 20;
                 }
             }
         }
-        if (newPrice !== 0){
-            await db.collection('items').doc(itemId).update({
-                minPriceEstimate: newPrice,
-                longerPeriodAcceptedDiscount: discount
-            });
-        }
+        // Store discount info
+        let fieldsToUpdate = { longerPeriodAcceptedDiscount: discount }
+        if (newPrice !== 0) { fieldsToUpdate['minPriceEstimate'] = newPrice; }
+        await db.collection('items').doc(itemId).update(fieldsToUpdate);
+        // Close toast
         triggerDiscountToastClose.click();
         setTimeout(function () { location.reload(); }, 400);
     });
+
+    closeDiscountToastButton.addEventListener("click", async function () {
+        // Store discount info
+        await db.collection('items').doc(itemId).update({ longerPeriodAcceptedDiscount: 0 });
+        // Close toast
+        triggerDiscountToastClose.click();
+        setTimeout(function () { location.reload(); }, 400);
+    });
+
     triggerDiscountToastOpen.click();
 }
 
@@ -150,7 +158,7 @@ function loadInfoRequests(userId) {
             var status = item.status;
             var brand = item.brand.replace(/'/g, '');
             var currentMinPrice = item.minPriceEstimate;
-            var deniedBefore = item?.infoRequests?.price?.response === "Denied" ? true : false ;
+            var deniedBefore = item?.infoRequests?.price?.response === "Denied" ? true : false;
             var archived = item.archived;
             var category = item.category;
             var frontImageUrl = images.frontImage;
