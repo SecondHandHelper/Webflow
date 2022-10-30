@@ -122,6 +122,7 @@ async function loadItemCards(items) {
 
         // Display list, hide empty state
         soldItemsDiv.style.display = "block";
+        noItemsDiv.style.display = "block";
         itemListSoldContainer.style.display = "block";
         sellButtonText.innerHTML = "Sälj ett plagg";
         youEarned = youEarned + sellerGets;
