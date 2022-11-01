@@ -73,43 +73,6 @@ async function openLongerPeriodToast(itemId, brand, currentMinPrice, deniedBefor
     triggerLongerPeriodToastOpen.click();
 }
 
-/* DEPRECATED FUNTION NOT IN USE: TOBE REMOVED
-async function openDiscountToast(itemId, price) {
-    const priceWithDiscount30 = Math.ceil((price * 0.7) / 10) * 10;
-    const priceWithDiscount20 = Math.ceil((price * 0.8) / 10) * 10;
-    priceAfterDiscount30.innerHTML = `(Priset blir ${priceWithDiscount30} kr)`;
-    priceAfterDiscount20.innerHTML = `(Priset blir ${priceWithDiscount20} kr)`;
-    priceNoDiscount.innerHTML = `(${price} kr)`;
-    discountDoneButton.addEventListener('click', async function () {
-        let newPrice = 0;
-        let discount = 0
-        var discountRadioButtons = document.getElementsByName("Discount");
-        for (var x = 0; x < discountRadioButtons.length; x++) {
-            if (discountRadioButtons[x].checked) {
-                const input = discountRadioButtons[x].value;
-                if (input === '30') {
-                    newPrice = priceWithDiscount30;
-                    discount = 30;
-                }
-                if (input === '20') {
-                    newPrice = priceWithDiscount20;
-                    discount = 20;
-                }
-            }
-        }
-        if (newPrice !== 0) {
-            await db.collection('items').doc(itemId).update({
-                minPriceEstimate: newPrice,
-                longerPeriodAcceptedDiscount: discount
-            });
-        }
-        triggerDiscountToastClose.click();
-        setTimeout(function () { location.reload(); }, 400);
-    });
-    triggerDiscountToastOpen.click();
-}
-*/
-
 async function storePriceResponse(itemId, max, min, response, status) {
     console.log("storePriceResponse", itemId, max, min, response);
     // Accept price
