@@ -21,7 +21,6 @@
             }
 
             const items = await getItems(userId);
-            if (items.empty) {noItemsDiv.style.display = "block";}
             showInviteToast(items);
             loadItemCards(items);
             loadInfoRequests(userId);
