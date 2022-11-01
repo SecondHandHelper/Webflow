@@ -15,22 +15,49 @@ async function openMeasurementsToast(itemId, description) {
 }
 
 async function openLongerPeriodToast(itemId, brand, currentMinPrice, deniedBefore) {
-    longerPeriodDescriptionText.innerHTML = `Säljperioden för ditt ${brand}-plagg har nått sitt slut efter 30 dagar. Vill du låta plagget ligga ute till försäljning i 30 dagar till?`;
-    // Accept longer selling period and ask if they want to lower the price
+    // If user is qualified to get the discount question -> Show it to the user
+    const priceWithDiscount30 = Math.ceil((price * 0.7) / 10) * 10;
+    const priceWithDiscount20 = Math.ceil((price * 0.8) / 10) * 10;
+    priceAfterDiscount30.innerHTML = `(Priset blir ${priceWithDiscount30} kr)`;
+    priceAfterDiscount20.innerHTML = `(Priset blir ${priceWithDiscount20} kr)`;
+    priceNoDiscount.innerHTML = `(${price} kr)`;
+    if (currentMinPrice >= 140 && !deniedBefore) {
+        longerPeriodDescriptionText.innerHTML = `Säljperioden för ditt ${brand}-plagg har nått sitt slut. Välj om du vill förlänga säljperioden med ytterligare 30 dagar och om du vill sänka priset för att öka chansen att få det sålt.`;
+        discountFormDiv.style.display = 'block';
+    } else {
+        longerPeriodDescriptionText.innerHTML = `Säljperioden för ditt ${brand}-plagg har nått sitt slut. Vill du förlänga säljperioden med ytterligare 30 dagar eller avsluta försäljningen?`;
+        discountFormDiv.style.display = 'none';
+    }
+
+    // Accept longer selling window and store chosen discount
     longerPeriodAcceptButton.addEventListener('click', async function () {
         const today = new Date();
         const todayDate = today.toISOString().split('T')[0];
+        let newPrice = currentMinPrice;
+        let discount = 0
+        var discountRadioButtons = document.getElementsByName("Discount");
+        for (var x = 0; x < discountRadioButtons.length; x++) {
+            if (discountRadioButtons[x].checked) {
+                const input = discountRadioButtons[x].value;
+                if (input === '30') {
+                    newPrice = priceWithDiscount30;
+                    discount = 30;
+                }
+                if (input === '20') {
+                    newPrice = priceWithDiscount20;
+                    discount = 20;
+                }
+            }
+        }
         await db.collection('items').doc(itemId).update({
             longerPeriodAcceptedDate: todayDate,
             "infoRequests.longerPeriod.status": "Resolved",
             "infoRequests.longerPeriod.response": "Accepted",
+            longerPeriodAcceptedDiscount: discount,
+            minPriceEstimate: newPrice
         });
         triggerLongerPeriodToastClose.click();
-        if (currentMinPrice >= 140 && !deniedBefore){
-            openDiscountToast(itemId, currentMinPrice);
-        } else {
-            setTimeout(function () { location.reload(); }, 300);
-        }
+        setTimeout(function () { location.reload(); }, 300);
     });
     // Decline longer selling period and quit sales
     longerPeriodDenyButton.addEventListener('click', async function () {
@@ -45,6 +72,7 @@ async function openLongerPeriodToast(itemId, brand, currentMinPrice, deniedBefor
     triggerLongerPeriodToastOpen.click();
 }
 
+/* DEPRECATED FUNTION NOT IN USE: TOBE REMOVED
 async function openDiscountToast(itemId, price) {
     const priceWithDiscount30 = Math.ceil((price * 0.7) / 10) * 10;
     const priceWithDiscount20 = Math.ceil((price * 0.8) / 10) * 10;
@@ -58,17 +86,17 @@ async function openDiscountToast(itemId, price) {
         for (var x = 0; x < discountRadioButtons.length; x++) {
             if (discountRadioButtons[x].checked) {
                 const input = discountRadioButtons[x].value;
-                if (input === '30'){
+                if (input === '30') {
                     newPrice = priceWithDiscount30;
                     discount = 30;
                 }
-                if (input === '20'){
+                if (input === '20') {
                     newPrice = priceWithDiscount20;
                     discount = 20;
                 }
             }
         }
-        if (newPrice !== 0){
+        if (newPrice !== 0) {
             await db.collection('items').doc(itemId).update({
                 minPriceEstimate: newPrice,
                 longerPeriodAcceptedDiscount: discount
@@ -79,6 +107,7 @@ async function openDiscountToast(itemId, price) {
     });
     triggerDiscountToastOpen.click();
 }
+*/
 
 async function storePriceResponse(itemId, max, min, response, status) {
     console.log("storePriceResponse", itemId, max, min, response);
@@ -150,7 +179,7 @@ function loadInfoRequests(userId) {
             var status = item.status;
             var brand = item.brand.replace(/'/g, '');
             var currentMinPrice = item.minPriceEstimate;
-            var deniedBefore = item?.infoRequests?.price?.response === "Denied" ? true : false ;
+            var deniedBefore = item?.infoRequests?.price?.response === "Denied" ? true : false;
             var archived = item.archived;
             var category = item.category;
             var frontImageUrl = images.frontImage;
