@@ -16,12 +16,13 @@ async function openMeasurementsToast(itemId, description) {
 
 async function openLongerPeriodToast(itemId, brand, currentMinPrice, deniedBefore) {
     // If user is qualified to get the discount question -> Show it to the user
+    const price = currentMinPrice;
     const priceWithDiscount30 = Math.ceil((price * 0.7) / 10) * 10;
     const priceWithDiscount20 = Math.ceil((price * 0.8) / 10) * 10;
     priceAfterDiscount30.innerHTML = `(Priset blir ${priceWithDiscount30} kr)`;
     priceAfterDiscount20.innerHTML = `(Priset blir ${priceWithDiscount20} kr)`;
     priceNoDiscount.innerHTML = `(${price} kr)`;
-    if (currentMinPrice >= 140 && !deniedBefore) {
+    if (price >= 140 && !deniedBefore) {
         longerPeriodDescriptionText.innerHTML = `Säljperioden för ditt ${brand}-plagg har nått sitt slut. Välj om du vill förlänga säljperioden med ytterligare 30 dagar och om du vill sänka priset för att öka chansen att få det sålt.`;
         discountFormDiv.style.display = 'block';
     } else {
@@ -33,7 +34,7 @@ async function openLongerPeriodToast(itemId, brand, currentMinPrice, deniedBefor
     longerPeriodAcceptButton.addEventListener('click', async function () {
         const today = new Date();
         const todayDate = today.toISOString().split('T')[0];
-        let newPrice = currentMinPrice;
+        let newPrice = price;
         let discount = 0
         var discountRadioButtons = document.getElementsByName("Discount");
         for (var x = 0; x < discountRadioButtons.length; x++) {
