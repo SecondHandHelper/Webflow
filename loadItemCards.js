@@ -131,5 +131,6 @@ async function loadItemCards(items) {
   });
 
   loadingDiv.style.display = "none";
+  sectionsDiv.style.display = "block";
   quickInfoDiv.style.display = "block";
 }
