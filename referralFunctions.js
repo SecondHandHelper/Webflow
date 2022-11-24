@@ -34,6 +34,7 @@ async function showReferralSection() {
     } else if ((user?.referralData?.referredBy ? false : true) && daysDiff < 100) {
         enterCodeState.style.display = 'block';
     }
+    enterCodeState.style.display = 'block'; //Temporary showing enter code DIV for all users during Black Friday, delete this row after Black Friday 
     referralSection.style.display = 'block';
 }
 
