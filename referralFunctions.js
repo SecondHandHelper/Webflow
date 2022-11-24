@@ -34,7 +34,13 @@ async function showReferralSection() {
     } else if ((user?.referralData?.referredBy ? false : true) && daysDiff < 100) {
         enterCodeState.style.display = 'block';
     }
-    enterCodeState.style.display = 'block'; //Temporary showing enter code DIV for all users during Black Friday, delete this row after Black Friday 
+
+    //START - Temporary showing enter code DIV for all users during Black Friday, delete this row after Black Friday 
+    if ((user?.referralData?.referredBy ? false : true)) {
+        enterCodeState.style.display = 'block'; 
+    }
+    //END
+    
     referralSection.style.display = 'block';
 }
 
