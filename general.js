@@ -63,6 +63,8 @@ async function updateFirestoreUserDocument(userId, email, phone) {
     let fields = {};
     if (email) { fields["email"] = email; }
     if (phone) { fields["phoneNumber"] = phone; }
+    const signInMethod = authUser.providerData[0].providerId;
+    if (signInMethod) { fields["signInMethod"] = signInMethod; }
     const docRef = db.collection("users").doc(userId);
 
     try {
