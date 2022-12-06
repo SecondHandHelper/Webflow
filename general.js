@@ -584,7 +584,7 @@ async function addUserAddress() {
 
     addressFirstName = addressFirstName ? addressFirstName.charAt(0).toUpperCase() + addressFirstName.slice(1).toLowerCase().trim() : "" ;
     addressLastName = addressLastName ? addressLastName.charAt(0).toUpperCase() + addressLastName.slice(1).toLowerCase().trim() : "" ;
-    addressStreetAddress = addressStreetAddress ? addressFirstName.charAt(0).toUpperCase() + addressFirstName.slice(1).trim() : "" ;
+    addressStreetAddress = addressStreetAddress ? addressStreetAddress.charAt(0).toUpperCase() + addressStreetAddress.slice(1).trim() : "" ;
     addressCO = addressCO ? addressCO.trim() : "" ;
     addressPostalCode = addressPostalCode ? addressPostalCode.trim() : "" ;
     addressCity = addressCity ? addressCity.charAt(0).toUpperCase() + addressCity.slice(1).toLowerCase().trim() : "" ;
