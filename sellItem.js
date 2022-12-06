@@ -17,16 +17,16 @@ function collect() {
   let status = "New";
   let shippingStatus = "Not sent";
   const size = itemSize.value;
-  const material = itemMaterial.value;
-  const brand = itemBrand.value;
-  const model = itemModel.value;
+  const material = itemMaterial.value ? itemMaterial.value.trim() : "";
+  const brand = itemBrand.value ? itemBrand.value.trim() : "";
+  const model = itemModel.value ? itemModel.value.trim() : "";
   const originalPrice = Number(itemOriginalPrice.value);
   const age = itemAge.value;
   const condition = itemCondition.value;
-  const defectDescription = itemDefectDescription.value;
+  const defectDescription = itemDefectDescription.value ? itemDefectDescription.value.trim() : "";
   const noAnimals = itemNoAnimals.checked;
   const noSmoke = itemNoSmoke.checked;
-  const userComment = itemUserComment.value;
+  const userComment = itemUserComment.value ? itemUserComment.value.trim() : "";
   const acceptPrice = Number(itemLowestAcceptPrice.value);
   const userValuationApproval = itemUserValuationApproval.checked;
 
