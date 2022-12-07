@@ -12,9 +12,6 @@
       // User is signed in and on mobile. Redirect from to private page.
       if (isMobile) {
         window.location.replace('./private');
-      } else {
-        // Log out user if on Desktop
-        signOut();
       }
     }
   });
