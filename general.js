@@ -540,13 +540,22 @@ function loadRecentlySold() {
 // FUNCTIONS FOR ADDING USER DETAILS
 async function addUserDetails() {
     // Grab values from form
-    const addressFirstName = document.getElementById("addressFirstName").value;
-    const addressLastName = document.getElementById("addressLastName").value;
-    const addressStreetAddress = document.getElementById("addressStreetAddress").value;
-    const addressCO = document.getElementById("addressCO").value;
-    const addressPostalCode = document.getElementById("addressPostalCode").value;
-    const addressCity = document.getElementById("addressCity").value;
-    const addressDoorCode = document.getElementById("addressDoorCode").value;
+    let addressFirstName = document.getElementById("addressFirstName").value;
+    let addressLastName = document.getElementById("addressLastName").value;
+    let addressStreetAddress = document.getElementById("addressStreetAddress").value;
+    let addressCO = document.getElementById("addressCO").value;
+    let addressPostalCode = document.getElementById("addressPostalCode").value;
+    let addressCity = document.getElementById("addressCity").value;
+    let addressDoorCode = document.getElementById("addressDoorCode").value;
+
+    addressFirstName = addressFirstName ? addressFirstName.charAt(0).toUpperCase() + addressFirstName.slice(1).toLowerCase().trim() : "" ;
+    addressLastName = addressLastName ? addressLastName.charAt(0).toUpperCase() + addressLastName.slice(1).toLowerCase().trim() : "" ;
+    addressStreetAddress = addressStreetAddress ? addressStreetAddress.charAt(0).toUpperCase() + addressStreetAddress.slice(1).trim() : "" ;
+    addressCO = addressCO ? addressCO.trim() : "" ;
+    addressPostalCode = addressPostalCode ? addressPostalCode.trim() : "" ;
+    addressCity = addressCity ? addressCity.charAt(0).toUpperCase() + addressCity.slice(1).toLowerCase().trim() : "" ;
+    addressDoorCode = addressDoorCode ? addressDoorCode.trim() : "" ;
+    
     let personalId = document.getElementById("personalId").value;
     personalId = personalId ? await formatPersonalId(personalId) : null;
 
