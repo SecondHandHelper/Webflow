@@ -10,7 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.76/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.71/infoRequestsFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.73/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.77/referralFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.52/cookieManagement.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.64/autocomplete-brands.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.72/loadItemCards.js"></script>
@@ -60,11 +60,15 @@
           console.log("user:", user);
           console.log("authUser", authUser);
           identify();
+
+          // Go to logged in pages when user authenticated
+          const path = window.location.pathname;
+          var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          if (isMobile && (path === "/" || path === "/sign-in")) { window.location.replace('./private'); }
         }
 
-        if (typeof window.main === "function") {
-          main();
-        }
+        // Run Main function if exists
+        if (typeof window.main === "function") { main(); }
       }).catch((error) => { console.log("Error getting document:", error); });
     } else {
       console.log('No user');
@@ -165,5 +169,19 @@
       str = "+46" + str;
     }
     return str;
+  }
+
+  // SEND SLACK PING
+  async function slackPing(channel, text) {
+    fetch('https://europe-west3-second-hand-helper.cloudfunctions.net/slackPing', {
+      method: 'POST',
+      body: JSON.stringify({
+        text,
+        channel
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
   }
 </script>
