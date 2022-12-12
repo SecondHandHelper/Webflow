@@ -98,21 +98,25 @@
 
 <script>
   ////////// GOOGLE ACCOUNT SIGN IN
-
   googleSignInButton.addEventListener('click', signInWithGoogle);
   googleSignInButton2.addEventListener('click', signInWithGoogle);
 
-  function signInWithGoogle() {
-    // [START auth_google_provider_create]
-    var provider = new firebase.auth.GoogleAuthProvider();
-    // [END auth_google_provider_create]
-    firebase.auth().signInWithRedirect(provider);
+  async function signInWithGoogle() {
+    try {
+      await slackPing('debug', `[webflow] User signing in with Google - Start`);
+      // [START auth_google_provider_create]
+      var provider = new firebase.auth.GoogleAuthProvider();
+      // [END auth_google_provider_create]
+      firebase.auth().signInWithRedirect(provider);
+    } catch (error) {
+      slackPing('debug', `[webflow] Error calling signInWithRedirect(provider): ${error}`);
+      slackPing('urgent', `[webflow] Error calling signInWithRedirect(provider): ${error}`);
+    }
   }
-
 
   firebase.auth()
     .getRedirectResult()
-    .then((result) => {
+    .then(async (result) => {
       if (result.credential) {
         /** @type {firebase.auth.OAuthCredential} */
         var credential = result.credential;
@@ -122,25 +126,21 @@
         // The signed-in user info.
         var user = result.user;
         window.userId = user.uid;
+        await slackPing('debug', `[webflow] User signing in with Google - Success`);
         window.location.replace('./private');
       } else {
         // No user is signed in.
         signinFormsDiv.style.display = 'block';
         signinLoadingDiv.style.display = 'none';
-        console.log("No user is signed in.");
+        if (!document.referrer){slackPing('debug', '[webflow] No document.referrer on /sign-in page');}
       }
-
     }).catch((error) => {
-      // Handle Errors here.
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      // The email of the user's account used.
-      var email = error.email;
-      // The firebase.auth.AuthCredential type that was used.
-      var credential = error.credential;
-      // ...
+      const errorText = `[webflow] Error signing in with Google: ${error.code}, ${error.message}, ${error.email}, ${error}`;
+      console.log(errorText);
 
-      console.log("Error message:", errorCode, errorMessage);
+      // Error to Slack
+      slackPing('urgent', errorText);
+      slackPing('debug', errorText);
     });
 
 </script>
