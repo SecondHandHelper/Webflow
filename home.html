@@ -6,15 +6,6 @@
     desktopDiv.style.display = 'block';
     mobileContainer.style.display = 'none';
   }
-
-  firebase.auth().onAuthStateChanged(function (user) {
-    if (user) {
-      // User is signed in and on mobile. Redirect from to private page.
-      if (isMobile) {
-        window.location.replace('./private');
-      }
-    }
-  });
 </script>
 <script>
   loadRecentlySold();
