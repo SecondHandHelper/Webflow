@@ -123,14 +123,8 @@
         closeNewPriceToastButton.addEventListener("click", function () { triggerNewPriceToastClose.click(); });
         closeInviteToastButton.addEventListener("click", function () { triggerInviteToastClose.click(); });
         closeLongerPeriodToastButton.addEventListener("click", function () { triggerLongerPeriodToastClose.click(); });
-        shareCodeButton.addEventListener('click', function () {
-            shareCode();
-            analytics.track("Click", { elementID: "shareCodeButton" });
-        });
-        sharePersonalLinkButton.addEventListener('click', function () {
-            shareCode();
-            analytics.track("Click", { elementID: "sharePersonalLinkButton" });
-        });
+        shareCodeButton.addEventListener('click', shareCode);
+        sharePersonalLinkButton.addEventListener('click', shareCode);
     });
 
     function shareCode() {

@@ -115,6 +115,17 @@
     });
   });
 
+  // TRACK LINK CLICKS
+  const linkElements = document.querySelectorAll("a");
+  linkElements.forEach(link => {
+    link.addEventListener('click', function handleClick(event) {
+      if (link.id) {
+        console.log('Clicked link ', link.id);
+        analytics.track('Click', { elementID: link.id });
+      }
+    });
+  });
+
   // SEGMENT IDENTIFY
   function identify() {
     const now = new Date().toISOString();

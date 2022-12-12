@@ -9,12 +9,6 @@
 </script>
 
 <script>
-  // Show loading icon that will show when users come back from Google Auth
-  signinFormsDiv.style.display = 'none';
-  mobileNumberDiv.style.display = 'none';
-  orLoginOtherWayDiv.style.display = 'none';
-  verifyDiv.style.display = 'none';
-
   // Disable Webflow form submit
   $('#Password-form').submit(function () {
     return false;
@@ -102,8 +96,8 @@
   googleSignInButton2.addEventListener('click', signInWithGoogle);
 
   async function signInWithGoogle() {
+    await slackPing('debug', `[webflow] User signing in with Google - Start`);
     try {
-      await slackPing('debug', `[webflow] User signing in with Google - Start`);
       // [START auth_google_provider_create]
       var provider = new firebase.auth.GoogleAuthProvider();
       // [END auth_google_provider_create]
@@ -132,7 +126,7 @@
         // No user is signed in.
         signinFormsDiv.style.display = 'block';
         signinLoadingDiv.style.display = 'none';
-        if (!document.referrer){slackPing('debug', '[webflow] No document.referrer on /sign-in page');}
+        if (!document.referrer) { slackPing('debug', '[webflow] No document.referrer on /sign-in page'); }
       }
     }).catch((error) => {
       const errorText = `[webflow] Error signing in with Google: ${error.code}, ${error.message}, ${error.email}, ${error}`;
