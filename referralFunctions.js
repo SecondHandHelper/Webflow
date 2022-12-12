@@ -45,8 +45,8 @@ async function showReferralSection() {
 }
 
 function createReferralCode() {
-    const fn = user.addressFirstName;
-    const ln = user.addressLastName;
+    const fn = user.addressFirstName.replace(/\s/g, ''); // Remove whitespace
+    const ln = user.addressLastName.replace(/\s/g, '');
     let letterCombo = fn.trim() + ln.charAt(0);
     letterCombo = letterCombo.toUpperCase();
     let newCode = letterCombo;
