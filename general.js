@@ -275,7 +275,7 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate) {
         let uniquePart = ``;
         if (method == "Service point") {
             uniquePart += `
-        <img src="https://global-uploads.webflow.com//6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg" loading="lazy" width="22" alt="" class="image-12">
+        <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg" loading="lazy" width="22" alt="" class="image-12">
             <div class="next-step-text-small">Lämna till ombud</div>
         `;
         } else if (method == "Pickup") {
