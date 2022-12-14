@@ -270,36 +270,71 @@ function openShippingToast(itemId, soldDate) {
 }
 
 function getShippingInfoDiv(itemId, method, soldDate, pickupDate) {
-    let uniquePart = ``;
-    if (method == "Service point") {
-        uniquePart += `
-        <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/62436932a8d26f07254b45e2_parcel.png" loading="lazy" width="26" alt="" class="image-12">
+    if (featureIsEnabled('C2C')) {
+        // ### C2C CODE ###
+        let uniquePart = ``;
+        if (method == "Service point") {
+            uniquePart += `
+        <img src="/6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg" loading="lazy" width="22" alt="" class="image-12">
             <div class="next-step-text-small">Lämna till ombud</div>
         `;
-    } else if (method == "Pickup") {
-        if (pickupDate) {
-            var date = new Date(pickupDate);
-            var days = ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'];
-            var months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
-            var dateNumber = date.getDate();
-            var monthName = months[date.getMonth()];
-            var dayName = days[date.getDay()];
-            var pickupTimeInfoText = dayName + ", " + dateNumber + " " + monthName + ", kl 9-16";
-            uniquePart += `
-            <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/608db91c363e28ae251e0998_delivery-truck%204.svg" loading="lazy" width="28" alt="" class="image-12">
+        } else if (method == "Pickup") {
+            if (pickupDate) {
+                var date = new Date(pickupDate);
+                var days = ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'];
+                var months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+                var dateNumber = date.getDate();
+                var monthName = months[date.getMonth()];
+                var dayName = days[date.getDay()];
+                var pickupTimeInfoText = dayName + ", " + dateNumber + " " + monthName + ", kl 9-16";
+                uniquePart += `
+            <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63999dabb3be9ead61bf6488_Vector.svg" loading="lazy" width="24" alt="" class="image-12">
             <div class="next-step-text-small">${pickupTimeInfoText}</div>
-        `;
+            `;
+            }
         }
-    }
 
-    const div = `
+        const div = `
         <div id="shippingInfoDiv" class="div-block-54">
             ${uniquePart}
             <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
                 <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
             </a>
         </div>`;
-    return div;
+        return div;
+    } else {
+        // ### LIVE CODE ###
+        let uniquePart = ``;
+        if (method == "Service point") {
+            uniquePart += `
+        <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/62436932a8d26f07254b45e2_parcel.png" loading="lazy" width="26" alt="" class="image-12">
+            <div class="next-step-text-small">Lämna till ombud</div>
+        `;
+        } else if (method == "Pickup") {
+            if (pickupDate) {
+                var date = new Date(pickupDate);
+                var days = ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'];
+                var months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+                var dateNumber = date.getDate();
+                var monthName = months[date.getMonth()];
+                var dayName = days[date.getDay()];
+                var pickupTimeInfoText = dayName + ", " + dateNumber + " " + monthName + ", kl 9-16";
+                uniquePart += `
+            <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/608db91c363e28ae251e0998_delivery-truck%204.svg" loading="lazy" width="28" alt="" class="image-12">
+            <div class="next-step-text-small">${pickupTimeInfoText}</div>
+            `;
+            }
+        }
+
+        const div = `
+        <div id="shippingInfoDiv" class="div-block-54">
+            ${uniquePart}
+            <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
+                <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
+            </a>
+        </div>`;
+        return div;
+    }
 }
 
 async function storeShippingMethod(itemId, method) {
@@ -548,14 +583,14 @@ async function addUserDetails() {
     let addressCity = document.getElementById("addressCity").value;
     let addressDoorCode = document.getElementById("addressDoorCode").value;
 
-    addressFirstName = addressFirstName ? addressFirstName.charAt(0).toUpperCase() + addressFirstName.slice(1).toLowerCase().trim() : "" ;
-    addressLastName = addressLastName ? addressLastName.charAt(0).toUpperCase() + addressLastName.slice(1).toLowerCase().trim() : "" ;
-    addressStreetAddress = addressStreetAddress ? addressStreetAddress.charAt(0).toUpperCase() + addressStreetAddress.slice(1).trim() : "" ;
-    addressCO = addressCO ? addressCO.trim() : "" ;
-    addressPostalCode = addressPostalCode ? addressPostalCode.trim() : "" ;
-    addressCity = addressCity ? addressCity.charAt(0).toUpperCase() + addressCity.slice(1).toLowerCase().trim() : "" ;
-    addressDoorCode = addressDoorCode ? addressDoorCode.trim() : "" ;
-    
+    addressFirstName = addressFirstName ? addressFirstName.charAt(0).toUpperCase() + addressFirstName.slice(1).toLowerCase().trim() : "";
+    addressLastName = addressLastName ? addressLastName.charAt(0).toUpperCase() + addressLastName.slice(1).toLowerCase().trim() : "";
+    addressStreetAddress = addressStreetAddress ? addressStreetAddress.charAt(0).toUpperCase() + addressStreetAddress.slice(1).trim() : "";
+    addressCO = addressCO ? addressCO.trim() : "";
+    addressPostalCode = addressPostalCode ? addressPostalCode.trim() : "";
+    addressCity = addressCity ? addressCity.charAt(0).toUpperCase() + addressCity.slice(1).toLowerCase().trim() : "";
+    addressDoorCode = addressDoorCode ? addressDoorCode.trim() : "";
+
     let personalId = document.getElementById("personalId").value;
     personalId = personalId ? await formatPersonalId(personalId) : null;
 
@@ -591,13 +626,13 @@ async function addUserAddress() {
     let addressCity = document.getElementById("addressCity").value;
     let addressDoorCode = document.getElementById("addressDoorCode").value;
 
-    addressFirstName = addressFirstName ? addressFirstName.charAt(0).toUpperCase() + addressFirstName.slice(1).toLowerCase().trim() : "" ;
-    addressLastName = addressLastName ? addressLastName.charAt(0).toUpperCase() + addressLastName.slice(1).toLowerCase().trim() : "" ;
-    addressStreetAddress = addressStreetAddress ? addressStreetAddress.charAt(0).toUpperCase() + addressStreetAddress.slice(1).trim() : "" ;
-    addressCO = addressCO ? addressCO.trim() : "" ;
-    addressPostalCode = addressPostalCode ? addressPostalCode.trim() : "" ;
-    addressCity = addressCity ? addressCity.charAt(0).toUpperCase() + addressCity.slice(1).toLowerCase().trim() : "" ;
-    addressDoorCode = addressDoorCode ? addressDoorCode.trim() : "" ;
+    addressFirstName = addressFirstName ? addressFirstName.charAt(0).toUpperCase() + addressFirstName.slice(1).toLowerCase().trim() : "";
+    addressLastName = addressLastName ? addressLastName.charAt(0).toUpperCase() + addressLastName.slice(1).toLowerCase().trim() : "";
+    addressStreetAddress = addressStreetAddress ? addressStreetAddress.charAt(0).toUpperCase() + addressStreetAddress.slice(1).trim() : "";
+    addressCO = addressCO ? addressCO.trim() : "";
+    addressPostalCode = addressPostalCode ? addressPostalCode.trim() : "";
+    addressCity = addressCity ? addressCity.charAt(0).toUpperCase() + addressCity.slice(1).toLowerCase().trim() : "";
+    addressDoorCode = addressDoorCode ? addressDoorCode.trim() : "";
 
     // Write to Firestore
     const itemRef = db.collection('users').doc(authUser.uid);
