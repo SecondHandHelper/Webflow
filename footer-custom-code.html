@@ -8,7 +8,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-functions.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.76/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test107/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.71/infoRequestsFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.77/referralFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.52/cookieManagement.js"></script>
@@ -57,6 +57,11 @@
       db.collection("users").doc(authUser.uid).get().then((doc) => {
         if (doc.exists) {
           user = doc.data();
+
+          // Add to different test groups
+          if (user.testGroups && user.testGroups.includes('alpha')) {
+            user.alphaUser = true;
+          }
           console.log("user:", user);
           console.log("authUser", authUser);
           identify();
@@ -180,6 +185,26 @@
       str = "+46" + str;
     }
     return str;
+  }
+
+  // FEATURE TOGGLE FUNCTION
+  var featureConfig = {
+    alpha: { C2C: true },
+    beta: { C2C: false },
+    default: { C2C: false }
+  };
+
+  function featureIsEnabled(featureName) {
+    if (user.testGroups) {
+      if (user.testGroups.includes('alpha')) {
+        return featureConfig.alpha[featureName]
+      }
+      if (user.testGroups.includes('beta')) {
+        return featureConfig.alpha[featureName]
+      }
+    } else {
+      return featureConfig.default[featureName]
+    }
   }
 
   // SEND SLACK PING

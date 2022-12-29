@@ -270,6 +270,8 @@ function openShippingToast(itemId, soldDate) {
 }
 
 function getShippingInfoDiv(itemId, method, soldDate, pickupDate) {
+    console.log("getShippingInfoDiv is running");
+    console.log("featureIsEnabled('C2C')", featureIsEnabled('C2C'));
     if (featureIsEnabled('C2C')) {
         // ### C2C CODE ###
         let uniquePart = ``;

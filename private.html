@@ -19,6 +19,12 @@
             if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
                 userId = "3OkW5av20HP8ScpUDS8ip9fBEZr1";
             }
+            
+            if (featureIsEnabled('C2C')) {
+                // ### C2C CODE ###
+            } else {
+                // ### LIVE CODE ###
+            }
 
             const items = await getItems(userId);
             showInviteToast(items);
