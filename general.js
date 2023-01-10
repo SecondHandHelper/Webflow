@@ -290,29 +290,28 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate) {
     if (featureIsEnabled('C2C')) {
         // ### C2C CODE ###
         let uniquePart = ``;
-        if (method == "Service point" && postnord)
-            if (method == "Service point" && bagReceived) {
-                uniquePart += `
+        if (method == "Service point") {
+            uniquePart += `
             <div class="div-block-189">
                 <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg" class="image-38">
                 <div class="next-step-text-small">Lämnas till ombud</div>
             </div>
             `;
-            } else if (method == "Pickup" && pickupDate) {
-                var date = new Date(pickupDate);
-                var days = ['Sön', 'Mån', 'Tis', 'Ons', 'Tors', 'Fre', 'Lör'];
-                var months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
-                var dateNumber = date.getDate();
-                var monthName = months[date.getMonth()];
-                var dayName = days[date.getDay()];
-                var pickupTimeInfoText = dayName + ", " + dateNumber + " " + monthName + ", kl 9-16";
-                uniquePart += `
+        } else if (method == "Pickup" && pickupDate) {
+            var date = new Date(pickupDate);
+            var days = ['Sön', 'Mån', 'Tis', 'Ons', 'Tors', 'Fre', 'Lör'];
+            var months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+            var dateNumber = date.getDate();
+            var monthName = months[date.getMonth()];
+            var dayName = days[date.getDay()];
+            var pickupTimeInfoText = dayName + ", " + dateNumber + " " + monthName + ", kl 9-16";
+            uniquePart += `
                 <div class="div-block-189">
                     <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63999dabb3be9ead61bf6488_Vector.svg" class="image-38">
                     <div class="next-step-text-small">${pickupTimeInfoText}</div>
                 </div>
                 `;
-            }
+        }
 
         const div = `
         <div id="shippingInfoDiv" class="div-block-54">

@@ -90,10 +90,12 @@ async function loadItemCards(items) {
           buyerInfoTextHTML = `<div class="text-block-44">Till ${buyerFirstName} i ${buyerAddressCity}</div>`;
         }
 
+        var userActionDiv = '';
+        var shippingInfoDiv = '';
+        
         if (featureIsEnabled('C2C')) {
           // ### C2C CODE ###
-          var userActionDiv = '';
-          var shippingInfoDiv = '';
+          
           if (shippingMethod === 'Service point' && postnordQrCode) {
             userActionDiv = getQrCodeButton(itemId); //TODO: Rename bagReceived to labelReceived everywhere
             shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
