@@ -208,10 +208,11 @@ function getPickupTimeInfoDiv(pickupDate) {
     return div;
 }
 
-function getBookPickupButton(itemId, soldDate, brand) {
-    const div = `<a id="bookPickupButton" href="javascript:openPickupToast('${itemId}', '${soldDate}', '${brand}');" class="link-block-13 w-inline-block">
-                                        <img src="https://global-uploads.webflow.com/6055e6b453114a22c1c345f0/608db91c363e28ae251e0998_delivery-truck%204.svg" loading="lazy" width="30" alt="" class="image-4">
-                                        <div class="text-pickup-small-button">Boka hämtning</div>
+function getQrCodeButton(itemId, soldDate, brand) {
+    let itemPageUrl = window.location.origin + `/item?id=${itemId}`;
+    const div = `<a id="qrCodeButton" href="${itemPageUrl}" class="link-block-39">
+                                        <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63bdeaf1af902f05607f86ef_Group.svg" class="image-43">
+                                        <div class="text-block-113">Visa QR</div>
                                     </a>`;
     return div;
 }
@@ -228,7 +229,21 @@ function closeFeedbackForm() {
 }
 
 function getBagReceivedCheckbox(itemId, soldDate) {
-    const div = `<div class="w-form">
+    if (featureIsEnabled('C2C')) {
+        // ### C2C CODE ###
+        const div = `<div class="w-form">
+        <form method="get" name="wf-form-" id="bagReceivedForm">
+            <label class="w-checkbox checkbox-field-3">
+                <div class="w-checkbox-input w-checkbox-input--inputType-custom checkbox-2"></div>
+                <input type="checkbox" id="bagReceivedCheckbox-${itemId}" style="opacity:0;position:absolute;z-index:-1" onclick="javascript:bagReceivedAction(this, '${itemId}', '${soldDate}');">
+                <span class="checkbox-label-3 w-form-label">Fraktetikett har kommit</span>
+            </label>
+        </form>
+    </div>`;
+        return div;
+    } else {
+        // ### LIVE CODE ###
+        const div = `<div class="w-form">
         <form method="get" name="wf-form-" id="bagReceivedForm">
             <label class="w-checkbox checkbox-field-3">
                 <div class="w-checkbox-input w-checkbox-input--inputType-custom checkbox-2"></div>
@@ -237,7 +252,8 @@ function getBagReceivedCheckbox(itemId, soldDate) {
             </label>
         </form>
     </div>`;
-    return div;
+        return div;
+    }
 }
 
 // SHIPPING FUNCTIONS
@@ -274,15 +290,15 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate) {
     if (featureIsEnabled('C2C')) {
         // ### C2C CODE ###
         let uniquePart = ``;
-        if (method == "Service point") {
-            uniquePart += `
+        if (method == "Service point" && postnord)
+            if (method == "Service point" && bagReceived) {
+                uniquePart += `
             <div class="div-block-189">
-                <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg" loading="lazy" width="22" alt="" class="image-38">
-                <div class="next-step-text-small">Lämna till ombud</div>
+                <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg" class="image-38">
+                <div class="next-step-text-small">Lämnas till ombud</div>
             </div>
-        `;
-        } else if (method == "Pickup") {
-            if (pickupDate) {
+            `;
+            } else if (method == "Pickup" && pickupDate) {
                 var date = new Date(pickupDate);
                 var days = ['Sön', 'Mån', 'Tis', 'Ons', 'Tors', 'Fre', 'Lör'];
                 var months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
@@ -292,12 +308,11 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate) {
                 var pickupTimeInfoText = dayName + ", " + dateNumber + " " + monthName + ", kl 9-16";
                 uniquePart += `
                 <div class="div-block-189">
-                    <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63999dabb3be9ead61bf6488_Vector.svg" loading="lazy" width="24" alt="" class="image-38">
+                    <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63999dabb3be9ead61bf6488_Vector.svg" class="image-38">
                     <div class="next-step-text-small">${pickupTimeInfoText}</div>
                 </div>
                 `;
             }
-        }
 
         const div = `
         <div id="shippingInfoDiv" class="div-block-54">

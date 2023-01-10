@@ -89,19 +89,37 @@ async function loadItemCards(items) {
           buyerInfoTextHTML = `<div class="text-block-44">Till ${buyerFirstName} i ${buyerAddressCity}</div>`;
         }
 
-        var bagReceivedCheckbox = ''; //TODO: Rename this to labelReceivedCheckbox everywhere
-        var shippingInfoDiv = '';
-        if (!shippingMethod && !pickupDate) {
-          bagReceivedCheckbox = getBagReceivedCheckbox(itemId, soldDate);
+        if (featureIsEnabled('C2C')) {
+          // ### C2C CODE ###
+          var userActionDiv = '';
+          var shippingInfoDiv = '';
+          if (shippingMethod === 'Service point' && postnordQrCode) {
+            userActionDiv = getQrCodeButton(itemId); //TODO: Rename bagReceived to labelReceived everywhere
+            shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
+          } else if (shippingMethod === 'Pickup' && pickupDate) {
+            shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
+          } else if (!shippingMethod && !pickupDate) { // Temporary for items that have been sold but not sent before this release and therefor have no shippingMethod
+            // ...
+            userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
+          }
         } else {
-          shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
+          // ### LIVE CODE ###
+          var userActionDiv = '';
+          var shippingInfoDiv = '';
+          if (!shippingMethod && !pickupDate) {
+            userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
+          } else {
+            shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
+          }
         }
+
+
 
         //Create card
         var soldNotSentCardHTML = ``;
         soldNotSentCardHTML =
           `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">Såld för ${soldPrice} kr</div>${buyerInfoTextHTML}<div class="text-block-44">Du får ${sellerGets} kr</div>
-                      ${bagReceivedCheckbox}
+                      ${userActionDiv}
                       ${shippingInfoDiv}
                   </div></div></div></div>`;
         itemListSoldNotSent.innerHTML += soldNotSentCardHTML;
