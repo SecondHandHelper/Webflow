@@ -89,12 +89,10 @@ async function loadItemCards(items) {
           buyerInfoTextHTML = `<div class="text-block-44">Till ${buyerFirstName} i ${buyerAddressCity}</div>`;
         }
 
-        var bagReceivedCheckbox = '';
+        var bagReceivedCheckbox = ''; //TODO: Rename this to labelReceivedCheckbox everywhere
         var shippingInfoDiv = '';
         if (!shippingMethod && !pickupDate) {
           bagReceivedCheckbox = getBagReceivedCheckbox(itemId, soldDate);
-        } else if (!shippingMethod && pickupDate) {
-          shippingInfoDiv = getShippingInfoDiv(itemId, 'Pickup', soldDate, pickupDate); // För items under en övergångsperiod
         } else {
           shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
         }
