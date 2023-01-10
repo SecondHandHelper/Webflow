@@ -97,7 +97,7 @@ async function loadItemCards(items) {
           // ### C2C CODE ###
           
           if (shippingMethod === 'Service point') {
-            if (postnordQrCod) {
+            if (postnordQrCode) {
               userActionDiv = getQrCodeButton(itemId); 
             }
             shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
