@@ -211,9 +211,11 @@ function getPickupTimeInfoDiv(pickupDate) {
 function getQrCodeButton(itemId, soldDate, brand) {
     let itemPageUrl = window.location.origin + `/item?id=${itemId}`;
     const div = `<a id="qrCodeButton" href="${itemPageUrl}" class="link-block-39">
+                        <div class="div-block-194">
                                         <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63bdeaf1af902f05607f86ef_Group.svg" class="image-43">
                                         <div class="text-block-113">Visa QR</div>
-                                    </a>`;
+                        </div>
+                </a>`;
     return div;
 }
 
