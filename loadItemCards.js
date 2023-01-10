@@ -92,25 +92,27 @@ async function loadItemCards(items) {
 
         var userActionDiv = '';
         var shippingInfoDiv = '';
-        
+
         if (featureIsEnabled('C2C')) {
           // ### C2C CODE ###
           
-          if (shippingMethod === 'Service point' && postnordQrCode) {
-            userActionDiv = getQrCodeButton(itemId); //TODO: Rename bagReceived to labelReceived everywhere
+          if (shippingMethod === 'Service point') {
+            if (postnordQrCod) {
+              userActionDiv = getQrCodeButton(itemId); 
+            }
             shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
           } else if (shippingMethod === 'Pickup' && pickupDate) {
             shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
           } else if (!shippingMethod && !pickupDate) { // Temporary for items that have been sold but not sent before this release and therefor have no shippingMethod
             // ...
-            userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
+            userActionDiv = getBagReceivedCheckbox(itemId, soldDate); //TODO: Rename bagReceived to labelReceived everywhere
           }
         } else {
           // ### LIVE CODE ###
           var userActionDiv = '';
           var shippingInfoDiv = '';
           if (!shippingMethod && !pickupDate) {
-            userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
+            userActionDiv = getBagReceivedCheckbox(itemId, soldDate); 
           } else {
             shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
           }
