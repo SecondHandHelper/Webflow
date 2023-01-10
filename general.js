@@ -312,15 +312,15 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate) {
                     <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63999dabb3be9ead61bf6488_Vector.svg" class="image-38">
                     <div class="next-step-text-small">${pickupTimeInfoText}</div>
                 </div>
+                <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
+                    <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
+                </a>
                 `;
         }
 
         const div = `
         <div id="shippingInfoDiv" class="div-block-54">
             ${uniquePart}
-            <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
-                <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
-            </a>
         </div>`;
         return div;
     } else {
