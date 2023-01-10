@@ -21,6 +21,7 @@ async function loadItemCards(items) {
     var infoRequests = doc.data().infoRequests;
     var pickupDate = doc.data().pickupDate;
     var shippingMethod = doc.data().shippingMethod;
+    var postnordQrCode = doc.data().postnordQrCode;
     var archived = doc.data().archived;
     var holidayMode = doc.data().holidayMode;
     var longerPeriodAcceptedDate = doc.data().longerPeriodAcceptedDate;
