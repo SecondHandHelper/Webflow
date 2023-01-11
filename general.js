@@ -312,9 +312,6 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
                         <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63999dabb3be9ead61bf6488_Vector.svg" class="image-45">
                         <div class="next-step-text-small">${pickupTimeInfoText}</div>
                     </div>
-                    <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
-                        <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
-                    </a>
                     `;
             } else {
                 uniquePart += `
@@ -329,7 +326,7 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
         }
 
         // Add "change shipping method" when applicable
-        if (method && bagReceived) {
+        if (bagReceived && (method === "Service point" || (method === "Pickup" && pickupDate))) {
             uniquePart += `
             <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
                 <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
