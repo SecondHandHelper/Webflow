@@ -211,7 +211,7 @@ function getBagReceivedCheckbox(itemId, soldDate) {
             <label class="w-checkbox checkbox-field-3">
                 <div class="w-checkbox-input w-checkbox-input--inputType-custom checkbox-2"></div>
                 <input type="checkbox" id="bagReceivedCheckbox-${itemId}" style="opacity:0;position:absolute;z-index:-1" onclick="javascript:bagReceivedAction(this, '${itemId}', '${soldDate}');">
-                <span class="checkbox-label-3 w-form-label">Fraktetikett har kommit</span>
+                <span class="checkbox-label-3 w-form-label">Etiketten har kommit</span>
             </label>
         </form>
     </div>`;
@@ -277,8 +277,9 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
     if (featureIsEnabled('C2C')) {
         // ### C2C CODE ###
         let uniquePart = ``;
+        const infoIcon = !bagReceived ? `<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="image-44">` : '';
+
         if (method == "Service point") {
-            const infoIcon = !bagReceived ? `<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="image-44">` : '';
             uniquePart += `
                 <div class="div-block-189">
                     <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg" class="image-38">
@@ -297,7 +298,7 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
                 var pickupTimeInfoText = dayName + ", " + dateNumber + " " + monthName + ", kl 9-16";
                 uniquePart += `
                     <div class="div-block-189">
-                        <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63999dabb3be9ead61bf6488_Vector.svg" class="image-38">
+                        <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63999dabb3be9ead61bf6488_Vector.svg" class="image-45">
                         <div class="next-step-text-small">${pickupTimeInfoText}</div>
                     </div>
                     <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
@@ -305,10 +306,9 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
                     </a>
                     `;
             } else {
-                const infoIcon = !bagReceived ? `<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="image-44">` : ``;
                 uniquePart += `
                     <div class="div-block-189">
-                        <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg" class="image-38" width="24">
+                        <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63999dabb3be9ead61bf6488_Vector.svg" class="image-45">
                         <div class="next-step-text-small">Upphämtning</div>
                         ${infoIcon}
                     </div>

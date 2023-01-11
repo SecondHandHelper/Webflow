@@ -115,7 +115,7 @@ async function loadItemCards(items) {
           } else if (!shippingMethod && !pickupDate) { // Temporary for items that have been sold but not sent before this release and therefor have no shippingMethod
             // ...
             userActionDiv = getBagReceivedCheckbox(itemId, soldDate); //TODO: Rename bagReceived to labelReceived everywhere
-          }
+          } 
 
           // Always show the 'shippingInfoDiv' - Styling depending on state is set in the function
           shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate, bagReceived);
