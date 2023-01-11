@@ -105,8 +105,9 @@ async function loadItemCards(items) {
             }
             else if (postnordQrCode) {
               userActionDiv = getQrCodeButton(itemId); 
+            } else {
+              shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate, bagReceived);
             }
-            shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
           } else if (shippingMethod === 'Pickup' && pickupDate) {
             shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
           } else if (!shippingMethod && !pickupDate) { // Temporary for items that have been sold but not sent before this release and therefor have no shippingMethod
