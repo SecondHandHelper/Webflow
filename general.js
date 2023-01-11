@@ -273,6 +273,7 @@ function openShippingToast(itemId, soldDate) {
 
 function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
     console.log("getShippingInfoDiv is running");
+    console.log("getShippingInfoDiv params: ", itemId, method, soldDate, pickupDate, bagReceived);
     if (featureIsEnabled('C2C')) {
         // ### C2C CODE ###
         let uniquePart = ``;
@@ -285,7 +286,7 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
                     ${infoIcon}
                 </div>
                 `;
-        } else if (method == "Pickup" && pickupDate) {
+        } else if (method == "Pickup") {
             if (pickupDate) {
                 var date = new Date(pickupDate);
                 var days = ['Sön', 'Mån', 'Tis', 'Ons', 'Tors', 'Fre', 'Lör'];
