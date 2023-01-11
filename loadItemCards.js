@@ -102,7 +102,7 @@ async function loadItemCards(items) {
 
           // Add a user action, such as 'show QR button' or 'bag received checkbox'
           if (shippingMethod === 'Service point') {
-            if (!bagReceived && soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') {
+            if (!bagReceived && (soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed')) {
                 userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
             }
             else if (postnordQrCode) {
