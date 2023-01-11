@@ -22,6 +22,7 @@ async function loadItemCards(items) {
     var pickupDate = doc.data().pickupDate;
     var shippingMethod = doc.data().shippingMethod;
     var postnordQrCode = doc.data().postnordQrCode;
+    var bagReceived = doc.data().bagReceived;
     var archived = doc.data().archived;
     var holidayMode = doc.data().holidayMode;
     var longerPeriodAcceptedDate = doc.data().longerPeriodAcceptedDate;
@@ -97,7 +98,11 @@ async function loadItemCards(items) {
           // ### C2C CODE ###
           
           if (shippingMethod === 'Service point') {
-            if (postnordQrCode) {
+            if (soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') {
+              userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
+              shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate, bagReceived);
+            }
+            else if (postnordQrCode) {
               userActionDiv = getQrCodeButton(itemId); 
             }
             shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
