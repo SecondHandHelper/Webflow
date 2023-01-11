@@ -304,7 +304,7 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
         } 
         
         // Add "change shipping method" when applicable
-        if (shippingMethod && bagReceived) {
+        if (method && bagReceived) {
             uniquePart += `
             <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
                 <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
