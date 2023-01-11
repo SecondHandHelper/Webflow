@@ -111,7 +111,10 @@ async function loadItemCards(items) {
           } else if (shippingMethod === 'Pickup') {
             if (!bagReceived) {
               userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
-            }
+            } else if (bagReceived && !pickupDate) {
+              //Show book pickup button
+              userActionDiv = getBookPickupButton(itemId, soldDate);
+            } 
           } else if (!shippingMethod && !pickupDate) { // Temporary for items that have been sold but not sent before this release and therefor have no shippingMethod
             // ...
             userActionDiv = getBagReceivedCheckbox(itemId, soldDate); //TODO: Rename bagReceived to labelReceived everywhere

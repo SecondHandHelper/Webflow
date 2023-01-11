@@ -203,6 +203,18 @@ function getQrCodeButton(itemId) {
     return div;
 }
 
+// TODO: Show a "Boka hämtning" button when the user has pressed bagreceievd but still hasn't picked a pickup
+function getBookPickupButton(itemId, soldDate) {
+    let itemPageUrl = window.location.origin + `/item?id=${itemId}`;
+    const div = `<a id="bookPickupButton" href="javascript:openPickupToast('${itemId}', '${soldDate}');" class="link-block-39">
+                        <div class="div-block-194">
+                                        <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63999dabb3be9ead61bf6488_Vector.svg" class="image-43">
+                                        <div class="text-block-113">Boka hämtning</div>
+                        </div>
+                </a>`;
+    return div;
+}
+
 function getBagReceivedCheckbox(itemId, soldDate) {
     if (featureIsEnabled('C2C')) {
         // ### C2C CODE ###
