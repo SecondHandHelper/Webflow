@@ -273,36 +273,51 @@ function openShippingToast(itemId, soldDate) {
 
 function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
     console.log("getShippingInfoDiv is running");
+    console.log("bagReceived: ", bagReceived);
+    console.log("!bagReceived: ", (!bagReceived));
     if (featureIsEnabled('C2C')) {
         // ### C2C CODE ###
         let uniquePart = ``;
         if (method == "Service point") {
-            uniquePart += `
-            <div class="div-block-189">
-                <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg" class="image-38">
-                <div class="next-step-text-small">Lämnas till ombud</div>
-                <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="image-44">
-            </div>
-            `;
-        } else if (method == "Pickup" && pickupDate) {
-            var date = new Date(pickupDate);
-            var days = ['Sön', 'Mån', 'Tis', 'Ons', 'Tors', 'Fre', 'Lör'];
-            var months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
-            var dateNumber = date.getDate();
-            var monthName = months[date.getMonth()];
-            var dayName = days[date.getDay()];
-            var pickupTimeInfoText = dayName + ", " + dateNumber + " " + monthName + ", kl 9-16";
+            const infoIcon = !bagReceived ? `<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="image-44">` : ``;
             uniquePart += `
                 <div class="div-block-189">
-                    <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63999dabb3be9ead61bf6488_Vector.svg" class="image-38">
-                    <div class="next-step-text-small">${pickupTimeInfoText}</div>
+                    <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg" class="image-38">
+                    <div class="next-step-text-small">Lämnas till ombud</div>
+                    ${infoIcon}
                 </div>
-                <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
-                    <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
-                </a>
                 `;
-        } 
-        
+        } else if (method == "Pickup" && pickupDate) {
+            if (pickupDate) {
+                var date = new Date(pickupDate);
+                var days = ['Sön', 'Mån', 'Tis', 'Ons', 'Tors', 'Fre', 'Lör'];
+                var months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+                var dateNumber = date.getDate();
+                var monthName = months[date.getMonth()];
+                var dayName = days[date.getDay()];
+                var pickupTimeInfoText = dayName + ", " + dateNumber + " " + monthName + ", kl 9-16";
+                uniquePart += `
+                    <div class="div-block-189">
+                        <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63999dabb3be9ead61bf6488_Vector.svg" class="image-38">
+                        <div class="next-step-text-small">${pickupTimeInfoText}</div>
+                    </div>
+                    <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
+                        <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
+                    </a>
+                    `;
+            } else {
+                const infoIcon = !bagReceived ? `<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="image-44">` : ``;
+                uniquePart += `
+                    <div class="div-block-189">
+                        <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg" class="image-38">
+                        <div class="next-step-text-small">Upphämtning</div>
+                        ${infoIcon}
+                    </div>
+                    `;
+            }
+
+        }
+
         // Add "change shipping method" when applicable
         if (method && bagReceived) {
             uniquePart += `

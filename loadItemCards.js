@@ -100,7 +100,9 @@ async function loadItemCards(items) {
           
           if (shippingMethod === 'Service point') {
             if (soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') {
-              userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
+              if (!bagReceived) {
+                userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
+              }
               shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate, bagReceived);
             }
             else if (postnordQrCode) {
