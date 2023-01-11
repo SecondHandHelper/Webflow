@@ -288,7 +288,7 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
     if (featureIsEnabled('C2C')) {
         // ### C2C CODE ###
         let uniquePart = ``;
-        const infoIcon = !bagReceived ? `<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="image-44">` : '';
+        const infoIcon = !bagReceived || (bagReceived && method == "Pickup" && !pickupDate) ? `<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="image-44">` : '';
 
         if (method == "Service point") {
             uniquePart += `
