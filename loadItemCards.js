@@ -87,47 +87,50 @@ async function loadItemCards(items) {
 
         // SOLD - NOT SENT
       } else if (status == "Sold" && shippingStatus != "Sent") {
+        // Prepare card
         var buyerInfoTextHTML = '';
         if (buyerFirstName != null && buyerAddressCity != null) {
           buyerInfoTextHTML = `<div class="text-block-44">Till ${buyerFirstName} i ${buyerAddressCity}</div>`;
         }
-
         var userActionDiv = '';
         var shippingInfoDiv = '';
 
         if (featureIsEnabled('C2C')) {
           // ### C2C CODE ###
-          
+          console.log("bagReceived: ", bagReceived);
+          console.log("!bagReceived: ", (!bagReceived));
+
+          // Add a user action, such as 'show QR button' or 'bag received checkbox'
           if (shippingMethod === 'Service point') {
-            if (soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') {
-              if (!bagReceived) {
+            if (!bagReceived && soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') {
                 userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
-              }
-              shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate, bagReceived);
             }
             else if (postnordQrCode) {
-              userActionDiv = getQrCodeButton(itemId); 
-            } else {
-              shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate, bagReceived);
+              userActionDiv = getQrCodeButton(itemId);
             }
-          } else if (shippingMethod === 'Pickup' && pickupDate) {
-            shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
+          } else if (shippingMethod === 'Pickup') {
+            if (!pickupDate) {
+              userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
+            } 
+
           } else if (!shippingMethod && !pickupDate) { // Temporary for items that have been sold but not sent before this release and therefor have no shippingMethod
             // ...
             userActionDiv = getBagReceivedCheckbox(itemId, soldDate); //TODO: Rename bagReceived to labelReceived everywhere
           }
+
+          // Always show the 'shippingInfoDiv' - Styling depending on state is set in the function
+          shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate, bagReceived);
+
         } else {
           // ### LIVE CODE ###
           var userActionDiv = '';
           var shippingInfoDiv = '';
           if (!shippingMethod && !pickupDate) {
-            userActionDiv = getBagReceivedCheckbox(itemId, soldDate); 
+            userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
           } else {
             shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
           }
         }
-
-
 
         //Create card
         var soldNotSentCardHTML = ``;

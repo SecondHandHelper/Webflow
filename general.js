@@ -273,13 +273,11 @@ function openShippingToast(itemId, soldDate) {
 
 function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
     console.log("getShippingInfoDiv is running");
-    console.log("bagReceived: ", bagReceived);
-    console.log("!bagReceived: ", (!bagReceived));
     if (featureIsEnabled('C2C')) {
         // ### C2C CODE ###
         let uniquePart = ``;
         if (method == "Service point") {
-            const infoIcon = !bagReceived ? `<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="image-44">` : ``;
+            const infoIcon = !bagReceived ? `<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="image-44">` : '';
             uniquePart += `
                 <div class="div-block-189">
                     <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg" class="image-38">
@@ -309,7 +307,7 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
                 const infoIcon = !bagReceived ? `<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="image-44">` : ``;
                 uniquePart += `
                     <div class="div-block-189">
-                        <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg" class="image-38">
+                        <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg" class="image-38" width="24">
                         <div class="next-step-text-small">Upphämtning</div>
                         ${infoIcon}
                     </div>
