@@ -321,7 +321,7 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
 
         // Turn shipping info into a link to ship item page
         const div = `
-                    <a id="shipItemPageLink" href="${shipItemPageUrl}">
+                    <a id="shipItemPageLink" href="${shipItemPageUrl}" class="link-block-40">
                             ${shippingInfo}
                     </a>`;
         return div;
