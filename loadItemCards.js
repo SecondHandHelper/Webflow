@@ -124,7 +124,7 @@ async function loadItemCards(items) {
           shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate, bagReceived);
 
           // Add "change shipping method" when applicable
-          if (bagReceived && (method === "Service point" || (method === "Pickup" && pickupDate))) {
+          if (bagReceived && (shippingMethod === "Service point" || (shippingMethod === "Pickup" && pickupDate))) {
             changeShippingMethod += `
           <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
               <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
