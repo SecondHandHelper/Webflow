@@ -94,6 +94,7 @@ async function loadItemCards(items) {
         }
         var userActionDiv = '';
         var shippingInfoDiv = '';
+        let changeShippingMethod = '';
 
         if (featureIsEnabled('C2C')) {
           // ### C2C CODE ###
@@ -103,7 +104,7 @@ async function loadItemCards(items) {
           // Add a user action, such as 'show QR button' or 'bag received checkbox'
           if (shippingMethod === 'Service point') {
             if (!bagReceived && (soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed')) {
-                userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
+              userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
             }
             else if (postnordQrCode) {
               userActionDiv = getQrCodeButton(itemId);
@@ -112,16 +113,23 @@ async function loadItemCards(items) {
             if (!bagReceived) {
               userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
             } else if (bagReceived && !pickupDate) {
-              //Show book pickup button
               userActionDiv = getBookPickupButton(itemId, soldDate);
-            } 
+            }
           } else if (!shippingMethod && !pickupDate) { // Temporary for items that have been sold but not sent before this release and therefor have no shippingMethod
             // ...
             userActionDiv = getBagReceivedCheckbox(itemId, soldDate); //TODO: Rename bagReceived to labelReceived everywhere
-          } 
+          }
 
           // Always show the 'shippingInfoDiv' - Styling depending on state is set in the function
           shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate, bagReceived);
+
+          // Add "change shipping method" when applicable
+          if (bagReceived && (method === "Service point" || (method === "Pickup" && pickupDate))) {
+            changeShippingMethod += `
+          <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
+              <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
+          </a>`;
+          }
 
         } else {
           // ### LIVE CODE ###
@@ -140,6 +148,7 @@ async function loadItemCards(items) {
           `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">Såld för ${soldPrice} kr</div>${buyerInfoTextHTML}<div class="text-block-44">Du får ${sellerGets} kr</div>
                       ${userActionDiv}
                       ${shippingInfoDiv}
+                      ${changeShippingMethod}
                   </div></div></div></div>`;
         itemListSoldNotSent.innerHTML += soldNotSentCardHTML;
 
