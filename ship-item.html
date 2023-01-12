@@ -1,0 +1,47 @@
+<script>
+    function loadItem(itemId) {
+        console.log(`loadItem(${itemId})`);
+        db.collection("items").doc(itemId)
+            .get().then((doc) => {
+                if (doc.exists) {
+                    console.log("Item data:", doc.data());
+                    data = doc.data();
+                    const brand = data.brand;
+                    const images = data.images;
+                    let imgUrl = images.frontImageSmall || images.frontImage;
+                    const category = data.category ? data.category : "";
+                    const postnordQrCode = data.postnordQrCode;
+                    const buyerFirstName = data.buyerFirstName;
+                    const buyerAddressCity = data.buyerAddressCity;
+                    const shippingMethod = data.shippingMethod;
+                    const soldPlatform = data.soldPlatform;
+
+                    pageTitleText.innerHTML = `Skicka ${brand.trim()}-${category.trim().toLowerCase()}`;
+                    buyerAddressDiv.innerHTML = `${buyerFirstName.trim()}<br>${buyerAddressCity.trim()}`;
+                    itemImageDiv.style.backgroundImage = `url('${imgUrl}')`;
+
+                    if (shippingMethod === 'Service point') {
+                        if (!(soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') && postnordQrCode) {
+                            qrCodeDiv.style.display = "block";
+                            howToShipQrDiv.style.display = "block";
+                        } else {
+                            howToShipNoQrDiv.style.display = "block";
+                        }
+                    } else if (shippingMethod === 'Pickup') {
+                        howToShipPickupDiv.style.display = "block";
+                    }
+
+                    pageTitleText.style.display = "block";
+                    contentDiv.style.display = "block";
+                    loadingDiv.style.display = "none";
+                } else {
+                    console.log("No such document!");
+                }
+            }).catch((error) => {
+                console.log("Error getting item document:", error);
+            });
+    }
+
+    // Load item
+    loadItem(params.id);
+</script>
