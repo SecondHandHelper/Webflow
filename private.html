@@ -91,7 +91,9 @@
         }
 
         if (daysSinceLatestSold <= 3 && soldItemsCount >= 2 && oneSoldNotSentItemExist && user?.referralData?.referralCode && !viewedToastBefore) {
+            referralCodeText.innerHTML = user.referralData.referralCode;
             triggerInviteToastOpen.click();
+            
             // Store elementViews to be able to not show it again
             db.collection('users').doc(authUser.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "inviteToast", timestamp: new Date() }) });
             // Track with segment
