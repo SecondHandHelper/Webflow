@@ -8,12 +8,12 @@
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-functions.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test107/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test131/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.71/infoRequestsFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.77/referralFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.52/cookieManagement.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.64/autocomplete-brands.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.72/loadItemCards.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test131/loadItemCards.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuidv4.min.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.74/sellItem.js"></script>
 
@@ -64,6 +64,7 @@
           }
           console.log("user:", user);
           console.log("authUser", authUser);
+          console.log("featureIsEnabled('C2C')", featureIsEnabled('C2C'));
           identify();
 
           // Go to logged in pages when user authenticated
@@ -195,12 +196,12 @@
   };
 
   function featureIsEnabled(featureName) {
-    if (user.testGroups) {
+    if (user?.testGroups) {
       if (user.testGroups.includes('alpha')) {
         return featureConfig.alpha[featureName]
       }
       if (user.testGroups.includes('beta')) {
-        return featureConfig.alpha[featureName]
+        return featureConfig.beta[featureName]
       }
     } else {
       return featureConfig.default[featureName]
