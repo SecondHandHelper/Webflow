@@ -127,7 +127,7 @@ async function loadItemCards(items) {
 
           // Add "change shipping method" when applicable and some spacing
           if (bagReceived && (shippingMethod === "Service point" || (shippingMethod === "Pickup" && pickupDate))) {
-            getShippingInfoDiv = '<div class="spacing-15-px"></div>'+ getShippingInfoDiv;
+            shippingInfoDiv = '<div class="spacing-15-px"></div>'+ shippingInfoDiv;
             changeShippingMethod += `
           <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
               <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
