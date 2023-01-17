@@ -125,8 +125,9 @@ async function loadItemCards(items) {
           // Always show the 'shippingInfoDiv' - Styling depending on state is set in the function
           shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate, bagReceived);
 
-          // Add "change shipping method" when applicable
+          // Add "change shipping method" when applicable and some spacing
           if (bagReceived && (shippingMethod === "Service point" || (shippingMethod === "Pickup" && pickupDate))) {
+            getShippingInfoDiv = '<div class="spacing-15-px"></div>'+ getShippingInfoDiv;
             changeShippingMethod += `
           <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
               <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
