@@ -193,7 +193,7 @@ function loadSoldByOthers(userID) {
 }
 
 function getQrCodeButton(itemId) {
-    let itemPageUrl = window.location.origin + `/item?id=${itemId}`;
+    let itemPageUrl = window.location.origin + `/ship-item?id=${itemId}`;
     const div = `<a id="qrCodeButton" href="${itemPageUrl}" class="link-block-39">
                         <div class="div-block-194">
                                         <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63bdeaf1af902f05607f86ef_Group.svg" class="image-43">
@@ -205,7 +205,6 @@ function getQrCodeButton(itemId) {
 
 // TODO: Show a "Boka hämtning" button when the user has pressed bagreceievd but still hasn't picked a pickup
 function getBookPickupButton(itemId, soldDate) {
-    let itemPageUrl = window.location.origin + `/item?id=${itemId}`;
     const div = `<a id="bookPickupButton" href="javascript:openPickupToast('${itemId}', '${soldDate}');" class="link-block-39">
                         <div class="div-block-194">
                             <div class="text-block-113">Boka hämtning</div>
