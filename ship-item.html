@@ -11,13 +11,16 @@
                     let imgUrl = images.frontImageSmall || images.frontImage;
                     const category = data.category ? data.category : "";
                     const postnordQrCode = data.postnordQrCode;
-                    const buyerFirstName = data.buyerFirstName;
-                    const buyerAddressCity = data.buyerAddressCity;
+                    const fn = data.buyerFirstName || '';
+                    const ln = data.buyerLastName || '';
+                    const street = data.buyerAddressStreetAddress || '';
+                    const postalCode = data.buyerAddressPostalCode || '';
+                    const city = data.buyerAddressCity || '';
                     const shippingMethod = data.shippingMethod;
                     const soldPlatform = data.soldPlatform;
 
                     pageTitleText.innerHTML = `Skicka ${brand.trim()}-${category.trim().toLowerCase()}`;
-                    buyerAddressDiv.innerHTML = `${buyerFirstName.trim()}<br>${buyerAddressCity.trim()}`;
+                    buyerAddressDiv.innerHTML = `${fn.trim()} ${ln.trim()}<br>${street.trim()}<br>${postalCode.trim()} ${city.trim()}`;
                     itemImageDiv.style.backgroundImage = `url('${imgUrl}')`;
 
                     if (shippingMethod === 'Service point') {
