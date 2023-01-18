@@ -268,11 +268,11 @@ function bagReceivedAction(checkbox, itemId, soldDate) {
 }
 
 function openShippingToast(itemId, soldDate) {
-        console.log("openShippingToast");
-        window.pickupFlowItemId = itemId;
-        servicePointButton.href = `javascript:storeShippingMethod('${itemId}', 'Service point')`;
-        bookPickupButton.href = `javascript:openPickupToast('${itemId}', '${soldDate}')`;
-        triggerShippingToastOpen.click();
+    console.log("openShippingToast");
+    window.pickupFlowItemId = itemId;
+    servicePointButton.href = `javascript:storeShippingMethod('${itemId}', 'Service point')`;
+    bookPickupButton.href = `javascript:openPickupToast('${itemId}', '${soldDate}')`;
+    triggerShippingToastOpen.click();
 }
 
 function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
@@ -372,11 +372,23 @@ av ditt plagg?`;
 }
 
 function openPickupToast(itemId, soldDate) {
-    console.log(`openPickupToast(${itemId}, ${soldDate}) is running`);
-    triggerShippingToastClose.click();
-    setDatesOfPickupToast(soldDate);
-    window.pickupFlowItemId = itemId;
-    triggerPickupAnimation.click();
+    if (featureIsEnabled('C2C')) {
+        // ### C2C CODE ###
+        console.log(`openPickupToast(${itemId}, ${soldDate}) is running`);
+        triggerShippingToastClose.click();
+        changeToServicePointButton.href = `javascript:storeShippingMethod('${itemId}', 'Service point')`;
+        changeToServicePointButton.style.display = 'flex';
+        setDatesOfPickupToast(soldDate);
+        window.pickupFlowItemId = itemId;
+        triggerPickupAnimation.click();
+    } else {
+        // ### LIVE CODE ###
+        console.log(`openPickupToast(${itemId}, ${soldDate}) is running`);
+        triggerShippingToastClose.click();
+        setDatesOfPickupToast(soldDate);
+        window.pickupFlowItemId = itemId;
+        triggerPickupAnimation.click();
+    }
 }
 
 function setDatesOfPickupToast(soldDate) {
