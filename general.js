@@ -216,12 +216,13 @@ function getBookPickupButton(itemId, soldDate) {
 function getBagReceivedCheckbox(itemId, soldDate, shippingMethod) {
     if (featureIsEnabled('C2C')) {
         // ### C2C CODE ###
+        const checkboxText = shippingMethod ? 'Etiketten har kommit': 'Påsen har kommit';
         const div = `<div class="w-form">
         <form method="get" name="wf-form-" id="bagReceivedForm">
             <label class="w-checkbox checkbox-field-3">
                 <div class="w-checkbox-input w-checkbox-input--inputType-custom checkbox-2"></div>
                 <input type="checkbox" id="bagReceivedCheckbox-${itemId}" style="opacity:0;position:absolute;z-index:-1" onclick="javascript:bagReceivedAction(this, '${itemId}', '${soldDate}', '${shippingMethod}');">
-                <span class="checkbox-label-3 w-form-label">Etiketten har kommit</span>
+                <span class="checkbox-label-3 w-form-label">${checkboxText}</span>
             </label>
         </form>
     </div>`;
