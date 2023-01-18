@@ -105,7 +105,7 @@ async function loadItemCards(items) {
           if (shippingMethod === 'Service point') {
             if (soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed'){
               if (!bagReceived) {
-                userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
+                userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
               }
             }
             else if (postnordQrCode) {
@@ -113,7 +113,7 @@ async function loadItemCards(items) {
             }
           } else if (shippingMethod === 'Pickup') {
             if (!bagReceived) {
-              userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
+              userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
             } else if (bagReceived && !pickupDate) {
               userActionDiv = getBookPickupButton(itemId, soldDate);
             }

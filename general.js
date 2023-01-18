@@ -213,14 +213,14 @@ function getBookPickupButton(itemId, soldDate) {
     return div;
 }
 
-function getBagReceivedCheckbox(itemId, soldDate) {
+function getBagReceivedCheckbox(itemId, soldDate, shippingMethod) {
     if (featureIsEnabled('C2C')) {
         // ### C2C CODE ###
         const div = `<div class="w-form">
         <form method="get" name="wf-form-" id="bagReceivedForm">
             <label class="w-checkbox checkbox-field-3">
                 <div class="w-checkbox-input w-checkbox-input--inputType-custom checkbox-2"></div>
-                <input type="checkbox" id="bagReceivedCheckbox-${itemId}" style="opacity:0;position:absolute;z-index:-1" onclick="javascript:bagReceivedAction(this, '${itemId}', '${soldDate}');">
+                <input type="checkbox" id="bagReceivedCheckbox-${itemId}" style="opacity:0;position:absolute;z-index:-1" onclick="javascript:bagReceivedAction(this, '${itemId}', '${soldDate}', '${shippingMethod}');">
                 <span class="checkbox-label-3 w-form-label">Etiketten har kommit</span>
             </label>
         </form>
@@ -254,14 +254,20 @@ function closeFeedbackForm() {
 
 // SHIPPING FUNCTIONS
 
-function bagReceivedAction(checkbox, itemId, soldDate) {
+function bagReceivedAction(checkbox, itemId, soldDate, shippingMethod) {
     if (featureIsEnabled('C2C')) {
         // ### C2C CODE ###
-        if (checkbox.checked == true) {
+        if (checkbox.checked) {
             db.collection('items').doc(itemId).update({ bagReceived: true }).then((docRef) => {
                 console.log(`Stored in DB that bag is received for item with ID: `, itemId);
             });
-            openPickupToast(itemId, soldDate, 'flex');
+            if (shippingMethod === 'Pickup'){
+                openPickupToast(itemId, soldDate, 'flex');
+            } else if (shippingMethod === 'Service point'){
+                //TODO: openServicePointToast();
+            } else {
+                openShippingToast(itemId, soldDate);
+            }
         } else {
             db.collection('items').doc(itemId).update({ bagReceived: false }).then((docRef) => {
                 console.log(`Stored in DB that bag is NOT received for item with ID: `, itemId);
@@ -324,7 +330,6 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
                         ${infoIcon}
                     `;
             }
-
         }
 
         // Turn shipping info into a link to ship item page
