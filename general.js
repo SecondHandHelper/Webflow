@@ -216,13 +216,12 @@ function getBookPickupButton(itemId, soldDate) {
 function getBagReceivedCheckbox(itemId, soldDate, shippingMethod) {
     if (featureIsEnabled('C2C')) {
         // ### C2C CODE ###
-        const checkboxText = shippingMethod ? 'Etiketten har kommit': 'Påsen har kommit';
         const div = `<div class="w-form">
         <form method="get" name="wf-form-" id="bagReceivedForm">
             <label class="w-checkbox checkbox-field-3">
                 <div class="w-checkbox-input w-checkbox-input--inputType-custom checkbox-2"></div>
                 <input type="checkbox" id="bagReceivedCheckbox-${itemId}" style="opacity:0;position:absolute;z-index:-1" onclick="javascript:bagReceivedAction(this, '${itemId}', '${soldDate}', '${shippingMethod}');">
-                <span class="checkbox-label-3 w-form-label">${checkboxText}</span>
+                <span class="checkbox-label-3 w-form-label">Etiketten har kommit</span>
             </label>
         </form>
     </div>`;
@@ -240,61 +239,6 @@ function getBagReceivedCheckbox(itemId, soldDate, shippingMethod) {
     </div>`;
         return div;
     }
-}
-
-function closePickupToast() {
-    document.getElementById('triggerPickupToastClose').click();
-}
-
-function closeFeedbackForm() {
-    document.getElementById('triggerFeedbackFormClose').click();
-    setTimeout(function () {
-        location.reload();
-    }, 400);
-}
-
-// SHIPPING FUNCTIONS
-
-function bagReceivedAction(checkbox, itemId, soldDate, shippingMethod) {
-    if (featureIsEnabled('C2C')) {
-        // ### C2C CODE ###
-        if (checkbox.checked) {
-            db.collection('items').doc(itemId).update({ bagReceived: true }).then((docRef) => {
-                console.log(`Stored in DB that bag is received for item with ID: `, itemId);
-            });
-            if (shippingMethod === 'Pickup'){
-                openPickupToast(itemId, soldDate, 'flex');
-            } else if (shippingMethod === 'Service point'){
-                //TODO: openServicePointToast();
-            } else {
-                openShippingToast(itemId, soldDate);
-            }
-        } else {
-            db.collection('items').doc(itemId).update({ bagReceived: false }).then((docRef) => {
-                console.log(`Stored in DB that bag is NOT received for item with ID: `, itemId);
-            });
-        }
-    } else {
-        // ### LIVE CODE ###
-        if (checkbox.checked == true) {
-            db.collection('items').doc(itemId).update({ bagReceived: true }).then((docRef) => {
-                console.log(`Stored in DB that bag is received for item with ID: `, itemId);
-            });
-            openShippingToast(itemId, soldDate);
-        } else {
-            db.collection('items').doc(itemId).update({ bagReceived: false }).then((docRef) => {
-                console.log(`Stored in DB that bag is NOT received for item with ID: `, itemId);
-            });
-        }
-    }
-}
-
-function openShippingToast(itemId, soldDate) {
-    console.log("openShippingToast");
-    window.pickupFlowItemId = itemId;
-    servicePointButton.href = `javascript:storeShippingMethod('${itemId}', 'Service point')`;
-    bookPickupButton.href = `javascript:openPickupToast('${itemId}', '${soldDate}')`;
-    triggerShippingToastOpen.click();
 }
 
 function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
@@ -374,6 +318,53 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
     }
 }
 
+function closePickupToast() {
+    document.getElementById('triggerPickupToastClose').click();
+}
+
+function closeFeedbackForm() {
+    document.getElementById('triggerFeedbackFormClose').click();
+    setTimeout(function () {
+        location.reload();
+    }, 400);
+}
+
+// SHIPPING FUNCTIONS
+
+function bagReceivedAction(checkbox, itemId, soldDate, shippingMethod) {
+    if (featureIsEnabled('C2C')) {
+        // ### C2C CODE ###
+        if (checkbox.checked) {
+            db.collection('items').doc(itemId).update({ bagReceived: true }).then((docRef) => {
+                console.log(`Stored in DB that bag is received for item with ID: `, itemId);
+            });
+            if (shippingMethod === 'Pickup') {
+                openPickupToast(itemId, soldDate, 'flex');
+            } else if (shippingMethod === 'Service point') {
+                //TODO: openServicePointToast();
+            } else {
+                openShippingToast(itemId, soldDate);
+            }
+        } else {
+            db.collection('items').doc(itemId).update({ bagReceived: false }).then((docRef) => {
+                console.log(`Stored in DB that bag is NOT received for item with ID: `, itemId);
+            });
+        }
+    } else {
+        // ### LIVE CODE ###
+        if (checkbox.checked == true) {
+            db.collection('items').doc(itemId).update({ bagReceived: true }).then((docRef) => {
+                console.log(`Stored in DB that bag is received for item with ID: `, itemId);
+            });
+            openShippingToast(itemId, soldDate);
+        } else {
+            db.collection('items').doc(itemId).update({ bagReceived: false }).then((docRef) => {
+                console.log(`Stored in DB that bag is NOT received for item with ID: `, itemId);
+            });
+        }
+    }
+}
+
 async function storeShippingMethod(itemId, method) {
     console.log(`storeShippingMethod(${itemId}, ${method}) is running`);
     await db.collection('items').doc(itemId).update({ shippingMethod: method }).then((docRef) => {
@@ -392,11 +383,28 @@ av ditt plagg?`;
     });
 }
 
+function openShippingToast(itemId, soldDate) {
+    console.log("openShippingToast");
+    window.pickupFlowItemId = itemId;
+    servicePointButton.href = `javascript:storeShippingMethod('${itemId}', 'Service point')`;
+    bookPickupButton.href = `javascript:openPickupToast('${itemId}', '${soldDate}')`;
+    triggerShippingToastOpen.click();
+}
+
+function openServicePointToast(itemId) {
+    console.log("openServicePointToast");
+    window.pickupFlowItemId = itemId;
+    changeToPickupButton.href = `javascript:storeShippingMethod('${itemId}', 'Pickup')`;
+    //bookPickupButton.href = `javascript:openPickupToast('${itemId}', '${soldDate}')`;
+    triggerServicePointToastOpen.click();
+}
+
 function openPickupToast(itemId, soldDate, servicePointButtonDisplay = 'none') {
     if (featureIsEnabled('C2C')) {
         // ### C2C CODE ###
         console.log(`openPickupToast(${itemId}, ${soldDate}) is running`);
         triggerShippingToastClose.click();
+        triggerServicePointToastClose.click();
         changeToServicePointButton.href = `javascript:storeShippingMethod('${itemId}', 'Service point')`;
         changeToServicePointButton.style.display = servicePointButtonDisplay;
         setDatesOfPickupToast(soldDate);
@@ -525,23 +533,46 @@ function setDatesOfPickupToast(soldDate) {
 }
 
 async function bookPickup() {
-    let pickupDate = "";
-    var pickupRadioButtons = document.getElementsByName("Pickup");
-    for (var x = 0; x < pickupRadioButtons.length; x++) {
-        if (pickupRadioButtons[x].checked) {
-            pickupDate = pickupRadioButtons[x].value; // yyyy--mm-dd
+    if (featureIsEnabled('C2C')) {
+        // ### C2C CODE ###
+        let pickupDate = "";
+        var pickupRadioButtons = document.getElementsByName("Pickup");
+        for (var x = 0; x < pickupRadioButtons.length; x++) {
+            if (pickupRadioButtons[x].checked) {
+                pickupDate = pickupRadioButtons[x].value; // yyyy--mm-dd
+            }
         }
-    }
 
-    const itemRef = db.collection('items').doc(pickupFlowItemId);
-    const res = await itemRef.update({
-        pickupDate: pickupDate
-    }).then(function () {
-        console.log(`pickupDate is now set on Firestore item`);
-        storeShippingMethod(pickupFlowItemId, 'Pickup');
-        happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
-    av ditt plagg?`;
-    });
+        db.collection('items').doc(pickupFlowItemId).update({ 
+            pickupDate,
+            shippingMethod: 'Pickup'
+        }).then((docRef) => {
+            console.log(`pickupDate '${pickupDate}' and shippingMethod 'Pickup' is now updated on Firestore item`);
+            happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
+av ditt plagg?`;
+            closePickupToast();
+            document.getElementById('triggerFeedbackFormOpen').click();
+        });
+    } else {
+        // ### LIVE CODE ###
+        let pickupDate = "";
+        var pickupRadioButtons = document.getElementsByName("Pickup");
+        for (var x = 0; x < pickupRadioButtons.length; x++) {
+            if (pickupRadioButtons[x].checked) {
+                pickupDate = pickupRadioButtons[x].value; // yyyy--mm-dd
+            }
+        }
+
+        const itemRef = db.collection('items').doc(pickupFlowItemId);
+        const res = await itemRef.update({
+            pickupDate: pickupDate
+        }).then(function () {
+            console.log(`pickupDate is now set on Firestore item`);
+            storeShippingMethod(pickupFlowItemId, 'Pickup');
+            happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
+av ditt plagg?`;
+        });
+    }
 }
 
 async function setHappinessRate(value) {
