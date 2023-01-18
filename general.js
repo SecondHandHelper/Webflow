@@ -404,7 +404,7 @@ function openPickupToast(itemId, soldDate, servicePointButtonDisplay = 'none') {
         // ### C2C CODE ###
         console.log(`openPickupToast(${itemId}, ${soldDate}) is running`);
         triggerShippingToastClose.click();
-        triggerServicePointToastClose.click();
+        //triggerServicePointToastClose.click();
         changeToServicePointButton.href = `javascript:storeShippingMethod('${itemId}', 'Service point')`;
         changeToServicePointButton.style.display = servicePointButtonDisplay;
         setDatesOfPickupToast(soldDate);
