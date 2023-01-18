@@ -255,15 +255,30 @@ function closeFeedbackForm() {
 // SHIPPING FUNCTIONS
 
 function bagReceivedAction(checkbox, itemId, soldDate) {
-    if (checkbox.checked == true) {
-        db.collection('items').doc(itemId).update({ bagReceived: true }).then((docRef) => {
-            console.log(`Stored in DB that bag is received for item with ID: `, itemId);
-        });
-        openShippingToast(itemId, soldDate);
+    if (featureIsEnabled('C2C')) {
+        // ### C2C CODE ###
+        if (checkbox.checked == true) {
+            db.collection('items').doc(itemId).update({ bagReceived: true }).then((docRef) => {
+                console.log(`Stored in DB that bag is received for item with ID: `, itemId);
+            });
+            openPickupToast(itemId, soldDate, 'flex');
+        } else {
+            db.collection('items').doc(itemId).update({ bagReceived: false }).then((docRef) => {
+                console.log(`Stored in DB that bag is NOT received for item with ID: `, itemId);
+            });
+        }
     } else {
-        db.collection('items').doc(itemId).update({ bagReceived: false }).then((docRef) => {
-            console.log(`Stored in DB that bag is NOT received for item with ID: `, itemId);
-        });
+        // ### LIVE CODE ###
+        if (checkbox.checked == true) {
+            db.collection('items').doc(itemId).update({ bagReceived: true }).then((docRef) => {
+                console.log(`Stored in DB that bag is received for item with ID: `, itemId);
+            });
+            openShippingToast(itemId, soldDate);
+        } else {
+            db.collection('items').doc(itemId).update({ bagReceived: false }).then((docRef) => {
+                console.log(`Stored in DB that bag is NOT received for item with ID: `, itemId);
+            });
+        }
     }
 }
 
@@ -371,13 +386,13 @@ av ditt plagg?`;
     });
 }
 
-function openPickupToast(itemId, soldDate) {
+function openPickupToast(itemId, soldDate, servicePointButtonDisplay = 'none') {
     if (featureIsEnabled('C2C')) {
         // ### C2C CODE ###
         console.log(`openPickupToast(${itemId}, ${soldDate}) is running`);
         triggerShippingToastClose.click();
         changeToServicePointButton.href = `javascript:storeShippingMethod('${itemId}', 'Service point')`;
-        changeToServicePointButton.style.display = 'flex';
+        changeToServicePointButton.style.display = servicePointButtonDisplay;
         setDatesOfPickupToast(soldDate);
         window.pickupFlowItemId = itemId;
         triggerPickupAnimation.click();
