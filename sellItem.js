@@ -183,12 +183,9 @@ async function updateItem(itemId, changedImages) {
         const imageDownloadUrl = await fileRef.getDownloadURL();
         let k = "images." + key;
         changes[k] = imageDownloadUrl;
-        if (key == "frontImage") {
-          console.log("CHANGES SET!!!!!!");
-          changes["images.frontImageSmall"] = "";
-          changes["images.frontImageMedium"] = "";
-          changes["images.frontImageLarge"] = "";
-        }
+        changes[`images.${key}Small`] = "";
+        changes[`images.${key}Medium`] = "";
+        changes[`images.${key}Large`] = "";
         if (elements.length == images.size) {
           updateItemDoc(itemId, changes);
         }
