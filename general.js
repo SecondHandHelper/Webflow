@@ -341,7 +341,7 @@ function bagReceivedAction(checkbox, itemId, soldDate, shippingMethod) {
             if (shippingMethod === 'Pickup') {
                 openPickupToast(itemId, soldDate, 'flex');
             } else if (shippingMethod === 'Service point') {
-                //TODO: openServicePointToast();
+                servicePointToast.style.display = 'block'; // TODO: Animate this
             } else {
                 openShippingToast(itemId, soldDate);
             }
@@ -391,11 +391,9 @@ function openShippingToast(itemId, soldDate) {
     triggerShippingToastOpen.click();
 }
 
-function openServicePointToast(itemId) {
+function openServicePointToast(itemId, soldDate) {
     console.log("openServicePointToast");
-    window.pickupFlowItemId = itemId;
-    changeToPickupButton.href = `javascript:storeShippingMethod('${itemId}', 'Pickup')`;
-    //bookPickupButton.href = `javascript:openPickupToast('${itemId}', '${soldDate}')`;
+    changeToPickupButton.href = `javascript:openPickupToast('${itemId}', '${soldDate}')`;
     triggerServicePointToastOpen.click();
 }
 
