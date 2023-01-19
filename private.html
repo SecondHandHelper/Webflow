@@ -131,6 +131,12 @@
         closeMeasurementsToastButton.addEventListener("click", function () { triggerMeasurementsToastClose.click(); });
         closeNewPriceToastButton.addEventListener("click", function () { triggerNewPriceToastClose.click(); });
         closeInviteToastButton.addEventListener("click", function () { triggerInviteToastClose.click(); });
+        closeServicePointToastButton.addEventListener("click", function () { triggerServicePointToastClose.click(); });
+        confirmServicePointButton.addEventListener("click", function () {
+            feedbackFormTitle.innerHTML = 'Tack, då vet vi att paketet snart lämnas till ett ombud.';
+            triggerServicePointToastClose.click();
+            triggerFeedbackFormOpen.click();
+        });
         closeLongerPeriodToastButton.addEventListener("click", function () { triggerLongerPeriodToastClose.click(); });
         shareCodeButton.addEventListener('click', shareCode);
         sharePersonalLinkButton.addEventListener('click', shareCode);

@@ -376,9 +376,6 @@ async function storeShippingMethod(itemId, method) {
         } else if (method == "Pickup") {
             closePickupToast();
         }
-        happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
-av ditt plagg?`;
-
         document.getElementById('triggerFeedbackFormOpen').click();
     });
 }
@@ -546,8 +543,6 @@ async function bookPickup() {
             shippingMethod: 'Pickup'
         }).then((docRef) => {
             console.log(`pickupDate '${pickupDate}' and shippingMethod 'Pickup' is now updated on Firestore item`);
-            happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
-av ditt plagg?`;
             closePickupToast();
             document.getElementById('triggerFeedbackFormOpen').click();
         });
@@ -567,8 +562,6 @@ av ditt plagg?`;
         }).then(function () {
             console.log(`pickupDate is now set on Firestore item`);
             storeShippingMethod(pickupFlowItemId, 'Pickup');
-            happinessQuestionText.innerText = `Hur nöjd är du med försäljningen 
-av ditt plagg?`;
         });
     }
 }
