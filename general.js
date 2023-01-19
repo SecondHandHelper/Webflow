@@ -341,7 +341,7 @@ function bagReceivedAction(checkbox, itemId, soldDate, shippingMethod) {
             if (shippingMethod === 'Pickup') {
                 openPickupToast(itemId, soldDate, 'flex');
             } else if (shippingMethod === 'Service point') {
-                servicePointToast.style.display = 'block'; // TODO: Animate this
+                openServicePointToast(itemId, soldDate);
             } else {
                 openShippingToast(itemId, soldDate);
             }
@@ -399,7 +399,7 @@ function openPickupToast(itemId, soldDate, servicePointButtonDisplay = 'none') {
         // ### C2C CODE ###
         console.log(`openPickupToast(${itemId}, ${soldDate}) is running`);
         triggerShippingToastClose.click();
-        //triggerServicePointToastClose.click();
+        triggerServicePointToastClose.click();
         changeToServicePointButton.href = `javascript:storeShippingMethod('${itemId}', 'Service point')`;
         changeToServicePointButton.style.display = servicePointButtonDisplay;
         setDatesOfPickupToast(soldDate);
