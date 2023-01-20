@@ -20,11 +20,13 @@
                     const soldPlatform = data.soldPlatform;
 
                     pageTitleText.innerHTML = `Skicka ${brand.trim()}-${category.trim().toLowerCase()}`;
-                    buyerAddressDiv.innerHTML = `${fn.trim()} ${ln.trim()}<br>${street.trim()}<br>${postalCode.trim()} ${city.trim()}`;
+                    //buyerAddressDiv.innerHTML = `${fn.trim()} ${ln.trim()}<br>${street.trim()}<br>${postalCode.trim()} ${city.trim()}`; // Show full address
+                    buyerAddressDiv.innerHTML = `${fn.trim()} ${ln.trim()}<br>i ${city.trim()}`; // Only show name and city
                     itemImageDiv.style.backgroundImage = `url('${imgUrl}')`;
 
                     if (shippingMethod === 'Service point') {
                         if (!(soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') && postnordQrCode) {
+                            qrCodeImage.src = postnordQrCode;
                             qrCodeDiv.style.display = "block";
                             howToShipQrDiv.style.display = "block";
                         } else {

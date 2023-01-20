@@ -373,9 +373,8 @@ async function storeShippingMethod(itemId, method) {
         if (method == "Service point") {
             document.getElementById('feedbackFormTitle').innerHTML = 'Tack, då vet vi att paketet snart lämnas till ett ombud.';
             document.getElementById('triggerShippingToastClose').click();
-        } else if (method == "Pickup") {
-            closePickupToast();
         }
+        closePickupToast();
         document.getElementById('triggerFeedbackFormOpen').click();
     });
 }

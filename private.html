@@ -133,7 +133,7 @@
         closeInviteToastButton.addEventListener("click", function () { triggerInviteToastClose.click(); });
         closeServicePointToastButton.addEventListener("click", function () { triggerServicePointToastClose.click(); });
         confirmServicePointButton.addEventListener("click", function () {
-            feedbackFormTitle.innerHTML = 'Tack, då vet vi att paketet snart lämnas till ett ombud.';
+            document.getElementById('feedbackFormTitle').innerHTML = '';
             triggerServicePointToastClose.click();
             triggerFeedbackFormOpen.click();
         });
