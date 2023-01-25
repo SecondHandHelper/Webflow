@@ -25,7 +25,7 @@ async function showReferralSection() {
         // Get inviters first name
         const inviter = user?.referralData?.referredBy;
 
-        const inviterName = await functions.httpsCallable('referrerName')({inviter});
+        const inviterName = await firebase.app().functions("europe-west3").httpsCallable('referrerName')({referrerId: inviter});
         if (inviterName && inviterName.name) {
           document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + inviterName.name;
         }
@@ -45,7 +45,7 @@ async function showReferralSection() {
 
 async function createReferralCode() {
     if (!user?.referralData?.referralCode) {
-      const referralCode = await functions.httpsCallable('setUserReferralCode');
+      const referralCode = await firebase.app().functions("europe-west3").httpsCallable('setUserReferralCode')();
       console.log("New referral code stored: ", referralCode?.referralCode);
       user.referralData.referralCode = referralCode?.referralCode;
       await showReferralSection();
@@ -56,7 +56,7 @@ async function connectReferralUsers(inputCode) {
     // Find user with matching referral code and connect users
   try {
     inputCode = inputCode.trim().toUpperCase();
-    const referrerUser = await functions.httpsCallable('connectReferralUser')({code: inputCode})
+    const referrerUser = await firebase.app().functions("europe-west3").httpsCallable('connectReferralUser')({code: inputCode})
     document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + referrerUser.name;
     referredByBonusState.style.display = 'block';
     enterCodeState.style.display = 'none';
