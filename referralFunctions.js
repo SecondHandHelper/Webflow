@@ -24,12 +24,11 @@ async function showReferralSection() {
     } else if (user?.referralData?.referredBy && !user?.referralData?.referredByBonusPaid) {
         // Get inviters first name
         const inviter = user?.referralData?.referredBy;
-        await db.collection("users").doc(inviter).get().then((doc) => {
-            if (doc.exists) {
-                const name = doc.data().addressFirstName;
-                document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + name;
-            }
-        });
+
+        const inviterName = await functions.httpsCallable('referrerName')({inviter});
+        if (inviterName && inviterName.name) {
+          document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + inviterName.name;
+        }
         referredByBonusState.style.display = 'block';
     } else if ((user?.referralData?.referredBy ? false : true) && daysDiff < 100) {
         enterCodeState.style.display = 'block';
@@ -44,87 +43,25 @@ async function showReferralSection() {
     referralSection.style.display = 'block';
 }
 
-function createReferralCode() {
-    const fn = user.addressFirstName.replace(/\s/g, ''); // Remove whitespace
-    const ln = user.addressLastName.replace(/\s/g, '');
-    let letterCombo = fn.trim() + ln.charAt(0);
-    letterCombo = letterCombo.toUpperCase();
-    let newCode = letterCombo;
-
-    // Check if letterCombo exists and increase number
+async function createReferralCode() {
     if (!user?.referralData?.referralCode) {
-        db.collection("users")
-            .where("referralData.referralCode", "!=", "")
-            .get()
-            .then((querySnapshot) => {
-                let letterComboExists = false;
-                let highestNumber = 0;
-                console.log("Users with referral code: ", querySnapshot.size);
-                querySnapshot.forEach((doc) => {
-                    const refCode = doc.data().referralData.referralCode.match(/[a-zA-Z]+|[0-9]+/g); //Split letters and numbers. TOBIASR1 -> ["TOBIASR", "1"]
-                    if (refCode[0] == letterCombo) {
-                        letterComboExists = true;
-                        let n = Number(refCode[1]);
-                        if (n > highestNumber) {
-                            highestNumber = n;
-                        }
-                    }
-                });
-
-                // Put together new code
-                if (letterComboExists) {
-                    const number = highestNumber + 1;
-                    newCode = letterCombo + number.toString();
-                }
-
-                // Store referral code
-                db.collection('users').doc(authUser.uid).update({
-                    "referralData.referralCode": newCode
-                }).then(function () {
-                    console.log("New referral code stored: ", newCode);
-                    user.referralData.referralCode = newCode;
-                    showReferralSection();
-                });
-            });
+      const referralCode = await functions.httpsCallable('setUserReferralCode');
+      console.log("New referral code stored: ", referralCode?.referralCode);
+      user.referralData.referralCode = referralCode?.referralCode;
+      await showReferralSection();
     }
 }
 
-function connectReferralUsers(inputCode) {
+async function connectReferralUsers(inputCode) {
     // Find user with matching referral code and connect users
-    
+  try {
     inputCode = inputCode.trim().toUpperCase();
-    db.collection("users")
-        .where("referralData.referralCode", "!=", "")
-        .get()
-        .then((querySnapshot) => {
-            let inviterUserId;
-            let inviterName;
-            let inviterCode;
-            for (var i in querySnapshot.docs) {
-                const doc = querySnapshot.docs[i];
-                const refCode = doc.data().referralData.referralCode.toUpperCase();
-                if (refCode == inputCode) {
-                    inviterUserId = doc.id;
-                    inviterName = doc.data().addressFirstName;
-                    inviterCode = refCode;
-                    break;
-                }
-            }
-
-            // CONNECT USERS
-            if (inviterUserId && !user?.referralData?.referredBy) {
-                // Add referredBy
-                db.collection('users').doc(authUser.uid).update({
-                    "referralData.referredBy": inviterUserId
-                }).then(() => {
-                    // Update referredUsers of the inviter
-                    db.collection('users').doc(inviterUserId).update({ "referralData.referredUsers": firebase.firestore.FieldValue.arrayUnion(authUser.uid) }).then(() => {
-                        document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + inviterName;
-                        referredByBonusState.style.display = 'block';
-                        enterCodeState.style.display = 'none';
-                        console.log("Referral connection successfully stored");
-                    });
-                });
-            }
-        });
+    const referrerUser = await functions.httpsCallable('connectReferralUser')({code: inputCode})
+    document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + referrerUser.name;
+    referredByBonusState.style.display = 'block';
+    enterCodeState.style.display = 'none';
+    console.log("Referral connection successfully stored");
+  } catch(e) {
+    console.log("Failed to use referral code", e);
+  }
 }
