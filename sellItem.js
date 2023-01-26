@@ -96,22 +96,44 @@ async function getShippingMethod() {
 }
 
 async function addItemInner(id) {
-  console.log("addItemInner called");
+  if (featureIsEnabled('C2C')) {
+    // ### C2C CODE ###
+    console.log("addItemInner called");
 
-  const pageData = collect();
-  const shippingMethod = await getShippingMethod();
-  const images = await uploadImages(id);
-  const item = { ...pageData, shippingMethod, images, version: "2" };
+    const pageData = collect();
+    const shippingMethod = await getShippingMethod();
+    const images = await uploadImages(id);
+    const item = { ...pageData, shippingMethod, images, version: "2" };
 
-  console.log('Storing item: ', item);
+    console.log('Storing item: ', item);
 
-  await db.collection('items').doc(id).set(item);
+    await db.collection('items').doc(id).set(item);
 
-  // If first time: User submitted their phone number
-  const phoneNumber = itemPhoneNumber.value;
-  if (phoneNumber) {
-    await writePhoneNumberToFirestore(authUser.uid, phoneNumber);
+    // If first time: User submitted their phone number
+    const phoneNumber = itemPhoneNumber.value;
+    if (phoneNumber) {
+      await writePhoneNumberToFirestore(authUser.uid, phoneNumber);
+    }
+  } else {
+    // ### LIVE CODE ###
+    console.log("addItemInner called");
+
+    const pageData = collect();
+    const images = await uploadImages(id);
+    const item = { ...pageData, images, version: "2" };
+
+    console.log('Storing item: ', item);
+
+    await db.collection('items').doc(id).set(item);
+
+    // TODO: Should this be here?
+    const phoneNumber = itemPhoneNumber.value;
+    if (phoneNumber) {
+      await writePhoneNumberToFirestore(authUser.uid, phoneNumber);
+    }
   }
+
+
 }
 
 async function uploadImages(itemId) {
