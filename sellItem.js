@@ -83,10 +83,24 @@ async function addItemInner(id) {
 
   await db.collection('items').doc(id).set(item);
 
-  // TODO: Should this be here?
+  // If first time: User submitted their phone number
   const phoneNumber = itemPhoneNumber.value;
   if (phoneNumber) {
     await writePhoneNumberToFirestore(authUser.uid, phoneNumber);
+  }
+
+  // If first time: User choses shipping method preference in sell item form
+  if (!user?.preferences?.shippingStatus) {
+    var radioButtons = document.getElementsByName("shippingMethod");
+    for (var x = 0; x < radioButtons.length; x++) {
+      if (radioButtons[x].checked) {
+        const method = radioButtons[x].value; // "Service point" or "Pickup"
+        if (method) {
+          await db.collection('users').doc(authUser.uid).update({ "preferences.shippingMethod": method });
+          console.log(`Shipping method '${method}' stored as preferences on user with ID: ${authUser.uid}`);
+        }
+      }
+    }
   }
 }
 

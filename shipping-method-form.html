@@ -1,0 +1,20 @@
+<script>
+    async function addShippingMethodPreference() {
+        saveShippingMethodButton.style.display = 'none';
+        loadingButtonDiv.style.display = 'flex';
+        let method = "Service point";
+        var radioButtons = document.getElementsByName("shippingMethod");
+        for (var x = 0; x < radioButtons.length; x++) {
+            if (radioButtons[x].checked) {
+                method = radioButtons[x].value; // "Service point" or "Pickup"
+            } 
+        }
+
+        await db.collection('users').doc(authUser.uid).update({ "preferences.shippingMethod": method }).then((docRef) => {
+            console.log(`Shipping method '${method}' stored as preference on user with ID: `, authUser.uid);
+            triggerShippingMethodConfirmationView.click();
+        });
+    }
+
+    saveShippingMethodButton.addEventListener("click", addShippingMethodPreference);
+</script>
