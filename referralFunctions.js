@@ -57,10 +57,14 @@ async function connectReferralUsers(inputCode) {
   try {
     inputCode = inputCode.trim().toUpperCase();
     const referrerUser = await firebase.app().functions("europe-west3").httpsCallable('connectReferralUser')({code: inputCode})
-    document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + referrerUser?.data?.name;
-    referredByBonusState.style.display = 'block';
-    enterCodeState.style.display = 'none';
-    console.log("Referral connection successfully stored");
+    if (referrerUser?.data?.name) {
+      document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + referrerUser?.data?.name;
+      referredByBonusState.style.display = 'block';
+      enterCodeState.style.display = 'none';
+      console.log("Referral connection successfully stored");
+    } else {
+      console.log("Failed to use referral code", referrerUser?.data);
+    }
   } catch(e) {
     console.log("Failed to use referral code", e);
   }
