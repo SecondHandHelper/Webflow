@@ -26,8 +26,8 @@ async function showReferralSection() {
         const inviter = user?.referralData?.referredBy;
 
         const inviterName = await firebase.app().functions("europe-west3").httpsCallable('referrerName')({referrerId: inviter});
-        if (inviterName && inviterName.name) {
-          document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + inviterName.name;
+        if (inviterName?.data?.name) {
+          document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + inviterName.data.name;
         }
         referredByBonusState.style.display = 'block';
     } else if ((user?.referralData?.referredBy ? false : true) && daysDiff < 100) {
@@ -46,8 +46,8 @@ async function showReferralSection() {
 async function createReferralCode() {
     if (!user?.referralData?.referralCode) {
       const referralCode = await firebase.app().functions("europe-west3").httpsCallable('setUserReferralCode')();
-      console.log("New referral code stored: ", referralCode?.referralCode);
-      user.referralData.referralCode = referralCode?.referralCode;
+      console.log("New referral code stored: ", referralCode?.data?.referralCode);
+      user.referralData.referralCode = referralCode?.data?.referralCode;
       await showReferralSection();
     }
 }
@@ -57,7 +57,7 @@ async function connectReferralUsers(inputCode) {
   try {
     inputCode = inputCode.trim().toUpperCase();
     const referrerUser = await firebase.app().functions("europe-west3").httpsCallable('connectReferralUser')({code: inputCode})
-    document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + referrerUser.name;
+    document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + referrerUser?.data?.name;
     referredByBonusState.style.display = 'block';
     enterCodeState.style.display = 'none';
     console.log("Referral connection successfully stored");
