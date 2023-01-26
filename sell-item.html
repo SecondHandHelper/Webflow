@@ -136,17 +136,12 @@
 
             // Om användare inte har shipping method preference, be om det i formuläret
             console.log("shipping method preference: ", user?.preferences?.shippingMethod);
-            console.log("user.preferences.shippingMethod", (user.preferences.shippingMethod), "!user.preferences.shippingMethod", (!user.preferences.shippingMethod));
-            if (!user.preferences.shippingMethod) {
+            console.log("user?.preferences?.shippingMethod", (user?.preferences?.shippingMethod), "(!user?.preferences?.shippingMethod)", (!user?.preferences?.shippingMethod));
+            if (!user?.preferences?.shippingMethod) {
                 $('#servicePointRadioButton').val("Service point");
                 $('#pickupRadioButton').val("Pickup");
-                shippingMethodDiv.style.display = "block";
-                
+                shippingMethodDiv.style.display = "block";   
             }
-            console.log("value of servicePointRadioButton: ", servicePointRadioButton.value);
-            console.log("type of servicePointRadioButton.value: ", typeof servicePointRadioButton.value);
-            console.log("!servicePointRadioButton.value", (!servicePointRadioButton.value));
-            console.log("(servicePointRadioButton.value)", (servicePointRadioButton.value));
         }
     }
 

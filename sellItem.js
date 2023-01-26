@@ -72,12 +72,36 @@ function collect() {
   };
 }
 
+async function getShippingMethod() {
+  // If first time: User choses shipping method preference in sell item form
+  let shippingMethod = 'Service point';
+  if (!user?.preferences?.shippingMethod) {
+    var radioButtons = document.getElementsByName("shippingMethod");
+    for (var x = 0; x < radioButtons.length; x++) {
+      if (radioButtons[x].checked) {
+        const method = radioButtons[x].value; // "Service point" or "Pickup"
+        if (method) {
+          shippingMethod = method;
+          await db.collection('users').doc(authUser.uid).update({ "preferences.shippingMethod": method });
+          console.log(`Shipping method '${method}' stored as preference on user with ID: ${authUser.uid}`);
+        }
+      }
+    }
+  } else {
+    shippingMethod = user?.preferences?.shippingMethod;
+    console.log(`Shipping method preference from user is '${shippingMethod}' and is now set on item`);
+  }
+
+  return shippingMethod;
+}
+
 async function addItemInner(id) {
   console.log("addItemInner called");
 
   const pageData = collect();
+  const shippingMethod = await getShippingMethod();
   const images = await uploadImages(id);
-  const item = { ...pageData, images, version: "2" };
+  const item = { ...pageData, shippingMethod, images, version: "2" };
 
   console.log('Storing item: ', item);
 
@@ -87,20 +111,6 @@ async function addItemInner(id) {
   const phoneNumber = itemPhoneNumber.value;
   if (phoneNumber) {
     await writePhoneNumberToFirestore(authUser.uid, phoneNumber);
-  }
-
-  // If first time: User choses shipping method preference in sell item form
-  if (!user?.preferences?.shippingStatus) {
-    var radioButtons = document.getElementsByName("shippingMethod");
-    for (var x = 0; x < radioButtons.length; x++) {
-      if (radioButtons[x].checked) {
-        const method = radioButtons[x].value; // "Service point" or "Pickup"
-        if (method) {
-          await db.collection('users').doc(authUser.uid).update({ "preferences.shippingMethod": method });
-          console.log(`Shipping method '${method}' stored as preferences on user with ID: ${authUser.uid}`);
-        }
-      }
-    }
   }
 }
 
