@@ -16,7 +16,7 @@ async function showReferralSection() {
     if (user?.referralData?.referralCode && soldItemExist) {
         document.getElementById("myReferralCodeText").innerHTML = user.referralData.referralCode;
         if (user?.referralData?.activatedReferredUsersCount > 0) {
-            console.log("shareCodeState 'block', but should also show the bonus received... TODO");
+            // shareCodeState 'block', but should also show the bonus received... TODO"
             shareCodeState.style.display = 'block';
         } else {
             shareCodeState.style.display = 'block';

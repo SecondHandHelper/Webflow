@@ -136,7 +136,6 @@
 
             // Om användare inte har shipping method preference, be om det i formuläret
             console.log("shipping method preference: ", user?.preferences?.shippingMethod);
-            console.log("user?.preferences?.shippingMethod", (user?.preferences?.shippingMethod), "(!user?.preferences?.shippingMethod)", (!user?.preferences?.shippingMethod));
             if (!user?.preferences?.shippingMethod) {
                 $('#servicePointRadioButton').val("Service point");
                 $('#pickupRadioButton').val("Pickup");
