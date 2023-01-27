@@ -46,13 +46,6 @@ async function loadItemCards(items) {
         daysLeftText = `${daysLeft} dagar kvar`;
       }
     }
-
-    if (featureIsEnabled('C2C')) {
-      // ### C2C CODE ###
-      // If a user has any item since before, they will set the shipping method preference through this page. If not, they will set it first time they add an item.
-      if (!user?.preferences?.shippingMethod) window.location.replace('./choose-shipping-method');
-    }
-
     if (archived == undefined && status != "Unsold") { displayItemCard(); }
 
     function displayItemCard() {
