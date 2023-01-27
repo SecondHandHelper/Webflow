@@ -10,7 +10,7 @@
                     const images = data.images;
                     let imgUrl = images.frontImageSmall || images.frontImage;
                     const category = data.category ? data.category : "";
-                    const postnordQrCode = data.postnordQrCode;
+                    const postnordQrCode = data.tmpPostnordQrCode || data.postnordQrCode;
                     const fn = data.buyerFirstName || '';
                     const ln = data.buyerLastName || '';
                     const street = data.buyerAddressStreetAddress || '';
@@ -20,13 +20,13 @@
                     const soldPlatform = data.soldPlatform;
 
                     pageTitleText.innerHTML = `Skicka ${brand.trim()}-${category.trim().toLowerCase()}`;
-                    //buyerAddressDiv.innerHTML = `${fn.trim()} ${ln.trim()}<br>${street.trim()}<br>${postalCode.trim()} ${city.trim()}`; // Show full address
-                    buyerAddressDiv.innerHTML = `${fn.trim()} ${ln.trim()}<br>i ${city.trim()}`; // Only show name and city
+                    buyerAddressDiv.innerHTML = `${fn.trim()} ${ln.trim()}<br>${street.trim()}<br>${postalCode.trim()} ${city.trim()}`; // Show full address
+                    //buyerAddressDiv.innerHTML = `${fn.trim()} ${ln.trim()}<br>${city.trim()}`; // Only show name and city
                     itemImageDiv.style.backgroundImage = `url('${imgUrl}')`;
 
                     if (shippingMethod === 'Service point') {
                         if (!(soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') && postnordQrCode) {
-                            qrCodeImage.src = postnordQrCode;
+                            qrCodeImage.style.backgroundImage = `url('${postnordQrCode}')`;
                             qrCodeDiv.style.display = "block";
                             howToShipQrDiv.style.display = "block";
                         } else {

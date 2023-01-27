@@ -81,8 +81,8 @@
     // Hide/Show warning about difficulty to sell certain brands
     let brand = document.getElementById("itemBrand");
     let hardToSellDiv = document.getElementById("hardToSellDiv");
-    let words = ["H&M", "HM", "Zara", "ASOS", "Nelly", "Gina Tricot", "BikBok", "Bik Bok" , "Lindex", "Kappahl", "Cubus", "NA-KD", "NAKD", "Mango", "Ellos", "Primark", "Shein", "Vila", "Forever 21", "Pull & Bear", "Bershka", "Stradivarius"];
-    
+    let words = ["H&M", "HM", "Zara", "ASOS", "Nelly", "Gina Tricot", "BikBok", "Bik Bok", "Lindex", "Kappahl", "Cubus", "NA-KD", "NAKD", "Mango", "Ellos", "Primark", "Shein", "Vila", "Forever 21", "Pull & Bear", "Bershka", "Stradivarius"];
+
 
     brand.onchange = function () {
         let value = this.value;
@@ -126,20 +126,33 @@
 
 <script>
     async function main() {
-        if (authUser) {
-            // Om användare inte har telefonnummer, be om telefonnummer i formuläret
-            console.log("phone: ", user.phoneNumber);
-            if (!user.phoneNumber) {
-                phoneNumberDiv.style.display = "block";
-                document.getElementById("itemPhoneNumber").required = true;
-            }
+        if (featureIsEnabled('C2C')) {
+            // ### C2C CODE ###
+            if (authUser) {
+                // Om användare inte har telefonnummer, be om telefonnummer i formuläret
+                console.log("phone: ", user.phoneNumber);
+                if (!user.phoneNumber) {
+                    phoneNumberDiv.style.display = "block";
+                    document.getElementById("itemPhoneNumber").required = true;
+                }
 
-            // Om användare inte har shipping method preference, be om det i formuläret
-            console.log("shipping method preference: ", user?.preferences?.shippingMethod);
-            if (!user?.preferences?.shippingMethod) {
-                $('#servicePointRadioButton').val("Service point");
-                $('#pickupRadioButton').val("Pickup");
-                shippingMethodDiv.style.display = "block";   
+                // Om användare inte har shipping method preference, be om det i formuläret
+                console.log("shipping method preference: ", user?.preferences?.shippingMethod);
+                if (!user?.preferences?.shippingMethod) {
+                    $('#servicePointRadioButton').val("Service point");
+                    $('#pickupRadioButton').val("Pickup");
+                    shippingMethodDiv.style.display = "block";
+                }
+            }
+        } else {
+            // ### LIVE CODE ###
+            if (authUser) {
+                // Om användare inte har telefonnummer, be om telefonnummer i formuläret
+                console.log("phone: ", user.phoneNumber);
+                if (!user.phoneNumber) {
+                    phoneNumberDiv.style.display = "block";
+                    document.getElementById("itemPhoneNumber").required = true;
+                }
             }
         }
     }
