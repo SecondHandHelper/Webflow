@@ -653,8 +653,8 @@ async function addUserDetails() {
     let addressCity = document.getElementById("addressCity").value;
     let addressDoorCode = document.getElementById("addressDoorCode").value;
 
-    addressFirstName = addressFirstName ? addressFirstName.charAt(0).toUpperCase() + addressFirstName.slice(1).toLowerCase().trim() : "";
-    addressLastName = addressLastName ? addressLastName.charAt(0).toUpperCase() + addressLastName.slice(1).toLowerCase().trim() : "";
+    addressFirstName = addressFirstName ? addressFirstName.charAt(0).toUpperCase().trim() + addressFirstName.slice(1).trim() : "";
+    addressLastName = addressLastName ? addressLastName.charAt(0).toUpperCase().trim() + addressLastName.slice(1).trim() : "";
     addressStreetAddress = addressStreetAddress ? addressStreetAddress.charAt(0).toUpperCase() + addressStreetAddress.slice(1).trim() : "";
     addressCO = addressCO ? addressCO.trim() : "";
     addressPostalCode = addressPostalCode ? addressPostalCode.trim() : "";
@@ -696,8 +696,8 @@ async function addUserAddress() {
     let addressCity = document.getElementById("addressCity").value;
     let addressDoorCode = document.getElementById("addressDoorCode").value;
 
-    addressFirstName = addressFirstName ? addressFirstName.charAt(0).toUpperCase() + addressFirstName.slice(1).toLowerCase().trim() : "";
-    addressLastName = addressLastName ? addressLastName.charAt(0).toUpperCase() + addressLastName.slice(1).toLowerCase().trim() : "";
+    addressFirstName = addressFirstName ? addressFirstName.charAt(0).toUpperCase().trim() + addressFirstName.slice(1).trim() : "";
+    addressLastName = addressLastName ? addressLastName.charAt(0).toUpperCase().trim() + addressLastName.slice(1).trim() : "";
     addressStreetAddress = addressStreetAddress ? addressStreetAddress.charAt(0).toUpperCase() + addressStreetAddress.slice(1).trim() : "";
     addressCO = addressCO ? addressCO.trim() : "";
     addressPostalCode = addressPostalCode ? addressPostalCode.trim() : "";
