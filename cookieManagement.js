@@ -36,3 +36,11 @@ function checkCookie(cname) {
     }
     return "";
 }
+
+const preferredLoginMethodCookieName = 'preferredLoginMethod';
+
+const getPreferredLogInMethod = () => getCookie(preferredLoginMethodCookieName);
+
+function setPreferredLogInMethodCookie(providerId) {
+    setCookie(preferredLoginMethodCookieName, providerId, 6000);
+}
