@@ -42,8 +42,5 @@ const preferredLoginMethodCookieName = 'preferredLoginMethod';
 const getPreferredLogInMethod = () => getCookie(preferredLoginMethodCookieName);
 
 function setPreferredLogInMethodCookie(providerId) {
-    const cookie = getCookie(preferredLoginMethodCookieName);
-    if (!cookie) {
-      setCookie(preferredLoginMethodCookieName, providerId, 6000);
-    }
+    setCookie(preferredLoginMethodCookieName, providerId, 6000);
 }
