@@ -645,13 +645,13 @@ function loadRecentlySold() {
 // FUNCTIONS FOR ADDING USER DETAILS
 
 function setFormAddressFields(user) {
-  document.getElementById("addressFirstName").value = user.addressFirstName;
-  document.getElementById("addressLastName").value = user.addressLastName;
-  document.getElementById("addressStreetAddress").value = user.addressStreetAddress;
-  document.getElementById("addressCO").value = user.addressCO;
-  document.getElementById("addressPostalCode").value = user.addressPostalCode;
-  document.getElementById("addressCity").value = user.addressCity;
-  document.getElementById("addressDoorCode").value = user.addressDoorCode;
+  document.getElementById("addressFirstName").value = user.addressFirstName || '';
+  document.getElementById("addressLastName").value = user.addressLastName || '';
+  document.getElementById("addressStreetAddress").value = user.addressStreetAddress || '';
+  document.getElementById("addressCO").value = user.addressCO || '';
+  document.getElementById("addressPostalCode").value = user.addressPostalCode || '';
+  document.getElementById("addressCity").value = user.addressCity || '';
+  document.getElementById("addressDoorCode").value = user.addressDoorCode || '';
 }
 function getFormAddressFields() {
   let addressFirstName = document.getElementById("addressFirstName").value;
