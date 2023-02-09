@@ -8,6 +8,7 @@
     #orderBagsSpinner {display: none}
     #closeOrderBagsSpinner {display: none}
     #orderBagsError { display: none }
+    #
   </style>
 </head>
 <body>
@@ -47,7 +48,7 @@
   }
 
   function updateOrderButton() {
-    document.getElementById('orderBags').style.color = numOrdered() === 0 ? '#7a7575' : '#000';
+    document.getElementById('orderBags').style['background-color'] = numOrdered() === 0 ? '#7a7575' : '#000';
     document.getElementById('orderBags').innerText = `Beställ ${numOrdered()} ${bagOrBags()} gratis`;
   }
 
@@ -65,6 +66,16 @@
       input.style.color = 'black';
     }
   }
+
+  function isEmpty(str) {
+    return str?.replace(/\s/g, '')?.length
+  }
+  async function isAdressSet() {
+    const doc = await db.collection("users").doc(authUser.uid).get();
+    const { addressFirstName, addressLastName, addressStreetAddress, addressPostalCode, addressCity } = doc.data();
+    return [ addressFirstName, addressLastName, addressStreetAddress, addressPostalCode, addressCity ].some(isEmpty);
+  }
+
   function addInputComponentEventListeners(minusElm, plusElm, inputElm) {
     document.getElementById(minusElm).addEventListener("click", function() {
       validateAndDecrease(document.getElementById(inputElm));
@@ -76,6 +87,17 @@
   addInputComponentEventListeners('minusSmall', 'plusSmall', 'numSmall');
   addInputComponentEventListeners('minusMedium', 'plusMedium', 'numMedium');
   addInputComponentEventListeners('minusLarge', 'plusLarge', 'numLarge');
+
+  document.getElementById('saveAddressButton').addEventListener(async () => {
+    document.getElementById('saveAddressButton').style.display = 'none';
+    document.getElementById('orderBagsSpinner').style.display = 'flex';
+    const addressFields = getFormAddressFields();
+    const userRef = db.collection('users').doc(authUser.uid);
+    await userRef.update(addressFields);
+    document.getElementById('orderBagsConfirmation').style.display = 'none';
+    document.getElementById('addressFormDiv').style.display = 'block';
+  });
+
   document.getElementById('orderBags').addEventListener('click', async function() {
     if (numOrdered() === 0) {
       return;
@@ -97,7 +119,13 @@
       return;
     }
     document.getElementById('orderBagsForm').style.display = 'none';
-    document.getElementById('orderBagsConfirmation').style.display = 'block';
+    if (await isAdressSet()) {
+      const userDoc = await db.collection('users').doc(authUser.uid).get().data();
+      document.getElementById('orderBagsConfirmation').style.display = 'block';
+      setFormAddressFields(userDoc);
+    } else {
+      document.getElementById('addressFormDiv').style.display = 'block';
+    }
   });
   document.getElementById('closeOrderBagsConfirmationButton').addEventListener("click", function () {
     document.getElementById('closeOrderBagsConfirmationButton').style.display = 'none';

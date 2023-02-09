@@ -643,23 +643,38 @@ function loadRecentlySold() {
 }
 
 // FUNCTIONS FOR ADDING USER DETAILS
+
+function setFormAddressFields(user) {
+  document.getElementById("addressFirstName").value = user.addressFirstName;
+  document.getElementById("addressLastName").value = user.addressLastName;
+  document.getElementById("addressStreetAddress").value = user.addressStreetAddress;
+  document.getElementById("addressCO").value = user.addressCO;
+  document.getElementById("addressPostalCode").value = user.addressPostalCode;
+  document.getElementById("addressCity").value = user.addressCity;
+  document.getElementById("addressDoorCode").value = user.addressDoorCode;
+}
+function getFormAddressFields() {
+  let addressFirstName = document.getElementById("addressFirstName").value;
+  let addressLastName = document.getElementById("addressLastName").value;
+  let addressStreetAddress = document.getElementById("addressStreetAddress").value;
+  let addressCO = document.getElementById("addressCO").value;
+  let addressPostalCode = document.getElementById("addressPostalCode").value;
+  let addressCity = document.getElementById("addressCity").value;
+  let addressDoorCode = document.getElementById("addressDoorCode").value;
+
+  addressFirstName = addressFirstName ? addressFirstName.charAt(0).toUpperCase() + addressFirstName.slice(1).toLowerCase().trim() : "";
+  addressLastName = addressLastName ? addressLastName.charAt(0).toUpperCase() + addressLastName.slice(1).toLowerCase().trim() : "";
+  addressStreetAddress = addressStreetAddress ? addressStreetAddress.charAt(0).toUpperCase() + addressStreetAddress.slice(1).trim() : "";
+  addressCO = addressCO ? addressCO.trim() : "";
+  addressPostalCode = addressPostalCode ? addressPostalCode.trim() : "";
+  addressCity = addressCity ? addressCity.charAt(0).toUpperCase() + addressCity.slice(1).toLowerCase().trim() : "";
+  addressDoorCode = addressDoorCode ? addressDoorCode.trim() : "";
+  return { addressFirstName, addressLastName, addressStreetAddress, addressCO, addressPostalCode, addressCity, addressDoorCode };
+}
+
 async function addUserDetails() {
     // Grab values from form
-    let addressFirstName = document.getElementById("addressFirstName").value;
-    let addressLastName = document.getElementById("addressLastName").value;
-    let addressStreetAddress = document.getElementById("addressStreetAddress").value;
-    let addressCO = document.getElementById("addressCO").value;
-    let addressPostalCode = document.getElementById("addressPostalCode").value;
-    let addressCity = document.getElementById("addressCity").value;
-    let addressDoorCode = document.getElementById("addressDoorCode").value;
-
-    addressFirstName = addressFirstName ? addressFirstName.charAt(0).toUpperCase() + addressFirstName.slice(1).toLowerCase().trim() : "";
-    addressLastName = addressLastName ? addressLastName.charAt(0).toUpperCase() + addressLastName.slice(1).toLowerCase().trim() : "";
-    addressStreetAddress = addressStreetAddress ? addressStreetAddress.charAt(0).toUpperCase() + addressStreetAddress.slice(1).trim() : "";
-    addressCO = addressCO ? addressCO.trim() : "";
-    addressPostalCode = addressPostalCode ? addressPostalCode.trim() : "";
-    addressCity = addressCity ? addressCity.charAt(0).toUpperCase() + addressCity.slice(1).toLowerCase().trim() : "";
-    addressDoorCode = addressDoorCode ? addressDoorCode.trim() : "";
+    const addressFields = getFormAddressFields();
 
     let personalId = document.getElementById("personalId").value;
     personalId = personalId ? await formatPersonalId(personalId) : null;
@@ -667,13 +682,7 @@ async function addUserDetails() {
     // Write to Firestore
     const itemRef = db.collection('users').doc(authUser.uid);
     itemRef.update({
-        addressFirstName,
-        addressLastName,
-        addressStreetAddress,
-        addressCO,
-        addressPostalCode,
-        addressCity,
-        addressDoorCode,
+        ...addressFields,
         personalId: personalId
     })
         .then(() => {
@@ -688,33 +697,11 @@ async function addUserDetails() {
 
 async function addUserAddress() {
     // Grab values from form
-    let addressFirstName = document.getElementById("addressFirstName").value;
-    let addressLastName = document.getElementById("addressLastName").value;
-    let addressStreetAddress = document.getElementById("addressStreetAddress").value;
-    let addressCO = document.getElementById("addressCO").value;
-    let addressPostalCode = document.getElementById("addressPostalCode").value;
-    let addressCity = document.getElementById("addressCity").value;
-    let addressDoorCode = document.getElementById("addressDoorCode").value;
-
-    addressFirstName = addressFirstName ? addressFirstName.charAt(0).toUpperCase() + addressFirstName.slice(1).toLowerCase().trim() : "";
-    addressLastName = addressLastName ? addressLastName.charAt(0).toUpperCase() + addressLastName.slice(1).toLowerCase().trim() : "";
-    addressStreetAddress = addressStreetAddress ? addressStreetAddress.charAt(0).toUpperCase() + addressStreetAddress.slice(1).trim() : "";
-    addressCO = addressCO ? addressCO.trim() : "";
-    addressPostalCode = addressPostalCode ? addressPostalCode.trim() : "";
-    addressCity = addressCity ? addressCity.charAt(0).toUpperCase() + addressCity.slice(1).toLowerCase().trim() : "";
-    addressDoorCode = addressDoorCode ? addressDoorCode.trim() : "";
+    const addressFields = getFormAddressFields();
 
     // Write to Firestore
     const itemRef = db.collection('users').doc(authUser.uid);
-    itemRef.update({
-        addressFirstName,
-        addressLastName,
-        addressStreetAddress,
-        addressCO,
-        addressPostalCode,
-        addressCity,
-        addressDoorCode
-    })
+    itemRef.update(addressFields)
         .then(() => {
             console.log(`User address of ${authUser.uid} is now updated`);
             window.location.href = window.location.origin + "/private";
