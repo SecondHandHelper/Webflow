@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Order bags</title>
+  <style>
+    #orderBagsButton {display: none}
+  </style>
+</head>
+<body>
+<script>
+  async function showOrderBagsButton() {
+    const maxBags = await firebase.app().functions("europe-west1").httpsCallable('maxNumBags')();
+    if (maxBags?.data?.maxOrderBags > 0) {
+      document.getElementById('orderBagsButton').style.display = 'block';
+    }
+  }
+  showOrderBagsButton();
+</script>
+</body>
+</html>
