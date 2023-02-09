@@ -47,6 +47,7 @@
   }
 
   function updateOrderButton() {
+    document.getElementById('orderBags').style.color = numOrdered() === 0 ? '#7a7575' : '#000';
     document.getElementById('orderBags').innerText = `Beställ ${numOrdered()} ${bagOrBags()} gratis`;
   }
 
@@ -103,4 +104,5 @@
     document.getElementById('closeOrderBagsSpinner').style.display = 'flex';
   });
 </script>
+</body>
 </html>
