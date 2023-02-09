@@ -662,12 +662,12 @@ function getFormAddressFields() {
   let addressCity = document.getElementById("addressCity").value;
   let addressDoorCode = document.getElementById("addressDoorCode").value;
 
-  addressFirstName = addressFirstName ? addressFirstName.trim().charAt(0).toUpperCase() + addressFirstName.slice(1).trim() : "";
-  addressLastName = addressLastName ? addressLastName.trim().charAt(0).toUpperCase() + addressLastName.slice(1).toLowerCase().trim() : "";
-  addressStreetAddress = addressStreetAddress ? addressStreetAddress.trim().charAt(0).toUpperCase() + addressStreetAddress.slice(1).trim() : "";
+  addressFirstName = addressFirstName ? addressFirstName.trim().charAt(0).toUpperCase() + addressFirstName.trim().slice(1) : "";
+  addressLastName = addressLastName ? addressLastName.trim().charAt(0).toUpperCase() + addressLastName.trim().slice(1).toLowerCase() : "";
+  addressStreetAddress = addressStreetAddress ? addressStreetAddress.trim().charAt(0).toUpperCase() + addressStreetAddress.trim().slice(1) : "";
   addressCO = addressCO ? addressCO.trim() : "";
   addressPostalCode = addressPostalCode ? addressPostalCode.trim().replace(/\D/g,'') : "";
-  addressCity = addressCity ? addressCity.trim().charAt(0).toUpperCase() + addressCity.slice(1).toLowerCase().trim() : "";
+  addressCity = addressCity ? addressCity.trim().charAt(0).toUpperCase() + addressCity.trim().slice(1).toLowerCase() : "";
   addressDoorCode = addressDoorCode ? addressDoorCode.trim() : "";
   return { addressFirstName, addressLastName, addressStreetAddress, addressCO, addressPostalCode, addressCity, addressDoorCode };
 }

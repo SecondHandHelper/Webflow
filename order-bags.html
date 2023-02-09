@@ -5,26 +5,22 @@
     if (maxBags?.data) {
       if (maxBags.data?.errorCode === 'unfulfilled-order') {
         document.getElementById('orderBagsError').style.display = 'block';
-        document.getElementById('orderBagsError').innerText = 'Du har redan en aktiv beställning som är på väg. Vänta tills den kommer fram innan du gör en ny beställning.';
-        validateAndDecrease(document.getElementById('numSmall'));
-        validateAndDecrease(document.getElementById('numMedium'));
-        validateAndDecrease(document.getElementById('numLarge'));
+        document.getElementById('orderBagsError').innerText = 'Du har nyligen lagt en beställning som är påväg till dig.\nVänta in påsarna innan du lägger fler beställningar.';
+        return 0;
       }
-      if (maxBags.data.maxOrderBags === 0) {
+      if (maxBags.data?.maxOrderBags === 0) {
         document.getElementById('orderBagsError').style.display = 'block';
-        document.getElementById('orderBagsError').innerText = 'Du har just nu inga varor till försäljning och kan därför inte beställa några påsar.';
-        validateAndDecrease(document.getElementById('numSmall'));
-        validateAndDecrease(document.getElementById('numMedium'));
-        validateAndDecrease(document.getElementById('numLarge'));
+        document.getElementById('orderBagsError').innerText = 'Du kan bara beställa påsar om\ndu har pågående försäljningar.';
+        return 0;
       }
       maxNumBags = Math.min(maxBags.data.maxOrderBags, maxNumBags);
+      return maxNumBags;
     }
   }
-  getMaxNumBags();
 
   function validateAndDecrease(input) {
     input.value = Math.max(+input.value - 1, 0);
-    input.style.color = +input.value === 0 ? '#9c9595' : '#000';
+    input.style.color = +input.value === 0 ? '#c3c2c2' : '#000';
     updateOrderButton();
   }
 
@@ -34,8 +30,8 @@
   }
 
   function updateOrderButton() {
-    document.getElementById('orderBags').style['background-color'] = numOrdered() === 0 ? '#7a7575' : '#000';
     document.getElementById('orderBags').innerText = `Beställ ${numOrdered()} ${bagOrBags()} gratis`;
+    document.getElementById('orderBagsError').style.display = 'none';
   }
 
   function bagOrBags() {
@@ -43,7 +39,7 @@
   }
 
   function validateAndIncrease(input) {
-    if (numOrdered() >= maxNumBags) {
+    if (numOrdered() >= 10) {
       return
     }
     input.value = Math.min(+input.value + 1, 10);
@@ -59,14 +55,14 @@
   async function isAdressSet() {
     const doc = await db.collection("users").doc(authUser.uid).get();
     const { addressFirstName, addressLastName, addressStreetAddress, addressPostalCode, addressCity } = doc.data();
-    return [ addressFirstName, addressLastName, addressStreetAddress, addressPostalCode, addressCity ].every(isSet);
+    return [addressFirstName, addressLastName, addressStreetAddress, addressPostalCode, addressCity].every(isSet);
   }
 
   function addInputComponentEventListeners(minusElm, plusElm, inputElm) {
-    document.getElementById(minusElm).addEventListener("click", function() {
+    document.getElementById(minusElm).addEventListener("click", function () {
       validateAndDecrease(document.getElementById(inputElm));
     });
-    document.getElementById(plusElm).addEventListener("click", function() {
+    document.getElementById(plusElm).addEventListener("click", function () {
       validateAndIncrease(document.getElementById(inputElm));
     })
   }
@@ -82,18 +78,39 @@
     document.getElementById('addressFormDiv').style.display = 'none';
   });
 
-  document.getElementById('orderBags').addEventListener('click', async function() {
+  document.getElementById('orderBags').addEventListener('click', async function () {
     if (numOrdered() === 0) {
+      document.getElementById('orderBagsError').style.display = 'block';
+      document.getElementById('orderBagsError').innerText = 'Välj minst 1 påse';
+      return;
+    }
+    if (numOrdered() > 10) {
+      document.getElementById('orderBagsError').style.display = 'block';
+      document.getElementById('orderBagsError').innerText = 'Max 10 påsar per beställning';
       return;
     }
     document.getElementById('orderBagsError').style.display = 'none';
     document.getElementById('orderBags').style.display = 'none';
     document.getElementById('orderBagsSpinner').style.display = 'flex';
+    //Tobias added 
+    const maxNumBags = await getMaxNumBags();
+    if (maxNumBags === 0) {
+      document.getElementById('orderBags').style.display = 'flex';
+      document.getElementById('orderBagsSpinner').style.display = 'none';
+      return;
+    }
+    if (numOrdered() > maxNumBags) {
+      document.getElementById('orderBagsError').style.display = 'block';
+      document.getElementById('orderBagsError').innerText = `Inte fler än antalet pågående försäljningar, dvs ${maxNumBags}`;
+      document.getElementById('orderBags').style.display = 'flex';
+      document.getElementById('orderBagsSpinner').style.display = 'none';
+      return;
+    }
     const numSmallBags = +document.getElementById('numSmall').value;
     const numMediumBags = +document.getElementById('numMedium').value;
     const numLargeBags = +document.getElementById('numLarge').value;
     try {
-      await firebase.app().functions("europe-west1").httpsCallable('orderSellerBags')({numLargeBags, numSmallBags, numMediumBags});
+      await firebase.app().functions("europe-west1").httpsCallable('orderSellerBags')({ numLargeBags, numSmallBags, numMediumBags });
       document.getElementById('bagsOrdered').innerText = `${numOrdered()} ${bagOrBags()} på väg!`;
     } catch (e) {
       document.getElementById('orderBagsError').style.display = 'block';
