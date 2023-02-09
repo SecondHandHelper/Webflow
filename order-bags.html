@@ -11,30 +11,6 @@
   </style>
 </head>
 <body>
-<div id="orderForm">
-  <div style="margin-bottom:10px;">
-    <span id="minusSmall" style="padding:10px 5px; cursor: pointer">-</span><input style="color: lightgray;" id="numSmall" value="0" width="40px"><span style="padding:10px 5px; cursor: pointer" id="plusSmall">+</span>
-  </div><div style="margin-bottom:10px;">
-    <span id="minusMedium" style="padding:10px 5px; cursor: pointer">-</span><input style="color: lightgray;" id="numMedium" value="0" width="40px"><span style="padding:10px 5px; cursor: pointer" id="plusMedium">+</span>
-  </div><div>
-    <span id="minusLarge" style="padding:10px 5px; cursor: pointer">-</span><input style="color: lightgray;" id="numLarge" value="0" width="40px"><span style="padding:10px 5px; cursor: pointer" id="plusLarge">+</span>
-  </div>
-  <div id="orderBagsError"></div>
-  <div style="margin-top: 20px">
-    <button type="button" id="orderBags" disabled><div id="orderBagsButtonText">Beställ 0 påsar gratis</div></button>
-  </div>
-  <div id="orderBagsSpinner">Loading ...</div>
-</div>
-<div id="orderBagsConfirmation">
-  <div style="margin-top: 20px">
-    <div>
-      <span id="bagsOrdered">0 påsar</span> på väg!
-    </div>
-    <button style="margin-top: 10px" type="button">Ok</button>
-    <div id="closeOrderBagsSpinner">Loading ...</div>
-  </div>
-</div>
-</body>
 <script>
   var maxNumBags = 10;
   async function getMaxNumBags() {
