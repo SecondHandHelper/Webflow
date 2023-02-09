@@ -9,6 +9,31 @@
 </script>
 
 <script>
+  //Get preferred sign in method
+  const preferredSignInMethod = getPreferredLogInMethod();
+
+  if (preferredSignInMethod) {
+    console.log("preferredSignInMethod exist", preferredSignInMethod);
+    if (preferredSignInMethod === 'google.com') {
+      displayPerferredSignInMethod('googleSignInButton');
+    }
+    if (preferredSignInMethod === 'phone') {
+      displayPerferredSignInMethod('smsCodeButton');
+    }
+    if (preferredSignInMethod === 'password') {
+      displayPerferredSignInMethod('emailAndPasswordButton');
+    }
+  }
+
+  function displayPerferredSignInMethod(buttonId) {
+    var outerDiv = document.getElementById(buttonId).parentElement;
+    var innerDiv = document.getElementById(buttonId);
+    preferredSignInMethodDiv.appendChild(outerDiv.removeChild(innerDiv));
+    preferredSignInMethodDiv.style.display = 'block';
+    showOtherSignInMethodsButton.style.display = 'flex';
+    otherSignInMethodsDiv.style.display = 'none';
+  }
+
   // Disable Webflow form submit
   $('#Password-form').submit(function () {
     return false;
@@ -103,7 +128,7 @@
     // [START auth_google_provider_create]
     var provider = new firebase.auth.GoogleAuthProvider();
     // [END auth_google_provider_create]
-    
+
 
     //NEW POPUP SIGNIN
     firebase.auth()
@@ -117,7 +142,6 @@
       }).catch((error) => {
         const errorText = `[webflow] Error signing in with Google: ${error.code}, ${error.message}, ${error.email}, ${error}`;
         console.log(errorText);
-        slackPing('debug', errorText);
       });
   }
 </script>
@@ -234,6 +258,9 @@
   });
   signUpWithEmailButton.addEventListener('click', signUpWithEmailPassword);
   signInWithEmailButton.addEventListener('click', signInWithEmailPassword);
+  showOtherSignInMethodsButton.addEventListener('click', function () {
+    triggerOtherSignInMethodsView.click();
+  });
 
   window.addEventListener('focus', function () {
     emailVerificationText.innerText += ".";

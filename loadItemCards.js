@@ -46,9 +46,7 @@ async function loadItemCards(items) {
         daysLeftText = `${daysLeft} dagar kvar`;
       }
     }
-    if (archived == undefined && status != "Unsold") {
-      displayItemCard();
-    }
+    if (archived == undefined && status != "Unsold") { displayItemCard(); }
 
     function displayItemCard() {
       //Putting the items in the right list
@@ -103,7 +101,7 @@ async function loadItemCards(items) {
 
           // Add a user action, such as 'show QR button' or 'bag received checkbox'
           if (shippingMethod === 'Service point') {
-            if (soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed'){
+            if (soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') {
               if (!bagReceived) {
                 userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
               }
@@ -127,7 +125,7 @@ async function loadItemCards(items) {
 
           // Add "change shipping method" when applicable and some spacing
           if (bagReceived && (shippingMethod === "Service point" || (shippingMethod === "Pickup" && pickupDate))) {
-            shippingInfoDiv = '<div class="spacing-15-px"></div>'+ shippingInfoDiv;
+            shippingInfoDiv = '<div class="spacing-15-px"></div>' + shippingInfoDiv;
             changeShippingMethod += `
           <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
               <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>

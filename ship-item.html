@@ -17,29 +17,41 @@
                     const postalCode = data.buyerAddressPostalCode || '';
                     const city = data.buyerAddressCity || '';
                     const shippingMethod = data.shippingMethod;
+                    const shippingStatus = data.shippingStatus;
                     const soldPlatform = data.soldPlatform;
 
                     pageTitleText.innerHTML = `Skicka ${brand.trim()}-${category.trim().toLowerCase()}`;
-                    //buyerAddressDiv.innerHTML = `${fn.trim()} ${ln.trim()}<br>${street.trim()}<br>${postalCode.trim()} ${city.trim()}`; // Show full address
-                    buyerAddressDiv.innerHTML = `${fn.trim()} ${ln.trim()}<br>i ${city.trim()}`; // Only show name and city
+                    buyerAddressDiv.innerHTML = `${fn.trim()} ${ln.trim()}<br>${city.trim()}`; // Only show name and city
                     itemImageDiv.style.backgroundImage = `url('${imgUrl}')`;
 
-                    if (shippingMethod === 'Service point') {
-                        if (!(soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') && postnordQrCode) {
-                            qrCodeImage.src = postnordQrCode;
-                            qrCodeDiv.style.display = "block";
-                            howToShipQrDiv.style.display = "block";
-                        } else {
-                            howToShipNoQrDiv.style.display = "block";
+                    if (shippingMethod) {
+                        if (shippingMethod === 'Service point') {
+                            if (!(soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') && postnordQrCode) {
+                                qrCodeImage.style.backgroundImage = `url('${postnordQrCode}')`;
+                                qrCodeDiv.style.display = "block";
+                                howToShipQrDiv.style.display = "block";
+                            } else {
+                                howToShipNoQrDiv.style.display = "block";
+                                dividerTop.style.display = "none";
+                            }
+                        } else if (shippingMethod === 'Pickup') {
+                            howToShipPickupDiv.style.display = "block";
                             dividerTop.style.display = "none";
                         }
-                    } else if (shippingMethod === 'Pickup') {
-                        howToShipPickupDiv.style.display = "block";
-                        dividerTop.style.display = "none";
                     }
 
                     pageTitleText.style.display = "block";
-                    contentDiv.style.display = "block";
+                    // Show content, or error message
+                    if (shippingMethod && shippingStatus !== 'Sent') {
+                        contentDiv.style.display = "block";
+                    } else {
+                        if (!shippingMethod) {
+                            errorMessage.innerHTML = "Plagget saknar fraktmetod!";
+                        } else if (shippingStatus === 'Sent') {
+                            errorMessage.innerHTML = "Plagget har skickats!";
+                        }
+                        errorMessageDiv.style.display = "block";
+                    }
                     loadingDiv.style.display = "none";
                 } else {
                     console.log("No such document!");

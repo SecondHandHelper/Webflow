@@ -58,14 +58,9 @@
                         text2 = valuationText;
                     }
 
-
-                    var pageTitleComponentHTML = `
-                            <div class="div-block-102">
+                    pageTitleDiv.innerHTML = `
                                 <div id="itemBrandText" class="text-block-16-copy">${brand}</div>
-                                <div id="itemCategoryText" class="text-block-62">${category}</div>
-                            </div>`;
-
-                    pageTitleDiv.innerHTML = pageTitleComponentHTML;
+                                <div id="itemCategoryText" class="text-block-62">${category}</div>`;
                     pageTitleDiv.style.display = "flex";
 
                     var itemComponentHTML = `

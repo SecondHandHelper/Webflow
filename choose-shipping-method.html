@@ -1,0 +1,52 @@
+<script>
+    async function addShippingMethodPreference() {
+        saveShippingMethodButton.style.display = 'none';
+        saveButtonLoadingDiv.style.display = 'flex';
+        let method = "Service point";
+        var radioButtons = document.getElementsByName("shippingMethod");
+        for (var x = 0; x < radioButtons.length; x++) {
+            if (radioButtons[x].checked) {
+                method = radioButtons[x].value; // "Service point" or "Pickup"
+            }
+        }
+
+        await db.collection('users').doc(authUser.uid).update({ "preferences.shippingMethod": method }).then(async (docRef) => {
+            console.log(`Shipping method '${method}' stored as preference on user with ID: `, authUser.uid);
+            await batchUpdateShippingMethod(method);
+            triggerShippingMethodConfirmationView.click();
+        });
+    }
+
+    async function batchUpdateShippingMethod(shippingMethod) {
+        const items = await getItems(authUser.uid);
+
+        // Prepare the batch
+        let batch = db.batch();
+        let itemsCount = 0;
+        let updatesCount = 0;
+        
+        items.forEach((doc) => {
+            itemsCount++; 
+
+            // If no shippingMethod, add to batch
+            const currentShippingMethod = doc.data().shippingMethod || null;
+            const status = doc.data().status;
+            const archived = doc.data().archived;
+            if (!currentShippingMethod && status !== "Unsold" && !archived) {
+                const docRef = db.collection('items').doc(doc.id);
+                batch.update(docRef, { shippingMethod });
+                updatesCount++;
+            }
+        })
+
+        // Commit the batch
+        await batch.commit();
+        console.log(`Updated ${updatesCount} items out of user's ${itemsCount} available items with shippingMethod '${shippingMethod}'`);
+    }
+
+    saveShippingMethodButton.addEventListener("click", addShippingMethodPreference);
+    closeConfirmationButton.addEventListener("click", function () {
+        closeConfirmationButton.style.display = 'none';
+        closeButtonLoadingDiv.style.display = 'flex';
+    });
+</script>

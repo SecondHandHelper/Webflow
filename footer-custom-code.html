@@ -8,14 +8,14 @@
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-functions.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test136/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.1/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.71/infoRequestsFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.77/referralFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.52/cookieManagement.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.1/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.2/cookieManagement.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.0.64/autocomplete-brands.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test136/loadItemCards.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.1/loadItemCards.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuidv4.min.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test135/sellItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.1/sellItem.js"></script>
 
 <script>
   // Firebase config
@@ -57,11 +57,6 @@
       db.collection("users").doc(authUser.uid).get().then((doc) => {
         if (doc.exists) {
           user = doc.data();
-
-          // Add to different test groups
-          if (user.testGroups && user.testGroups.includes('alpha')) {
-            user.alphaUser = true;
-          }
           console.log("user:", user);
           console.log("authUser", authUser);
           console.log("featureIsEnabled('C2C')", featureIsEnabled('C2C'));
@@ -81,7 +76,7 @@
       console.log('No user');
       // Go to landing page if no user and on logged in pages
       const path = window.location.pathname;
-      if (path === "/private" || path === "/personal-id-form" || path === "/address-form" || path === "/item" || path === "/sell-item") {
+      if (path === "/private" || path === "/personal-id-form" || path === "/address-form" || path === "/item" || path === "/sell-item" || path === "/ship-item" || path === "/edit-item") {
         window.location.href = window.location.origin;
       }
 
@@ -193,7 +188,7 @@
   var featureConfig = {
     alpha: { C2C: true },
     beta: { C2C: false },
-    default: { C2C: false }
+    default: { C2C: true }
   };
 
   function featureIsEnabled(featureName) {
