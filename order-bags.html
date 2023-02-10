@@ -5,7 +5,7 @@
     if (maxBags?.data) {
       if (maxBags.data?.errorCode === 'unfulfilled-order') {
         document.getElementById('orderBagsError').style.display = 'block';
-        document.getElementById('orderBagsError').innerText = 'Du har nyligen lagt en beställning som är påväg till dig.\nVänta in påsarna innan du lägger fler beställningar.';
+        document.getElementById('orderBagsError').innerText = 'Du har nyligen lagt en beställning som är på väg till dig.\nVänta in påsarna innan du lägger fler beställningar.';
         return 0;
       }
       if (maxBags.data?.maxOrderBags === 0) {
