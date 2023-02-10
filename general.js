@@ -677,10 +677,6 @@ async function addUserDetails() {
     const addressFields = getFormAddressFields();
 
     let personalId = document.getElementById("personalId").value;
-    if (!isValidSwedishSsn(personalId)) {
-      document.getElementById("personalId").setCustomValidity('Ogiltigt personnummer');
-      return;
-    }
     personalId = personalId ? formatPersonalId(personalId) : null;
 
     // Write to Firestore
@@ -739,14 +735,9 @@ async function addUserAddress() {
         });
 }
 
-async function addPersonalId(e) {
+async function addPersonalId() {
     // Grab values from form
     let personalId = document.getElementById("personalId").value;
-    if (!isValidSwedishSsn(personalId)) {
-      e.preventDefault();
-      document.getElementById("personalId").setCustomValidity('Ogiltigt personnummer');
-      return false;
-    }
     personalId = formatPersonalId(personalId);
 
     // Write to Firestore

@@ -122,6 +122,11 @@
             itemCondition.style.color = "#333";
         }
     };
+
+    document.getElementById('personalId').addEventListener("input", () => {
+      const error = isValidSwedishSsn(document.getElementById('personalId').value) ? '' : 'Ogiltigt personnummer';
+      document.getElementById("personalId").setCustomValidity(error);
+    })
 </script>
 
 <script>
