@@ -739,12 +739,13 @@ async function addUserAddress() {
         });
 }
 
-async function addPersonalId() {
+async function addPersonalId(e) {
     // Grab values from form
     let personalId = document.getElementById("personalId").value;
     if (!isValidSwedishSsn(personalId)) {
+      e.preventDefault();
       document.getElementById("personalId").setCustomValidity('Ogiltigt personnummer');
-      return;
+      return false;
     }
     personalId = formatPersonalId(personalId);
 
