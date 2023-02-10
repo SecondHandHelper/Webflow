@@ -677,7 +677,11 @@ async function addUserDetails() {
     const addressFields = getFormAddressFields();
 
     let personalId = document.getElementById("personalId").value;
-    personalId = personalId ? await formatPersonalId(personalId) : null;
+    if (!isValidSwedishSsn(personalId)) {
+      document.getElementById("personalId").setCustomValidity('Ogiltigt personnummer');
+      return;
+    }
+    personalId = personalId ? formatPersonalId(personalId) : null;
 
     // Write to Firestore
     const itemRef = db.collection('users').doc(authUser.uid);
@@ -693,6 +697,29 @@ async function addUserDetails() {
         .catch((error) => {
             console.error("Error updating document: ", error);
         });
+}
+
+// Validate Swedish Social Security Number (personnummer) using checksum
+//   Note: this is somewhat simplified because it does not take into account
+//   that the date of the number is valid (e.g. "000000-0000" does return as true)
+function isValidSwedishSsn(ssn) {
+  ssn = ssn
+    .replace(/\D/g, "")     // strip out all but digits
+    .split("")              // convert string to array
+    .reverse()              // reverse order for Luhn
+    .slice(0, 10);          // keep only 10 digits (i.e. 1977 becomes 77)
+
+  // verify we got 10 digits, otherwise it is invalid
+  if (ssn.length !== 10) {
+    return false;
+  }
+  const sum = ssn.map((n) => Number(n))
+    .reduce((previous, current, index) => {
+      if (index % 2) current *= 2;
+      if (current > 9) current -= 9;
+      return previous + current;
+    });
+  return 0 === sum % 10;
 }
 
 async function addUserAddress() {
@@ -715,7 +742,11 @@ async function addUserAddress() {
 async function addPersonalId() {
     // Grab values from form
     let personalId = document.getElementById("personalId").value;
-    personalId = await formatPersonalId(personalId);
+    if (!isValidSwedishSsn(personalId)) {
+      document.getElementById("personalId").setCustomValidity('Ogiltigt personnummer');
+      return;
+    }
+    personalId = formatPersonalId(personalId);
 
     // Write to Firestore
     if (personalId) {
@@ -737,7 +768,7 @@ async function addPersonalId() {
     }
 }
 
-async function formatPersonalId(personalId) {
+function formatPersonalId(personalId) {
     if (personalId.length !== 12 && (personalId.substring(0, 2) !== '19' || personalId.substring(0, 2) !== '20')) {
         console.log("Number(personalId.substring(0, 2)", Number(personalId.substring(0, 2)));
         if (Number(personalId.substring(0, 2)) <= 99 && Number(personalId.substring(0, 2)) > 25) {
