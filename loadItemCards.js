@@ -94,13 +94,13 @@ async function loadItemCards(items) {
           let output = '';
           const words = str.split(' ');
           words.forEach(function (word) {
-            if (output.length > str.length){
+            if (output.length + word.length > str.length/2){
               output += '\n';
             }
             output += word + ' ';
           });
-          output = output.trim()
-
+          output = output.trim();
+          console.log(output);
           buyerInfoTextHTML = `<div class="text-block-44">${output}</div>`;
         }
         var userActionDiv = '';
