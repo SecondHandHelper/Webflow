@@ -88,7 +88,20 @@ async function loadItemCards(items) {
         // Prepare card
         var buyerInfoTextHTML = '';
         if (buyerFirstName != null && buyerAddressCity != null && soldPrice) {
-          buyerInfoTextHTML = `<div class="text-block-44">Såld till ${buyerFirstName} i ${buyerAddressCity} för ${soldPrice} kr</div>`;
+          const str = `Såld till ${buyerFirstName} i ${buyerAddressCity} för ${soldPrice} kr`;
+
+          // Split sentence into two equally long rows
+          let output = '';
+          const words = str.split(' ');
+          words.forEach(function (word) {
+            if (output.length > str.length){
+              output += '\n';
+            }
+            output += word + ' ';
+          });
+          output = output.trim()
+
+          buyerInfoTextHTML = `<div class="text-block-44">${output}</div>`;
         }
         var userActionDiv = '';
         var shippingInfoDiv = '';
@@ -146,7 +159,7 @@ async function loadItemCards(items) {
         //Create card
         var soldNotSentCardHTML = ``;
         soldNotSentCardHTML =
-          `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">Såld för ${soldPrice} kr</div>${buyerInfoTextHTML}
+          `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">Du får ${sellerGets} kr</div>${buyerInfoTextHTML}
                       ${userActionDiv}
                       ${shippingInfoDiv}
                       ${changeShippingMethod}
