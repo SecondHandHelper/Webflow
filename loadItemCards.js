@@ -87,8 +87,8 @@ async function loadItemCards(items) {
       } else if (status == "Sold" && shippingStatus != "Sent") {
         // Prepare card
         var buyerInfoTextHTML = '';
-        if (buyerFirstName != null && buyerAddressCity != null) {
-          buyerInfoTextHTML = `<div class="text-block-44">Till ${buyerFirstName} i ${buyerAddressCity}</div>`;
+        if (buyerFirstName != null && buyerAddressCity != null && soldPrice) {
+          buyerInfoTextHTML = `<div class="text-block-44">Såld till ${buyerFirstName} i ${buyerAddressCity} för ${soldPrice} kr</div>`;
         }
         var userActionDiv = '';
         var shippingInfoDiv = '';
@@ -146,7 +146,7 @@ async function loadItemCards(items) {
         //Create card
         var soldNotSentCardHTML = ``;
         soldNotSentCardHTML =
-          `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">Såld för ${soldPrice} kr</div>${buyerInfoTextHTML}<div class="text-block-44">Du får ${sellerGets} kr</div>
+          `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">Såld för ${soldPrice} kr</div>${buyerInfoTextHTML}
                       ${userActionDiv}
                       ${shippingInfoDiv}
                       ${changeShippingMethod}
