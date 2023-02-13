@@ -94,7 +94,7 @@ async function loadItemCards(items) {
           let output = '';
           const words = str.split(' ');
           words.forEach(function (word) {
-            if (output.length > str.length/2 && !output.includes('<br>')){
+            if (output.trim().length > str.length/2 && !output.includes('<br>')){
               output += '<br>';
             }
             output += word + ' ';
