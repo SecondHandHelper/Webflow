@@ -50,6 +50,7 @@ async function loadItemCards(items) {
 
     function displayItemCard() {
       //Putting the items in the right list
+      let itemPageUrl = window.location.origin + `/item?id=${itemId}`;
 
       // WE SELL RIGHT NOW
       if (status != "Sold") {
@@ -71,8 +72,7 @@ async function loadItemCards(items) {
           const text2 = holidayMode ? "Pausad" : daysLeftText;
           textDiv2 = `<div class='text-block-34'>${text2}</div>`;
         }
-
-        let itemPageUrl = window.location.origin + `/item?id=${itemId}`;
+        
         let sellingItemCardHTML = `<div class="div-block-14"><a id="itemLinkBlock" href="${itemPageUrl}" class="link-block-18 w-inline-block"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div><div class="text-block-14">${brand}</div>${textDiv1}${textDiv2}</a></div>`;
         itemListSelling.innerHTML += sellingItemCardHTML;
 
@@ -159,7 +159,7 @@ async function loadItemCards(items) {
         //Create card
         var soldNotSentCardHTML = ``;
         soldNotSentCardHTML =
-          `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">Du får ${sellerGets} kr</div>${buyerInfoTextHTML}
+          `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><a id="itemLinkFromSoldNotSentSection" href="${itemPageUrl}"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></a></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">Du får ${sellerGets} kr</div>${buyerInfoTextHTML}
                       ${userActionDiv}
                       ${shippingInfoDiv}
                       ${changeShippingMethod}
