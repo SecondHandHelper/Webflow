@@ -68,9 +68,8 @@ itemStatusText.style.fontWeight = "500";
                         text1 = payoutStatus === "Payed" ? "" : "Utbetalning kommer via Swish inom en dag" ;
                         if (shippingStatus === "Not sent"){
                             text1 = "Utbetalning sker när du skickat plagget"
-                            text2 = "Såhär skickar du" ;
-                            itemText2.href = window.location.origin + `/ship-item?id=${itemId}`;
-                            itemText2.style.textDecoration = "underline";
+                            toShipItemLink.href = window.location.origin + `/ship-item?id=${itemId}`;
+                            toShipItemLink.style.display = "flex";
                         }
                         sellerGetsTitle.innerHTML = payoutStatus === "Payed" ? "Du fick" : "Du får" ;
                         sellerGetsText.innerHTML = `${sellerGets} kr`
