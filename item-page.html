@@ -6,6 +6,7 @@
                 if (doc.exists) {
                     console.log("Item data:", doc.data());
                     data = doc.data();
+                    const itemId = doc.id;
                     const brand = data.brand;
                     const images = data.images;
                     const infoRequests = data.infoRequests;
@@ -35,7 +36,10 @@
                     let min = data.minPriceEstimate;
                     let max = data.maxPriceEstimate;
                     const valuationText = min && max ? `${min}-${max} kr` : "";
-
+                    const soldPrice = data.soldPrice;
+                    const sellerGets = data.sellerGets;
+                    const payoutStatus = data.payoutStatus;
+                    const shippingStatus = data.shippingStatus;
                     let text1 = "";
                     let text2 = "";
 
@@ -57,26 +61,30 @@
                         text1 = daysLeftText;
                         text2 = valuationText;
                     }
+                    if (status === "Sold"){
+statusText = `Såld!`;
+itemStatusText.style.fontSize = "18px";
+itemStatusText.style.fontWeight = "500";
+                        text1 = payoutStatus === "Payed" ? "" : "Utbetalning kommer via Swish inom en dag" ;
+                        if (shippingStatus === "Not sent"){
+                            text1 = "Utbetalning sker när du skickat plagget"
+                            text2 = "Såhär skickar du" ;
+                            itemText2.href = window.location.origin + `/ship-item?id=${itemId}`;
+                            itemText2.style.textDecoration = "underline";
+                        }
+                        sellerGetsTitle.innerHTML = payoutStatus === "Payed" ? "Du fick" : "Du får" ;
+                        sellerGetsText.innerHTML = `${sellerGets} kr`
+                        sellerGetsDiv.style.display = "flex";
+                    }
 
-                    pageTitleDiv.innerHTML = `
-                                <div id="itemBrandText" class="text-block-16-copy">${brand}</div>
-                                <div id="itemCategoryText" class="text-block-62">${category}</div>`;
+                    itemBrandText.innerHTML = brand;
+                    itemCategoryText.innerHTML = category;
                     pageTitleDiv.style.display = "flex";
+                    coverImageDiv.style.backgroundImage = `url('${imgUrl}')`;
+                    itemStatusText.innerHTML = statusText;
+                    itemText1.innerHTML = text1;
+                    itemText2.innerHTML = text2;
 
-                    var itemComponentHTML = `
-                            <div class="div-block-104"><div class="div-block-103">
-                                    <div class="ratio-box _16-9">
-                                        <div class="content-block with-image">
-                                            <div class="img-container" style="background-image: url('${imgUrl}');"></div>
-                                        </div>
-                                    </div>
-                            </div></div>
-                            <div class="div-block-105">
-                                <div id="itemStatusText" class="text-block-16-copy">${statusText}</div>
-                                <div id="itemText1" class="text-block-63">${text1}</div>
-                                <div id="itemText2" class="text-block-63">${text2}</div>
-                            </div>`;
-                    itemDiv.innerHTML = itemComponentHTML;
                     itemDiv.style.display = "block";
                     loadingDiv.style.display = "none";
                 } else {
@@ -194,5 +202,4 @@
     // Load item
     loadItem(params.id);
     loadItemEvents(params.id);
-    //loadItemEvents('3fb6b9eb-48b9-486d-a432-67aeac630ead');
 </script>
