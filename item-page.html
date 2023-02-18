@@ -1,6 +1,5 @@
 <script>
     function loadItem(itemId) {
-        console.log(`loadItem(${itemId})`);
         db.collection("items").doc(itemId)
             .get().then((doc) => {
                 if (doc.exists) {
@@ -86,11 +85,9 @@ itemStatusText.style.fontWeight = "500";
 
                     itemDiv.style.display = "block";
                     loadingDiv.style.display = "none";
-                } else {
-                    console.log("No such document!");
                 }
-            }).catch((error) => {
-                console.log("Error getting item document:", error);
+            }).catch((e) => {
+                console.log("Error getting item document:", e);
             });
     }
 
@@ -117,9 +114,10 @@ itemStatusText.style.fontWeight = "500";
                     itemEventsDiv.innerHTML = component.concat(content);
                 }
             }
+            itemEventsDiv.style.display = 'block'; itemEventsLoadingDiv.style.display = 'none';
 
             // Show list if itemAdded exists
-            if (itemAddedEventExists) { sellingProcessDiv.style.display = 'block'; console.log("Showing events list"); }
+            if (!itemAddedEventExists) { sellingProcessDiv.style.display = 'none'; }
         }
     }
 
@@ -141,10 +139,12 @@ itemStatusText.style.fontWeight = "500";
         const weekdays = ['Sön', 'Mån', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör', 'Sön']
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
         const date = new Date(event.timestamp);
-        time = weekdays[date.getDay()] + " " + date.getHours() + ":" + date.getMinutes();
+        const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes() ;
+        const hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours() ;
+        time = weekdays[date.getDay()] + " " + hours + ":" + minutes;
         let now = new Date();
-        let daysDiff = Math.round((now.getTime() - date.getTime()) / (1000 * 3600 * 24)); console.log("D:", daysDiff);
-        if (daysDiff > 6) { time = date.getDate() + " " + months[date.getMonth()] + " " + date.getHours() + ":" + date.getMinutes(); }
+        let daysDiff = Math.round((now.getTime() - date.getTime()) / (1000 * 3600 * 24));
+        if (daysDiff > 6) { time = date.getDate() + " " + months[date.getMonth()] + " " + hours + ":" + minutes; }
 
         // Set text
         if (event.type === 'itemAdded') {
@@ -157,14 +157,14 @@ itemStatusText.style.fontWeight = "500";
         if (event.type === 'priceAdjusted') { text = `Pris sänktes till ${event.data.newPrice} kr`; }
         if (event.type === 'priceRequestSent') { text = `Nytt prisförslag på ${event.data.min}-${event.data.max} kr`; }
         if (event.type === 'priceRequestResponse') {
-            if (event.data.response === 'Accepted') {
-                text = `Du accepterade prisförslaget`;
-            } else if (event.data.response === 'Denied') {
-                text = `Du avböjde prisförslaget`;
-            }
+            if (event.data.response === 'Accepted') {text = `Du accepterade prisförslaget`;} 
+            else if (event.data.response === 'Denied') {text = `Du avböjde prisförslaget`;}
         }
         if (event.type === 'listingRenewal') { text = `Annonser förnyades`; }
-        if (event.type === 'platformAdded') { text = `Publicerades på en till plattform`; }
+        if (event.type === 'platformAdded') { 
+            if (event.data.platforms) {text = `Publicerades på ${event.data.platforms[0]}`;}
+            if (event.data.platforms.includes('Mai Shop')) { text += '<br>(Google Shopping, Instagram Shop, Facebook Shop)'}
+        }
         if (event.type === 'itemSold') { text = `Såld för ${event.data.soldPrice} kr till ${event.data.buyerFirstName} i ${event.data.buyerAddressCity}`; }
         if (event.type === 'bagSentToSeller') { text = `Fraktpåse skickades till dig`; }
         if (event.type === 'itemSent') {
@@ -173,21 +173,15 @@ itemStatusText.style.fontWeight = "500";
         if (event.type === 'payoutCompleted') { text = `Du fick ${event.data.amount} kr utbetalt`; }
 
         if (text) {
-            component = `
-                <div class="div-block-135">
-                    <div class="div-block-144">
-                        <div class="div-block-142">
-                            <div class="div-block-139" style="display: ${displayLine};"></div>
+            component = `<div class="div-block-135"><div class="div-block-144"><div class="div-block-142">
+                        <div class="div-block-139" style="display: ${displayLine};"></div>
                         </div>
-                        <div class="div-block-138">
-                            ${icon}
+                        <div class="div-block-138">${icon}</div>
                         </div>
-                    </div>
                     <div class="div-block-136">
                         <div class="item-event-text ${className}">${text}</div>
                         <div class="text-block-82">${time}</div>
-                    </div>
-                </div>`;
+                    </div></div>`;
         }
 
         const response = component ? component : false;
