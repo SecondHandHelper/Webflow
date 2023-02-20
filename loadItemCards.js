@@ -27,10 +27,7 @@ async function loadItemCards(items) {
     var archived = doc.data().archived;
     var holidayMode = doc.data().holidayMode;
     var longerPeriodAcceptedDate = doc.data().longerPeriodAcceptedDate;
-    var frontImageUrl = images.frontImage;
-    if (images.frontImageSmall) {
-      frontImageUrl = images.frontImageSmall;
-    }
+    var frontImageUrl = images.coverImage ?  (images.coverImageSmall || images.coverImage) : (images.frontImageSmall | images.frontImage);
     let daysLeftText = "";
     let publishedDate = doc.data().publishedDate;
     if (publishedDate) {

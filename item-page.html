@@ -9,10 +9,7 @@
                     const brand = data.brand;
                     const images = data.images;
                     const infoRequests = data.infoRequests;
-                    let imgUrl = images.frontImage;
-                    if (images.frontImageSmall) {
-                        imgUrl = images.frontImageSmall;
-                    }
+                    let imgUrl = images.coverImage ?  (images.coverImageSmall || images.coverImage) : (images.frontImageSmall | images.frontImage);
                     const status = data.status;
                     const category = data.category ? data.category : "";
                     const longerPeriodAcceptedDate = data.longerPeriodAcceptedDate;

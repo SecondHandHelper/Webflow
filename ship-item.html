@@ -8,7 +8,7 @@
                     data = doc.data();
                     const brand = data.brand;
                     const images = data.images;
-                    let imgUrl = images.frontImageSmall || images.frontImage;
+                    let imgUrl = images.coverImage ?  (images.coverImageSmall || images.coverImage) : (images.frontImageSmall | images.frontImage);
                     const category = data.category ? data.category : "";
                     const postnordQrCode = data.postnordQrCode;
                     const fn = data.buyerFirstName || '';
