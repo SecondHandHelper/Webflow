@@ -175,8 +175,7 @@ function loadSoldByOthers(userID) {
                 var sellerId = doc.data().user;
                 var brand = doc.data().brand;
                 var soldPrice = doc.data().soldPrice;
-                var images = doc.data().images;
-                var imageUrl = images.coverImage ?  (images.coverImageSmall || images.coverImage) : (images.frontImageSmall | images.frontImage);
+                var imageUrl = itemCoverImage(doc.data());
 
                 // Add card to list if seller is other than myself
                 if (sellerId != userID && soldPrice >= 200) {
@@ -615,8 +614,7 @@ function loadRecentlySold() {
                 if (data.hasOwnProperty(key)) {
                     var brand = data[key].brand;
                     var soldPrice = data[key].soldPrice;
-                    var images = data[key].images;
-                    var imageUrl = images.coverImage ?  (images.coverImageSmall || images.coverImage) : (images.frontImageSmall | images.frontImage);
+                    var imageUrl = itemCoverImage(data[key])
 
                     if (soldPrice >= 240) {
                         var itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>${brand}</div></div>`;
@@ -829,4 +827,9 @@ function calculateSellerGets(value, elementId, feeElementId) {
     } else {
         div.style.display = 'none';
     }
+}
+
+function itemCoverImage(item) {
+  const images = item.images;
+  return images.coverImage ?  (images.coverImageSmall || images.coverImage) : (images.frontImageSmall | images.frontImage);
 }

@@ -139,14 +139,13 @@ function loadInfoRequests(userId) {
             var itemId = doc.id;
             var item = doc.data();
             var infoRequests = item.infoRequests;
-            var images = item.images;
             var status = item.status;
             var brand = item.brand.replace(/'/g, '');
             var currentMinPrice = item.minPriceEstimate;
             var deniedBefore = item?.infoRequests?.price?.response === "Denied" ? true : false;
             var archived = item.archived;
             var category = item.category;
-            var frontImageUrl = images.coverImage ?  (images.coverImageSmall || images.coverImage) : (images.frontImageSmall | images.frontImage);
+            var frontImageUrl = itemCoverImage(item);
             if (archived == undefined && status !== "Unsold" && status !== "Sold" && infoRequests) {
                 displayRequests();
             }
