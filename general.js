@@ -831,5 +831,5 @@ function calculateSellerGets(value, elementId, feeElementId) {
 
 function itemCoverImage(item) {
   const images = item.images;
-  return images.coverImage ?  (images.coverImageSmall || images.coverImage) : (images.frontImageSmall | images.frontImage);
+  return images.coverImage ?  (images.coverImageSmall || images.coverImage) : (images.frontImageSmall || images.frontImage);
 }

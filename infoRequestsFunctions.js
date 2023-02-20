@@ -146,7 +146,7 @@ function loadInfoRequests(userId) {
             var archived = item.archived;
             var category = item.category;
             const images = item.images;
-            var frontImageUrl = images.coverImage ? (images.coverImageSmall || images.coverImage) : (images.frontImageSmall | images.frontImage);
+            var frontImageUrl = images.coverImage ? (images.coverImageSmall || images.coverImage) : (images.frontImageSmall || images.frontImage);
             if (archived == undefined && status !== "Unsold" && status !== "Sold" && infoRequests) {
                 displayRequests();
             }
