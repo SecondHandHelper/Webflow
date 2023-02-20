@@ -145,7 +145,8 @@ function loadInfoRequests(userId) {
             var deniedBefore = item?.infoRequests?.price?.response === "Denied" ? true : false;
             var archived = item.archived;
             var category = item.category;
-            var frontImageUrl = itemCoverImage(item);
+            const images = item.images;
+            var frontImageUrl = images.coverImage ? (images.coverImageSmall || images.coverImage) : (images.frontImageSmall | images.frontImage);
             if (archived == undefined && status !== "Unsold" && status !== "Sold" && infoRequests) {
                 displayRequests();
             }
