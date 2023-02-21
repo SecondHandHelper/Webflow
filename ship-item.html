@@ -7,8 +7,7 @@
                     console.log("Item data:", doc.data());
                     data = doc.data();
                     const brand = data.brand;
-                    const images = data.images;
-                    let imgUrl = images.frontImageSmall || images.frontImage;
+                    let imgUrl = itemCoverImage(data);
                     const category = data.category ? data.category : "";
                     const postnordQrCode = data.postnordQrCode;
                     const fn = data.buyerFirstName || '';

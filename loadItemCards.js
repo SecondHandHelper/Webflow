@@ -8,7 +8,6 @@ async function loadItemCards(items) {
     var itemId = doc.id;
     var createdDate = doc.data().createdAt;
     var soldDate = doc.data().soldDate;
-    var images = doc.data().images;
     var status = doc.data().status;
     var shippingStatus = doc.data().shippingStatus;
     var brand = doc.data().brand;
@@ -27,10 +26,8 @@ async function loadItemCards(items) {
     var archived = doc.data().archived;
     var holidayMode = doc.data().holidayMode;
     var longerPeriodAcceptedDate = doc.data().longerPeriodAcceptedDate;
-    var frontImageUrl = images.frontImage;
-    if (images.frontImageSmall) {
-      frontImageUrl = images.frontImageSmall;
-    }
+    const images = doc.data().images;
+    var frontImageUrl = images.coverImage ? (images.coverImageSmall || images.coverImage) : (images.frontImageSmall || images.frontImage);
     let daysLeftText = "";
     let publishedDate = doc.data().publishedDate;
     if (publishedDate) {
