@@ -604,22 +604,16 @@ function loadRecentlySold() {
             // Read result of the Cloud Function.
             console.log('Cloud Function är klar! Nu gör vi något med resultatet!');
 
-            var itemListRecentlySoldStartPage = document.getElementById('itemListRecentlySoldStartPage');
+            const itemListRecentlySoldStartPage = document.getElementById('itemListRecentlySoldStartPage');
             itemListRecentlySoldStartPage.innerHTML = "";
 
-            data = result.data;
-
-            for (var key in data) {
-                if (data.hasOwnProperty(key)) {
-                    var brand = data[key].brand;
-                    var soldPrice = data[key].soldPrice;
-                    var imageUrl = itemCoverImage(data[key])
-
-                    if (soldPrice >= 240) {
-                        var itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>${brand}</div></div>`;
-                        var itemListRecentlySoldStartPage = document.getElementById('itemListRecentlySoldStartPage');
-                        itemListRecentlySoldStartPage.innerHTML += itemCardHTML;
-                    }
+            for (const item of result.data) {
+                const brand = item.brand;
+                const soldPrice = item.soldPrice;
+                const imageUrl = itemCoverImage(item);
+                if (soldPrice >= 240) {
+                    const itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>${brand}</div></div>`;
+                    itemListRecentlySoldStartPage.innerHTML += itemCardHTML;
                 }
             }
         })
