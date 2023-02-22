@@ -597,10 +597,9 @@ function signOut() {
 function loadRecentlySold() {
     var data = {};
 
-    // [START fb_functions_call_add_message_error]
-    var addMessage = firebase.functions().httpsCallable('addMessage');
+    const recentlySoldItems = firebase.app().functions('europe-west1').httpsCallable('recentlySoldItems');
 
-    addMessage()
+    recentlySoldItems()
         .then((result) => {
             // Read result of the Cloud Function.
             console.log('Cloud Function är klar! Nu gör vi något med resultatet!');
