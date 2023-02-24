@@ -13,8 +13,8 @@ async function loadItemCards(items) {
     var brand = doc.data().brand;
     var soldPrice = doc.data().soldPrice;
     var sellerGets = doc.data().sellerGets;
-    var buyerFirstName = doc.data().buyerFirstName;
-    var buyerAddressCity = doc.data().buyerAddressCity;
+    var buyerFirstName = doc.data().buyer?.FirstName || doc.data().buyerFirstName;
+    var buyerAddressCity = doc.data().buyer?.City || doc.data().buyerAddressCity;
     var minPriceEstimate = doc.data().minPriceEstimate;
     var maxPriceEstimate = doc.data().maxPriceEstimate;
     var infoRequests = doc.data().infoRequests;

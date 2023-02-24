@@ -10,11 +10,11 @@
                     let imgUrl = itemCoverImage(data);
                     const category = data.category ? data.category : "";
                     const postnordQrCode = data.postnordQrCode;
-                    const fn = data.buyerFirstName || '';
-                    const ln = data.buyerLastName || '';
-                    const street = data.buyerAddressStreetAddress || '';
-                    const postalCode = data.buyerAddressPostalCode || '';
-                    const city = data.buyerAddressCity || '';
+                    const fn = data.buyer?.FirstName || data.buyerFirstName || '';
+                    const ln = data.buyer?.LastName || data.buyerLastName || '';
+                    const street = data.buyer?.StreetAddress || data.buyerAddressStreetAddress || '';
+                    const postalCode = data.buyer?.PostalCode || data.buyerAddressPostalCode || '';
+                    const city = data.buyer?.City || data.buyerAddressCity || '';
                     const shippingMethod = data.shippingMethod;
                     const shippingStatus = data.shippingStatus;
                     const soldPlatform = data.soldPlatform;
