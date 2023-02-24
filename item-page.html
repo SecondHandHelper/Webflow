@@ -161,7 +161,11 @@ itemStatusText.style.fontWeight = "500";
             if (event.data.platforms) {text = `Publicerades på ${event.data.platforms[0]}`;}
             if (event.data.platforms.includes('Mai Shop')) { text += '<br>(Google Shopping, Instagram Shop, Facebook Shop)'}
         }
-        if (event.type === 'itemSold') { text = `Såld för ${event.data.soldPrice} kr till ${event.data.buyerFirstName} i ${event.data.buyerAddressCity}`; }
+        if (event.type === 'itemSold') {
+          const buyerFirstName = event.data.buyer?.FirstName || event.data.buyerFirstName;
+          const buyerCity = event.data.buyer?.City || event.data.buyerAddressCity;
+          text = `Såld för ${event.data.soldPrice} kr till ${buyerFirstName} i ${buyerCity}`;
+        }
         if (event.type === 'bagSentToSeller') { text = `Fraktpåse skickades till dig`; }
         if (event.type === 'itemSent') {
             text = `Plagget skickades iväg`;
