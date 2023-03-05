@@ -1,0 +1,71 @@
+<script>
+    async function addNpsScore() {
+        let score = 11;
+        var radioButtons = document.getElementsByName("nps");
+        for (var x = 0; x < radioButtons.length; x++) {
+            if (radioButtons[x].checked) {
+                score = parseInt(radioButtons[x].value); // 0-10
+            }
+        }
+
+        // Validation
+        if (!(score >= 0 && score <= 10)) {
+            npsErrorMessage.style.display = 'block';
+            return;
+        }
+        if (!authUser) {
+            npsErrorMessage.innerHTML = 'Du måste vara inloggad för att svara';
+            npsErrorMessage.style.display = 'block';
+            return;
+        }
+
+        // Store score
+        await db.collection('users').doc(authUser.uid).update({ nps: firebase.firestore.FieldValue.arrayUnion({ score, timestamp: new Date() }) });
+        console.log(`Score '${score}' stored on user with ID: `, authUser.uid);
+
+        // Show follow up question
+        if (score >= 0 && score <= 6) {
+            followUpQuestion.innerHTML = 'Tack för feedbacken! Vilka förändringar skulle Mai behöva göra för att få ett högre betyg?';
+        }
+        if (score >= 7 && score <= 8) {
+            followUpQuestion.innerHTML = 'Tack för feedbacken! Skulle du vilja dela din motivering till det betyget med oss?';
+        }
+        if (score >= 9 && score <= 10) {
+            followUpQuestion.innerHTML = 'Kul att du gillar det! Vad är Mai riktigt bra på?';
+        }
+        followUpDiv.style.display = 'block';
+        npsFormDiv.style.display = 'none';
+    }
+
+    async function addFollowUp() {
+        const question = followUpQuestion.innerHTML;
+        const answer = followUpAnswer.value;
+        const followUp = { followUpQuestion: question, followUpAnswer: answer };
+
+        // Update latest NPS rating object with question and answer
+        const doc = await db.collection('users').doc(authUser.uid).get();
+        let npsArray = doc.data().nps;
+        const i = npsArray.length - 1; // Latest NPS rating
+        Object.assign(npsArray[i], followUp); // Add follow up question and answer to the latest rating
+        await db.collection('users').doc(authUser.uid).update({ nps: npsArray });
+        console.log(`Follow up question and answer stored on user with ID: `, authUser.uid);
+
+        // Show thank you div
+        followUpDiv.style.display = 'none';
+        thankYouDiv.style.display = 'block';
+    }
+
+    async function main() {
+        // Store elementViews to be able to hinder it to show again
+        db.collection('users').doc(authUser.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "npsSurvey", timestamp: new Date() }) });
+        // Track with segment
+        //analytics.track("Element Viewed", { elementID: "npsSurvey" });
+    }
+
+    npsSubmitButton.addEventListener("click", addNpsScore);
+    followUpSubmitButton.addEventListener("click", addFollowUp);
+    closeThankYouButton.addEventListener("click", function () {
+        if (authUser) { window.location.href = window.location.origin + "/private"; }
+        else { window.location.href = window.location.origin; }
+    });
+</script>
