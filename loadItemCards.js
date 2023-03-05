@@ -69,7 +69,7 @@ async function loadItemCards(items) {
           const text2 = holidayMode ? "Pausad" : daysLeftText;
           textDiv2 = `<div class='text-block-34'>${text2}</div>`;
         }
-        
+
         let sellingItemCardHTML = `<div class="div-block-14"><a id="itemLinkBlock" href="${itemPageUrl}" class="link-block-18 w-inline-block"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div><div class="text-block-14">${brand}</div>${textDiv1}${textDiv2}</a></div>`;
         itemListSelling.innerHTML += sellingItemCardHTML;
 
@@ -91,66 +91,49 @@ async function loadItemCards(items) {
           let output = '';
           const words = str.split(' ');
           words.forEach(function (word) {
-            if (output.trim().length > str.length/2 && !output.includes('<br>')){
+            if (output.trim().length > str.length / 2 && !output.includes('<br>')) {
               output += '<br>';
             }
             output += word + ' ';
           });
           output = output.trim();
-          console.log(output);
           buyerInfoTextHTML = `<div class="text-block-44">${output}</div>`;
         }
         var userActionDiv = '';
         var shippingInfoDiv = '';
         let changeShippingMethod = '';
 
-        if (featureIsEnabled('C2C')) {
-          // ### C2C CODE ###
-          console.log("bagReceived: ", bagReceived);
-          console.log("!bagReceived: ", (!bagReceived));
-
-          // Add a user action, such as 'show QR button' or 'bag received checkbox'
-          if (shippingMethod === 'Service point') {
-            if (soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') {
-              if (!bagReceived) {
-                userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
-              }
-            }
-            else if (postnordQrCode) {
-              userActionDiv = getQrCodeButton(itemId);
-            }
-          } else if (shippingMethod === 'Pickup') {
+        // Add a user action, such as 'show QR button' or 'bag received checkbox'
+        if (shippingMethod === 'Service point') {
+          if (soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') {
             if (!bagReceived) {
               userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
-            } else if (bagReceived && !pickupDate) {
-              userActionDiv = getBookPickupButton(itemId, soldDate);
             }
-          } else if (!shippingMethod && !pickupDate) { // Temporary for items that have been sold but not sent before this release and therefor have no shippingMethod
-            // ...
-            userActionDiv = getBagReceivedCheckbox(itemId, soldDate); //TODO: Rename bagReceived to labelReceived everywhere
           }
+          else if (postnordQrCode) {
+            userActionDiv = getQrCodeButton(itemId);
+          }
+        } else if (shippingMethod === 'Pickup') {
+          if (!bagReceived) {
+            userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
+          } else if (bagReceived && !pickupDate) {
+            userActionDiv = getBookPickupButton(itemId, soldDate);
+          }
+        } else if (!shippingMethod && !pickupDate) { // Temporary for items that have been sold but not sent before this release and therefor have no shippingMethod
+          // ...
+          userActionDiv = getBagReceivedCheckbox(itemId, soldDate); //TODO: Rename bagReceived to labelReceived everywhere
+        }
 
-          // Always show the 'shippingInfoDiv' - Styling depending on state is set in the function
-          shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate, bagReceived);
+        // Always show the 'shippingInfoDiv' - Styling depending on state is set in the function
+        shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate, bagReceived);
 
-          // Add "change shipping method" when applicable and some spacing
-          if (bagReceived && (shippingMethod === "Service point" || (shippingMethod === "Pickup" && pickupDate))) {
-            shippingInfoDiv = '<div class="spacing-15-px"></div>' + shippingInfoDiv;
-            changeShippingMethod += `
+        // Add "change shipping method" when applicable and some spacing
+        if (bagReceived && (shippingMethod === "Service point" || (shippingMethod === "Pickup" && pickupDate))) {
+          shippingInfoDiv = '<div class="spacing-15-px"></div>' + shippingInfoDiv;
+          changeShippingMethod += `
           <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
               <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
           </a>`;
-          }
-
-        } else {
-          // ### LIVE CODE ###
-          var userActionDiv = '';
-          var shippingInfoDiv = '';
-          if (!shippingMethod && !pickupDate) {
-            userActionDiv = getBagReceivedCheckbox(itemId, soldDate);
-          } else {
-            shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate);
-          }
         }
 
         //Create card

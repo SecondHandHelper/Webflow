@@ -238,8 +238,6 @@ function getBagReceivedCheckbox(itemId, soldDate, shippingMethod) {
 }
 
 function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
-    console.log("getShippingInfoDiv is running");
-    console.log("getShippingInfoDiv params: ", itemId, method, soldDate, pickupDate, bagReceived);
     if (featureIsEnabled('C2C')) {
         // ### C2C CODE ###
         let shippingInfo = ``;
