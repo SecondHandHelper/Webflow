@@ -43,6 +43,52 @@
             if (user && user.addressFirstName && user.addressLastName && !user?.referralData?.referralCode) { createReferralCode(); }
         }
     }
+
+    function showNpsSurvey(items) {
+        const nowDate = new Date();
+        let daysSinceFirstPublished = 0;
+        let daysSinceLastPublished = 0;
+        /*// Last viewed
+        const surveyLastViewed = user?.elementViews && user.elementViews.some(e => e.elementID === 'npsSurvey') ? true : false;
+        const lastViwedTimeDiff = nowDate.getTime() - surveyLastViewed.getTime();
+        const daysSinceLastViewed = Math.floor(lastViwedTimeDiff / (1000 * 3600 * 24));*/
+
+        // Last answered
+        const doc = await db.collection('users').doc(authUser.uid).get();
+        let npsArray = doc.data().nps;
+        const surveyLastAnswered = new Date(npsArray[npsArray.length - 1].timestamp);
+        const lastAnsweredTimeDiff = nowDate.getTime() - surveyLastAnswered.getTime();
+        const daysSinceLastAnswered = Math.floor(lastAnsweredTimeDiff / (1000 * 3600 * 24));
+
+        if (items) {
+            items.forEach((doc) => {
+                var itemId = doc.id;
+                var i = doc.data();
+                let soldDate = i.soldDate;
+                let publishedDate = i.publishedDate;
+                const status = i.status;
+                const archived = i.archived;
+
+                if (publishedDate && !archived) {
+                    publishedDate = new Date(publishedDate);
+                    let timeDiff = nowDate.getTime() - publishedDate.getTime();
+                    let daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
+                    if (daysDiff > daysSinceFirstPublished) {
+                        daysSinceFirstPublished = daysDiff;
+                        console.log("daysSinceFirstPublished UPDATED: ", daysSinceFirstPublished);
+                    }
+                    if (daysDiff < daysSinceLastPublished && daysDiff !== 0) {
+                        daysSinceLastPublished = daysDiff;
+                        console.log("daysSinceLastPublished UPDATED: ", daysSinceLastPublished);
+                    }
+                }
+            });
+        }
+
+        if (daysSinceFirstPublished >= 25 && daysSinceLastPublished <= 60 && surveyLastViewed) {
+            window.location.href = window.location.origin + "/feedback-nps"
+        }
+    }
 </script>
 <script>
     //Disable webflow form submissions
