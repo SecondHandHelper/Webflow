@@ -44,49 +44,35 @@
         }
     }
 
-    function showNpsSurvey(items) {
+    async function showNpsSurvey(items) {
         const nowDate = new Date();
         let daysSinceFirstPublished = 0;
         let daysSinceLastPublished = 0;
-        /*// Last viewed
-        const surveyLastViewed = user?.elementViews && user.elementViews.some(e => e.elementID === 'npsSurvey') ? true : false;
-        const lastViwedTimeDiff = nowDate.getTime() - surveyLastViewed.getTime();
-        const daysSinceLastViewed = Math.floor(lastViwedTimeDiff / (1000 * 3600 * 24));*/
 
-        // Last answered
-        const doc = await db.collection('users').doc(authUser.uid).get();
-        let npsArray = doc.data().nps;
-        const surveyLastAnswered = new Date(npsArray[npsArray.length - 1].timestamp);
-        const lastAnsweredTimeDiff = nowDate.getTime() - surveyLastAnswered.getTime();
-        const daysSinceLastAnswered = Math.floor(lastAnsweredTimeDiff / (1000 * 3600 * 24));
+        // Last viewed
+        const x = user.elementViews ? user.elementViews.reverse().find(e => e.elementID === 'npsSurvey') : null;
+        const surveyLastViewed = x ? x.timestamp.toDate() : null;
+        const daysSinceSurveyLastViewed = surveyLastViewed ? Math.floor((nowDate.getTime() - surveyLastViewed.getTime()) / (1000 * 3600 * 24)) : null;
 
         if (items) {
             items.forEach((doc) => {
-                var itemId = doc.id;
-                var i = doc.data();
-                let soldDate = i.soldDate;
-                let publishedDate = i.publishedDate;
-                const status = i.status;
-                const archived = i.archived;
-
-                if (publishedDate && !archived) {
-                    publishedDate = new Date(publishedDate);
-                    let timeDiff = nowDate.getTime() - publishedDate.getTime();
-                    let daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
+                const i = doc.data();
+                if (i.publishedDate && !i.archived) {
+                    const publishedDate = new Date(i.publishedDate);
+                    const daysDiff = Math.floor((nowDate.getTime() - publishedDate.getTime()) / (1000 * 3600 * 24));
                     if (daysDiff > daysSinceFirstPublished) {
                         daysSinceFirstPublished = daysDiff;
-                        console.log("daysSinceFirstPublished UPDATED: ", daysSinceFirstPublished);
                     }
-                    if (daysDiff < daysSinceLastPublished && daysDiff !== 0) {
+                    if (daysDiff < daysSinceLastPublished || (daysSinceLastPublished === 0 && daysDiff > 0)) {
                         daysSinceLastPublished = daysDiff;
-                        console.log("daysSinceLastPublished UPDATED: ", daysSinceLastPublished);
                     }
                 }
             });
         }
 
-        if (daysSinceFirstPublished >= 25 && daysSinceLastPublished <= 60 && surveyLastViewed) {
-            window.location.href = window.location.origin + "/feedback-nps"
+        //console.log("IF all true -> Show NPS: ", `daysSinceFirstPublished(${daysSinceFirstPublished}) >= 25 && daysSinceLastPublished(${daysSinceLastPublished}) <= 60 && (!daysSinceSurveyLastViewed(${daysSinceSurveyLastViewed}) || daysSinceSurveyLastViewed(${daysSinceSurveyLastViewed}) > 90)`);
+        if (daysSinceFirstPublished >= 25 && daysSinceLastPublished <= 60 && (!daysSinceSurveyLastViewed || daysSinceSurveyLastViewed > 90)) {
+            window.location.href = window.location.origin + "/feedback-nps";
         }
     }
 </script>
