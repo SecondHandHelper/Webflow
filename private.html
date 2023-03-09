@@ -70,8 +70,8 @@
             });
         }
 
-        //console.log("IF all true -> Show NPS: ", `daysSinceFirstPublished(${daysSinceFirstPublished}) >= 25 && daysSinceLastPublished(${daysSinceLastPublished}) <= 60 && (!daysSinceSurveyLastViewed(${daysSinceSurveyLastViewed}) || daysSinceSurveyLastViewed(${daysSinceSurveyLastViewed}) > 90)`);
-        if (daysSinceFirstPublished >= 25 && daysSinceLastPublished <= 60 && (!daysSinceSurveyLastViewed || daysSinceSurveyLastViewed > 90)) {
+        //console.log("IF all true -> Show NPS: ", `daysSinceFirstPublished(${daysSinceFirstPublished}) >= 25 && daysSinceLastPublished(${daysSinceLastPublished}) <= 60 && (!surveyLastViewed(${surveyLastViewed}) || daysSinceSurveyLastViewed(${daysSinceSurveyLastViewed}) > 90)`);
+        if (daysSinceFirstPublished >= 25 && daysSinceLastPublished <= 60 && (!surveyLastViewed || daysSinceSurveyLastViewed > 90) && !document.referrer.includes('feedback-nps')) {
             window.location.href = window.location.origin + "/feedback-nps";
         }
     }

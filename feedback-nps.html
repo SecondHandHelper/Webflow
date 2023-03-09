@@ -1,4 +1,6 @@
 <script>
+    var npsId;
+
     async function addNpsScore() {
         let score = 11;
         var radioButtons = document.getElementsByName("nps");
@@ -20,21 +22,22 @@
         }
 
         // Store score
-        await db.collection('users').doc(authUser.uid).update({ nps: firebase.firestore.FieldValue.arrayUnion({ score, timestamp: new Date() }) });
-        console.log(`Score '${score}' stored on user with ID: `, authUser.uid);
+        const docRef = await db.collection("nps").add({ score, answeredAt: new Date(), user: authUser.uid });
+        npsId = docRef.id;
+        console.log(`Score '${score}' stored in DB with npsId: `, npsId);
 
         // Show follow up question
         if (score >= 0 && score <= 6) {
             followUpQuestion.innerHTML = 'Tack för feedbacken! Vilka förändringar skulle Mai behöva göra för att få ett högre betyg?';
         }
         if (score >= 7 && score <= 8) {
-            followUpQuestion.innerHTML = 'Tack för feedbacken! Skulle du vilja dela din motivering till det betyget med oss?';
+            followUpQuestion.innerHTML = 'Tack för feedbacken! Vilka förändringar skulle göra Mai bättre?';
         }
         if (score >= 9 && score <= 10) {
             followUpQuestion.innerHTML = 'Kul att du gillar det! Vad är Mai riktigt bra på?';
         }
-        followUpDiv.style.display = 'block';
-        npsFormDiv.style.display = 'none';
+
+        triggerShowFollowUpQuestion.click();
     }
 
     async function addFollowUp() {
@@ -42,24 +45,19 @@
         const answer = followUpAnswer.value;
         const followUp = { followUpQuestion: question, followUpAnswer: answer };
 
-        // Update latest NPS rating object with question and answer
-        const doc = await db.collection('users').doc(authUser.uid).get();
-        let npsArray = doc.data().nps;
-        const i = npsArray.length - 1; // Latest NPS rating
-        Object.assign(npsArray[i], followUp); // Add follow up question and answer to the latest rating
-        await db.collection('users').doc(authUser.uid).update({ nps: npsArray });
-        console.log(`Follow up question and answer stored on user with ID: `, authUser.uid);
+        // Update latest NPS document with question and answer
+        await db.collection('nps').doc(npsId).update({ followUpQuestion: question, followUpAnswer: answer });
+        console.log(`Follow up question and answer stored on doc with npsId: `, npsId);
 
         // Show thank you div
-        followUpDiv.style.display = 'none';
-        thankYouDiv.style.display = 'block';
+        triggerShowThankYou.click();
     }
 
     async function main() {
         // Store elementViews to be able to hinder it to show again
         db.collection('users').doc(authUser.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "npsSurvey", timestamp: new Date() }) });
         // Track with segment
-        //analytics.track("Element Viewed", { elementID: "npsSurvey" });
+        analytics.track("Element Viewed", { elementID: "npsSurvey" });
     }
 
     npsSubmitButton.addEventListener("click", addNpsScore);
