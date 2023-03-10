@@ -43,11 +43,9 @@
     async function addFollowUp() {
         const question = followUpQuestion.innerHTML;
         const answer = followUpAnswer.value;
-        const followUp = { followUpQuestion: question, followUpAnswer: answer };
 
         // Update latest NPS document with question and answer
-        await db.collection('nps').doc(npsId).update({ followUpQuestion: question, followUpAnswer: answer });
-        console.log(`Follow up question and answer stored on doc with npsId: `, npsId);
+        if (answer) { await db.collection('nps').doc(npsId).update({ followUpQuestion: question, followUpAnswer: answer }); }
 
         // Show thank you div
         triggerShowThankYou.click();
