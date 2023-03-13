@@ -109,10 +109,19 @@ async function addItemInner(id) {
 
     await db.collection('items').doc(id).set(item);
 
+
+
+
     // If first time: User submitted their phone number
     const phoneNumber = itemPhoneNumber.value;
     if (phoneNumber) {
       await writePhoneNumberToFirestore(authUser.uid, phoneNumber);
+    }
+
+    // Track with segment 'User Activated'
+    console.log('addItem() userItemsCount: ', userItemsCount);
+    if (userItemsCount === 1) {
+      analytics.track('User Activated');
     }
   } else {
     // ### LIVE CODE ###
