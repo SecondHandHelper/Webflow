@@ -46,10 +46,11 @@
     }
 
     async function showNpsSurvey(items) {
+        if (!user) { return; }
         const nowDate = new Date();
         let daysSinceFirstPublished = 0;
         let daysSinceLastPublished = 0;
-
+        
         // Last viewed
         const x = user.elementViews ? user.elementViews.reverse().find(e => e.elementID === 'npsSurvey') : null;
         const surveyLastViewed = x ? x.timestamp.toDate() : null;
