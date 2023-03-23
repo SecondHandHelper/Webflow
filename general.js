@@ -610,7 +610,7 @@ function loadRecentlySold() {
                 const soldPrice = item.soldPrice;
                 const imageUrl = itemCoverImage(item);
                 if (soldPrice >= 240) {
-                    const itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>${brand}</div></div>`;
+                    const itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>${brand}</div><div class='text-block-34'>Idag</div></div>`;
                     itemListRecentlySoldStartPage.innerHTML += itemCardHTML;
                 }
             }
