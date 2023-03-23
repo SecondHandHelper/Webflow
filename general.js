@@ -593,24 +593,26 @@ function signOut() {
 
 // FUNCTIONS FOR START PAGE (Logged out)
 function loadRecentlySold() {
-    var data = {};
-
     const recentlySoldItems = firebase.app().functions('europe-west1').httpsCallable('recentlySoldItems');
 
     recentlySoldItems()
         .then((result) => {
             // Read result of the Cloud Function.
-            console.log('Cloud Function är klar! Nu gör vi något med resultatet!');
-
             const itemListRecentlySoldStartPage = document.getElementById('itemListRecentlySoldStartPage');
             itemListRecentlySoldStartPage.innerHTML = "";
 
             for (const item of result.data) {
                 const brand = item.brand;
                 const soldPrice = item.soldPrice;
+                console.log("soldDate", item.soldDate);
+                const soldTime = new Date(item.soldDate).toISOString().split('T')[0] === new Date().toISOString().split('T')[0] ? "Idag" : "Igår" ;
                 const imageUrl = itemCoverImage(item);
                 if (soldPrice >= 240) {
-                    const itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>${brand}</div><div class='text-block-34'>Idag</div></div>`;
+                    const itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="conten-block with-image">
+                    <div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div>
+                    <div class="text-block-14">${soldPrice} kr</div>
+                    <div class='text-block-34'>${brand}</div>
+                    <div class='text-block-34'>${soldTime}</div></div>`;
                     itemListRecentlySoldStartPage.innerHTML += itemCardHTML;
                 }
             }
@@ -619,7 +621,6 @@ function loadRecentlySold() {
             // Getting the Error details.
             var code = error.code;
             var message = error.message;
-            var details = error.details;
             console.log('Error message: ', message, code);
         });
     // [END fb_functions_call_add_message_error]
