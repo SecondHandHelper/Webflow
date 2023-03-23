@@ -604,7 +604,6 @@ function loadRecentlySold() {
             for (const item of result.data) {
                 const brand = item.brand;
                 const soldPrice = item.soldPrice;
-                console.log("soldDate", item.soldDate);
                 const soldTime = new Date(item.soldDate).toISOString().split('T')[0] === new Date().toISOString().split('T')[0] ? "Idag" : "Igår" ;
                 const imageUrl = itemCoverImage(item);
                 if (soldPrice >= 240) {
