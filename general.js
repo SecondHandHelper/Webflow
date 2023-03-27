@@ -604,14 +604,17 @@ function loadRecentlySold() {
             for (const item of result.data) {
                 const brand = item.brand;
                 const soldPrice = item.soldPrice;
-                const soldTime = new Date(item.soldDate).toISOString().split('T')[0] === new Date().toISOString().split('T')[0] ? "Idag" : "Igår" ;
+                const soldDate = new Date(item.soldDate);
+                const publishedDate = new Date(item.publishedDate);
+                const soldTimeText = new Date(item.soldDate).toISOString().split('T')[0] === new Date().toISOString().split('T')[0] ? "Idag" : "Igår" ;
                 const imageUrl = itemCoverImage(item);
-                if (soldPrice >= 240) {
+                const daysToSold = Math.floor((soldDate.getTime() - publishedDate.getTime()) / (1000 * 3600 * 24));
+                if (soldPrice >= 200 || daysToSold <= 20) {
                     const itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="conten-block with-image">
                     <div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div>
                     <div class="text-block-14">${soldPrice} kr</div>
                     <div class='text-block-34'>${brand}</div>
-                    <div class='text-block-34'>${soldTime}</div></div>`;
+                    <div class='text-block-34'>${soldTimeText}</div></div>`;
                     itemListRecentlySoldStartPage.innerHTML += itemCardHTML;
                 }
             }
