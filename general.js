@@ -609,7 +609,7 @@ function loadRecentlySold() {
                 const soldTimeText = new Date(item.soldDate).toISOString().split('T')[0] === new Date().toISOString().split('T')[0] ? "Idag" : "Igår" ;
                 const imageUrl = itemCoverImage(item);
                 const daysToSold = Math.floor((soldDate.getTime() - publishedDate.getTime()) / (1000 * 3600 * 24));
-                if (soldPrice >= 200 || daysToSold <= 20) {
+                if (soldPrice >= 180 || daysToSold <= 20) {
                     const itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="conten-block with-image">
                     <div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div>
                     <div class="text-block-14">${soldPrice} kr</div>
