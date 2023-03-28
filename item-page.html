@@ -131,7 +131,6 @@ itemStatusText.style.fontWeight = "500";
             icon = '<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/62c53fa9db6d0f383ee430f9_check-mark%202%20(1).svg" loading="lazy" width="auto" alt="">';
         }
 
-        // Set time
         const weekdays = ['Sön', 'Mån', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör', 'Sön']
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
         const date = new Date(event.timestamp);
@@ -142,7 +141,6 @@ itemStatusText.style.fontWeight = "500";
         let daysDiff = Math.round((now.getTime() - date.getTime()) / (1000 * 3600 * 24));
         if (daysDiff > 6) { time = date.getDate() + " " + months[date.getMonth()] + " " + hours + ":" + minutes; }
 
-        // Set text
         if (event.type === 'itemAdded') {
             text = 'Plagg lades upp på Mai';
             displayLine = 'none';
@@ -150,7 +148,11 @@ itemStatusText.style.fontWeight = "500";
         if (event.type === 'valuationCompleted') { text = `Värderades till ${event.data.min}-${event.data.max} kr`; }
         if (event.type === 'valuationAccepted') { text = `Du accepterade värderingen`; }
         if (event.type === 'itemPublished') { text = `Försäljning påbörjades`; }
-        if (event.type === 'priceAdjusted') { text = `Pris sänktes till ${event.data.newPrice} kr`; }
+        if (event.type === 'priceAdjusted') {
+          const { platform, newPrice } = event.data
+          const capPlatform = platform && platform.charAt(0).toUpperCase() + platform.slice(1).split(/(?=[A-Z])/).join(' ');
+          text = `Pris sänktes till ${newPrice} kr ${platform && platform !== '' ? ' på ' + capPlatform : ''}`;
+        }
         if (event.type === 'priceRequestSent') { text = `Nytt prisförslag på ${event.data.min}-${event.data.max} kr`; }
         if (event.type === 'priceRequestResponse') {
             if (event.data.response === 'Accepted') {text = `Du accepterade prisförslaget`;} 
