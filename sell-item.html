@@ -1,167 +1,206 @@
 <script>
-    var userItemsCount;
+  var userItemsCount;
 </script>
 <script>
-    let frontImageUpload = document.getElementById("frontImage");
-    let frontImagePreviewUploading = document.getElementById("frontImagePreviewUploading");
-    let frontImagePreview = document.getElementById("frontImagePreview");
-    let brandTagImageUpload = document.getElementById("brandTagImage");
-    let brandTagImagePreviewUploading = document.getElementById("brandTagImagePreviewUploading");
-    let brandTagImagePreview = document.getElementById("brandTagImagePreview");
-    let productImageUpload = document.getElementById("productImage");
-    let productImagePreview = document.getElementById("productImagePreview");
-    let defectImageUpload = document.getElementById("defectImage");
-    let defectImagePreview = document.getElementById("defectImagePreview");
-    let materialTagImageUpload = document.getElementById("materialTagImage");
-    let materialTagImagePreview = document.getElementById("materialTagImagePreview");
-    let extraImageUpload = document.getElementById("extraImage");
-    let extraImagePreview = document.getElementById("extraImagePreview");
+  let frontImageUpload = document.getElementById("frontImage");
+  let frontImagePreviewUploading = document.getElementById("frontImagePreviewUploading");
+  let frontImagePreview = document.getElementById("frontImagePreview");
+  let brandTagImageUpload = document.getElementById("brandTagImage");
+  let brandTagImagePreviewUploading = document.getElementById("brandTagImagePreviewUploading");
+  let brandTagImagePreview = document.getElementById("brandTagImagePreview");
+  let productImageUpload = document.getElementById("productImage");
+  let productImagePreview = document.getElementById("productImagePreview");
+  let defectImageUpload = document.getElementById("defectImage");
+  let defectImagePreview = document.getElementById("defectImagePreview");
+  let materialTagImageUpload = document.getElementById("materialTagImage");
+  let materialTagImagePreview = document.getElementById("materialTagImagePreview");
+  let extraImageUpload = document.getElementById("extraImage");
+  let extraImagePreview = document.getElementById("extraImagePreview");
 
-    // display image when file has been selected
-    frontImageUpload.onchange = function () {
-        let input = this.files[0];
-        if (input) {
-            let src = URL.createObjectURL(input);
-            frontImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-            frontImagePreview.style.backgroundImage = `url('${src}')`;
-        }
-    };
-    brandTagImageUpload.onchange = function () {
-        let input = this.files[0];
-        if (input) {
-            let src = URL.createObjectURL(input);
-            brandTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-            brandTagImagePreview.style.backgroundImage = `url('${src}')`;
-        }
-    };
-    productImageUpload.onchange = function () {
-        let input = this.files[0];
-        if (input) {
-            let src = URL.createObjectURL(input);
-            productImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-            productImagePreview.style.backgroundImage = `url('${src}')`;
-        }
-
-    };
-    defectImageUpload.onchange = function () {
-        let input = this.files[0];
-        if (input) {
-            let src = URL.createObjectURL(input);
-            defectImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-            defectImagePreview.style.backgroundImage = `url('${src}')`;
-        }
-
-    };
-    materialTagImageUpload.onchange = function () {
-        let input = this.files[0];
-        if (input) {
-            let src = URL.createObjectURL(input);
-            materialTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-            materialTagImagePreview.style.backgroundImage = `url('${src}')`;
-        }
-
-    };
-    extraImageUpload.onchange = function () {
-        let input = this.files[0];
-        if (input) {
-            let src = URL.createObjectURL(input);
-            extraImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-            extraImagePreview.style.backgroundImage = `url('${src}')`;
-        }
-    };
-
-    // Change font color of dropdown itemAge when user selects a value
-    let itemAge = document.getElementById("itemAge");
-    itemAge.onchange = function () {
-        let input = this.value;
-        if (input != "") {
-            itemAge.style.color = "#333";
-        } else {
-            itemAge.style.color = "#929292";
-        }
-    };
-
-    // Hide/Show warning about difficulty to sell certain brands
-    let brand = document.getElementById("itemBrand");
-    let hardToSellDiv = document.getElementById("hardToSellDiv");
-    let words = ["H&M", "HM", "Zara", "ASOS", "Nelly", "Gina Tricot", "BikBok", "Bik Bok", "Lindex", "Kappahl", "Cubus", "NA-KD", "NAKD", "Mango", "Ellos", "Primark", "Shein", "Vila", "Forever 21", "Pull & Bear", "Bershka", "Stradivarius"];
-
-
-    brand.onchange = function () {
-        let value = this.value;
-        setTimeout(function () {
-            value = brand.value;
-            checkBrand(value);
-        }, 10);
-    };
-    brand.oninput = function () {
-        let value = this.value;
-        checkBrand(value);
-    };
-
-    function checkBrand(value) {
-        if (words.some(words => value.toLowerCase().includes(words.toLowerCase()))) {
-            hardToSellText.innerHTML = `Vi säljer i regel inte ${value}-plagg på grund av för lågt andrahandsvärde. Undantag kan finnas.`;
-            hardToSellDiv.style.display = 'block';
-        } else {
-            hardToSellDiv.style.display = 'none';
-        }
+  // display image when file has been selected
+  frontImageUpload.onchange = function () {
+    let input = this.files[0];
+    if (input) {
+      let src = URL.createObjectURL(input);
+      frontImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+      frontImagePreview.style.backgroundImage = `url('${src}')`;
+    }
+  };
+  brandTagImageUpload.onchange = function () {
+    let input = this.files[0];
+    if (input) {
+      let src = URL.createObjectURL(input);
+      brandTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+      brandTagImagePreview.style.backgroundImage = `url('${src}')`;
+    }
+  };
+  productImageUpload.onchange = function () {
+    let input = this.files[0];
+    if (input) {
+      let src = URL.createObjectURL(input);
+      productImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+      productImagePreview.style.backgroundImage = `url('${src}')`;
     }
 
-    // Hide/Show extra fields for defects
-    let itemCondition = document.getElementById("itemCondition");
-    let defectInfoDiv = document.getElementById("defectInfoDiv");
+  };
+  defectImageUpload.onchange = function () {
+    let input = this.files[0];
+    if (input) {
+      let src = URL.createObjectURL(input);
+      defectImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+      defectImagePreview.style.backgroundImage = `url('${src}')`;
+    }
 
-    itemCondition.onchange = function () {
-        let input = this.value;
-        if (input == "Använd, tecken på slitage") {
-            defectInfoDiv.style.display = 'block';
-            itemCondition.style.color = "#333";
-        } else if (input == "") {
-            defectInfoDiv.style.display = 'none';
-            itemCondition.style.color = "#929292";
-        } else {
-            defectInfoDiv.style.display = 'none';
-            itemCondition.style.color = "#333";
-        }
-    };
+  };
+  materialTagImageUpload.onchange = function () {
+    let input = this.files[0];
+    if (input) {
+      let src = URL.createObjectURL(input);
+      materialTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+      materialTagImagePreview.style.backgroundImage = `url('${src}')`;
+    }
 
-    document.getElementById('personalId').addEventListener("input", () => {
-      const error = isValidSwedishSsn(document.getElementById('personalId').value) ? '' : 'Ogiltigt personnummer';
-      document.getElementById("personalId").setCustomValidity(error);
-    })
+  };
+  extraImageUpload.onchange = function () {
+    let input = this.files[0];
+    if (input) {
+      let src = URL.createObjectURL(input);
+      extraImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+      extraImagePreview.style.backgroundImage = `url('${src}')`;
+    }
+  };
+
+  // Change font color of dropdown itemAge when user selects a value
+  let itemAge = document.getElementById("itemAge");
+  itemAge.onchange = function () {
+    let input = this.value;
+    if (input != "") {
+      itemAge.style.color = "#333";
+    } else {
+      itemAge.style.color = "#929292";
+    }
+  };
+
+  // Share sold Ids
+  let brandShareSoldText = document.getElementById('shareSoldText')
+  let shareSoldDiv = document.getElementById('shareSoldDiv')
+
+  // Hide/Show warning about difficulty to sell certain brands
+  let brand = document.getElementById("itemBrand");
+  let hardToSellDiv = document.getElementById("hardToSellDiv");
+  let words = ["H&M", "HM", "Zara", "ASOS", "Nelly", "Gina Tricot", "BikBok", "Bik Bok", "Lindex", "Kappahl", "Cubus", "NA-KD", "NAKD", "Mango", "Ellos", "Primark", "Shein", "Vila", "Forever 21", "Pull & Bear", "Bershka", "Stradivarius"];
+
+
+  brand.onchange = function () {
+    let value = this.value;
+    setTimeout(function () {
+      value = brand.value;
+      checkBrand(value);
+    }, 10);
+  };
+  brand.oninput = function () {
+    shareSoldDiv.style.display = 'none';
+    let value = this.value;
+    checkAndDisplayShareSold(value)
+    checkBrand(value);
+
+  };
+
+  function checkBrand(value) {
+    if (words.some(words => value.toLowerCase().includes(words.toLowerCase()))) {
+      hardToSellText.innerHTML = `Vi säljer i regel inte ${value}-plagg på grund av för lågt andrahandsvärde. Undantag kan finnas.`;
+      hardToSellDiv.style.display = 'block';
+    } else {
+      hardToSellDiv.style.display = 'none';
+    }
+  }
+
+
+  async function checkAndDisplayShareSold(value) {
+    const response = await firebase.app().functions("europe-west1").httpsCallable(
+      'fetchBrandShareSoldInfo',
+    )({cleanedBrandName: value})
+
+    if (response.data && response.data.cleanedBrand) {
+      if (response.data.shareSold > '95%') {
+        brandShareSoldText.innerHTML = `95% av plaggen från ${response.data.cleanedBrand} säljs`
+        shareSoldDiv.style.display = 'block';
+        return;
+      }
+
+      if (response.data.shareSold > '55%') {
+        brandShareSoldText.innerHTML = `${response.data.shareSold} av plaggen från ${response.data.cleanedBrand} säljs`
+        shareSoldDiv.style.display = 'block';
+        return;
+      }
+      if (response.data.shareSold >= '45%') {
+        brandShareSoldText.innerHTML = `Hälften av det som tas in av ${response.data.cleanedBrand} säljs`
+        shareSoldDiv.style.display = 'block';
+        return;
+      }
+
+      brandShareSoldText.innerHTML = `Mindre än hälften av det som tas in av ${response.data.cleanedBrand} säljs`
+      shareSoldDiv.style.display = 'block';
+    } else {
+      brandShareSoldText.innerHTML = ''
+      shareSoldDiv.style.display = 'none'
+    }
+  }
+
+  // Hide/Show extra fields for defects
+  let itemCondition = document.getElementById("itemCondition");
+  let defectInfoDiv = document.getElementById("defectInfoDiv");
+
+  itemCondition.onchange = function () {
+    let input = this.value;
+    if (input == "Använd, tecken på slitage") {
+      defectInfoDiv.style.display = 'block';
+      itemCondition.style.color = "#333";
+    } else if (input == "") {
+      defectInfoDiv.style.display = 'none';
+      itemCondition.style.color = "#929292";
+    } else {
+      defectInfoDiv.style.display = 'none';
+      itemCondition.style.color = "#333";
+    }
+  };
+
+  document.getElementById('personalId').addEventListener("input", () => {
+    const error = isValidSwedishSsn(document.getElementById('personalId').value) ? '' : 'Ogiltigt personnummer';
+    document.getElementById("personalId").setCustomValidity(error);
+  })
 </script>
 
 <script>
-    async function main() {
-            if (authUser) {
-                // Om användare inte har telefonnummer, be om telefonnummer i formuläret
-                console.log("phone: ", user.phoneNumber);
-                if (!user.phoneNumber) {
-                    phoneNumberDiv.style.display = "block";
-                    document.getElementById("itemPhoneNumber").required = true;
-                }
+  async function main() {
+    if (authUser) {
+      // Om användare inte har telefonnummer, be om telefonnummer i formuläret
+      console.log("phone: ", user.phoneNumber);
+      if (!user.phoneNumber) {
+        phoneNumberDiv.style.display = "block";
+        document.getElementById("itemPhoneNumber").required = true;
+      }
 
-                // Om användare inte har shipping method preference, be om det i formuläret
-                console.log("shipping method preference: ", user?.preferences?.shippingMethod);
-                if (!user?.preferences?.shippingMethod) {
-                    $('#servicePointRadioButton').val("Service point");
-                    $('#pickupRadioButton').val("Pickup");
-                    shippingMethodDiv.style.display = "block";
-                }
+      // Om användare inte har shipping method preference, be om det i formuläret
+      console.log("shipping method preference: ", user?.preferences?.shippingMethod);
+      if (!user?.preferences?.shippingMethod) {
+        $('#servicePointRadioButton').val("Service point");
+        $('#pickupRadioButton').val("Pickup");
+        shippingMethodDiv.style.display = "block";
+      }
 
-                // Get user's item count to be able to send 'User Activated' event if they add their first item
-                var items = await getItems(authUser.uid);
-                userItemsCount = items.size;
-                console.log('main() userItemsCount: ', userItemsCount);
-            }
+      // Get user's item count to be able to send 'User Activated' event if they add their first item
+      var items = await getItems(authUser.uid);
+      userItemsCount = items.size;
+      console.log('main() userItemsCount: ', userItemsCount);
     }
+  }
 
-    // Initial state
-    addressFormDiv.style.display = 'none';
-    itemConfirmationDiv.style.display = 'none';
-    addItemForm.addEventListener("submit", addItem);
-    userAddressForm.addEventListener("submit", addUserDetails);
-    /*initiate the autocomplete function on the "itemBrand" element, and pass along the brands array as possible autocomplete values:*/
-    autocomplete(document.getElementById("itemBrand"), brands);
+  // Initial state
+  addressFormDiv.style.display = 'none';
+  itemConfirmationDiv.style.display = 'none';
+  addItemForm.addEventListener("submit", addItem);
+  userAddressForm.addEventListener("submit", addUserDetails);
+  /*initiate the autocomplete function on the "itemBrand" element, and pass along the brands array as possible autocomplete values:*/
+  autocomplete(document.getElementById("itemBrand"), brands);
 </script>
