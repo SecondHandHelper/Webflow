@@ -649,11 +649,11 @@ function getFormAddressFields() {
   let addressDoorCode = document.getElementById("addressDoorCode").value;
 
   addressFirstName = addressFirstName ? addressFirstName.trim().charAt(0).toUpperCase() + addressFirstName.trim().slice(1) : "";
-  addressLastName = addressLastName ? addressLastName.trim().charAt(0).toUpperCase() + addressLastName.trim().slice(1).toLowerCase() : "";
+  addressLastName = addressLastName ? addressLastName.trim().charAt(0).toUpperCase() + addressLastName.trim().slice(1) : "";
   addressStreetAddress = addressStreetAddress ? addressStreetAddress.trim().charAt(0).toUpperCase() + addressStreetAddress.trim().slice(1) : "";
   addressCO = addressCO ? addressCO.trim() : "";
   addressPostalCode = addressPostalCode ? addressPostalCode.trim().replace(/\D/g,'') : "";
-  addressCity = addressCity ? addressCity.trim().charAt(0).toUpperCase() + addressCity.trim().slice(1).toLowerCase() : "";
+  addressCity = addressCity ? addressCity.trim().charAt(0).toUpperCase() + addressCity.trim().slice(1) : "";
   addressDoorCode = addressDoorCode ? addressDoorCode.trim() : "";
   return { addressFirstName, addressLastName, addressStreetAddress, addressCO, addressPostalCode, addressCity, addressDoorCode };
 }
