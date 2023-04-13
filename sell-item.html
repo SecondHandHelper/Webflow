@@ -93,6 +93,7 @@
             value = brand.value;
             if (!checkBrand(value)) {
                 checkAndDisplayShareSold(value);
+                displayFindModelDiv(value);
             }
         }, 5);
     };
@@ -101,6 +102,7 @@
         let value = this.value;
         if (!checkBrand(value)) {
             checkAndDisplayShareSold(value);
+            displayFindModelDiv(value);
         }
     };
 
@@ -145,6 +147,14 @@
             demandLevelText.innerHTML = '';
             shareSoldText.innerHTML = ''
             shareSoldDiv.style.display = 'none'
+        }
+    }
+
+    function displayFindModelDiv(value){
+        if (featureIsEnabled('modelDB')) {
+            if (value === 'Rodebjer'){
+                findModelDiv.style.display = 'block';
+            }
         }
     }
 

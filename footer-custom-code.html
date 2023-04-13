@@ -61,6 +61,7 @@
           console.log("user:", user);
           console.log("authUser", authUser);
           console.log("featureIsEnabled('C2C')", featureIsEnabled('C2C'));
+          console.log("featureIsEnabled('modelDB')", featureIsEnabled('modelDB'));
           identify();
 
           setPreferredLogInMethodCookie(authUser.providerData[0].providerId);
@@ -194,9 +195,9 @@
 
   // FEATURE TOGGLE FUNCTION
   var featureConfig = {
-    alpha: { C2C: true },
-    beta: { C2C: false },
-    default: { C2C: true }
+    alpha: { C2C: true, modelDB: true },
+    beta: { C2C: true, modelDB: true },
+    default: { C2C: true, modelDB: false }
   };
 
   function featureIsEnabled(featureName) {
