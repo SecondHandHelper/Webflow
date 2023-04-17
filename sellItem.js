@@ -117,9 +117,12 @@ async function addItemInner(id) {
     // ### C2C CODE ###
     console.log("addItemInner called");
 
-    const pageData = collect();
+    const { selectedModelCoverImageUrl, ...pageData} = collect();
     const shippingMethod = await getShippingMethod();
     const images = await uploadImages(id);
+    if (selectedModelCoverImageUrl) {
+      images['coverImage'] = selectedModelCoverImageUrl;
+    }
     const item = { ...pageData, shippingMethod, images, version: "2" };
 
     console.log('Storing item: ', item);
