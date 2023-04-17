@@ -53,6 +53,17 @@ function collect() {
     }
   }
 
+  const modelBoxCard = document.getElementById('findModelBoxCard');
+  let selectedModelCoverImageUrl = '';
+  let selectedModelId = '';
+  if (modelBoxCard.lastElementChild?.tagName === 'DIV' &&
+    document.getElementById('findModelBoxEmpty').style.display === 'none') {
+    // There is a current model selected grab the cover image and id from it
+    const modelData = JSON.parse(modelBoxCard.lastElementChild.getAttribute('data-model'));
+    selectedModelCoverImageUrl = modelData['coverImage'];
+    selectedModelId = modelData['id'];
+  }
+
   return {
     user: authUser.uid,
     createdAt: now,
@@ -72,7 +83,9 @@ function collect() {
     noSmoke,
     userComment,
     acceptPrice,
-    preferences: { userValuationApproval }
+    preferences: { userValuationApproval },
+    selectedModelCoverImageUrl,
+    selectedModelId
   };
 }
 

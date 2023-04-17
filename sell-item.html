@@ -150,10 +150,16 @@
         }
     }
 
-    function displayFindModelDiv(value){
+    async function displayFindModelDiv(value){
         if (featureIsEnabled('modelDB')) {
             if (value === 'Rodebjer'){
                 findModelDiv.style.display = 'block';
+                let response = await fetch('https://getbrandmodels-heypmjzjfq-ew.a.run.app?brand=Rodebjer', {
+                  method: 'GET',
+                  headers: { 'Content-Type': 'application/json' },
+                });
+                const models = await response.json();
+                sessionStorage.setItem('models', JSON.stringify(models));
             }
         }
     }
