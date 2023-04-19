@@ -54,14 +54,14 @@ function collect() {
   }
 
   const modelBoxCard = document.getElementById('findModelBoxCard');
-  let selectedModelCoverImageUrl = '';
-  let selectedModelId = '';
+  let modelCoverImageUrl = '';
+  let atModelVariantId = '';
   if (modelBoxCard.lastElementChild?.tagName === 'DIV' &&
     document.getElementById('findModelBoxEmpty').style.display === 'none') {
     // There is a current model selected grab the cover image and id from it
     const modelData = JSON.parse(modelBoxCard.lastElementChild.getAttribute('data-model'));
-    selectedModelCoverImageUrl = modelData['coverImage'];
-    selectedModelId = modelData['id'];
+    modelCoverImageUrl = modelData['coverImage'];
+    atModelVariantId = modelData['atVariantId'];
   }
 
   return {
@@ -84,8 +84,8 @@ function collect() {
     userComment,
     acceptPrice,
     preferences: { userValuationApproval },
-    selectedModelCoverImageUrl,
-    selectedModelId
+    modelCoverImageUrl,
+    atModelVariantId,
   };
 }
 
@@ -117,11 +117,11 @@ async function addItemInner(id) {
     // ### C2C CODE ###
     console.log("addItemInner called");
 
-    const { selectedModelCoverImageUrl, ...pageData} = collect();
+    const { modelCoverImageUrl, ...pageData} = collect();
     const shippingMethod = await getShippingMethod();
     const images = await uploadImages(id);
-    if (selectedModelCoverImageUrl) {
-      images['coverImage'] = selectedModelCoverImageUrl;
+    if (modelCoverImageUrl) {
+      images['coverImage'] = modelCoverImageUrl;
     }
     const item = { ...pageData, shippingMethod, images, version: "2" };
 

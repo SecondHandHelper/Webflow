@@ -2,21 +2,15 @@ const selectSize = (modelClicked) => (event) => {
   closeModelSelect();
   // Show selected model in search box
   document.getElementById('findModelBoxEmpty').style.display = 'none';
-  const clonedModelElement = modelClicked.cloneNode(true);
-  clonedModelElement.style.cursor = 'auto';
-  const modelBoxCard = document.getElementById('findModelBoxCard');
-  modelBoxCard.style.display = 'flex';
-  clonedModelElement.style.height = `${modelBoxCard.parentElement.clientHeight}px`;
-
-  // remove any previously selected model then add the new one
-  if (modelBoxCard.lastElementChild?.tagName === 'DIV') {
-    modelBoxCard.removeChild(modelBoxCard.lastChild);
-  }
-  const modelImg = clonedModelElement.getElementsByTagName('img')[0];
-  modelImg.style.borderRadius = '0px';
-  modelBoxCard.appendChild(clonedModelElement);
-  // Fill form with attributes from selected model
+  document.getElementById('findModelBoxFilled').style.display = 'flex';
   const model = JSON.parse(modelClicked.getAttribute("data-model"));
+  document.getElementById('findModelBoxImage').style.backgroundImage = `url('${model["coverImage"]}')`;
+  document.getElementById('findModelBoxNameCategory').innerText = `${model['brand']}, ${model['category']}`;
+  document.getElementById('findModelBoxName').innerText = `${model['maiName']}`;
+  document.getElementById('findModelBoxColor').innerText = `${model['color']}`;
+  document.getElementById('findModelBoxGender').innerText = `${model['gender']}`;
+
+  // Fill form with attributes from selected model
   document.getElementById(model['gender']).parentElement.click();
   document.getElementById('itemSize').value = event.target.innerText;
   document.getElementById('itemMaterial').value = model['material'];
