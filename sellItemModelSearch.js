@@ -77,30 +77,24 @@ const showModelItems = (models) => {
   }
 }
 
-function showFindModelPage(alwaysShow) {
-  return () => {
-    if (!alwaysShow && document.getElementById('findModelBoxEmpty').style.display === 'none') {
-      // A model is selected and shown, don't open the find model page on click inside the box
-      return;
-    }
-    document.getElementById('addItemFormDiv').style.display = 'none';
-    document.getElementById('modelSelectError').style.display = 'none';
-    document.getElementById('modelSizeSelect').style.display = 'none';
-    document.getElementById('modelSelectTitle').innerText = 'Välj modell';
-    document.getElementById('modelSelectDiv').style.display = 'block';
-    document.getElementById('modelList').style.display = 'block';
-    let modelDb = sessionStorage.getItem('models');
-    if (!modelDb) {
-      document.getElementById('modelSpinner').style.display = 'block'
-    } else {
-      document.getElementById('modelSpinner').style.display = 'none';
-      showModelItems(JSON.parse(modelDb).slice(0, 5));
-    }
+function showFindModelPage() {
+  document.getElementById('addItemFormDiv').style.display = 'none';
+  document.getElementById('modelSelectError').style.display = 'none';
+  document.getElementById('modelSizeSelect').style.display = 'none';
+  document.getElementById('modelSelectTitle').innerText = 'Välj modell';
+  document.getElementById('modelSelectDiv').style.display = 'block';
+  document.getElementById('modelList').style.display = 'block';
+  let modelDb = sessionStorage.getItem('models');
+  if (!modelDb) {
+    document.getElementById('modelSpinner').style.display = 'block'
+  } else {
+    document.getElementById('modelSpinner').style.display = 'none';
+    showModelItems(JSON.parse(modelDb).slice(0, 5));
   }
 }
 
-document.getElementById('find-model-box').addEventListener('click', showFindModelPage(false))
-document.getElementById('findNewModel').addEventListener('click', showFindModelPage(true))
+document.getElementById('findModelBoxEmpty').addEventListener('click', showFindModelPage)
+document.getElementById('findNewModel').addEventListener('click', showFindModelPage)
 
 const closeModelSelect = () => {
   document.getElementById('addItemFormDiv').style.display = 'block';
