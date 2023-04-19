@@ -3,7 +3,9 @@ const selectSize = (modelClicked) => (event) => {
   // Show selected model in search box
   document.getElementById('findModelBoxEmpty').style.display = 'none';
   document.getElementById('findModelBoxFilled').style.display = 'flex';
-  const model = JSON.parse(modelClicked.getAttribute("data-model"));
+  const modelJson = modelClicked.getAttribute("data-model");
+  document.getElementById('findModelBoxFilled').setAttribute("data-model", modelJson)
+  const model = JSON.parse(modelJson);
   document.getElementById('findModelBoxImage').style.backgroundImage = `url('${model["coverImage"]}')`;
   document.getElementById('findModelBoxNameCategory').innerText = `${model['brand']}, ${model['category']}`;
   document.getElementById('findModelBoxName').innerText = `${model['maiName']}`;

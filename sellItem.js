@@ -53,13 +53,12 @@ function collect() {
     }
   }
 
-  const modelBoxCard = document.getElementById('findModelBoxCard');
+  const modelBoxFilled = document.getElementById('findModelBoxFilled');
   let modelCoverImageUrl = '';
   let atModelVariantId = '';
-  if (modelBoxCard.lastElementChild?.tagName === 'DIV' &&
-    document.getElementById('findModelBoxEmpty').style.display === 'none') {
+  if (modelBoxFilled.style.display === 'flex') {
     // There is a current model selected grab the cover image and id from it
-    const modelData = JSON.parse(modelBoxCard.lastElementChild.getAttribute('data-model'));
+    const modelData = JSON.parse(modelBoxFilled.getAttribute('data-model'));
     modelCoverImageUrl = modelData['coverImage'];
     atModelVariantId = modelData['atVariantId'];
   }
