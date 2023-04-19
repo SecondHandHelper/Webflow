@@ -1,0 +1,283 @@
+<script>
+  let pageHeader = document.getElementById('pageTitleText')
+  let fullPersonId = ''
+  let address = {
+    addressFirstName: '',
+    addressLastName: '',
+    addressStreetAddress: '',
+    addressPostalCode: '',
+    addressCity: '',
+    addressDoorCode: ''
+  }
+  let phoneNumber = document.getElementById('phoneNumber')
+  let shippingPreference = document.getElementById('shippingPreferences')
+  let swishNumber = document.getElementById('swishNumber')
+  let servicePointSettings = document.getElementById('ServicePointSettings');
+  let displayedPersonId = document.getElementById('personalId')
+  let displayedAddress = document.getElementById('displayAddress')
+  let newFirstName = document.getElementById('newAddressFirstName')
+  let newLastName = document.getElementById('newAddressLastName')
+  let newStreetAddress = document.getElementById("newStreetAddress")
+  let newPostalCode = document.getElementById("newAddressPostalCode")
+  let newCity = document.getElementById("newAddressCity")
+  let newDoorCode = document.getElementById("newAddressDoorCode")
+  let newPersonalId = document.getElementById("newPersonalId")
+  let newSwishNumber = document.getElementById("newSwishNumber")
+  let newPhoneNumber = document.getElementById("newPhoneNumber")
+  let saveButton = document.getElementById('saveButton')
+  let saveLoadingSpinner = document.getElementById('saveLoadingSpinner')
+  let settingsContainer = document.getElementById('settingsContainer')
+
+  let {
+    addressFirstName,
+    addressLastName,
+    addressStreetAddress,
+    addressPostalCode,
+    addressCity,
+    addressDoorCode
+  } = address
+
+  async function getUserInfo(onUpdate) {
+    try {
+      const response = await firebase.app().functions("europe-west1").httpsCallable('getUserInfo')();
+      await displayPersonalId(response.data.personalId);
+      ({
+        addressFirstName = '',
+        addressLastName = '',
+        addressStreetAddress = '',
+        addressPostalCode = '',
+        addressCity = '',
+        addressDoorCode = ''
+      } = response.data);
+      const shippingMethod = response.data.preferences.shippingMethod || null;
+
+      displayedAddress.innerHTML = addressStreetAddress ? `${addressStreetAddress} <br/> ${addressPostalCode} ${addressCity}` : '-';
+      swishNumber.innerHTML = response.data.swishPayeeAlias || '-';
+      phoneNumber.innerHTML = response.data.phoneNumber || '-';
+      shippingPreference.innerHTML = shippingMethod || '-';
+
+      if (shippingMethod) {
+        if (shippingMethod !== servicePointSettings.value) {
+          document.getElementById('PickupSettings').checked = true
+        } else {
+          servicePointSettings.checked = true
+        }
+      }
+    } catch (e) {
+      console.log('error fetching user data', e)
+    } finally {
+      if (!onUpdate) {
+        document.getElementById('loadingDiv').style.display = 'none'
+        settingsContainer.style.display = 'block'
+      }
+    }
+  }
+
+  async function displayPersonalId(personId) {
+    fullPersonId = personId || ''
+    let personIdLastFour = '-'
+
+    if (fullPersonId.length > 4) {
+      personIdLastFour = fullPersonId.substring(fullPersonId.length - 4);
+      displayedPersonId.innerHTML = `XXXXXXXX-${personIdLastFour}`
+      return
+    }
+    displayedPersonId.innerHTML = personIdLastFour
+  }
+
+  async function updateUserAddress() {
+    try {
+      await firebase.app().functions("europe-west1").httpsCallable(
+        'updateFirebaseUser',
+      )({...await getFormAddressFields()})
+      await onUpdateComplete()
+    } catch (e) {
+      console.log('Error updating user', e)
+    }
+  }
+
+  async function updateUserPhoneNumber() {
+    try {
+      await firebase.app().functions("europe-west1").httpsCallable(
+        'updateFirebaseUser',
+      )({phoneNumber: getCleanedNumber(false)})
+      await onUpdateComplete()
+    } catch (e) {
+      console.log('Error updating user', e)
+    }
+  }
+
+  async function updateShippingPreference() {
+    let shippingMethod = "";
+    let radioButtons = document.getElementsByName('shippingMethodSettings');
+    for (let x = 0; x < radioButtons.length; x++) {
+      if (radioButtons[x].checked) {
+        shippingMethod = radioButtons[x].value; // "Service point" or "Pickup"
+      }
+    }
+    await firebase.app().functions("europe-west1").httpsCallable(
+      'updateFirebaseUser',
+    )({preferences: {shippingMethod}})
+    await onUpdateComplete()
+  }
+
+  async function updateSwishNumber() {
+    try {
+      await firebase.app().functions("europe-west1").httpsCallable(
+        'updateFirebaseUser',
+      )({swishPayeeAlias: getCleanedNumber(true)})
+      await onUpdateComplete()
+    } catch (e) {
+      console.log('Error updating user', e)
+    }
+  }
+
+  async function updateUserPersonId() {
+    try {
+      await firebase.app().functions("europe-west1").httpsCallable(
+        'updateFirebaseUser',
+      )({personalId: getCleanedPersonalId()})
+      await onUpdateComplete()
+    } catch (e) {
+      console.log('Error updating user', e)
+    }
+  }
+
+  async function onUpdateComplete() {
+    await getUserInfo(true)
+    saveButton.innerHTML = 'Sparat'
+    saveButton.style.opacity = '0.6'
+    saveButton.disabled = true
+    saveLoadingSpinner.style.display = 'none'
+    document.getElementById('saveButtonContainer').style.display = 'block'
+  }
+
+  async function getFormAddressFields() {
+    const address = {
+      addressFirstName: newFirstName.value.charAt(0).toUpperCase() + newFirstName.value.slice(1),
+      addressLastName: newLastName.value.charAt(0).toUpperCase() + newLastName.value.slice(1),
+      addressStreetAddress: newStreetAddress.value.trim().replace(/^\w/, c => c.toUpperCase()),
+      addressPostalCode: newPostalCode.value.trim().replace(/\D/g, ''),
+      addressCity: newCity.value.trim().replace(/^\w/, c => c.toUpperCase()),
+      addressDoorCode: newDoorCode.value.trim()
+    }
+    if (!address.addressStreetAddress || !address.addressPostalCode || !address.addressCity) {
+      return null;
+    }
+    return address
+  }
+
+  function getCleanedPersonalId() {
+    const input = newPersonalId.value.trim();
+    return input.replace(/\D/g, '');
+  }
+
+  function getCleanedNumber(isSwish) {
+    let input = isSwish ? newSwishNumber.value.trim() : newPhoneNumber.value.trim()
+    if (input[0] !== '+') {
+      input = `+46${parseInt(input, 10)}`
+    }
+    return input
+  }
+
+  async function setAddressFields() {
+    newFirstName.value = addressFirstName
+    newLastName.value = addressLastName
+    newStreetAddress.value = addressStreetAddress
+    newPostalCode.value = addressPostalCode
+    newCity.value = addressCity
+    newDoorCode.value = addressDoorCode
+  }
+
+  function displayForm(divId, formId, newValue, headerText) {
+    document.getElementById(formId).style.display = 'block'
+    document.getElementById('updateContainer').style.display = 'block'
+    document.getElementById('goBackDiv').style.display = 'none'
+    document.getElementById('resetPageDiv').style.display = 'block'
+    saveButton.style.display = 'block'
+    settingsContainer.style.display = 'none'
+    pageHeader.innerHTML = headerText
+    pageHeader.value = headerText
+    if (newValue) {
+      if (newValue === newPersonalId) {
+        newValue.value = fullPersonId
+        return
+      }
+      newValue.value = document.getElementById(divId).innerHTML.length > 2 ? document.getElementById(divId).innerHTML : ''
+    }
+  }
+
+  document.getElementById('adressDiv').addEventListener('click', async function () {
+    await setAddressFields()
+    displayForm('adressDiv', 'addressForm', null, 'Adress')
+  })
+
+  document.getElementById('phoneDiv').addEventListener("click", function () {
+    displayForm('phoneNumber', 'phoneForm', newPhoneNumber, 'Mobilnummer')
+  })
+
+  document.getElementById('shippingPrefDiv').addEventListener("click", function () {
+    displayForm('shippingPrefDiv', 'shippingPrefForm', null, 'Skicka plagg')
+  })
+
+  document.getElementById('swishDiv').addEventListener("click", function () {
+    displayForm('swishNumber', 'swishForm', newSwishNumber, 'Swish')
+  })
+
+  document.getElementById('personIdDiv').addEventListener("click", function () {
+    displayForm('fullPersonId', 'personIdForm', newPersonalId, 'Personnummer')
+  })
+
+  document.getElementById('resetPageButton').addEventListener("click", () => {
+    const formIds = {
+      'Adress': 'addressForm',
+      'Mobilnummer': 'phoneForm',
+      'Swish': 'swishForm',
+      'Personnummer': 'personIdForm',
+      'Skicka plagg': 'shippingPrefForm',
+    }
+    document.getElementById(formIds[pageHeader.value]).style.display = 'none'
+    document.getElementById('updateContainer').style.display = 'none'
+    document.getElementById('goBackDiv').style.display = 'block'
+    document.getElementById('resetPageDiv').style.display = 'none'
+    settingsContainer.style.display = 'block'
+    saveButton.style.display = 'none'
+    saveLoadingSpinner.style.display = 'none'
+    pageHeader.innerHTML = 'Inställningar'
+    pageHeader.value = 'Inställningar'
+    saveButton.innerHTML = 'Spara'
+    saveButton.style.opacity = '1'
+    saveButton.disabled = false
+  })
+  saveButton.addEventListener("click", async function () {
+    document.getElementById('saveButtonContainer').style.display = 'none'
+    saveLoadingSpinner.style.display = 'block'
+    switch (pageHeader.value) {
+      case 'Adress':
+        await updateUserAddress()
+        break
+      case 'Mobilnummer':
+        await updateUserPhoneNumber()
+        break
+      case 'Skicka plagg':
+        await updateShippingPreference()
+        break
+      case 'Swish':
+        await updateSwishNumber()
+        break
+      case 'Personnummer':
+        await updateUserPersonId()
+        break
+    }
+  })
+
+  getUserInfo()
+</script>
+
+<script defer src="https://cdn.jsdelivr.net/gh/CodeCrumbsApp/floating-form-labels@0.1.1/index.min.js"></script>
+<script>
+  window.CodeCrumbs.FloatLabels({
+    inputSelector: ".input-settings",
+    labelActiveClass: "float",
+  })
+</script>
