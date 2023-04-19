@@ -30,7 +30,10 @@ const showModelSizes = (modelClicked) => {
     modelSizeList.removeChild(modelSizeList.lastChild);
   }
   const model = JSON.parse(modelClicked.getAttribute("data-model"));
-  for (const [idx, size] of model.sizes.entries()) {
+  if (model.sizes.length === 1) {
+    return selectSize(modelClicked)({target: model.sizes[0]});
+  }
+  for (const [idx, size] of model.sizes.sort(sizeCompare).entries()) {
     const newNode = templateSize.cloneNode(true);
     newNode.id = `${templateSize.id}_${idx}`;
     newNode.style.display = 'block';
@@ -89,6 +92,14 @@ function modelCompare(a, b) {
     return -1;
   }
   return 0;
+}
+
+function sizeCompare(a, b) {
+  const sizeOrdering = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL']
+  if (sizeOrdering.indexOf(a) > -1 && sizeOrdering.indexOf(b) > -1) {
+    return sizeOrdering.indexOf(a) - sizeOrdering.indexOf(b)
+  }
+  return a - b;
 }
 
 function showFindModelPage() {
