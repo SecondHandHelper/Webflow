@@ -79,6 +79,18 @@ const showModelItems = (models) => {
   }
 }
 
+function modelCompare(a, b) {
+  const nameA = a["maiName"].toLowerCase();
+  const nameB = b["maiName"].toLowerCase();
+  if (nameA > nameB) {
+    return 1;
+  }
+  if (nameA < nameB) {
+    return -1;
+  }
+  return 0;
+}
+
 function showFindModelPage() {
   document.getElementById('addItemFormDiv').style.display = 'none';
   document.getElementById('modelSelectError').style.display = 'none';
@@ -86,12 +98,21 @@ function showFindModelPage() {
   document.getElementById('modelSelectTitle').innerText = 'Välj modell';
   document.getElementById('modelSelectDiv').style.display = 'block';
   document.getElementById('modelList').style.display = 'block';
+  document.getElementById('modelSearchInput').value = '';
   let modelDb = sessionStorage.getItem('models');
   if (!modelDb) {
     document.getElementById('modelSpinner').style.display = 'block'
+    const timerId = setInterval(() => {
+      modelDb = sessionStorage.getItem('models');
+      if (modelDb) {
+        clearInterval(timerId);
+        document.getElementById('modelSpinner').style.display = 'none';
+        showModelItems(JSON.parse(modelDb).sort(modelCompare));
+      }
+    }, 1000);
   } else {
     document.getElementById('modelSpinner').style.display = 'none';
-    showModelItems(JSON.parse(modelDb).slice(0, 5));
+    showModelItems(JSON.parse(modelDb).sort(modelCompare));
   }
 }
 
@@ -123,7 +144,7 @@ document.getElementById('modelSearchInput').addEventListener('input', () => {
     const searchResult = fuse.search(modelSearchString.replace(', ', ' '), { limit: 5 });
     showModelItems(searchResult.map(r => r.item));
   } else {
-    showModelItems(modelDb.slice(0, 5));
+    showModelItems(modelDb.sort(modelCompare));
   }
 })
 
