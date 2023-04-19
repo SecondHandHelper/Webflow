@@ -127,7 +127,7 @@ document.getElementById('modelSearchInput').addEventListener('input', () => {
 
 document.getElementById('removeModelIcon').addEventListener('click', (event) => {
   document.getElementById('findModelBoxEmpty').style.display = 'flex';
-  document.getElementById('findModelBoxCard').style.display = 'none';
+  document.getElementById('findModelBoxFilled').style.display = 'none';
   document.getElementById('findModelDescription').style.display = 'block';
   document.getElementById('findNewModel').style.display = 'none';
   event.stopPropagation();
