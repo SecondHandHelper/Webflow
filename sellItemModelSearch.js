@@ -6,7 +6,7 @@ const selectSize = (modelClicked) => (event) => {
   const modelJson = modelClicked.getAttribute("data-model");
   document.getElementById('findModelBoxFilled').setAttribute("data-model", modelJson)
   const model = JSON.parse(modelJson);
-  document.getElementById('findModelBoxImage').style.backgroundImage = `url('${model["coverImage"]}')`;
+  document.getElementById('findModelBoxImage').style.backgroundImage = `url('${model["coverImageSmall"]}')`;
   document.getElementById('findModelBoxNameCategory').innerText = `${model['brand']}, ${model['category']}`;
   document.getElementById('findModelBoxName').innerText = `${model['maiName']}`;
   document.getElementById('findModelBoxColor').innerText = `${model['color']}`;
@@ -71,7 +71,7 @@ const showModelItems = (models) => {
       child.id = `${child.id}_${idx}`;
     }
     modelResultList.appendChild(newNode);
-    document.getElementById(`modelImage_${idx}`).src = model['coverImage'];
+    document.getElementById(`modelImage_${idx}`).src = model['coverImageSmall'];
     document.getElementById(`brandNameCategory_${idx}`).innerText = `${model['brand']}, ${model['category']}`;
     document.getElementById(`modelName_${idx}`).innerText = `${model['maiName']}`;
     document.getElementById(`modelColor_${idx}`).innerText = `${model['color']}`;
