@@ -96,17 +96,6 @@
     }
   }
 
-  async function updateUserPhoneNumber() {
-    try {
-      await firebase.app().functions("europe-west1").httpsCallable(
-        'updateFirebaseUser',
-      )({phoneNumber: getCleanedNumber(false)})
-      await onUpdateComplete()
-    } catch (e) {
-      console.log('Error updating user', e)
-    }
-  }
-
   async function updateShippingPreference() {
     let shippingMethod = "";
     let radioButtons = document.getElementsByName('shippingMethodSettings');
@@ -121,14 +110,14 @@
     await onUpdateComplete()
   }
 
-  async function updateSwishNumber() {
+  async function updateContactNumbers(isSwish) {
     try {
       await firebase.app().functions("europe-west1").httpsCallable(
         'updateFirebaseUser',
-      )({swishPayeeAlias: getCleanedNumber(true)})
+      )({...getCleanedNumber(isSwish)})
       await onUpdateComplete()
     } catch (e) {
-      console.log('Error updating user', e)
+
     }
   }
 
@@ -169,15 +158,13 @@
 
   function getCleanedPersonalId() {
     const input = newPersonalId.value.trim();
-    return input.replace(/\D/g, '');
+    input.replace(/\D/g, '');
+    return formatPersonalId(input)
   }
 
   function getCleanedNumber(isSwish) {
     let input = isSwish ? newSwishNumber.value.trim() : newPhoneNumber.value.trim()
-    if (input[0] !== '+') {
-      input = `+46${parseInt(input, 10)}`
-    }
-    return input
+    return isSwish ? {swishPayeeAlias: formatPhoneNumber(input)} : {phoneNumber: formatPhoneNumber(input)}
   }
 
   async function setAddressFields() {
@@ -228,6 +215,11 @@
     displayForm('fullPersonId', 'personIdForm', newPersonalId, 'Personnummer')
   })
 
+  document.getElementById('personId').addEventListener("input", () => {
+    const error = isValidSwedishSsn(document.getElementById('personId').value) ? '' : 'Ogiltigt personnummer';
+    document.getElementById("personId").setCustomValidity(error);
+  })
+
   document.getElementById('resetPageButton').addEventListener("click", () => {
     const formIds = {
       'Adress': 'addressForm',
@@ -256,18 +248,14 @@
       case 'Adress':
         await updateUserAddress()
         break
-      case 'Mobilnummer':
-        await updateUserPhoneNumber()
-        break
       case 'Skicka plagg':
         await updateShippingPreference()
-        break
-      case 'Swish':
-        await updateSwishNumber()
         break
       case 'Personnummer':
         await updateUserPersonId()
         break
+      default:
+        await updateContactNumbers(pageHeader.value === 'Swish')
     }
   })
 
