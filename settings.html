@@ -21,7 +21,7 @@
   let newPostalCode = document.getElementById("newAddressPostalCode")
   let newCity = document.getElementById("newAddressCity")
   let newDoorCode = document.getElementById("newAddressDoorCode")
-  let newPersonalId = document.getElementById("newPersonalId")
+  let personalId = document.getElementById("personalId")
   let newSwishNumber = document.getElementById("newSwishNumber")
   let newPhoneNumber = document.getElementById("newPhoneNumber")
   let saveButton = document.getElementById('saveButton')
@@ -157,7 +157,7 @@
   }
 
   function getCleanedPersonalId() {
-    const input = newPersonalId.value.trim();
+    const input = personalId.value.trim();
     input.replace(/\D/g, '');
     return formatPersonalId(input)
   }
@@ -186,7 +186,7 @@
     pageHeader.innerHTML = headerText
     pageHeader.value = headerText
     if (newValue) {
-      if (newValue === newPersonalId) {
+      if (newValue === personalId) {
         newValue.value = fullPersonId
         return
       }
@@ -212,10 +212,26 @@
   })
 
   document.getElementById('personIdDiv').addEventListener("click", function () {
-    displayForm('fullPersonId', 'personIdForm', newPersonalId, 'Personnummer')
+    displayForm('fullPersonId', 'personIdForm', personalId, 'Personnummer')
   })
 
-  document.getElementById('personId').addEventListener("input", () => {
+  function checkInputValue(value){
+    if (value){ return true}
+    return false
+  }
+
+  function displayFieldLabel(id){
+    id.style.display = 'inline-block'
+  }
+
+  personIdDiv.addEventListener("oninput", function (this) {
+    const hasValue = checkInputValue(this.value)
+    if (){
+
+    }
+  })
+
+  document.getElementById('personalId').addEventListener("input", () => {
     const error = isValidSwedishSsn(document.getElementById('personId').value) ? '' : 'Ogiltigt personnummer';
     document.getElementById("personId").setCustomValidity(error);
   })
