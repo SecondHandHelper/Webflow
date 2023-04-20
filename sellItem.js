@@ -201,13 +201,6 @@ function fieldLabelToggle(labelId) {
   }
 }
 
-document.getElementById('itemBrand').addEventListener('input', fieldLabelToggle('itemBrandLabel'));
-document.getElementById('itemModel').addEventListener('input', fieldLabelToggle('itemModelLabel'));
-document.getElementById('itemSize').addEventListener('input', fieldLabelToggle('itemSizeLabel'));
-document.getElementById('itemMaterial').addEventListener('input', fieldLabelToggle('itemMaterialLabel'));
-document.getElementById('itemOriginalPrice').addEventListener('input', fieldLabelToggle('itemOriginalPriceLabel'));
-document.getElementById('itemAge').addEventListener('input', fieldLabelToggle('itemAgeLabel'));
-
 async function updateItem(itemId, changedImages) {
   console.log("updateItem()");
   const now = new Date();

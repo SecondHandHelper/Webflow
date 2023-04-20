@@ -17,6 +17,15 @@
     let extraImageUpload = document.getElementById("extraImage");
     let extraImagePreview = document.getElementById("extraImagePreview");
 
+
+    document.getElementById('itemBrand').addEventListener('input', fieldLabelToggle('itemBrandLabel'));
+    document.getElementById('itemModel').addEventListener('input', fieldLabelToggle('itemModelLabel'));
+    document.getElementById('itemSize').addEventListener('input', fieldLabelToggle('itemSizeLabel'));
+    document.getElementById('itemMaterial').addEventListener('input', fieldLabelToggle('itemMaterialLabel'));
+    document.getElementById('itemOriginalPrice').addEventListener('input', fieldLabelToggle('itemOriginalPriceLabel'));
+    document.getElementById('itemAge').addEventListener('input', fieldLabelToggle('itemAgeLabel'));
+    setupModelSearchEventListeners();
+
     // display image when file has been selected
     frontImageUpload.onchange = function () {
         let input = this.files[0];
@@ -147,20 +156,6 @@
             demandLevelText.innerHTML = '';
             shareSoldText.innerHTML = ''
             shareSoldDiv.style.display = 'none'
-        }
-    }
-
-    async function displayFindModelDiv(value){
-        if (featureIsEnabled('modelDB')) {
-            if (value === 'Rodebjer'){
-                findModelDiv.style.display = 'block';
-                let response = await fetch('https://getbrandmodels-heypmjzjfq-ew.a.run.app?brand=Rodebjer', {
-                  method: 'GET',
-                  headers: { 'Content-Type': 'application/json' },
-                });
-                const models = await response.json();
-                sessionStorage.setItem('models', JSON.stringify(models));
-            }
         }
     }
 

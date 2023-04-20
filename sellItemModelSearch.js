@@ -134,38 +134,53 @@ function showFindModelPage() {
   }
 }
 
-document.getElementById('findModelBoxEmpty').addEventListener('click', showFindModelPage)
-document.getElementById('findNewModel').addEventListener('click', showFindModelPage)
-
 const closeModelSelect = () => {
   document.getElementById('addItemFormDiv').style.display = 'block';
   document.getElementById('modelSelectDiv').style.display = 'none';
   document.getElementById('modelSizeSelect').style.display = 'none';
 }
 
-document.getElementById('modelSelectClose').addEventListener('click', () => {
-  closeModelSelect();
-})
+const setupModelSearchEventListeners = () => {
+  document.getElementById('findModelBoxEmpty').addEventListener('click', showFindModelPage)
+  document.getElementById('findNewModel').addEventListener('click', showFindModelPage)
+  document.getElementById('modelSelectClose').addEventListener('click', () => {
+    closeModelSelect();
+  })
 
-document.getElementById('modelSearchInput').addEventListener('input', () => {
-  const modelSearchString = document.getElementById('modelSearchInput').value;
-  const modelDb = JSON.parse(sessionStorage.getItem('models'));
-  if (modelSearchString && modelSearchString.length > 0) {
-    const fuse = new Fuse(modelDb, {
-      includeScore: true,
-      keys: ["name", "category", "color", "maiColor", "articleNumber"]
-    });
-    const searchResult = fuse.search(modelSearchString.replace(', ', ' '));
-    showModelItems(searchResult.map(r => r.item));
-  } else {
-    showModelItems(modelDb.sort(modelCompare));
+  document.getElementById('modelSearchInput').addEventListener('input', () => {
+    const modelSearchString = document.getElementById('modelSearchInput').value;
+    const modelDb = JSON.parse(sessionStorage.getItem('models'));
+    if (modelSearchString && modelSearchString.length > 0) {
+      const fuse = new Fuse(modelDb, {
+        includeScore: true,
+        keys: ["name", "category", "color", "maiColor", "articleNumber"]
+      });
+      const searchResult = fuse.search(modelSearchString.replace(', ', ' '));
+      showModelItems(searchResult.map(r => r.item));
+    } else {
+      showModelItems(modelDb.sort(modelCompare));
+    }
+  })
+
+  document.getElementById('removeModelIcon').addEventListener('click', (event) => {
+    document.getElementById('findModelBoxEmpty').style.display = 'flex';
+    document.getElementById('findModelBoxFilled').style.display = 'none';
+    document.getElementById('findModelDescription').style.display = 'block';
+    document.getElementById('findNewModel').style.display = 'none';
+    event.stopPropagation();
+  });
+}
+
+const displayFindModelDiv = async (value) => {
+  if (featureIsEnabled('modelDB')) {
+    if (value === 'Rodebjer'){
+      findModelDiv.style.display = 'block';
+      let response = await fetch('https://getbrandmodels-heypmjzjfq-ew.a.run.app?brand=Rodebjer', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const models = await response.json();
+      sessionStorage.setItem('models', JSON.stringify(models));
+    }
   }
-})
-
-document.getElementById('removeModelIcon').addEventListener('click', (event) => {
-  document.getElementById('findModelBoxEmpty').style.display = 'flex';
-  document.getElementById('findModelBoxFilled').style.display = 'none';
-  document.getElementById('findModelDescription').style.display = 'block';
-  document.getElementById('findNewModel').style.display = 'none';
-  event.stopPropagation();
-});
+}
