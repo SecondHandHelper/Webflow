@@ -135,6 +135,17 @@
     }
   }
 
+  function displayFieldLabel(id, show) {
+    id.style.display = !!show ? 'inline-block' : 'none'
+  }
+
+  personalId.addEventListener("input", () => {
+    displayFieldLabel(personalIdText, personalId.value)
+
+    const error = isValidSwedishSsn(personalId.value) ? '' : 'Ogiltigt personnummer';
+    personalId.setCustomValidity(error);
+  })
+
   document.getElementById('adressDiv').addEventListener('click', async function () {
     displayForm('adressDiv', 'addressForm', null, 'Adress')
   })
@@ -153,16 +164,6 @@
 
   document.getElementById('personIdDiv').addEventListener("click", function () {
     displayForm('fullPersonId', 'personIdForm', personalId, 'Personnummer')
-  })
-
-  document.getElementById('personalId').addEventListener("input", () => {
-    if (personalId.value) {
-      personalIdText.style.display = 'inline-block'
-    } else {
-      personalIdText.style.display = 'none'
-    }
-    const error = isValidSwedishSsn(document.getElementById('personalId').value) ? '' : 'Ogiltigt personnummer';
-    document.getElementById("personalId").setCustomValidity(error);
   })
 
   saveButton.addEventListener("click", async function () {
