@@ -22,7 +22,7 @@ const selectSize = (modelClicked) => (event) => {
   document.getElementById('findNewModel').style.display = 'flex';
   document.getElementById('itemAge').selectedIndex = 0;
   if (model['collectionYear'] + 1 >= new Date().getFullYear()) {
-    document.getElementById('itemAge').selectedIndex = 0;
+    document.getElementById('itemAge').selectedIndex = 1;
     document.getElementById('itemAge').style.color = 'rgb(51, 51, 51)';
   }
 }
