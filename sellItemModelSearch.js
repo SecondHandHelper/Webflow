@@ -1,3 +1,8 @@
+const setFieldValue = (fieldId, value) => {
+  document.getElementById(fieldId).value = value;
+  document.getElementById(fieldId).dispatchEvent(new Event('input'));
+}
+
 const selectSize = (modelClicked) => (event) => {
   closeModelSelect();
   // Show selected model in search box
@@ -14,16 +19,16 @@ const selectSize = (modelClicked) => (event) => {
 
   // Fill form with attributes from selected model
   document.getElementById(model['gender']).parentElement.click();
-  document.getElementById('itemSize').value = event.target.innerText;
-  document.getElementById('itemMaterial').value = model['material'];
-  document.getElementById('itemModel').value = model['maiName'];
-  document.getElementById('itemOriginalPrice').value = model['originalPriceSek']
+  setFieldValue('itemSize', event.target.innerText);
+  setFieldValue('itemMaterial', model['material']);
+  setFieldValue('itemModel', model['maiName']);
+  setFieldValue('itemOriginalPrice', model['originalPriceSek']);
   document.getElementById('findModelDescription').style.display = 'none';
   document.getElementById('findNewModel').style.display = 'flex';
-  document.getElementById('itemAge').selectedIndex = 0;
   if (model['collectionYear'] + 1 >= new Date().getFullYear()) {
     document.getElementById('itemAge').selectedIndex = 1;
     document.getElementById('itemAge').style.color = 'rgb(51, 51, 51)';
+    document.getElementById('itemAge').dispatchEvent(new Event('input'));
   }
   document.getElementById('findModelDiv').scrollIntoView(true);
 }
