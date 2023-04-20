@@ -1,60 +1,30 @@
 <script>
   let pageHeader = document.getElementById('pageTitleText')
   let fullPersonId = ''
-  let address = {
-    addressFirstName: '',
-    addressLastName: '',
-    addressStreetAddress: '',
-    addressPostalCode: '',
-    addressCity: '',
-    addressDoorCode: ''
-  }
+
   let phoneNumber = document.getElementById('phoneNumber')
-  let shippingPreference = document.getElementById('shippingPreferences')
   let swishNumber = document.getElementById('swishNumber')
   let servicePointSettings = document.getElementById('ServicePointSettings');
-  let displayedPersonId = document.getElementById('personalId')
-  let displayedAddress = document.getElementById('displayAddress')
-  let newFirstName = document.getElementById('newAddressFirstName')
-  let newLastName = document.getElementById('newAddressLastName')
-  let newStreetAddress = document.getElementById("newStreetAddress")
-  let newPostalCode = document.getElementById("newAddressPostalCode")
-  let newCity = document.getElementById("newAddressCity")
-  let newDoorCode = document.getElementById("newAddressDoorCode")
-  let newPersonalId = document.getElementById("newPersonalId")
+
   let newSwishNumber = document.getElementById("newSwishNumber")
   let newPhoneNumber = document.getElementById("newPhoneNumber")
   let saveButton = document.getElementById('saveButton')
   let saveLoadingSpinner = document.getElementById('saveLoadingSpinner')
   let settingsContainer = document.getElementById('settingsContainer')
 
-  let {
-    addressFirstName,
-    addressLastName,
-    addressStreetAddress,
-    addressPostalCode,
-    addressCity,
-    addressDoorCode
-  } = address
 
   async function getUserInfo(onUpdate) {
     try {
       const response = await firebase.app().functions("europe-west1").httpsCallable('getUserInfo')();
       await displayPersonalId(response.data.personalId);
-      ({
-        addressFirstName = '',
-        addressLastName = '',
-        addressStreetAddress = '',
-        addressPostalCode = '',
-        addressCity = '',
-        addressDoorCode = ''
-      } = response.data);
+      setFormAddressFields(response.data)
+      const address = response.data
       const shippingMethod = response.data.preferences.shippingMethod || null;
 
-      displayedAddress.innerHTML = addressStreetAddress ? `${addressStreetAddress} <br/> ${addressPostalCode} ${addressCity}` : '-';
-      swishNumber.innerHTML = response.data.swishPayeeAlias || '-';
-      phoneNumber.innerHTML = response.data.phoneNumber || '-';
-      shippingPreference.innerHTML = shippingMethod || '-';
+      addressDisplay.innerHTML = address.addressStreetAddress ? `${address.addressStreetAddress} <br/> ${address.addressPostalCode} ${address.addressCity}` : '-';
+      swishNumberDisplay.innerHTML = response.data.swishPayeeAlias || '-';
+      phoneNumberDisplay.innerHTML = response.data.phoneNumber || '-';
+      shippingPreferencesDisplay.innerHTML = shippingMethod || '-';
 
       if (shippingMethod) {
         if (shippingMethod !== servicePointSettings.value) {
@@ -67,7 +37,7 @@
       console.log('error fetching user data', e)
     } finally {
       if (!onUpdate) {
-        document.getElementById('loadingDiv').style.display = 'none'
+        loadingDiv.style.display = 'none'
         settingsContainer.style.display = 'block'
       }
     }
@@ -79,10 +49,10 @@
 
     if (fullPersonId.length > 4) {
       personIdLastFour = fullPersonId.substring(fullPersonId.length - 4);
-      displayedPersonId.innerHTML = `XXXXXXXX-${personIdLastFour}`
+      personalIdDisplay.innerHTML = `XXXXXXXX-${personIdLastFour}`
       return
     }
-    displayedPersonId.innerHTML = personIdLastFour
+    personalIdDisplay.innerHTML = personIdLastFour
   }
 
   async function updateUserAddress() {
@@ -125,7 +95,7 @@
     try {
       await firebase.app().functions("europe-west1").httpsCallable(
         'updateFirebaseUser',
-      )({personalId: getCleanedPersonalId()})
+      )({personalId: formatPersonalId(personalId.value.trim().replace(/\D/g, ''))})
       await onUpdateComplete()
     } catch (e) {
       console.log('Error updating user', e)
@@ -138,42 +108,13 @@
     saveButton.style.opacity = '0.6'
     saveButton.disabled = true
     saveLoadingSpinner.style.display = 'none'
-    document.getElementById('saveButtonContainer').style.display = 'block'
+    saveButtonContainer.style.display = 'block'
   }
 
-  async function getFormAddressFields() {
-    const address = {
-      addressFirstName: newFirstName.value.charAt(0).toUpperCase() + newFirstName.value.slice(1),
-      addressLastName: newLastName.value.charAt(0).toUpperCase() + newLastName.value.slice(1),
-      addressStreetAddress: newStreetAddress.value.trim().replace(/^\w/, c => c.toUpperCase()),
-      addressPostalCode: newPostalCode.value.trim().replace(/\D/g, ''),
-      addressCity: newCity.value.trim().replace(/^\w/, c => c.toUpperCase()),
-      addressDoorCode: newDoorCode.value.trim()
-    }
-    if (!address.addressStreetAddress || !address.addressPostalCode || !address.addressCity) {
-      return null;
-    }
-    return address
-  }
-
-  function getCleanedPersonalId() {
-    const input = newPersonalId.value.trim();
-    input.replace(/\D/g, '');
-    return formatPersonalId(input)
-  }
 
   function getCleanedNumber(isSwish) {
     let input = isSwish ? newSwishNumber.value.trim() : newPhoneNumber.value.trim()
     return isSwish ? {swishPayeeAlias: formatPhoneNumber(input)} : {phoneNumber: formatPhoneNumber(input)}
-  }
-
-  async function setAddressFields() {
-    newFirstName.value = addressFirstName
-    newLastName.value = addressLastName
-    newStreetAddress.value = addressStreetAddress
-    newPostalCode.value = addressPostalCode
-    newCity.value = addressCity
-    newDoorCode.value = addressDoorCode
   }
 
   function displayForm(divId, formId, newValue, headerText) {
@@ -186,7 +127,7 @@
     pageHeader.innerHTML = headerText
     pageHeader.value = headerText
     if (newValue) {
-      if (newValue === newPersonalId) {
+      if (newValue === personalId) {
         newValue.value = fullPersonId
         return
       }
@@ -195,7 +136,6 @@
   }
 
   document.getElementById('adressDiv').addEventListener('click', async function () {
-    await setAddressFields()
     displayForm('adressDiv', 'addressForm', null, 'Adress')
   })
 
@@ -212,15 +152,47 @@
   })
 
   document.getElementById('personIdDiv').addEventListener("click", function () {
-    displayForm('fullPersonId', 'personIdForm', newPersonalId, 'Personnummer')
+    displayForm('fullPersonId', 'personIdForm', personalId, 'Personnummer')
   })
 
-  document.getElementById('personId').addEventListener("input", () => {
-    const error = isValidSwedishSsn(document.getElementById('personId').value) ? '' : 'Ogiltigt personnummer';
-    document.getElementById("personId").setCustomValidity(error);
+  document.getElementById('personalId').addEventListener("input", () => {
+    if (personalId.value) {
+      personalIdText.style.display = 'inline-block'
+    } else {
+      personalIdText.style.display = 'none'
+    }
+    const error = isValidSwedishSsn(document.getElementById('personalId').value) ? '' : 'Ogiltigt personnummer';
+    document.getElementById("personalId").setCustomValidity(error);
   })
 
-  document.getElementById('resetPageButton').addEventListener("click", () => {
+  saveButton.addEventListener("click", async function () {
+    switch (pageHeader.value) {
+      case 'Adress':
+        document.getElementById('saveButtonContainer').style.display = 'none'
+        saveLoadingSpinner.style.display = 'block'
+        await updateUserAddress()
+        break
+      case 'Skicka plagg':
+        document.getElementById('saveButtonContainer').style.display = 'none'
+        saveLoadingSpinner.style.display = 'block'
+        await updateShippingPreference()
+        break
+      case 'Personnummer':
+        if (personalId.validity.valid) {
+          document.getElementById('saveButtonContainer').style.display = 'none'
+          saveLoadingSpinner.style.display = 'block'
+          await updateUserPersonId()
+        } else {
+          personalId.reportValidity()
+        }
+        break
+      default:
+        document.getElementById('saveButtonContainer').style.display = 'none'
+        saveLoadingSpinner.style.display = 'block'
+        await updateContactNumbers(pageHeader.value === 'Swish')
+    }
+  })
+  resetPageButton.addEventListener("click", () => {
     const formIds = {
       'Adress': 'addressForm',
       'Mobilnummer': 'phoneForm',
@@ -240,23 +212,6 @@
     saveButton.innerHTML = 'Spara'
     saveButton.style.opacity = '1'
     saveButton.disabled = false
-  })
-  saveButton.addEventListener("click", async function () {
-    document.getElementById('saveButtonContainer').style.display = 'none'
-    saveLoadingSpinner.style.display = 'block'
-    switch (pageHeader.value) {
-      case 'Adress':
-        await updateUserAddress()
-        break
-      case 'Skicka plagg':
-        await updateShippingPreference()
-        break
-      case 'Personnummer':
-        await updateUserPersonId()
-        break
-      default:
-        await updateContactNumbers(pageHeader.value === 'Swish')
-    }
   })
 
   getUserInfo()
