@@ -61,7 +61,7 @@ function collect() {
     modelVariantFields = {
       modelCoverImageUrl: modelData['coverImage'],
       atModelVariantId: modelData['atVariantId'],
-      category: modelData['maiCategory'],
+      category: modelData['category'],
       color: modelData['maiColor'],
     }
   }
