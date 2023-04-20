@@ -195,17 +195,18 @@ async function firstNameSet() {
   }
 }
 
-function fieldLabelToggle(event) {
-  event.target.previousElementSibling.firstElementChild.style.display = event.target.value.length > 0 ?
-    'inline-block' : 'none'
+function fieldLabelToggle(labelId) {
+  return (event) => {
+    document.getElementById(labelId).style.display = event.target.value.length > 0 ? 'inline-block' : 'none'
+  }
 }
 
-document.getElementById('itemBrand').addEventListener('input', fieldLabelToggle)
-document.getElementById('itemModel').addEventListener('input', fieldLabelToggle)
-document.getElementById('itemSize').addEventListener('input', fieldLabelToggle)
-document.getElementById('itemMaterial').addEventListener('input', fieldLabelToggle)
-document.getElementById('itemOriginalPrice').addEventListener('input', fieldLabelToggle)
-document.getElementById('itemAge').addEventListener('input', fieldLabelToggle)
+document.getElementById('itemBrand').addEventListener('input', fieldLabelToggle('itemBrandLabel'));
+document.getElementById('itemModel').addEventListener('input', fieldLabelToggle('itemModelLabel'));
+document.getElementById('itemSize').addEventListener('input', fieldLabelToggle('itemSizeLabel'));
+document.getElementById('itemMaterial').addEventListener('input', fieldLabelToggle('itemMaterialLabel'));
+document.getElementById('itemOriginalPrice').addEventListener('input', fieldLabelToggle('itemOriginalPriceLabel'));
+document.getElementById('itemAge').addEventListener('input', fieldLabelToggle('itemAgeLabel'));
 
 async function updateItem(itemId, changedImages) {
   console.log("updateItem()");
