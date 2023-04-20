@@ -119,7 +119,7 @@ function showFindModelPage() {
   window.scrollTo({ top: 0 });
   let modelDb = sessionStorage.getItem('models');
   if (!modelDb) {
-    document.getElementById('modelSpinner').style.display = 'block'
+    document.getElementById('modelSpinner').style.display = 'flex'
     const timerId = setInterval(() => {
       modelDb = sessionStorage.getItem('models');
       if (modelDb) {
