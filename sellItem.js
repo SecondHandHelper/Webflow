@@ -54,13 +54,16 @@ function collect() {
   }
 
   const modelBoxFilled = document.getElementById('findModelBoxFilled');
-  let modelCoverImageUrl = '';
-  let atModelVariantId = '';
+  let modelVariantFields = {};
   if (modelBoxFilled.style.display === 'flex') {
     // There is a current model selected grab the cover image and id from it
     const modelData = JSON.parse(modelBoxFilled.getAttribute('data-model'));
-    modelCoverImageUrl = modelData['coverImage'];
-    atModelVariantId = modelData['atVariantId'];
+    modelVariantFields = {
+      modelCoverImageUrl: modelData['coverImage'],
+      atModelVariantId: modelData['atVariantId'],
+      category: modelData['maiCategory'],
+      color: modelData['maiColor'],
+    }
   }
 
   return {
@@ -83,8 +86,7 @@ function collect() {
     userComment,
     acceptPrice,
     preferences: { userValuationApproval },
-    modelCoverImageUrl,
-    atModelVariantId,
+    ...modelVariantFields,
   };
 }
 
@@ -121,6 +123,7 @@ async function addItemInner(id) {
     const images = await uploadImages(id);
     if (modelCoverImageUrl) {
       images['coverImage'] = modelCoverImageUrl;
+      pageData['coverImageUpdatedAt'] = new Date();
     }
     const item = { ...pageData, shippingMethod, images, version: "2" };
 
