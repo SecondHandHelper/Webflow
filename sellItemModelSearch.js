@@ -20,6 +20,11 @@ const selectSize = (modelClicked) => (event) => {
   document.getElementById('itemOriginalPrice').value = model['originalPriceSek']
   document.getElementById('findModelDescription').style.display = 'none';
   document.getElementById('findNewModel').style.display = 'flex';
+  document.getElementById('itemAge').selectedIndex = 0;
+  if (model['collectionYear'] + 1 >= new Date().getFullYear()) {
+    document.getElementById('itemAge').selectedIndex = 0;
+    document.getElementById('itemAge').style.color = 'rgb(51, 51, 51)';
+  }
 }
 
 const showModelSizes = (modelClicked) => {
@@ -147,12 +152,10 @@ document.getElementById('modelSearchInput').addEventListener('input', () => {
     const fuse = new Fuse(modelDb, {
       includeScore: true,
       keys: [
-        { name: "name", weight: 2 },
-        "category",
-        "color",
+        "name", "category", "color", "maiColor", "articleNumber"
       ]
     });
-    const searchResult = fuse.search(modelSearchString.replace(', ', ' '), { limit: 5 });
+    const searchResult = fuse.search(modelSearchString.replace(', ', ' '));
     showModelItems(searchResult.map(r => r.item));
   } else {
     showModelItems(modelDb.sort(modelCompare));
