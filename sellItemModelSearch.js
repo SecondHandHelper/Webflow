@@ -36,7 +36,7 @@ const showModelSizes = (modelClicked) => {
   }
   const model = JSON.parse(modelClicked.getAttribute("data-model"));
   if (model.sizes.length === 1) {
-    return selectSize(modelClicked)({target: model.sizes[0]});
+    return selectSize(modelClicked)({target: { innerText: model.sizes[0] }});
   }
   for (const [idx, size] of model.sizes.sort(sizeCompare).entries()) {
     const newNode = templateSize.cloneNode(true);
@@ -151,9 +151,7 @@ document.getElementById('modelSearchInput').addEventListener('input', () => {
   if (modelSearchString && modelSearchString.length > 0) {
     const fuse = new Fuse(modelDb, {
       includeScore: true,
-      keys: [
-        "name", "category", "color", "maiColor", "articleNumber"
-      ]
+      keys: ["name", "category", "color", "maiColor", "articleNumber"]
     });
     const searchResult = fuse.search(modelSearchString.replace(', ', ' '));
     showModelItems(searchResult.map(r => r.item));
