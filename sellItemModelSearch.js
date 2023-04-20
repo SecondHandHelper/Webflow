@@ -25,6 +25,7 @@ const selectSize = (modelClicked) => (event) => {
     document.getElementById('itemAge').selectedIndex = 1;
     document.getElementById('itemAge').style.color = 'rgb(51, 51, 51)';
   }
+  document.getElementById('findModelDiv').scrollIntoView(true);
 }
 
 const showModelSizes = (modelClicked) => {
@@ -115,6 +116,7 @@ function showFindModelPage() {
   document.getElementById('modelSelectDiv').style.display = 'block';
   document.getElementById('modelList').style.display = 'block';
   document.getElementById('modelSearchInput').value = '';
+  window.scrollTo({ top: 0 });
   let modelDb = sessionStorage.getItem('models');
   if (!modelDb) {
     document.getElementById('modelSpinner').style.display = 'block'

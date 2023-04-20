@@ -195,6 +195,18 @@ async function firstNameSet() {
   }
 }
 
+function fieldLabelToggle(event) {
+  event.target.previousElementSibling.firstElementChild.style.display = event.target.value.length > 0 ?
+    'inline-block' : 'none'
+}
+
+document.getElementById('itemBrand').addEventListener('input', fieldLabelToggle)
+document.getElementById('itemModel').addEventListener('input', fieldLabelToggle)
+document.getElementById('itemSize').addEventListener('input', fieldLabelToggle)
+document.getElementById('itemMaterial').addEventListener('input', fieldLabelToggle)
+document.getElementById('itemOriginalPrice').addEventListener('input', fieldLabelToggle)
+document.getElementById('itemAge').addEventListener('input', fieldLabelToggle)
+
 async function updateItem(itemId, changedImages) {
   console.log("updateItem()");
   const now = new Date();
