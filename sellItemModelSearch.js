@@ -47,6 +47,7 @@ const showModelSizes = (modelClicked) => {
   for (const [idx, size] of model.sizes.sort(sizeCompare).entries()) {
     const newNode = templateSize.cloneNode(true);
     newNode.id = `${templateSize.id}_${idx}`;
+    newNode.addEventListener('click', linkClickTracker);
     newNode.style.display = 'block';
     newNode.addEventListener('click', function clickHandler(event) {
       selectSize(modelClicked)(event);
@@ -77,6 +78,7 @@ const showModelItems = (models) => {
   for (const [idx, model] of models.entries()) {
     const newNode = templateCard.cloneNode(true);
     newNode.id = `${templateCard.id}_${idx}`;
+    newNode.addEventListener('click', linkClickTracker);
     newNode.style.display = 'flex';
     newNode.style.cursor = 'pointer';
     newNode.setAttribute("data-model", JSON.stringify(model));

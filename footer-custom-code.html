@@ -127,16 +127,15 @@
     });
   });
 
+  function linkClickTracker(event) {
+    if (event.currentTarget.id) {
+      console.log('Clicked link ', event.currentTarget.id);
+      analytics.track('Click', { elementID: event.currentTarget.id });
+    }
+  }
+
   // TRACK LINK CLICKS
-  const linkElements = document.querySelectorAll("a");
-  linkElements.forEach(link => {
-    link.addEventListener('click', function handleClick(event) {
-      if (link.id) {
-        console.log('Clicked link ', link.id);
-        analytics.track('Click', { elementID: link.id });
-      }
-    });
-  });
+  document.querySelectorAll("a").forEach(link => link.addEventListener('click', linkClickTracker) );
 
   // SEGMENT IDENTIFY
   function identify() {
