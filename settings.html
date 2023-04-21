@@ -1,6 +1,6 @@
 <script>
   let fullPersonId = ''
-  let address = {}
+  let address
   let pageHeader = document.getElementById('pageTitleText')
 
   let saveLoadingSpinner = document.getElementById('saveLoadingSpinner')
@@ -149,7 +149,7 @@
   }
 
   adressDiv.addEventListener("click", async function () {
-    setFormAddressFields(response.data)
+    await setFormAddressFields(address)
     displayForm('adressDiv', 'addressForm', null, 'Adress')
   })
 
