@@ -632,12 +632,19 @@ function loadRecentlySold() {
 
 function setFormAddressFields(user) {
   document.getElementById("addressFirstName").value = user.addressFirstName || '';
+  document.getElementById("addressFirstName").dispatchEvent(new Event('input'));
   document.getElementById("addressLastName").value = user.addressLastName || '';
+  document.getElementById("addressLastName").dispatchEvent(new Event('input'));
   document.getElementById("addressStreetAddress").value = user.addressStreetAddress || '';
+  document.getElementById("addressStreetAddress").dispatchEvent(new Event('input'));
   document.getElementById("addressCO").value = user.addressCO || '';
+  document.getElementById("addressCO").dispatchEvent(new Event('input'));
   document.getElementById("addressPostalCode").value = user.addressPostalCode || '';
+  document.getElementById("addressPostalCode").dispatchEvent(new Event('input'));
   document.getElementById("addressCity").value = user.addressCity || '';
+  document.getElementById("addressCity").dispatchEvent(new Event('input'));
   document.getElementById("addressDoorCode").value = user.addressDoorCode || '';
+  document.getElementById("addressDoorCode").dispatchEvent(new Event('input'));
 }
 function getFormAddressFields() {
   let addressFirstName = document.getElementById("addressFirstName").value;
