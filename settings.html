@@ -1,13 +1,8 @@
 <script>
   let fullPersonId = ''
+  let address = {}
   let pageHeader = document.getElementById('pageTitleText')
 
-  let phoneNumber = document.getElementById('phoneNumber')
-  let servicePointSettings = document.getElementById('ServicePointSettings');
-  let PickupSettings = document.getElementById('ServicePointSettings');
-
-  let newSwishNumber = document.getElementById("newSwishNumber")
-  let newPhoneNumber = document.getElementById("newPhoneNumber")
   let saveLoadingSpinner = document.getElementById('saveLoadingSpinner')
   let settingsContainer = document.getElementById('settingsContainer')
 
@@ -16,22 +11,13 @@
     try {
       const response = await firebase.app().functions("europe-west1").httpsCallable('getUserInfo')();
       await displayPersonalId(response.data.personalId);
-      setFormAddressFields(response.data)
-      const address = response.data
+      address = response.data
       const shippingMethod = response.data.preferences.shippingMethod || null;
 
       addressDisplay.innerHTML = address.addressStreetAddress ? `${address.addressStreetAddress} <br/> ${address.addressPostalCode} ${address.addressCity}` : '-';
       swishNumberDisplay.innerHTML = response.data.swishPayeeAlias || '-';
       phoneNumberDisplay.innerHTML = response.data.phoneNumber || '-';
       shippingPreferencesDisplay.innerHTML = shippingMethod || '-';
-
-      if (shippingMethod) {
-        if (shippingMethod !== servicePointSettings.value) {
-          PickupSettings.Checked = true
-        } else {
-          servicePointSettings.Checked = true
-        }
-      }
     } catch (e) {
       console.log('error fetching user data', e)
     } finally {
@@ -116,7 +102,7 @@
 
 
   function getCleanedNumber(isSwish) {
-    let input = isSwish ? newSwishNumber.value.trim() : newPhoneNumber.value.trim()
+    let input = isSwish ? swishNumber.value.trim() : phoneNumber.value.trim()
     return isSwish ? {swishPayeeAlias: formatPhoneNumber(input)} : {phoneNumber: formatPhoneNumber(input)}
   }
 
@@ -144,30 +130,78 @@
   }
 
   function isValid(id) {
-    return !!id.validity.valid
+    return !!id.validity.valid && saveButton.innerHTML === 'Spara'
+  }
+
+  function isAllValid(ids) {
+    let valid = true
+
+    for (const id of ids) {
+      if (!id.validity.valid) {
+        valid = false
+      }
+    }
+    return !!valid && saveButton.innerHTML === 'Spara'
   }
 
   function displayFieldLabel(id, show) {
     id.style.display = !!show ? 'inline-block' : 'none'
   }
 
-  document.getElementById('adressDiv').addEventListener('click', async function () {
+  adressDiv.addEventListener("click", async function () {
+    setFormAddressFields(response.data)
     displayForm('adressDiv', 'addressForm', null, 'Adress')
   })
 
-  document.getElementById('phoneDiv').addEventListener("click", function () {
-    displayForm('phoneNumber', 'phoneForm', newPhoneNumber, 'Mobilnummer')
+  addressFirstName.addEventListener("input", function () {
+    displayFieldLabel(firstNameText, addressFirstName.value)
+  })
+  addressLastName.addEventListener("input", function () {
+    displayFieldLabel(lastNameText, addressLastName.value)
+  })
+  addressStreetAddress.addEventListener("input", function () {
+    displayFieldLabel(streetAddressText, addressStreetAddress.value)
+  })
+  addressCO.addEventListener("input", function () {
+    displayFieldLabel(addressCoText, addressCO.value)
+  })
+  addressPostalCode.addEventListener("input", function () {
+    displayFieldLabel(postalCodeText, addressPostalCode.value)
+  })
+  addressCity.addEventListener("input", function () {
+    displayFieldLabel(addressCityText, addressCity.value)
+  })
+  addressDoorCode.addEventListener("input", function () {
+    displayFieldLabel(doorCodeText, addressDoorCode.value)
   })
 
-  document.getElementById('shippingPrefDiv').addEventListener("click", function () {
+  phoneDiv.addEventListener("click", function () {
+    displayForm('phoneNumberDisplay', 'phoneForm', phoneNumber, 'Mobilnummer')
+  })
+
+  phoneNumber.addEventListener("input", function () {
+    displayFieldLabel(phoneNumberText, phoneNumber.value)
+
+    const error = phoneNumber.length !== 0 ? '' : 'Ogiltigt phonenummer';
+    phoneNumber.setCustomValidity(error);
+  })
+
+  shippingPrefDiv.addEventListener("click", function () {
     displayForm('shippingPrefDiv', 'shippingPrefForm', null, 'Skicka plagg')
   })
 
-  document.getElementById('swishDiv').addEventListener("click", function () {
-    displayForm('swishNumber', 'swishForm', newSwishNumber, 'Swish')
+  swishDiv.addEventListener("click", function () {
+    displayForm('swishNumberDisplay', 'swishForm', swishNumber, 'Swish')
   })
 
-  document.getElementById('personIdDiv').addEventListener("click", function () {
+  swishNumber.addEventListener("input", () => {
+    displayFieldLabel(swishNumberText, swishNumber.value)
+
+    const error = swishNumber.length !== 0 ? '' : 'Ogiltigt swishNumber';
+    swishNumber.setCustomValidity(error);
+  })
+
+  personIdDiv.addEventListener("click", function () {
     displayForm('fullPersonId', 'personIdForm', personalId, 'Personnummer')
   })
 
@@ -178,30 +212,39 @@
     personalId.setCustomValidity(error);
   })
 
-  swishNumber.addEventListener("input", () => {
-    displayFieldLabel(swishNumberTextText, swishNumber.value)
-  })
-
-
   saveButton.addEventListener("click", async function () {
     switch (pageHeader.value) {
       case 'Adress':
-        await updateUserAddress()
+        if (isAllValid([addressFirstName, addressLastName, addressCity, addressPostalCode, addressStreetAddress])) {
+          await updateUserAddress()
+        }
+        addressFirstName.reportValidity()
+        addressLastName.reportValidity()
+        addressCity.reportValidity()
+        addressPostalCode.reportValidity()
+        addressStreetAddress.reportValidity()
+
         break
       case 'Skicka plagg':
         await updateShippingPreference()
         break
       case 'Personnummer':
-        if (isValid(personalId) && saveButton.innerHTML === 'Spara') {
+        if (isValid(personalId)) {
           await updateUserPersonId()
         }
         personalId.reportValidity()
         break
       case 'Swish':
-        await updateContactNumbers(true)
+        if (isValid(swishNumber)) {
+          await updateContactNumbers(true)
+        }
+        swishNumber.reportValidity()
         break
       case'Mobilnummer':
-        await updateContactNumbers(true)
+        if (isValid(phoneNumber)) {
+          await updateContactNumbers()
+        }
+        phoneNumber.reportValidity()
         break
     }
   })
