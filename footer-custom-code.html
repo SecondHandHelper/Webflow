@@ -184,12 +184,17 @@
 
   // FUNCTIONS PRIVATE PAGE
   function formatPhoneNumber(str) {
-    if (str.slice(0, 1) == 0 && str.length == 10) {
+    str = str.replace(/[^0-9+]/g, '');
+    if (str.slice(0, 1) == 0 && str.length == 10) { //0769419519
       str = str.substring(1);
       str = "+46" + str;
     }
-    if (str.slice(0, 1) == 7 && str.length == 9) {
+    if (str.slice(0, 1) == 7 && str.length == 9) { //769419519
       str = "+46" + str;
+    }
+    if (str.slice(0, 2) == '00' && str.length == 13) { //0046769419519
+      str = str.substring(2);
+      str = "+" + str;
     }
     return str;
   }

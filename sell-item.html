@@ -213,6 +213,11 @@
     itemConfirmationDiv.style.display = 'none';
     addItemForm.addEventListener("submit", addItem);
     userAddressForm.addEventListener("submit", addUserDetails);
+    document.getElementById('itemPhoneNumber').addEventListener("input", () => {
+        const pn = formatPhoneNumber(itemPhoneNumber.value);
+        const error = pn.length >= 12 && pn.includes('+') ? '' : 'Ogiltigt mobilnummer';
+        itemPhoneNumber.setCustomValidity(error);
+    });
     /*initiate the autocomplete function on the "itemBrand" element, and pass along the brands array as possible autocomplete values:*/
     autocomplete(document.getElementById("itemBrand"), brands);
 </script>

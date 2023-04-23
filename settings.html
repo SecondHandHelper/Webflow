@@ -73,8 +73,13 @@
       newValue.dispatchEvent(new Event('input'));
     } 
     if (formId === 'shippingPrefForm'){
-      // TODO: Check the right radio button
-      servicePointSettings.classList.add("w--redirected-checked");
+      if (document.getElementById(divId).innerHTML.includes('ombud')){
+        servicePointSettings.previousElementSibling.classList.add("w--redirected-checked");
+        servicePointSettings.checked = true;
+      } else {
+        pickupSettings.previousElementSibling.classList.add("w--redirected-checked");
+        pickupSettings.checked = true;
+      } 
     }
   }
 
@@ -132,7 +137,7 @@
     displaySaveButton()
   })
 
-
+  
   //Phone
   phoneDiv.addEventListener("click", function () {
     displayForm('phoneNumberDisplay', 'phoneForm', phoneNumber, 'Mobilnummer')
@@ -141,13 +146,14 @@
   phoneNumber.addEventListener("input", function () {
     displayFieldLabel(phoneNumberLabel, phoneNumber.value)
     displaySaveButton()
-    const error = phoneNumber.length !== 0 ? '' : 'Ogiltigt mobilnummer';
+    const pn = formatPhoneNumber(phoneNumber.value);
+    const error = pn.length >= 12 && pn.includes('+') ? '' : 'Ogiltigt mobilnummer';
     phoneNumber.setCustomValidity(error);
   })
 
   //Shipping
   shippingPrefDiv.addEventListener("click", function () {
-    displayForm('shippingPrefDiv', 'shippingPrefForm', null, 'Skicka plagg')
+    displayForm('shippingPreferencesDisplay', 'shippingPrefForm', null, 'Skicka plagg')
   })
 
   //Swish
@@ -234,9 +240,6 @@
     savedCheckIcon.style.display = 'none'
     pageHeader.innerHTML = 'Inställningar'
     pageHeader.value = 'Inställningar'
-    saveButton.innerHTML = 'Spara'
-    saveButton.style.opacity = '1'
-    saveButton.disabled = false
   })
 
   getUserInfo()
