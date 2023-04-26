@@ -641,7 +641,7 @@ async function fetchAndLoadRecentlyAddedItems() {
                     <div class="img-container" style="background-image: url('${item.image}')"></div></div></div>
                     <div class="recent-added-items-subheader">${item.brand}</div>
                     <div class="recent-added-items-subheader-category" style="color: #7a7575">${item.category}</div>
-                    <div class="Recently-added-price">${item.currentPrice} kr</div>
+                    <div class="recently-added-price">${item.currentPrice} kr</div>
                     <div class="recently-added-brands-link-text">Mai Shop</div><a/></div>`;
       itemList.innerHTML += itemCardHTML;
     }
