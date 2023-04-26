@@ -629,13 +629,12 @@ function loadRecentlySold() {
 }
 
 async function fetchAndLoadRecentlyAddedItems() {
-  const itemList = document.getElementById('ItemListRecentlyAddedItems')
-  itemList.innerHTML = "";
-
   try {
     const response = await firebase.app().functions("europe-west1").httpsCallable(
       'fetchMaiShopRecentlyAddedItems',
     )()
+    const itemList = document.getElementById('ItemListRecentlyAddedItems')
+    itemList.innerHTML = "";
 
     for (const item of response.data) {
       const itemCardHTML = `<div class="div-block-14-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
@@ -646,8 +645,6 @@ async function fetchAndLoadRecentlyAddedItems() {
                     <div class="recently-added-brands-link-text">Mai Shop</div><a/></div>`;
       itemList.innerHTML += itemCardHTML;
     }
-    loadingContainer.style.display = 'none'
-    itemList.style.display = 'flex'
   } catch (e) {
     console.log('error', e)
   }
