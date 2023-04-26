@@ -531,7 +531,7 @@ async function bookPickup() {
             }
         }
 
-        db.collection('items').doc(pickupFlowItemId).update({ 
+        db.collection('items').doc(pickupFlowItemId).update({
             pickupDate,
             shippingMethod: 'Pickup'
         }).then((docRef) => {
@@ -626,6 +626,31 @@ function loadRecentlySold() {
             console.log('Error message: ', message, code);
         });
     // [END fb_functions_call_add_message_error]
+}
+
+async function fetchAndLoadRecentlyAddedItems() {
+  const itemList = document.getElementById('ItemListRecentlyAddedItems')
+  itemList.innerHTML = "";
+
+  try {
+    const response = await firebase.app().functions("europe-west1").httpsCallable(
+      'fetchMaiShopRecentlyAddedItems',
+    )()
+
+    for (const item of response.data) {
+      const itemCardHTML = `<div class="div-block-14-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
+                    <div class="img-container" style="background-image: url('${item.image}')"></div></div></div>
+                    <div class="recent-added-items-subheader">${item.brand}</div>
+                    <div class="recent-added-items-subheader-category" style="color: #7a7575">${item.category}</div>
+                    <div class="Recently-added-price">${item.currentPrice} kr</div>
+                    <div class="recently-added-brands-link-text">Mai Shop</div><a/></div>`;
+      itemList.innerHTML += itemCardHTML;
+    }
+    loadingContainer.style.display = 'none'
+    itemList.style.display = 'flex'
+  } catch (e) {
+    console.log('error', e)
+  }
 }
 
 // FUNCTIONS FOR ADDING USER DETAILS
