@@ -606,7 +606,7 @@ function loadRecentlySold() {
                 const soldPrice = item.soldPrice;
                 const soldDate = new Date(item.soldDate);
                 const publishedDate = new Date(item.publishedDate);
-                const soldTimeText = new Date(item.soldDate).toISOString().split('T')[0] === new Date().toISOString().split('T')[0] ? "Idag" : "Igår" ;
+                const soldTimeText = new Date(item.soldDate).toISOString().split('T')[0] === new Date().toISOString().split('T')[0] ? "Idag" : "Igår";
                 const imageUrl = itemCoverImage(item);
                 const daysToSold = Math.floor((soldDate.getTime() - publishedDate.getTime()) / (1000 * 3600 * 24));
                 if (soldPrice >= 180 || daysToSold <= 20) {
@@ -629,62 +629,64 @@ function loadRecentlySold() {
 }
 
 async function fetchAndLoadRecentlyAddedItems() {
-  try {
-    const response = await firebase.app().functions("europe-west1").httpsCallable(
-      'fetchMaiShopRecentlyAddedItems',
-    )()
-    const itemList = document.getElementById('ItemListRecentlyAddedItems')
-    itemList.innerHTML = "";
+    try {
+        const response = await firebase.app().functions("europe-west1").httpsCallable(
+            'fetchMaiShopRecentlyAddedItems',
+        )()
+        const itemList = document.getElementById('ItemListRecentlyAddedItems')
+        itemList.innerHTML = "";
 
-    for (const item of response.data) {
-      const itemCardHTML = `<div class="div-block-14-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
+        for (const item of response.data) {
+            const itemCardHTML = `<div class="div-block-14-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
                     <div class="img-container" style="background-image: url('${item.image}')"></div></div></div>
-                    <div class="recent-added-items-subheader">${item.brand}</div>
-                    <div class="recent-added-items-subheader-category" style="color: #7a7575">${item.category}</div>
-                    <div class="recently-added-price">${item.currentPrice} kr</div>
-                    <div class="recently-added-brands-link-text">Mai Shop</div><a/></div>`;
-      itemList.innerHTML += itemCardHTML;
+                    <div class="recently-added-text-block">
+                        <div class="recent-added-items-subheader">${item.brand}</div>
+                        <div class="recent-added-items-subheader-category">${item.category}</div>
+                        <div class="recently-added-price">${item.currentPrice} kr</div>
+                        <div class="recently-added-brands-link-text">Mai Shop</div>
+                    </div><a/></div>`;
+            itemList.innerHTML += itemCardHTML;
+        }
+    } catch (e) {
+        console.log('error', e)
     }
-  } catch (e) {
-    console.log('error', e)
-  }
 }
 
 // FUNCTIONS FOR ADDING USER DETAILS
 
 function setFormAddressFields(user) {
-  document.getElementById("addressFirstName").value = user.addressFirstName || '';
-  document.getElementById("addressFirstName").dispatchEvent(new Event('input'));
-  document.getElementById("addressLastName").value = user.addressLastName || '';
-  document.getElementById("addressLastName").dispatchEvent(new Event('input'));
-  document.getElementById("addressStreetAddress").value = user.addressStreetAddress || '';
-  document.getElementById("addressStreetAddress").dispatchEvent(new Event('input'));
-  document.getElementById("addressCO").value = user.addressCO || '';
-  document.getElementById("addressCO").dispatchEvent(new Event('input'));
-  document.getElementById("addressPostalCode").value = user.addressPostalCode || '';
-  document.getElementById("addressPostalCode").dispatchEvent(new Event('input'));
-  document.getElementById("addressCity").value = user.addressCity || '';
-  document.getElementById("addressCity").dispatchEvent(new Event('input'));
-  document.getElementById("addressDoorCode").value = user.addressDoorCode || '';
-  document.getElementById("addressDoorCode").dispatchEvent(new Event('input'));
+    document.getElementById("addressFirstName").value = user.addressFirstName || '';
+    document.getElementById("addressFirstName").dispatchEvent(new Event('input'));
+    document.getElementById("addressLastName").value = user.addressLastName || '';
+    document.getElementById("addressLastName").dispatchEvent(new Event('input'));
+    document.getElementById("addressStreetAddress").value = user.addressStreetAddress || '';
+    document.getElementById("addressStreetAddress").dispatchEvent(new Event('input'));
+    document.getElementById("addressCO").value = user.addressCO || '';
+    document.getElementById("addressCO").dispatchEvent(new Event('input'));
+    document.getElementById("addressPostalCode").value = user.addressPostalCode || '';
+    document.getElementById("addressPostalCode").dispatchEvent(new Event('input'));
+    document.getElementById("addressCity").value = user.addressCity || '';
+    document.getElementById("addressCity").dispatchEvent(new Event('input'));
+    document.getElementById("addressDoorCode").value = user.addressDoorCode || '';
+    document.getElementById("addressDoorCode").dispatchEvent(new Event('input'));
 }
 function getFormAddressFields() {
-  let addressFirstName = document.getElementById("addressFirstName").value;
-  let addressLastName = document.getElementById("addressLastName").value;
-  let addressStreetAddress = document.getElementById("addressStreetAddress").value;
-  let addressCO = document.getElementById("addressCO").value;
-  let addressPostalCode = document.getElementById("addressPostalCode").value;
-  let addressCity = document.getElementById("addressCity").value;
-  let addressDoorCode = document.getElementById("addressDoorCode").value;
+    let addressFirstName = document.getElementById("addressFirstName").value;
+    let addressLastName = document.getElementById("addressLastName").value;
+    let addressStreetAddress = document.getElementById("addressStreetAddress").value;
+    let addressCO = document.getElementById("addressCO").value;
+    let addressPostalCode = document.getElementById("addressPostalCode").value;
+    let addressCity = document.getElementById("addressCity").value;
+    let addressDoorCode = document.getElementById("addressDoorCode").value;
 
-  addressFirstName = addressFirstName ? addressFirstName.trim().charAt(0).toUpperCase() + addressFirstName.trim().slice(1) : "";
-  addressLastName = addressLastName ? addressLastName.trim().charAt(0).toUpperCase() + addressLastName.trim().slice(1) : "";
-  addressStreetAddress = addressStreetAddress ? addressStreetAddress.trim().charAt(0).toUpperCase() + addressStreetAddress.trim().slice(1) : "";
-  addressCO = addressCO ? addressCO.trim() : "";
-  addressPostalCode = addressPostalCode ? addressPostalCode.trim().replace(/\D/g,'') : "";
-  addressCity = addressCity ? addressCity.trim().charAt(0).toUpperCase() + addressCity.trim().slice(1) : "";
-  addressDoorCode = addressDoorCode ? addressDoorCode.trim() : "";
-  return { addressFirstName, addressLastName, addressStreetAddress, addressCO, addressPostalCode, addressCity, addressDoorCode };
+    addressFirstName = addressFirstName ? addressFirstName.trim().charAt(0).toUpperCase() + addressFirstName.trim().slice(1) : "";
+    addressLastName = addressLastName ? addressLastName.trim().charAt(0).toUpperCase() + addressLastName.trim().slice(1) : "";
+    addressStreetAddress = addressStreetAddress ? addressStreetAddress.trim().charAt(0).toUpperCase() + addressStreetAddress.trim().slice(1) : "";
+    addressCO = addressCO ? addressCO.trim() : "";
+    addressPostalCode = addressPostalCode ? addressPostalCode.trim().replace(/\D/g, '') : "";
+    addressCity = addressCity ? addressCity.trim().charAt(0).toUpperCase() + addressCity.trim().slice(1) : "";
+    addressDoorCode = addressDoorCode ? addressDoorCode.trim() : "";
+    return { addressFirstName, addressLastName, addressStreetAddress, addressCO, addressPostalCode, addressCity, addressDoorCode };
 }
 
 async function addUserDetails() {
@@ -714,23 +716,23 @@ async function addUserDetails() {
 //   Note: this is somewhat simplified because it does not take into account
 //   that the date of the number is valid (e.g. "000000-0000" does return as true)
 function isValidSwedishSsn(ssn) {
-  ssn = ssn
-    .replace(/\D/g, "")     // strip out all but digits
-    .split("")              // convert string to array
-    .reverse()              // reverse order for Luhn
-    .slice(0, 10);          // keep only 10 digits (i.e. 1977 becomes 77)
+    ssn = ssn
+        .replace(/\D/g, "")     // strip out all but digits
+        .split("")              // convert string to array
+        .reverse()              // reverse order for Luhn
+        .slice(0, 10);          // keep only 10 digits (i.e. 1977 becomes 77)
 
-  // verify we got 10 digits, otherwise it is invalid
-  if (ssn.length !== 10) {
-    return false;
-  }
-  const sum = ssn.map((n) => Number(n))
-    .reduce((previous, current, index) => {
-      if (index % 2) current *= 2;
-      if (current > 9) current -= 9;
-      return previous + current;
-    });
-  return 0 === sum % 10;
+    // verify we got 10 digits, otherwise it is invalid
+    if (ssn.length !== 10) {
+        return false;
+    }
+    const sum = ssn.map((n) => Number(n))
+        .reduce((previous, current, index) => {
+            if (index % 2) current *= 2;
+            if (current > 9) current -= 9;
+            return previous + current;
+        });
+    return 0 === sum % 10;
 }
 
 async function addUserAddress() {
@@ -853,6 +855,6 @@ function calculateSellerGets(value, elementId, feeElementId) {
 }
 
 function itemCoverImage(item) {
-  const images = item.images;
-  return images.coverImage ?  (images.coverImageSmall || images.coverImage) : (images.frontImageSmall || images.frontImage);
+    const images = item.images;
+    return images.coverImage ? (images.coverImageSmall || images.coverImage) : (images.frontImageSmall || images.frontImage);
 }
