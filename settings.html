@@ -13,9 +13,13 @@
       addressDisplay.innerHTML = address.addressStreetAddress ? `${address.addressFirstName} ${address.addressLastName}${coDisplayText}<br/>${address.addressStreetAddress}<br/>${address.addressPostalCode} ${address.addressCity}` : '-';
       swishNumberDisplay.innerHTML = response.data.swishPayeeAlias || '-';
       phoneNumberDisplay.innerHTML = response.data.phoneNumber || '-';
-      if (shippingMethod === 'Pickup') { shippingPreferencesDisplay.innerHTML = 'Upphämtning vid dörren' }
-      else if (shippingMethod === 'Service point') { shippingPreferencesDisplay.innerHTML = 'Lämna till ombud' }
-      else { shippingPreferencesDisplay.innerHTML = shippingMethod || '-';}
+
+      if (shippingMethod) {
+        if (shippingMethod === 'Pickup') { shippingPreferencesDisplay.innerHTML = 'Upphämtning vid dörren' }
+        if (shippingMethod === 'Service point') { shippingPreferencesDisplay.innerHTML = 'Lämna till ombud' }
+      } else {
+        shippingPreferencesDisplay.innerHTML = '-';
+      }
     } catch (e) {
       console.log('error fetching user data', e)
     } finally {
@@ -71,7 +75,7 @@
         newValue.value = document.getElementById(divId).innerHTML.length > 2 ? document.getElementById(divId).innerHTML : ''
       }
       newValue.dispatchEvent(new Event('input'));
-    } 
+    }
     if (formId === 'shippingPrefForm'){
       if (document.getElementById(divId).innerHTML.includes('ombud')){
         servicePointSettings.previousElementSibling.classList.add("w--redirected-checked");
@@ -79,7 +83,7 @@
       } else {
         pickupSettings.previousElementSibling.classList.add("w--redirected-checked");
         pickupSettings.checked = true;
-      } 
+      }
     }
   }
 
@@ -137,7 +141,7 @@
     displaySaveButton()
   })
 
-  
+
   //Phone
   phoneDiv.addEventListener("click", function () {
     displayForm('phoneNumberDisplay', 'phoneForm', phoneNumber, 'Mobilnummer')
