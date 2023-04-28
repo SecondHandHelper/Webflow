@@ -42,7 +42,6 @@
     return false;
   });
 
-  ////////// PHONE NUMBER SIGN IN
   var form = document.getElementById("Phone-number-form");
   form.addEventListener('submit', phoneSignIn);
 
@@ -60,23 +59,19 @@
 
     firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
       .then((confirmationResult) => {
-        // SMS sent. Prompt user to type the code from the message, then sign the
-        // user in with confirmationResult.confirm(code).
-
-        //sessionStorage.setItem('confirmationResult', confirmationResult);
         window.confirmationResult = confirmationResult;
         console.log('V Code' + window.confirmationResult.verificationId);
         mobileNumberDiv.style.display = 'none';
         verifyDiv.style.display = 'block';
 
       }).catch((error) => {
-        // Error; SMS not sent
-        // ...
-        errorMessageDiv.style.display = 'block';
-        submitLoadIcon.style.display = 'none';
-        errorMessageDiv.innerText = error.message;
-        console.log('Error message: ' + error.message);
-      });
+      // Error; SMS not sent
+      // ...
+      //errorMessageDiv.style.display = 'block';
+      submitLoadIcon.style.display = 'none';
+      errorMessageDiv.innerText = error.message;
+      console.log('Error message: ' + error.message);
+    });
   }
 
   signinButton.addEventListener('click', verifyCode);
@@ -87,36 +82,51 @@
   });
 
   function verifyCode() {
-    // [START auth_phone_verify_code]
     const code = verificationCode.value;
     console.log('Verify screen. My code: ' + code);
     console.log('VerificationID' + confirmationResult.verificationId);
     confirmationResult.confirm(code).then((result) => {
-      // User signed in successfully.
       const user = result.user;
 
-      // Check browser support before useing Web storage
       if (typeof (Storage) !== "undefined") {
         sessionStorage.setItem("userId", user.uid);
-        sessionStorage.setItem("email", user.email);
         sessionStorage.setItem("phone", user.phoneNumber);
       } else {
         console.log("Sorry, your browser does not support Web Storage...");
       }
 
-      window.location.replace('./private');
-      // ...
+      if (result.additionalUserInfo.isNewUser) {
+        EmailForTipsDiv.style.display = 'block'
+        verifyDiv.style.display = 'none';
+      } else {
+        window.location.replace('./private');
+      }
     }).catch((error) => {
-      // User couldn't sign in (bad verification code?)
-      // ...
       console.log('My error: ' + error.message);
     });
-    // [END auth_phone_verify_code]
   }
+
+
+  function addEmailAndNavigate() {
+    try {
+      tipsEmailButton.style.display = 'none'
+      loadingSpinnerDiv.style.display = 'flex'
+      if (typeof (Storage) !== "undefined") {
+        sessionStorage.setItem("email", emailTipsInput.value);
+      } else {
+        console.log("Sorry, your browser does not support Web Storage...");
+      }
+      window.location.replace('./private');
+    } catch (e) {
+      console.log('failed to add email', e)
+      loadingSpinnerDiv.style.display = 'none'
+      tipsEmailButton.style.display = 'block'
+    }
+  }
+
 </script>
 
 <script>
-  ////////// GOOGLE ACCOUNT SIGN IN
   googleSignInButton.addEventListener('click', signInWithGoogle);
   googleSignInButton2.addEventListener('click', signInWithGoogle);
   signinFormsDiv.style.display = 'block';
@@ -140,9 +150,9 @@
         var user = result.user;
         window.location.replace('./private');
       }).catch((error) => {
-        const errorText = `[webflow] Error signing in with Google: ${error.code}, ${error.message}, ${error.email}, ${error}`;
-        console.log(errorText);
-      });
+      const errorText = `[webflow] Error signing in with Google: ${error.code}, ${error.message}, ${error.email}, ${error}`;
+      console.log(errorText);
+    });
   }
 </script>
 
@@ -183,7 +193,7 @@
     // [START auth_signup_password]
     firebase.auth().createUserWithEmailAndPassword(email, password)
       .then((userCredential) => {
-        // Signed in 
+        // Signed in
         var user = userCredential.user;
         window.userId = user.uid;
         console.log("Logged in user: ", user.uid);
@@ -238,7 +248,6 @@
           chooseEmailDiv.style.display = 'none';
           signinWithEmailDiv.style.display = 'block';
         } else {
-          // User have to register instead of signing in.
           console.log("Account doesn't exist -> Create new account");
           chooseEmailDiv.style.display = 'none';
           choosePasswordDiv.style.display = 'block';
@@ -249,8 +258,11 @@
       });
   }
 
-  //Eventlisteners
   emailNextStepButton.addEventListener('click', checkEmail);
+  skipEmail.addEventListener('click', function() {
+    window.location.replace('./private')
+  })
+  tipsEmailButton.addEventListener('click', addEmailAndNavigate)
   resetPasswordLink.addEventListener('click', sendPasswordReset);
   emailAndPasswordButton.addEventListener('click', function () {
     chooseEmailDiv.style.display = 'block';

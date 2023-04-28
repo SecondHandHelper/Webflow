@@ -7,7 +7,7 @@
     async function main() {
         if (authUser) {
             userId = authUser.uid;
-            email = authUser.email;
+            email = authUser.email || sessionStorage.getItem("email");
             phone = authUser.phoneNumber;
             emailVerified = authUser.emailVerified;
             await updateFirestoreUserDocument(authUser.uid, email, phone); //Important that this happen first, since many other functions depend on an existing user document
@@ -50,7 +50,7 @@
         const nowDate = new Date();
         let daysSinceFirstPublished = 0;
         let daysSinceLastPublished = 0;
-        
+
         // Last viewed
         const x = user.elementViews ? user.elementViews.reverse().find(e => e.elementID === 'npsSurvey') : null;
         const surveyLastViewed = x ? x.timestamp.toDate() : null;
