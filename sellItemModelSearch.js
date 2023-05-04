@@ -160,7 +160,7 @@ const setupModelSearchEventListeners = () => {
     if (modelSearchString && modelSearchString.length > 0) {
       const fuse = new Fuse(modelDb, {
         includeScore: true,
-        keys: ["name", "category", "color", "maiColor", "articleNumber"]
+        keys: ["maiName", "category", "color", "maiColor", "articleNumber", "name"]
       });
       const searchResult = fuse.search(modelSearchString.replace(', ', ' '));
       showModelItems(searchResult.map(r => r.item));
