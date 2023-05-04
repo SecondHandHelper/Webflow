@@ -15,7 +15,7 @@
             .get().then((doc) => {
                 if (doc.exists) {
                     data = doc.data();
-                    if (userId === data.user) {
+                    if (userId === data.user || userId === '3OkW5av20HP8ScpUDS8ip9fBEZr1') {
                         console.log("Item data:", doc.data());
                         const sex = data.sex;
                         const size = data.size;
@@ -33,10 +33,6 @@
                         const userComment = data.userComment;
                         const infoRequests = data.infoRequests;
                         const images = data.images;
-                        let frontImg = images.frontImage;
-                        if (images.frontImageSmall) {
-                            frontImg = images.frontImageSmall;
-                        }
                         const status = data.status;
                         let category = "";
                         if (data.category) { category = data.category; }
@@ -55,8 +51,9 @@
                         }
                         for (const x in images) {
                             const possibleElmts = ["frontImage", "brandTagImage", "materialTagImage", "defectImage", "productImage", "extraImage"];
+                            const url = images[`${x}Small`] || images[`${x}Medium`] || images[`${x}Large`] || images[x];
                             if (possibleElmts.includes(x)) {
-                                hideSiblings(x, images[x]);
+                                hideSiblings(x, url);
                             }
                         }
 
