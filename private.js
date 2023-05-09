@@ -32,7 +32,6 @@ function showInviteToast(items) {
             let soldDate = i.soldDate;
             const status = i.status;
             const shippingStatus = i.shippingStatus;
-            const shippingMethod = i.shippingMethod;
             const archived = i.archived;
 
             if (!archived && status === 'Sold' && soldDate) {
@@ -44,7 +43,7 @@ function showInviteToast(items) {
                     let daysDiff = Math.floor(timeDifference / (1000 * 3600 * 24));
                     if (daysDiff <= daysSinceLatestSold) { daysSinceLatestSold = daysDiff; }
                 }
-                if (shippingStatus !== 'Sent' && !shippingMethod) {
+                if (shippingStatus !== 'Sent') {
                     oneSoldNotSentItemExist = true;
                 }
             }
