@@ -1,5 +1,6 @@
 <script>
     var npsId;
+    var npsScore;
 
     async function addNpsScore() {
         let score = 11;
@@ -7,6 +8,7 @@
         for (var x = 0; x < radioButtons.length; x++) {
             if (radioButtons[x].checked) {
                 score = parseInt(radioButtons[x].value); // 0-10
+                npsScore = score;
             }
         }
 
@@ -46,9 +48,6 @@
 
         // Update latest NPS document with question and answer
         if (answer) { await db.collection('nps').doc(npsId).update({ followUpQuestion: question, followUpAnswer: answer }); }
-
-        // Show thank you div
-        triggerShowThankYou.click();
     }
 
     async function main() {
@@ -58,10 +57,22 @@
         analytics.track("Element Viewed", { elementID: "npsSurvey" });
     }
 
+
     npsSubmitButton.addEventListener("click", addNpsScore);
-    followUpSubmitButton.addEventListener("click", addFollowUp);
+    followUpSubmitButton.addEventListener("click", async function () {
+        await addFollowUp();
+        // Show thank you div
+        if (user?.referralData?.referralCode && npsScore >= 9 && npsScore <= 10){
+            referralCodeText.innerHTML = user.referralData.referralCode;
+            thankYouNoPromotorDiv.style.display = 'none';
+            thankYouPromotorDiv.style.display = 'block';
+            analytics.track("Element Viewed", { elementID: "thankYouPromotorDiv" });
+        }
+        triggerShowThankYou.click();
+    });
     closeThankYouButton.addEventListener("click", function () {
         if (authUser) { window.location.href = window.location.origin + "/private"; }
         else { window.location.href = window.location.origin; }
     });
+    sharePersonalLinkFromNpsButton.addEventListener('click', shareCode);
 </script>
