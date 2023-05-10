@@ -858,3 +858,25 @@ function itemCoverImage(item) {
     const images = item.images;
     return images.coverImage ? (images.coverImageSmall || images.coverImage) : (images.frontImageSmall || images.frontImage);
 }
+
+
+function shareCode() {
+    const code = user.referralData.referralCode;
+    const text = `Hej, jag vill tipsa om Mai för att rensa ur garderoben. Mai är en tjänst som hjälper dig att sälja dina kläder på ett enkelt sätt. Man tar bilder på sina plagg, sedan sköter Mai resten, såsom värdering, publicering på plattformar, kontakt med köpare och frakt när det blir sålt. Man får själv behålla 80% av slutpriset, och blir det inte sålt kostar det ingenting.
+
+Som en uppmuntran till att komma igång ger Mai dig 100kr i välkomstgåva, när du registrerar dig med min kod ${code}.
+
+Läs mer och registrera dig här:`
+    if (navigator.share) {
+        navigator.share({
+            text: text,
+            url: `https://maiapp.se/?invite=${code}`
+        }).then(() => { console.log('Thanks for sharing!'); }).catch(console.error);
+    } else {
+        console.log("Browser doesn't support navigator.share => Copy to clipboard!");
+        const shareText = text + "\n" + `https://maiapp.se/?invite=${code}`;
+        navigator.clipboard.writeText(shareText);
+        linkCopiedBanner.style.display = 'flex';
+        setTimeout(function () { linkCopiedBanner.style.display = 'none'; }, 1500);
+    }
+}
