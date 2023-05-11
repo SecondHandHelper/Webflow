@@ -380,7 +380,3 @@ function fillForm(itemId) {
       console.log("Error getting item document:", error);
     });
 }
-
-if (params.id) {
-  fillForm(params.id);
-}
