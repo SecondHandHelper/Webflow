@@ -338,8 +338,8 @@ function fillForm(itemId) {
         }
 
         // Populate text input fields
-        itemSize.value = size;
-        setFieldValue('itemBrand', brand);
+        itemBrand.value = brand;
+        fieldLabelToggle('itemBrandLabel'); // Didn't want to use the setFieldValue for the brand since that triggered a dropdown to open
         setFieldValue('itemSize', size);
         setFieldValue('itemMaterial', material);
         setFieldValue('itemModel', model);
@@ -374,7 +374,7 @@ function fillForm(itemId) {
         document.getElementById(data.sex).previousElementSibling.classList.add("w--redirected-checked");
         document.getElementById(data.sex).checked = true;
 
-        
+
       } else {
         console.log("No such document!");
       }
