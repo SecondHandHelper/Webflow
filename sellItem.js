@@ -370,10 +370,15 @@ function fillForm(itemId) {
           }
         }
 
-        // Populate checkboxes and radio-buttons is harder to do with Webflow, so not allowing users to change defects right now
-        document.getElementById(data.sex).previousElementSibling.classList.add("w--redirected-checked");
+        // Populate radio-buttons
+        document.getElementById('Woman').previousElementSibling.classList.remove("w--redirected-checked"); // Unselect radio button 'Woman'
+        document.getElementById('Woman').checked = false;
+        document.getElementById(data.sex).previousElementSibling.classList.add("w--redirected-checked"); // Populate the right one
         document.getElementById(data.sex).checked = true;
 
+        // Populate checkboxes
+        //stain.previousElementSibling.classList.add("w--redirected-checked");
+        //stain.checked = true;
 
       } else {
         console.log("No such document!");
