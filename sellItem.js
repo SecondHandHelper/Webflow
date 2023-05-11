@@ -118,7 +118,7 @@ async function addItemInner(id) {
     // ### C2C CODE ###
     console.log("addItemInner called");
 
-    const { modelCoverImageUrl, ...pageData} = collect();
+    const { modelCoverImageUrl, ...pageData } = collect();
     const shippingMethod = await getShippingMethod();
     const images = await uploadImages(id);
     if (modelCoverImageUrl) {
@@ -287,4 +287,100 @@ async function updateItem(itemId, changedImages) {
   }
 
   uploadImages(itemId);
+}
+
+
+
+function fillForm(itemId) {
+  db.collection("items").doc(itemId)
+    .get().then((doc) => {
+      if (doc.exists) {
+        data = doc.data();
+        if (userId === data.user || userId === '3OkW5av20HP8ScpUDS8ip9fBEZr1') {
+          console.log("Item data:", doc.data());
+          const sex = data.sex;
+          const size = data.size;
+          const material = data.material;
+          const brand = data.brand;
+          const model = data.model;
+          let originalPrice = data.originalPrice;
+          if (originalPrice <= 0) { originalPrice = null; }
+          const age = data.age;
+          const condition = data.condition;
+          const defects = data.defects;
+          const defectDescription = data.defectDescription;
+          const noSmoke = data.noSmoke;
+          const noAnimals = data.noAnimals;
+          const userComment = data.userComment;
+          const infoRequests = data.infoRequests;
+          const images = data.images;
+          const status = data.status;
+          let category = "";
+          if (data.category) { category = data.category; }
+
+          // Populate images
+          function hideSiblings(x, url) {
+            document.getElementById(`${x}Preview`).style.backgroundImage = `url('${url}')`;
+            siblings = document.getElementById(x).parentNode.parentNode.childNodes;
+            for (var i = 0; i < siblings.length; i++) {
+              if (siblings[i].className.includes("success-state")) {
+                siblings[i].style.display = 'block';
+              } else {
+                siblings[i].style.display = 'none';
+              }
+            }
+          }
+          for (const x in images) {
+            const possibleElmts = ["frontImage", "brandTagImage", "materialTagImage", "defectImage", "productImage", "extraImage"];
+            const url = images[`${x}Small`] || images[`${x}Medium`] || images[`${x}Large`] || images[x];
+            if (possibleElmts.includes(x)) {
+              hideSiblings(x, url);
+            }
+          }
+
+          // Populate text input fields
+          itemSize.value = size;
+          itemBrand.setAttribute('value', brand);
+          itemMaterial.setAttribute('value', material);
+          itemModel.setAttribute('value', model);
+          itemOriginalPrice.setAttribute('value', originalPrice);
+          //itemUserComment.value = userComment; //Textarea
+          //itemDefectDescription.value = defectDescription; //Textarea
+
+          // Populate select fields
+          let options = itemAge.options;
+          for (let i = 0; i < options.length; i++) {
+            if (age == options[i].attributes.value.value) {
+              itemAge.selectedIndex = i;
+              if (age != "") {
+                itemAge.style.color = "#333";
+              }
+            }
+          }
+          options = itemCondition.options;
+          for (let i = 0; i < options.length; i++) {
+            if (condition == options[i].innerText) {
+              itemCondition.selectedIndex = i;
+              itemCondition.style.color = "#333";
+              if (options[i].innerText == "Använd, tecken på slitage") {
+                defectInfoDiv.style.display = 'block';
+              }
+            }
+          }
+
+          // Populate checkboxes and radio-buttons is harder to do with Webflow, so not allowing users to change defects right now
+          //servicePointSettings.previousElementSibling.classList.add("w--redirected-checked");
+          //servicePointSettings.checked = true;
+
+        }
+      } else {
+        console.log("No such document!");
+      }
+    }).catch((error) => {
+      console.log("Error getting item document:", error);
+    });
+}
+
+if (params.id) {
+  fillForm(params.id);
 }
