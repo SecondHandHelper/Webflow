@@ -339,10 +339,11 @@ function fillForm(itemId) {
 
           // Populate text input fields
           itemSize.value = size;
-          itemBrand.setAttribute('value', brand);
-          itemMaterial.setAttribute('value', material);
-          itemModel.setAttribute('value', model);
-          itemOriginalPrice.setAttribute('value', originalPrice);
+          setFieldValue('itemBrand', brand);
+          setFieldValue('itemSize', size);
+          setFieldValue('itemMaterial', material);
+          setFieldValue('itemModel', model);
+          setFieldValue('itemOriginalPrice', originalPrice);
           //itemUserComment.value = userComment; //Textarea
           //itemDefectDescription.value = defectDescription; //Textarea
 
@@ -353,6 +354,7 @@ function fillForm(itemId) {
               itemAge.selectedIndex = i;
               if (age != "") {
                 itemAge.style.color = "#333";
+                itemAge.dispatchEvent(new Event('input'));
               }
             }
           }
@@ -361,6 +363,7 @@ function fillForm(itemId) {
             if (condition == options[i].innerText) {
               itemCondition.selectedIndex = i;
               itemCondition.style.color = "#333";
+              itemCondition.dispatchEvent(new Event('input'));
               if (options[i].innerText == "Använd, tecken på slitage") {
                 defectInfoDiv.style.display = 'block';
               }
