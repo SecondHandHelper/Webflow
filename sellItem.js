@@ -296,7 +296,6 @@ function fillForm(itemId) {
     .get().then((doc) => {
       if (doc.exists) {
         data = doc.data();
-        if (userId === data.user || userId === '3OkW5av20HP8ScpUDS8ip9fBEZr1') {
           console.log("Item data:", doc.data());
           const sex = data.sex;
           const size = data.size;
@@ -371,8 +370,6 @@ function fillForm(itemId) {
           // Populate checkboxes and radio-buttons is harder to do with Webflow, so not allowing users to change defects right now
           //servicePointSettings.previousElementSibling.classList.add("w--redirected-checked");
           //servicePointSettings.checked = true;
-
-        }
       } else {
         console.log("No such document!");
       }
