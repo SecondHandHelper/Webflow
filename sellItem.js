@@ -156,7 +156,8 @@ async function uploadImages(itemId) {
     return { ...prev, [current]: file }
   }, {}); // { frontImage: <file object>, ... }
 
-
+  console.log("imageData", imageData);
+  console.log("imageData[0]", imageData[0]);
 
   const storageRef = storage.ref();
   const promises = Object.keys(imageData).map(async (key) => {
