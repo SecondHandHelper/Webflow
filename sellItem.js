@@ -150,7 +150,7 @@ async function fileFromPreviewUrl(url) { // This is for the case the form have b
 
 async function uploadImages(itemId) {
   const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
-  const imageData = imageElements.reduce(async (prev, current) => {
+  const imageData = await imageElements.reduce(async (prev, current) => {
     const file = document.getElementById(current).files[0] || await fileFromPreviewUrl(sessionStorage.getItem(`${current}PreviewUrl`));
     if (!file) return prev;
     return { ...prev, [current]: file }
