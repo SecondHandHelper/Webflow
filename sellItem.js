@@ -245,10 +245,11 @@ function fillForm(itemId) {
           }
 
           // Create hidden elements
-          const y = document.createElement("INPUT");
-          y.setAttribute("type", "hidden");
-          y.setAttribute("value", url);
-          y.setAttribute("id", `${x}PreviewUrl`);
+          const newNode = document.createElement("INPUT");
+          newNode.setAttribute("type", "hidden");
+          newNode.value = url;
+          newNode.id = `${x}PreviewUrl`;
+          console.log(newNode, typeof newNode);
         }
         for (const x in images) {
           const possibleElmts = ["frontImage", "brandTagImage", "materialTagImage", "defectImage", "productImage", "extraImage"];
