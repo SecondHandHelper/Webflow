@@ -161,11 +161,16 @@ async function addItemInner(id) {
 async function fileFromPreviewUrl(x) { // This is for the case the form have been prefilled with images
   console.log('I get here: ', x);
   console.log(`${x}PreviewUrl`);
-  const url = document.getElementById(`${x}PreviewUrl`).value; // e.g. frontImagePreviewUrl
-  const response = await fetch(url); // Download to cache
-  const file = response.blob();
-  console.log('File exist: ', (file), typeof file);
-  return file // Return image file as blob
+  const elm = document.getElementById(`${x}PreviewUrl`); // e.g. frontImagePreviewUrl
+  console.log('hidden element: ', elm);
+  if (elm) {
+    const url = elm.value;
+    console.log('found hidden element');
+    const response = await fetch(url); // Download to cache
+    const file = response.blob();
+    console.log('File exist: ', (file), typeof file);
+    return file // Return image file as blob
+  }
 }
 
 async function uploadImages(itemId) {
