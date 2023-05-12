@@ -115,8 +115,6 @@ async function getShippingMethod() {
 }
 
 async function addItemInner(id) {
-  if (featureIsEnabled('C2C')) {
-    // ### C2C CODE ###
     console.log("addItemInner called");
 
     const { modelCoverImageUrl, ...pageData } = collect();
@@ -137,25 +135,6 @@ async function addItemInner(id) {
     if (phoneNumber) {
       await writePhoneNumberToFirestore(authUser.uid, phoneNumber);
     }
-
-  } else {
-    // ### LIVE CODE ###
-    console.log("addItemInner called");
-
-    const pageData = collect();
-    const images = await uploadImages(id);
-    const item = { ...pageData, images, version: "2" };
-
-    console.log('Storing item: ', item);
-
-    await db.collection('items').doc(id).set(item);
-
-    // TODO: Should this be here?
-    const phoneNumber = itemPhoneNumber.value;
-    if (phoneNumber) {
-      await writePhoneNumberToFirestore(authUser.uid, phoneNumber);
-    }
-  }
 }
 
 async function fileFromPreviewUrl(x) { // This is for the case the form have been prefilled with images
@@ -169,10 +148,12 @@ async function fileFromPreviewUrl(x) { // This is for the case the form have bee
     console.log('found hidden element');
   }
   if(x === 'frontImage'){ // Tillfälligt test
-    url === 'https://firebasestorage.googleapis.com/v0/b/second-hand-helper.appspot.com/o/images%2F4f50b3c6-dce8-41ab-9c17-017b5fa7221b%2FbrandTagImage?alt=media&token=1ff11c9f-0e85-44e2-9940-4b3bc1c6830e'; 
+    url = 'https://firebasestorage.googleapis.com/v0/b/second-hand-helper.appspot.com/o/images%2F4f50b3c6-dce8-41ab-9c17-017b5fa7221b%2FbrandTagImage?alt=media&token=1ff11c9f-0e85-44e2-9940-4b3bc1c6830e'; 
   }
+  console.log(url);
   if(url){
     const response = await fetch(url); // Download to cache
+    console.log('respponse'), response;
     const file = response.blob();
     console.log('File exist: ', (file), typeof file);
     return file // Return image file as blob
