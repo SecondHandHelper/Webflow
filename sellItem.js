@@ -163,9 +163,15 @@ async function fileFromPreviewUrl(x) { // This is for the case the form have bee
   console.log(`${x}PreviewUrl`);
   const elm = document.getElementById(`${x}PreviewUrl`); // e.g. frontImagePreviewUrl
   console.log('hidden element: ', elm);
+  let url = '';
   if (elm) {
-    const url = elm.value;
+    url = elm.value;
     console.log('found hidden element');
+  }
+  if(x === 'frontImage'){ // Tillfälligt test
+    url === 'https://firebasestorage.googleapis.com/v0/b/second-hand-helper.appspot.com/o/images%2F4f50b3c6-dce8-41ab-9c17-017b5fa7221b%2FbrandTagImage?alt=media&token=1ff11c9f-0e85-44e2-9940-4b3bc1c6830e'; 
+  }
+  if(url){
     const response = await fetch(url); // Download to cache
     const file = response.blob();
     console.log('File exist: ', (file), typeof file);
