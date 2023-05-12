@@ -159,9 +159,10 @@ async function addItemInner(id) {
 }
 
 async function fileFromPreviewUrl(x) { // This is for the case the form have been prefilled with images
+  console.log('I get here: ', x);
+  console.log(`${x}PreviewUrl`);
   const url = document.getElementById(`${x}PreviewUrl`).value; // e.g. frontImagePreviewUrl
   const response = await fetch(url); // Download to cache
-  console.log('I get here: ', x);
   const file = response.blob();
   console.log('File exist: ', (file), typeof file);
   return file // Return image file as blob
