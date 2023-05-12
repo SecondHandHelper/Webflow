@@ -161,13 +161,16 @@ async function addItemInner(id) {
 async function fileFromPreviewUrl(x) { // This is for the case the form have been prefilled with images
   const url = document.getElementById(`${x}PreviewUrl`).value; // e.g. frontImagePreviewUrl
   const response = await fetch(url); // Download to cache
-  return response.blob(); // Return image file as blob
+  console.log('I get here: ', x);
+  const file = response.blob();
+  console.log('File exist: ', (file), typeof file);
+  return file // Return image file as blob
 }
 
 async function uploadImages(itemId) {
   const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
   const imageData = imageElements.reduce(async (prev, current) => {
-    const file = document.getElementById(current).files[0] || fileFromPreviewUrl(current);
+    const file = document.getElementById(current).files[0] || await fileFromPreviewUrl(current);
     if (!file) return prev;
     return { ...prev, [current]: file }
   }, {}); // { frontImage: <file object>, ... }
@@ -198,7 +201,7 @@ async function firstNameSet() {
     addressFormDiv.style.display = 'block';
     addItemFormDiv.style.display = 'none';
   } else {
-    window.location.href = window.location.origin + "/private";
+    //window.location.href = window.location.origin + "/private";
   }
 }
 
@@ -227,6 +230,7 @@ function fillForm(itemId) {
 
         //TODO: Get other data that's not part of the form, to store that immediately as well. Such as category, color, max / min price etc...
 
+        //TODO: Make frontImage and brandTagImage required when the user removes the preview of any of them
 
         // Populate images
         function showPreview(x, url) {
