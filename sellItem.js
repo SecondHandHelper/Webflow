@@ -137,24 +137,12 @@ async function addItemInner(id) {
     }
 }
 
-async function fileFromPreviewUrl(x) { // This is for the case the form have been prefilled with images
-  console.log('I get here: ', x);
-  console.log(`${x}PreviewUrl`);
-  const elm = document.getElementById(`${x}PreviewUrl`); // e.g. frontImagePreviewUrl
-  console.log('hidden element: ', elm);
-  let url = '';
-  if (elm) {
-    url = elm.value;
-    console.log('found hidden element');
-  }
-  if(x === 'frontImage'){ // Tillfälligt test
-    url = 'https://firebasestorage.googleapis.com/v0/b/second-hand-helper.appspot.com/o/images%2F4f50b3c6-dce8-41ab-9c17-017b5fa7221b%2FbrandTagImage?alt=media&token=1ff11c9f-0e85-44e2-9940-4b3bc1c6830e'; 
-  }
-  console.log(url);
+async function fileFromPreviewUrl(url) { // This is for the case the form have been prefilled with images
+  console.log('url in fileFromPreviewUrl(): ', url);
   if(url){
     const response = await fetch(url); // Download to cache
-    console.log('respponse'), response;
-    const file = response.blob();
+    console.log('response'), response;
+    const file = await response.blob();
     console.log('File exist: ', (file), typeof file);
     return file // Return image file as blob
   }
@@ -163,7 +151,7 @@ async function fileFromPreviewUrl(x) { // This is for the case the form have bee
 async function uploadImages(itemId) {
   const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
   const imageData = imageElements.reduce(async (prev, current) => {
-    const file = document.getElementById(current).files[0] || await fileFromPreviewUrl(current);
+    const file = document.getElementById(current).files[0] || await fileFromPreviewUrl(sessionStorage.getItem(`${current}PreviewUrl`));
     if (!file) return prev;
     return { ...prev, [current]: file }
   }, {}); // { frontImage: <file object>, ... }
@@ -236,18 +224,14 @@ function fillForm(itemId) {
               siblings[i].style.display = 'none'; // Hide other states of file input field "empty-state" and "error-state"
             }
           }
-
-          // Create hidden elements
-          const newNode = document.createElement("INPUT");
-          newNode.setAttribute("type", "hidden");
-          newNode.value = url;
-          newNode.id = `${x}PreviewUrl`;
-          console.log(newNode, typeof newNode);
         }
         for (const x in images) {
           const possibleElmts = ["frontImage", "brandTagImage", "materialTagImage", "defectImage", "productImage", "extraImage"];
           const url = images[x] || images[`${x}Large`] || images[`${x}Medium`] || images[`${x}Small`];
-          if (possibleElmts.includes(x)) { showPreview(x, url); }
+          if (possibleElmts.includes(x)) { 
+            showPreview(x, url); 
+            sessionStorage.setItem(`${x}PreviewUrl`, url); // Store preview url to create image from on submit
+          }
         }
 
         // Populate text input fields
