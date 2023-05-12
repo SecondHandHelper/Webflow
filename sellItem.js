@@ -1,3 +1,5 @@
+const defectsChoicesInSwedish = new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
+
 function addItem() {
   const id = uuidv4();
   console.log(`addItem called, new id: ${id}`);
@@ -36,7 +38,6 @@ function collect() {
 
   // Get defects list
   let defectElements = new Map().set("hole", hole.checked).set("stain", stain.checked).set("lostFit", lostFit.checked).set("nopprig", nopprig.checked).set("threadUp", threadUp.checked).set("colorChange", colorChange.checked).set("otherDefect", otherDefect.checked);
-  let defectsChoicesInSwedish = new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
   let defects = [];
   defectElements.forEach((value, key) => {
     if (value) {
@@ -377,9 +378,12 @@ function fillForm(itemId) {
         document.getElementById(data.sex).checked = true;
 
         // Populate checkboxes
-        //stain.previousElementSibling.classList.add("w--redirected-checked");
-        //stain.checked = true;
-
+        defectsChoicesInSwedish.forEach((value, key) => {
+          if (data.defects.includes(value)) {
+            document.getElementById(key).previousElementSibling.classList.add("w--redirected-checked");
+            document.getElementById(key).checked = true;
+          }
+        });
       } else {
         console.log("No such document!");
       }
