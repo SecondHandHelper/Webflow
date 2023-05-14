@@ -158,13 +158,14 @@ async function uploadImages(itemId) {
   const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
   const filesFromPreviewUrl = await getFilesFromPreviewUrl(imageElements);
 
-  const frontImageFile = document.getElementById('frontImage').files[0]
+  const frontImageFile = document.getElementById('frontImage').files[0];
   console.log('document.getElementById(current).files[0]', frontImageFile, typeof frontImageFile);
-
   console.log('filesFromPreviewUrl[current]', filesFromPreviewUrl['frontImage']);
 
   const imageData = await imageElements.reduce(async (prev, current) => {
     const file = document.getElementById(current).files[0] || filesFromPreviewUrl[current];
+    console.log("File in the imageDate reduce thing: ", file);
+    console.log('filesFromPreviewUrl[current]', filesFromPreviewUrl[current]);
     if (!file) return prev;
     return { ...prev, [current]: file }
   }, {}); // { frontImage: <file object>, ... }
