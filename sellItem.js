@@ -165,7 +165,7 @@ async function getFilesFromPreviewUrl(imageElements) { // This is for the case t
 
 async function uploadImages(itemId) {
   const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
-  const filesFromPreviewUrl = getFilesFromPreviewUrl(imageElements);
+  const filesFromPreviewUrl = await getFilesFromPreviewUrl(imageElements);
   /*
   const filesFromPreviewUrl = {}; // { frontImage: <file object>, ... }
   imageElements.forEach(async (elm) => {
