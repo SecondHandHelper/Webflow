@@ -150,8 +150,8 @@ async function fileFromPreviewUrl(url) { // This is for the case the form have b
 
 async function getFilesFromPreviewUrl(imageElements) { // This is for the case the form have been prefilled with images
   const files = {};
-  imageElements.forEach(async (elm) => {
-    const url = sessionStorage.getItem(`${elm}PreviewUrl`);
+  for (let i = 0; i < imageElements.length; i++){
+    const url = sessionStorage.getItem(`${imageElements[i]}PreviewUrl`);
     if (url) {
       const response = await fetch(url); // Download to cache
       console.log('response'), response;
@@ -159,7 +159,8 @@ async function getFilesFromPreviewUrl(imageElements) { // This is for the case t
       console.log('File exist: ', (file), typeof file);
       files[elm] = file;
     }
-  });
+  }
+  console.log('Files: ', files);
   return files // Return object with blob files: { frontImage: <file object>, ... }
 }
 
