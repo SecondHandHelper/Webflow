@@ -137,17 +137,6 @@ async function addItemInner(id) {
   }
 }
 
-async function fileFromPreviewUrl(url) { // This is for the case the form have been prefilled with images
-  console.log('url in fileFromPreviewUrl(): ', url);
-  if (url) {
-    const response = await fetch(url); // Download to cache
-    console.log('response'), response;
-    const file = await response.blob();
-    console.log('File exist: ', (file), typeof file);
-    return file // Return image file as blob
-  }
-}
-
 async function getFilesFromPreviewUrl(imageElements) { // This is for the case the form have been prefilled with images
   const files = {};
   for (let i = 0; i < imageElements.length; i++){
@@ -168,12 +157,9 @@ async function getFilesFromPreviewUrl(imageElements) { // This is for the case t
 async function uploadImages(itemId) {
   const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
   const filesFromPreviewUrl = await getFilesFromPreviewUrl(imageElements);
-  /*
-  const filesFromPreviewUrl = {}; // { frontImage: <file object>, ... }
-  imageElements.forEach(async (elm) => {
-    filesFromPreviewUrl[`${elm}PreviewUrl`] = await fileFromPreviewUrl(sessionStorage.getItem(`${elm}PreviewUrl`));
-  });
-  */
+
+  const frontImageFile = document.getElementById('frontImage').files[0]
+  console.log('document.getElementById(current).files[0]', frontImageFile, typeof frontImageFile);
 
   const imageData = await imageElements.reduce(async (prev, current) => {
     const file = document.getElementById(current).files[0] || filesFromPreviewUrl[current];
