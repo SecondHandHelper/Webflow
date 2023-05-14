@@ -162,7 +162,7 @@ async function uploadImages(itemId) {
   console.log('document.getElementById(current).files[0]', frontImageFile, typeof frontImageFile);
   console.log('filesFromPreviewUrl[current]', filesFromPreviewUrl['frontImage']);
 
-  const imageData = await imageElements.reduce(async (prev, current) => {
+  const imageData = imageElements.reduce( prev, current => {
     const file = document.getElementById(current).files[0] || filesFromPreviewUrl[current];
     console.log("File in the imageDate reduce thing: ", file);
     console.log('filesFromPreviewUrl[current]', filesFromPreviewUrl[current]);
