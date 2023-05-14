@@ -148,7 +148,7 @@ async function fileFromPreviewUrl(url) { // This is for the case the form have b
   }
 }
 
-async function getFilesFromPreviewUrl(elements) { // This is for the case the form have been prefilled with images
+async function getFilesFromPreviewUrl(imageElements) { // This is for the case the form have been prefilled with images
   const files = {};
   imageElements.forEach(async (elm) => {
     const url = sessionStorage.getItem(`${elm}PreviewUrl`);
