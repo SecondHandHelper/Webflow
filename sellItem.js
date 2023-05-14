@@ -124,7 +124,8 @@ async function addItemInner(id) {
     images['coverImage'] = modelCoverImageUrl;
     pageData['coverImageUpdatedAt'] = new Date();
   }
-  const item = { ...pageData, shippingMethod, images, version: "2" };
+  const createdFromItem = params.id ? { createdFromItem: params.id } : {} ;
+  const item = { ...pageData, shippingMethod, images, ...createdFromItem, version: "2" };
 
   console.log('Storing item: ', item);
 
@@ -182,17 +183,16 @@ async function nextStep() {
     window.location.href = window.location.origin + "/sign-in";
     return
   }
-  
   signedInNextStep().then(() => console.log('signedInNextStep completed'));
 }
 
-async function signedInNextStep(){
+async function signedInNextStep() {
   console.log('in signedInNextStep');
   const docRef = db.collection("users").doc(authUser.uid);
   const doc = await docRef.get();
   const firstNameSet = doc.data().addressFirstName;
   // If first name not set, show address form. Else, go to private page.
-  if (!firstNameSet) { 
+  if (!firstNameSet) {
     addressFormDiv.style.display = 'block';
     addItemFormDiv.style.display = 'none';
   } else {
