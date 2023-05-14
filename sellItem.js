@@ -139,7 +139,7 @@ async function addItemInner(id) {
 
 async function getFilesFromPreviewUrl(imageElements) { // This is for the case the form have been prefilled with images
   const files = {};
-  for (let i = 0; i < imageElements.length; i++){
+  for (let i = 0; i < imageElements.length; i++) {
     const elm = imageElements[i];
     const url = sessionStorage.getItem(`${elm}PreviewUrl`);
     if (url) {
@@ -162,7 +162,7 @@ async function uploadImages(itemId) {
   console.log('document.getElementById(current).files[0]', frontImageFile, typeof frontImageFile);
   console.log('filesFromPreviewUrl[current]', filesFromPreviewUrl['frontImage']);
 
-  const imageData = imageElements.reduce( prev, current => {
+  const imageData = imageElements.reduce((prev, current) => {
     const file = document.getElementById(current).files[0] || filesFromPreviewUrl[current];
     console.log("File in the imageDate reduce thing: ", file);
     console.log('filesFromPreviewUrl[current]', filesFromPreviewUrl[current]);
