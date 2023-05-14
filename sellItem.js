@@ -10,7 +10,7 @@ function addItem() {
       // Track with segment 'User Activated'
       if (userItemsCount === 0) { analytics.track('User Activated'); }
 
-      firstNameSet().then(() => console.log('firstNameSet completed'));
+      nextStep().then(() => console.log('nextStep completed'));
     })
     .catch((e) => {
       console.error('addItem failed', e);
@@ -68,7 +68,7 @@ function collect() {
   }
 
   return {
-    user: authUser.uid,
+    user: authUser.uid || null,
     createdAt: now,
     status,
     shippingStatus,
@@ -144,34 +144,21 @@ async function getFilesFromPreviewUrl(imageElements) { // This is for the case t
     const url = sessionStorage.getItem(`${elm}PreviewUrl`);
     if (url) {
       const response = await fetch(url); // Download to cache
-      console.log('response'), response;
       const file = await response.blob();
-      console.log('File exist: ', (file), typeof file);
       files[elm] = file;
     }
   }
-  console.log('Files: ', files);
   return files // Return object with blob files: { frontImage: <file object>, ... }
 }
 
 async function uploadImages(itemId) {
   const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
   const filesFromPreviewUrl = await getFilesFromPreviewUrl(imageElements);
-
-  const frontImageFile = document.getElementById('frontImage').files[0];
-  console.log('document.getElementById(current).files[0]', frontImageFile, typeof frontImageFile);
-  console.log('filesFromPreviewUrl[current]', filesFromPreviewUrl['frontImage']);
-
   const imageData = imageElements.reduce((prev, current) => {
     const file = document.getElementById(current).files[0] || filesFromPreviewUrl[current];
-    console.log("File in the imageDate reduce thing: ", file);
-    console.log('filesFromPreviewUrl[current]', filesFromPreviewUrl[current]);
     if (!file) return prev;
     return { ...prev, [current]: file }
   }, {}); // { frontImage: <file object>, ... }
-
-  console.log("imageData", imageData);
-
   const storageRef = storage.ref();
   const promises = Object.keys(imageData).map(async (key) => {
     const imagePathReference = `images/${itemId}/${key}`;
@@ -186,17 +173,30 @@ async function uploadImages(itemId) {
   }, {});
 }
 
-async function firstNameSet() {
-  console.log('in firstNameSet');
+async function nextStep() {
+  console.log('in nextStep');
+  if (!authUser) {
+    // If user isn't logged in they will be taken through these steps:
+    // 1. Logg in or create account on the /sign-in page
+    // 2. Get back to /sell-item and continue normal flow (show address if no address, show confirmation div)
+    window.location.href = window.location.origin + "/sign-in";
+    return
+  }
+  
+  signedInNextStep().then(() => console.log('signedInNextStep completed'));
+}
+
+async function signedInNextStep(){
+  console.log('in signedInNextStep');
   const docRef = db.collection("users").doc(authUser.uid);
   const doc = await docRef.get();
   const firstNameSet = doc.data().addressFirstName;
-  console.log('firstNameSet', firstNameSet);
-  if (!firstNameSet) {
+  // If first name not set, show address form. Else, go to private page.
+  if (!firstNameSet) { 
     addressFormDiv.style.display = 'block';
     addItemFormDiv.style.display = 'none';
   } else {
-    //window.location.href = window.location.origin + "/private";
+    window.location.href = window.location.origin + "/private";
   }
 }
 
@@ -212,7 +212,6 @@ function fillForm(itemId) {
       if (doc.exists) {
         data = doc.data();
         console.log("Item data:", doc.data());
-        const sex = data.sex;
         const size = data.size;
         const material = data.material;
         const brand = data.brand;
@@ -224,8 +223,6 @@ function fillForm(itemId) {
         const images = data.images;
 
         //TODO: Get other data that's not part of the form, to store that immediately as well. Such as category, color, max / min price etc...
-
-        //TODO: Make frontImage and brandTagImage required when the user removes the preview of any of them
 
         // Populate images
         function showPreview(x, url) {
