@@ -161,6 +161,8 @@ async function uploadImages(itemId) {
   const frontImageFile = document.getElementById('frontImage').files[0]
   console.log('document.getElementById(current).files[0]', frontImageFile, typeof frontImageFile);
 
+  console.log('filesFromPreviewUrl[current]', filesFromPreviewUrl['frontImage']);
+
   const imageData = await imageElements.reduce(async (prev, current) => {
     const file = document.getElementById(current).files[0] || filesFromPreviewUrl[current];
     if (!file) return prev;
