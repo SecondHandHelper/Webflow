@@ -151,7 +151,8 @@ async function fileFromPreviewUrl(url) { // This is for the case the form have b
 async function getFilesFromPreviewUrl(imageElements) { // This is for the case the form have been prefilled with images
   const files = {};
   for (let i = 0; i < imageElements.length; i++){
-    const url = sessionStorage.getItem(`${imageElements[i]}PreviewUrl`);
+    const elm = imageElements[i];
+    const url = sessionStorage.getItem(`${elm}PreviewUrl`);
     if (url) {
       const response = await fetch(url); // Download to cache
       console.log('response'), response;
