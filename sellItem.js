@@ -115,31 +115,31 @@ async function getShippingMethod() {
 }
 
 async function addItemInner(id) {
-    console.log("addItemInner called");
+  console.log("addItemInner called");
 
-    const { modelCoverImageUrl, ...pageData } = collect();
-    const shippingMethod = await getShippingMethod();
-    const images = await uploadImages(id);
-    if (modelCoverImageUrl) {
-      images['coverImage'] = modelCoverImageUrl;
-      pageData['coverImageUpdatedAt'] = new Date();
-    }
-    const item = { ...pageData, shippingMethod, images, version: "2" };
+  const { modelCoverImageUrl, ...pageData } = collect();
+  const shippingMethod = await getShippingMethod();
+  const images = await uploadImages(id);
+  if (modelCoverImageUrl) {
+    images['coverImage'] = modelCoverImageUrl;
+    pageData['coverImageUpdatedAt'] = new Date();
+  }
+  const item = { ...pageData, shippingMethod, images, version: "2" };
 
-    console.log('Storing item: ', item);
+  console.log('Storing item: ', item);
 
-    await db.collection('items').doc(id).set(item);
+  await db.collection('items').doc(id).set(item);
 
-    // If first time: User submitted their phone number
-    const phoneNumber = itemPhoneNumber.value;
-    if (phoneNumber) {
-      await writePhoneNumberToFirestore(authUser.uid, phoneNumber);
-    }
+  // If first time: User submitted their phone number
+  const phoneNumber = itemPhoneNumber.value;
+  if (phoneNumber) {
+    await writePhoneNumberToFirestore(authUser.uid, phoneNumber);
+  }
 }
 
 async function fileFromPreviewUrl(url) { // This is for the case the form have been prefilled with images
   console.log('url in fileFromPreviewUrl(): ', url);
-  if(url){
+  if (url) {
     const response = await fetch(url); // Download to cache
     console.log('response'), response;
     const file = await response.blob();
@@ -148,16 +148,38 @@ async function fileFromPreviewUrl(url) { // This is for the case the form have b
   }
 }
 
+async function getFilesFromPreviewUrl(elements) { // This is for the case the form have been prefilled with images
+  const files = {};
+  imageElements.forEach(async (elm) => {
+    const url = sessionStorage.getItem(`${elm}PreviewUrl`);
+    if (url) {
+      const response = await fetch(url); // Download to cache
+      console.log('response'), response;
+      const file = await response.blob();
+      console.log('File exist: ', (file), typeof file);
+      files[elm] = file;
+    }
+  });
+  return files // Return object with blob files: { frontImage: <file object>, ... }
+}
+
 async function uploadImages(itemId) {
   const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
+  const filesFromPreviewUrl = getFilesFromPreviewUrl(imageElements);
+  /*
+  const filesFromPreviewUrl = {}; // { frontImage: <file object>, ... }
+  imageElements.forEach(async (elm) => {
+    filesFromPreviewUrl[`${elm}PreviewUrl`] = await fileFromPreviewUrl(sessionStorage.getItem(`${elm}PreviewUrl`));
+  });
+  */
+
   const imageData = await imageElements.reduce(async (prev, current) => {
-    const file = document.getElementById(current).files[0] || await fileFromPreviewUrl(sessionStorage.getItem(`${current}PreviewUrl`));
+    const file = document.getElementById(current).files[0] || filesFromPreviewUrl[current];
     if (!file) return prev;
     return { ...prev, [current]: file }
   }, {}); // { frontImage: <file object>, ... }
 
   console.log("imageData", imageData);
-  console.log("imageData[0]", imageData[0]);
 
   const storageRef = storage.ref();
   const promises = Object.keys(imageData).map(async (key) => {
@@ -229,8 +251,8 @@ function fillForm(itemId) {
         for (const x in images) {
           const possibleElmts = ["frontImage", "brandTagImage", "materialTagImage", "defectImage", "productImage", "extraImage"];
           const url = images[x] || images[`${x}Large`] || images[`${x}Medium`] || images[`${x}Small`];
-          if (possibleElmts.includes(x)) { 
-            showPreview(x, url); 
+          if (possibleElmts.includes(x)) {
+            showPreview(x, url);
             sessionStorage.setItem(`${x}PreviewUrl`, url); // Store preview url to create image from on submit
           }
         }
