@@ -130,6 +130,10 @@ async function addItemInner(id) {
   console.log('Storing item: ', item);
 
   await db.collection('items').doc(id).set(item);
+  if (params.id){
+    sessionStorage.setItem('itemCreatedFromAnotherItem', id);
+  }
+  
 
   // If first time: User submitted their phone number
   const phoneNumber = itemPhoneNumber.value;
