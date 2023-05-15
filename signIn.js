@@ -1,4 +1,4 @@
-function nextStep() {
+function signedInNextStep() {
     // User is signed in
     // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item
     console.log('document.referrer', document.referrer);
