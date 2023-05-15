@@ -136,7 +136,7 @@ async function addItemInner(id) {
     console.log(`JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'))`, JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')));
     const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
     console.log('itemFromStorage', itemFromStorage);
-    //await db.collection('items').doc(id).set(itemFromStorage);
+    await db.collection('items').doc(itemFromStorage.id).set(itemFromStorage.item);
   } else {
     await db.collection('items').doc(id).set(item);
   }
