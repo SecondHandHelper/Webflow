@@ -101,8 +101,12 @@ async function getShippingMethod() {
         const method = radioButtons[x].value; // "Service point" or "Pickup"
         if (method) {
           shippingMethod = method;
-          await db.collection('users').doc(authUser.uid).update({ "preferences.shippingMethod": method });
-          console.log(`Shipping method '${method}' stored as preference on user with ID: ${authUser.uid}`);
+          if (authUser) {
+            await db.collection('users').doc(authUser.uid).update({ "preferences.shippingMethod": method });
+            console.log(`Shipping method '${method}' stored as preference on user with ID: ${authUser.uid}`);
+          } else {
+            sessionStorage.setItem('shippingMethod', shippingMethod);
+          }
         }
       }
     }
@@ -124,19 +128,13 @@ async function addItemInner(id) {
     images['coverImage'] = modelCoverImageUrl;
     pageData['coverImageUpdatedAt'] = new Date();
   }
-  const createdFromItem = params.id ? { createdFromItem: params.id } : {} ;
+  const createdFromItem = params.id ? { createdFromItem: params.id } : {};
   const item = { ...pageData, shippingMethod, images, ...createdFromItem, version: "2" };
 
   console.log('Storing item: ', item);
 
-  if (params.id){
-    //sessionStorage.setItem('itemCreatedFromAnotherItem', id);
-    sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({id, item}));
-    console.log(`'itemToBeCreatedAfterSignIn', JSON.stringify({id, item})`, {id, item});
-    console.log(`JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'))`, JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')));
-    const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
-    console.log('itemFromStorage', itemFromStorage);
-    await db.collection('items').doc(itemFromStorage.id).set(itemFromStorage.item);
+  if (params.id) {
+    sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
     await db.collection('items').doc(id).set(item);
   }
@@ -144,8 +142,18 @@ async function addItemInner(id) {
   // If first time: User submitted their phone number
   const phoneNumber = itemPhoneNumber.value;
   if (phoneNumber) {
-    await writePhoneNumberToFirestore(authUser.uid, phoneNumber);
+    if (authUser) {
+      await writePhoneNumberToFirestore(authUser.uid, phoneNumber);
+    } else {
+      sessionStorage.setItem('phoneNumber', phoneNumber);
+    }
   }
+}
+
+async function storeItemAfterSignIn() {
+  const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
+  console.log('itemFromStorage', itemFromStorage);
+  await db.collection('items').doc(itemFromStorage.id).set(itemFromStorage.item);
 }
 
 async function getFilesFromPreviewUrl(imageElements) { // This is for the case the form have been prefilled with images
