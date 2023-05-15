@@ -116,6 +116,7 @@
       } else {
         console.log("Sorry, your browser does not support Web Storage...");
       }
+
       window.location.replace('./private');
     } catch (e) {
       console.log('failed to add email', e)
@@ -123,7 +124,6 @@
       tipsEmailButton.style.display = 'block'
     }
   }
-
 </script>
 
 <script>
@@ -148,7 +148,8 @@
         var credential = result.credential;
         var token = credential.accessToken;
         var user = result.user;
-        window.location.replace('./private');
+        //window.location.replace('./private');
+        nextStep();
       }).catch((error) => {
       const errorText = `[webflow] Error signing in with Google: ${error.code}, ${error.message}, ${error.email}, ${error}`;
       console.log(errorText);
