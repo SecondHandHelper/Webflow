@@ -132,9 +132,11 @@ async function addItemInner(id) {
   if (params.id){
     //sessionStorage.setItem('itemCreatedFromAnotherItem', id);
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({id, item}));
-    console.log();
+    console.log(`'itemToBeCreatedAfterSignIn', JSON.stringify({id, item})`, {id, item});
+    console.log(`JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'))`, JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')));
     const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
-    await db.collection('items').doc(id).set(itemFromStorage);
+    console.log('itemFromStorage', itemFromStorage);
+    //await db.collection('items').doc(id).set(itemFromStorage);
   } else {
     await db.collection('items').doc(id).set(item);
   }
