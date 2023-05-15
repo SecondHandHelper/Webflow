@@ -10,7 +10,7 @@ function addItem() {
       // Track with segment 'User Activated'
       if (userItemsCount === 0) { analytics.track('User Activated'); }
 
-      nextStep().then(() => console.log('nextStep completed'));
+      //nextStep().then(() => console.log('nextStep completed'));
     })
     .catch((e) => {
       console.error('addItem failed', e);
@@ -129,11 +129,15 @@ async function addItemInner(id) {
 
   console.log('Storing item: ', item);
 
-  await db.collection('items').doc(id).set(item);
   if (params.id){
-    sessionStorage.setItem('itemCreatedFromAnotherItem', id);
+    //sessionStorage.setItem('itemCreatedFromAnotherItem', id);
+    sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({id, item}));
+    console.log();
+    const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
+    await db.collection('items').doc(id).set(itemFromStorage);
+  } else {
+    await db.collection('items').doc(id).set(item);
   }
-  
 
   // If first time: User submitted their phone number
   const phoneNumber = itemPhoneNumber.value;
