@@ -178,7 +178,7 @@
                 await storeItemAfterSignIn();
                 const shippingMethod = sessionStorage.getItem('shippingMethod')
                 if (shippingMethod) { await db.collection('users').doc(authUser.uid).update({ "preferences.shippingMethod": shippingMethod }); }
-                await nextStep();
+                return await nextStep();
             }
 
             // Get user's item count to be able to send 'User Activated' event
@@ -188,14 +188,12 @@
         }
 
         // Be om telefonnummer i formuläret
-        console.log("phone: ", user.phoneNumber);
-        if (!user.phoneNumber) {
+        if (!user?.phoneNumber) {
             phoneNumberDiv.style.display = "block";
             document.getElementById("itemPhoneNumber").required = true;
         }
 
         // Be om det i formuläret
-        console.log("shipping method preference: ", user?.preferences?.shippingMethod);
         if (!user?.preferences?.shippingMethod) {
             $('#servicePointRadioButton').val("Service point");
             $('#pickupRadioButton').val("Pickup");
