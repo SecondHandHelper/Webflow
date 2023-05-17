@@ -8,7 +8,7 @@
         if (authUser) {
             userId = authUser.uid;
             email = authUser.email || sessionStorage.getItem("email");
-            phone = authUser.phoneNumber;
+            phone = authUser.phoneNumber || sessionStorage.getItem("phoneNumber");
             emailVerified = authUser.emailVerified;
             await updateFirestoreUserDocument(authUser.uid, email, phone); //Important that this happen first, since many other functions depend on an existing user document
             updateIC(userId, email, phone);

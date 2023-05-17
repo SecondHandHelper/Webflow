@@ -17,15 +17,6 @@
     let extraImageUpload = document.getElementById("extraImage");
     let extraImagePreview = document.getElementById("extraImagePreview");
 
-
-    document.getElementById('itemBrand').addEventListener('input', fieldLabelToggle('itemBrandLabel'));
-    document.getElementById('itemModel').addEventListener('input', fieldLabelToggle('itemModelLabel'));
-    document.getElementById('itemSize').addEventListener('input', fieldLabelToggle('itemSizeLabel'));
-    document.getElementById('itemMaterial').addEventListener('input', fieldLabelToggle('itemMaterialLabel'));
-    document.getElementById('itemOriginalPrice').addEventListener('input', fieldLabelToggle('itemOriginalPriceLabel'));
-    document.getElementById('itemAge').addEventListener('input', fieldLabelToggle('itemAgeLabel'));
-    setupModelSearchEventListeners();
-
     // display image when file has been selected
     frontImageUpload.onchange = function () {
         let input = this.files[0];
@@ -160,9 +151,6 @@
     }
 
     // Hide/Show extra fields for defects
-    let itemCondition = document.getElementById("itemCondition");
-    let defectInfoDiv = document.getElementById("defectInfoDiv");
-
     itemCondition.onchange = function () {
         let input = this.value;
         if (input == "Använd, tecken på slitage") {
@@ -177,40 +165,60 @@
         }
     };
 
-    document.getElementById('personalId').addEventListener("input", () => {
-        const error = isValidSwedishSsn(document.getElementById('personalId').value) ? '' : 'Ogiltigt personnummer';
-        document.getElementById("personalId").setCustomValidity(error);
+    personalId.addEventListener("input", () => {
+        const error = isValidSwedishSsn(personalId.value) ? '' : 'Ogiltigt personnummer';
+        personalId.setCustomValidity(error);
     })
-</script>
 
-<script>
     async function main() {
         if (authUser) {
-            // Om användare inte har telefonnummer, be om telefonnummer i formuläret
-            console.log("phone: ", user.phoneNumber);
-            if (!user.phoneNumber) {
-                phoneNumberDiv.style.display = "block";
-                document.getElementById("itemPhoneNumber").required = true;
+            // Create item from sessionStorage
+            console.log('document.referrer', document.referrer);
+            if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
+                await storeItemAfterSignIn();
+                const shippingMethod = sessionStorage.getItem('shippingMethod')
+                if (shippingMethod) { await db.collection('users').doc(authUser.uid).update({ "preferences.shippingMethod": shippingMethod }); }
+                await nextStep();
             }
 
-            // Om användare inte har shipping method preference, be om det i formuläret
-            console.log("shipping method preference: ", user?.preferences?.shippingMethod);
-            if (!user?.preferences?.shippingMethod) {
-                $('#servicePointRadioButton').val("Service point");
-                $('#pickupRadioButton').val("Pickup");
-                shippingMethodDiv.style.display = "block";
-            }
-
-            // Get user's item count to be able to send 'User Activated' event if they add their first item
+            // Get user's item count to be able to send 'User Activated' event
             var items = await getItems(authUser.uid);
             userItemsCount = items.size;
             console.log('main() userItemsCount: ', userItemsCount);
         }
+
+        // Be om telefonnummer i formuläret
+        console.log("phone: ", user.phoneNumber);
+        if (!user.phoneNumber) {
+            phoneNumberDiv.style.display = "block";
+            document.getElementById("itemPhoneNumber").required = true;
+        }
+
+        // Be om det i formuläret
+        console.log("shipping method preference: ", user?.preferences?.shippingMethod);
+        if (!user?.preferences?.shippingMethod) {
+            $('#servicePointRadioButton').val("Service point");
+            $('#pickupRadioButton').val("Pickup");
+            shippingMethodDiv.style.display = "block";
+        }
+
+        // Fill form if the user comes from a prefill link
+        if (params.id) { fillForm(params.id); }
+        else {
+            document.getElementById("frontImage").required = true;
+            document.getElementById("brandTagImage").required = true;
+        }
     }
 
     // Initial state
-    addressFormDiv.style.display = 'none';
-    itemConfirmationDiv.style.display = 'none';
+    itemBrand.addEventListener('input', fieldLabelToggle('itemBrandLabel'));
+    itemModel.addEventListener('input', fieldLabelToggle('itemModelLabel'));
+    itemSize.addEventListener('input', fieldLabelToggle('itemSizeLabel'));
+    itemMaterial.addEventListener('input', fieldLabelToggle('itemMaterialLabel'));
+    itemOriginalPrice.addEventListener('input', fieldLabelToggle('itemOriginalPriceLabel'));
+    itemAge.addEventListener('input', fieldLabelToggle('itemAgeLabel'));
+    setupModelSearchEventListeners();
+
     addItemForm.addEventListener("submit", addItem);
     userAddressForm.addEventListener("submit", addUserDetails);
     document.getElementById('itemPhoneNumber').addEventListener("input", () => {

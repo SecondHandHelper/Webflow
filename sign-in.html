@@ -1,3 +1,5 @@
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test235/signIn.js"></script>
+
 <script>
   window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sendCodeButton', {
     'size': 'invisible',
@@ -149,7 +151,7 @@
         var token = credential.accessToken;
         var user = result.user;
         //window.location.replace('./private');
-        nextStep();
+        signedInNextStep();
       }).catch((error) => {
       const errorText = `[webflow] Error signing in with Google: ${error.code}, ${error.message}, ${error.email}, ${error}`;
       console.log(errorText);
