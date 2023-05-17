@@ -143,19 +143,14 @@
 
 
     //NEW POPUP SIGNIN
-    firebase.auth()
-      .signInWithPopup(provider)
-      .then((result) => {
-        /** @type {firebase.auth.OAuthCredential} */
-        var credential = result.credential;
-        var token = credential.accessToken;
-        var user = result.user;
-        //window.location.replace('./private');
-        signedInNextStep();
-      }).catch((error) => {
+    try {
+      const result = await firebase.auth().signInWithPopup(provider);
+      /** @type {firebase.auth.OAuthCredential} */
+      await signedInNextStep();
+    } catch (error) {
       const errorText = `[webflow] Error signing in with Google: ${error.code}, ${error.message}, ${error.email}, ${error}`;
       console.log(errorText);
-    });
+    }
   }
 </script>
 
