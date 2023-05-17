@@ -70,7 +70,7 @@ function collect() {
   }
 
   return {
-    user: authUser.uid || null,
+    user: authUser?.uid || null,
     createdAt: now,
     status,
     shippingStatus,
@@ -94,7 +94,7 @@ function collect() {
 }
 
 async function getShippingMethod() {
-  // If first time: User choses shipping method preference in sell item form
+  // If first time: User chooses shipping method preference in sell item form
   let shippingMethod = 'Service point';
   if (!user?.preferences?.shippingMethod) {
     var radioButtons = document.getElementsByName("shippingMethod");
@@ -125,6 +125,7 @@ async function addItemInner(id) {
 
   const { modelCoverImageUrl, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
+  // TODO: wait with this until after the user is signed in if no authUser set?
   const images = await uploadImages(id);
   if (modelCoverImageUrl) {
     images['coverImage'] = modelCoverImageUrl;
@@ -155,7 +156,7 @@ async function addItemInner(id) {
 async function storeItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   console.log('itemFromStorage', itemFromStorage);
-  await db.collection('items').doc(itemFromStorage.id).set(itemFromStorage.item);
+  await db.collection('items').doc(itemFromStorage.id).set({ ...itemFromStorage.item, user: authUser.uid });
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
 }
 
