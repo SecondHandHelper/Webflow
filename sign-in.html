@@ -1,4 +1,4 @@
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.24/signIn.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test246/signIn.js"></script>
 
 <script>
   window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sendCodeButton', {
@@ -144,7 +144,7 @@
 
     //NEW POPUP SIGNIN
     try {
-      const result = await firebase.auth().signInWithPopup(provider);
+      await firebase.auth().signInWithPopup(provider);
       /** @type {firebase.auth.OAuthCredential} */
       await signedInNextStep();
     } catch (error) {
