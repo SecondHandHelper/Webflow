@@ -1,26 +1,11 @@
 <!-- The core Firebase JS SDK is always required and must be listed first -->
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
-
-<!-- TODO: Add SDKs for Firebase products that you want to use
-     https://firebase.google.com/docs/web/setup#available-libraries -->
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-analytics.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-functions.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.23/general.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.10/infoRequestsFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.10/referralFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test248/cookieManagement.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.15/autocomplete-brands.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.11/loadItemCards.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuidv4.min.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test248/sellItem.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.16/sellItemModelSearch.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test248/editItem.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.22/private.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.17/settings.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test248/signIn.js"></script>
 
 <script>
   // Firebase config
@@ -40,8 +25,21 @@
   var functions = firebase.functions();
   var storage = firebase.storage();
   var auth = firebase.auth();
-  setupAuthStateChangeListener();
 </script>
+
+
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.23/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.10/infoRequestsFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.10/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test248/cookieManagement.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.15/autocomplete-brands.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.11/loadItemCards.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test248/sellItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.16/sellItemModelSearch.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test248/editItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.22/private.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.17/settings.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test248/signIn.js"></script>
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>
@@ -52,8 +50,35 @@
 
 <script>
   // GET USER
-  var user;
-  var authUser;
+  const user = {
+    value: null,
+    callbacks: [],
+    get val() {
+      return this.value;
+    },
+    set val(newVal) {
+      this.value = newVal;
+      this.callbacks.forEach((cb) => cb(newVal));
+    },
+    set onAuthStateChanged(cb) {
+      this.callbacks.push(cb);
+    },
+  };
+  const authUser = {
+    value: null,
+    callbacks: [],
+    get val() {
+      return this.value;
+    },
+    set val(newVal) {
+      this.value = newVal;
+      this.callbacks.forEach((cb) => cb(newVal));
+    },
+    set onAuthStateChanged(cb) {
+      this.callbacks.push(cb);
+    },
+  };
+
 
   // Set attribution cookies (could be put on any campaign page)
   checkCookie("utm_campaign");
