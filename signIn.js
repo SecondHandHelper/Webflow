@@ -1,12 +1,50 @@
+firebase.auth().onAuthStateChanged(async (result) => {
+  const now = new Date().toISOString();
+
+  if (result) {
+    // Get and set current user
+    authUser = result;
+    try {
+      const doc = await db.collection("users").doc(authUser.uid).get();
+      if (doc.exists) {
+        user = doc.data();
+        console.log("user:", user);
+        console.log("authUser", authUser);
+        identify();
+
+        setPreferredLogInMethodCookie(authUser.providerData[0].providerId);
+        // Go to logged in pages when user authenticated
+        const path = window.location.pathname;
+        var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+          await signedInNextStep();
+        }
+      }
+    } catch (error) {
+      console.log("Error getting document:", error);
+    }
+  } else {
+    console.log('No user');
+    // Go to landing page if no user and on logged in pages
+    const path = window.location.pathname;
+    // Latest page view for logged out users
+    analytics.identify({ latestPageView: now });
+
+    if (path === "/private" || path === "/personal-id-form" || path === "/address-form" || path === "/item" || path === "/ship-item" || path === "/edit-item" || path === "/order-bags") {
+      window.location.replace('./');
+    }
+  }
+});
+
 async function signedInNextStep() {
     // User is signed in
-    // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item
     if (authUser) {
       const email = authUser.email || sessionStorage.getItem("email");
       const phone = authUser.phoneNumber || sessionStorage.getItem("phoneNumber");
       await updateFirestoreUserDocument(authUser.uid, email, phone); //Important that this happens first, since many other functions depend on an existing user document
     }
     console.log({referrer: document.referrer});
+    // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item
     if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sell-item')) {
         window.location.replace('./sell-item');
     } else {
