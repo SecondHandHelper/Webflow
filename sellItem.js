@@ -226,11 +226,11 @@ async function nextStep() {
     window.location.href = window.location.origin + "/sign-in";
     return
   }
-  await signedInNextStep();
+  await nextStepSignedIn();
   console.log('signedInNextStep completed');
 }
 
-async function signedInNextStep() {
+async function nextStepSignedIn() {
   console.log('in signedInNextStep');
   const firstNameSet = user.addressFirstName;
   // If first name not set, show address form. Else, go to private page.
