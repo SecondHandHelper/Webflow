@@ -71,7 +71,7 @@ function collect() {
   }
 
   return {
-    user: authUser?.uid || null,
+    user: authUser.current?.uid || null,
     createdAt: now,
     status,
     shippingStatus,
@@ -104,9 +104,9 @@ async function getShippingMethod() {
         const method = radioButtons[x].value; // "Service point" or "Pickup"
         if (method) {
           shippingMethod = method;
-          if (authUser) {
+          if (authUser.current) {
             await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ "preferences.shippingMethod": method });
-            console.log(`Shipping method '${method}' stored as preference on user with ID: ${authUser.uid}`);
+            console.log(`Shipping method '${method}' stored as preference on user with ID: ${authUser.current.uid}`);
           } else {
             sessionStorage.setItem('shippingMethod', shippingMethod);
           }
@@ -126,7 +126,7 @@ async function addItemInner(id) {
 
   const { modelCoverImageUrl, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
-  const images = authUser ? await uploadImagesFromForm(id) : await readImages();
+  const images = authUser.current ? await uploadImagesFromForm(id) : await readImages();
   if (modelCoverImageUrl) {
     images['coverImage'] = modelCoverImageUrl;
     pageData['coverImageUpdatedAt'] = new Date();
@@ -145,8 +145,8 @@ async function addItemInner(id) {
   // If first time: User submitted their phone number
   const phoneNumber = itemPhoneNumber.value;
   if (phoneNumber) {
-    if (authUser) {
-      await writePhoneNumberToFirestore(authUser.uid, phoneNumber);
+    if (authUser.current) {
+      await writePhoneNumberToFirestore(authUser.current.uid, phoneNumber);
     } else {
       sessionStorage.setItem('phoneNumber', phoneNumber);
     }
@@ -219,7 +219,7 @@ async function uploadImages(itemId, imageData) {
 
 async function nextStep() {
   console.log('in nextStep');
-  if (!authUser) {
+  if (!authUser.current) {
     // If user isn't logged in they will be taken through these steps:
     // 1. Logg in or create account on the /sign-in page
     // 2. Get back to /sell-item and continue normal flow (show address if no address, show confirmation div)
@@ -232,7 +232,7 @@ async function nextStep() {
 
 async function nextStepSignedIn() {
   console.log('in nextStepSignedIn');
-  const firstNameSet = user.addressFirstName;
+  const firstNameSet = user.current.addressFirstName;
   // If first name not set, show address form. Else, go to private page.
   if (!firstNameSet) {
     addressFormDiv.style.display = 'block';

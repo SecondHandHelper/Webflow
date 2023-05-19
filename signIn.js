@@ -4,16 +4,16 @@ firebase.auth().onAuthStateChanged(async (result) => {
 
   if (result) {
     // Get and set current user
-    authUser.val = result;
+    authUser.current = result;
     try {
-      const doc = await db.collection("users").doc(authUser.uid).get();
+      const doc = await db.collection("users").doc(authUser.current.uid).get();
       if (doc.exists) {
-        user.val = doc.data();
+        user.current = doc.data();
         console.log("user:", user);
-        console.log("authUser", authUser);
+        console.log("authUser.current", authUser.current);
         identify();
 
-        setPreferredLogInMethodCookie(authUser.providerData[0].providerId);
+        setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
         // Go to logged in pages when user authenticated
         const path = window.location.pathname;
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -39,10 +39,10 @@ firebase.auth().onAuthStateChanged(async (result) => {
 
 async function signedInNextStep() {
     // User is signed in
-    if (authUser) {
-      const email = authUser.email || sessionStorage.getItem("email");
-      const phone = authUser.phoneNumber || sessionStorage.getItem("phoneNumber");
-      await updateFirestoreUserDocument(authUser.uid, email, phone); //Important that this happens first, since many other functions depend on an existing user document
+    if (authUser.current) {
+      const email = authUser.current.email || sessionStorage.getItem("email");
+      const phone = authUser.current.phoneNumber || sessionStorage.getItem("phoneNumber");
+      await updateFirestoreUserDocument(authUser.current.uid, email, phone); //Important that this happens first, since many other functions depend on an existing user document
     }
     console.log({referrer: document.referrer});
     // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item

@@ -1,8 +1,8 @@
 <script>
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
-            console.log('UID: ' + user.uid);
-            userId = user.uid;
+            console.log('UID: ' + user.current.uid);
+            userId = user.current.uid;
         } else {
             console.log('No user is logged in');
             window.location.href = window.location.origin;
