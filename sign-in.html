@@ -272,6 +272,7 @@
   window.addEventListener('focus', function () {
     emailVerificationText.innerText += ".";
     const divDisplayed = waitOnVerificationDiv.style.display;
+    console.log("window focused callback waitOnVerificationDiv display=" + divDisplayed);
     if (divDisplayed === "block") {
       window.location.replace('./private');
     }
