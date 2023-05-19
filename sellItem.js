@@ -126,7 +126,7 @@ async function addItemInner(id) {
 
   const { modelCoverImageUrl, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
-  const images = authUser ? await uploadImagesFromForm(id) : await readImages(id);
+  const images = authUser ? await uploadImagesFromForm(id) : await readImages();
   if (modelCoverImageUrl) {
     images['coverImage'] = modelCoverImageUrl;
     pageData['coverImageUpdatedAt'] = new Date();
@@ -156,8 +156,13 @@ async function addItemInner(id) {
 async function storeItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   console.log('itemFromStorage', itemFromStorage);
-  const images = await uploadImages(itemFromStorage.id, itemFromStorage.images);
-  await firebase.app().functions("europe-west1").httpsCallable('createItem')({ ...itemFromStorage, images });
+  const imageWithData = Object.keys(itemFromStorage.item.images).reduce((acc, imageName) => {
+    const img = itemFromStorage.item.images[imageName];
+    acc[imageName] = new Blob([img.data], { type: img.type });
+    return acc;
+  }, {});
+  const images = await uploadImages(itemFromStorage.id, imageWithData);
+  await firebase.app().functions("europe-west1").httpsCallable('createItem')({ ...itemFromStorage.item, images });
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
 }
 
@@ -173,15 +178,16 @@ async function getPrefilledImageUrls() {
   return files
 }
 
-async function readImages(itemId) {
+async function readImages() {
   const filesFromPreviewUrl = await getPrefilledImageUrls();
   const fileContent = {};
   for (const imageName of imageElements) {
     if (document.getElementById(imageName).files[0]) {
-      fileContent[imageName] = document.getElementById(imageName).files[0].blob;
+      const blob = new Blob(document.getElementById(imageName).files[0].arrayBuffer());
+      fileContent[imageName] = { data: await blob.text(), type: blob.type };
     } else if (filesFromPreviewUrl[imageName]) {
       const response = await fetch(filesFromPreviewUrl[imageName].url);
-      fileContent[imageName] = await response.blob();
+      fileContent[imageName] = { data: await response.text(), type: 'image/jpeg' };
     }
   }
   return fileContent;
