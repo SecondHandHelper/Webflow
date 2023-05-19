@@ -186,7 +186,7 @@ async function readImages() {
       const blob = new Blob(document.getElementById(imageName).files[0].arrayBuffer());
       fileContent[imageName] = { data: await blob.text(), type: blob.type };
     } else if (filesFromPreviewUrl[imageName]) {
-      const response = await fetch(filesFromPreviewUrl[imageName].url);
+      const response = await fetch(filesFromPreviewUrl[imageName]);
       fileContent[imageName] = { data: await response.text(), type: 'image/jpeg' };
     }
   }
