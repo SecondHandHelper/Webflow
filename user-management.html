@@ -104,7 +104,7 @@
     function sendEmailVerification(auth) {
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                emailVerificationText.innerHTML = `Klicka på länken i mailet vi skickat till ${user.email} för att verifiera din email.`;
+                emailVerificationText.innerHTML = `Klicka på länken i mailet vi skickat till ${user.current.email} för att verifiera din email.`;
             }
             verifyEmailDiv.style.display = 'block';
             loadingDiv.style.display = 'none';

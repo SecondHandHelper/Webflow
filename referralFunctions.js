@@ -1,6 +1,6 @@
 // REFERRAL PROGRAM FUNCTIONS
 async function showReferralSection() {
-    const userCreatedDate = new Date(authUser.metadata.creationTime);
+    const userCreatedDate = new Date(authUser.current.metadata.creationTime);
     const now = new Date();
     let daysDiff = (now.getTime() - userCreatedDate.getTime()) / (1000 * 3600 * 24);
     console.log("Days since user registered", daysDiff);
@@ -14,7 +14,7 @@ async function showReferralSection() {
     });
 
     if (user?.referralData?.referralCode && soldItemExist) {
-        document.getElementById("myReferralCodeText").innerHTML = user.referralData.referralCode;
+        document.getElementById("myReferralCodeText").innerHTML = user.current.referralData.referralCode;
         if (user?.referralData?.activatedReferredUsersCount > 0) {
             // shareCodeState 'block', but should also show the bonus received... TODO"
             shareCodeState.style.display = 'block';
@@ -47,7 +47,7 @@ async function createReferralCode() {
     if (!user?.referralData?.referralCode) {
       const referralCode = await firebase.app().functions("europe-west3").httpsCallable('setUserReferralCode')();
       console.log("New referral code stored: ", referralCode?.data?.referralCode);
-      user.referralData.referralCode = referralCode?.data?.referralCode;
+      user.current.referralData.referralCode = referralCode?.data?.referralCode;
       await showReferralSection();
     }
 }

@@ -25,21 +25,53 @@
   var functions = firebase.functions();
   var storage = firebase.storage();
   var auth = firebase.auth();
+
+  const user = {
+    value: null,
+    callbacks: [],
+    get current() {
+      return this.value;
+    },
+    set current(newVal) {
+      this.value = newVal;
+      this.callbacks.forEach((cb) => cb(newVal));
+    },
+    whenSet(cb) {
+      this.callbacks.push(cb);
+      if (this.value) {
+        cb(this.value);
+      }
+    },
+  };
+  const authUser = {
+    value: null,
+    callbacks: [],
+    get current() {
+      return this.value;
+    },
+    set current(newVal) {
+      this.value = newVal;
+      this.callbacks.forEach((cb) => cb(newVal));
+    },
+    onChange(cb) {
+      this.callbacks.push(cb);
+    },
+  };
 </script>
 
 
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.23/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.10/infoRequestsFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.10/referralFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test248/cookieManagement.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test251/cookieManagement.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.15/autocomplete-brands.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.11/loadItemCards.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test248/sellItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test251/sellItem.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.16/sellItemModelSearch.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test248/editItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test251/editItem.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.22/private.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.17/settings.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test248/signIn.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test251/signIn.js"></script>
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>
@@ -49,36 +81,6 @@
 <!-- End Google Tag Manager (noscript) -->
 
 <script>
-  // GET USER
-  const user = {
-    value: null,
-    callbacks: [],
-    get val() {
-      return this.value;
-    },
-    set val(newVal) {
-      this.value = newVal;
-      this.callbacks.forEach((cb) => cb(newVal));
-    },
-    set onAuthStateChanged(cb) {
-      this.callbacks.push(cb);
-    },
-  };
-  const authUser = {
-    value: null,
-    callbacks: [],
-    get val() {
-      return this.value;
-    },
-    set val(newVal) {
-      this.value = newVal;
-      this.callbacks.forEach((cb) => cb(newVal));
-    },
-    set onAuthStateChanged(cb) {
-      this.callbacks.push(cb);
-    },
-  };
-
 
   // Set attribution cookies (could be put on any campaign page)
   checkCookie("utm_campaign");
@@ -127,29 +129,28 @@
   // SEGMENT IDENTIFY
   function identify() {
     const now = new Date().toISOString();
-    let createdAt = new Date(authUser.metadata.creationTime).toISOString();
-    let latestLogin = new Date(authUser.metadata.lastSignInTime).toISOString();
-    let signInMethod = authUser.providerData[0].providerId;
-    const firstName = user.addressFirstName ? user.addressFirstName : null;
-    const lastName = user.addressLastName ? user.addressLastName : null;
-    const email = user.email ? user.email : null;
-    const phone = user.phoneNumber ? user.phoneNumber : null;
-    const street = user.addressStreetAddress ? user.addressStreetAddress : null;
-    const city = user.addressCity ? user.addressCity : null;
-    const postalCode = user.addressPostalCode ? user.addressPostalCode : null;
-    const doorCode = user.addressDoorCode ? user.addressDoorCode : null;
-    const replace = user.replace ? user.replace : null;
+    let createdAt = new Date(authUser.current.metadata.creationTime).toISOString();
+    let latestLogin = new Date(authUser.current.metadata.lastSignInTime).toISOString();
+    let signInMethod = authUser.current.providerData[0].providerId;
+    const firstName = user.current.addressFirstName ? user.current.addressFirstName : null;
+    const lastName = user.current.addressLastName ? user.current.addressLastName : null;
+    const email = user.current.email ? user.current.email : null;
+    const phone = user.current.phoneNumber ? user.current.phoneNumber : null;
+    const street = user.current.addressStreetAddress ? user.current.addressStreetAddress : null;
+    const city = user.current.addressCity ? user.current.addressCity : null;
+    const postalCode = user.current.addressPostalCode ? user.current.addressPostalCode : null;
+    const doorCode = user.current.addressDoorCode ? user.current.addressDoorCode : null;
     let campaign = {};
-    if (user.attribution) {
-      campaign["name"] = user.attribution.utm_campaign ? user.attribution.utm_campaign : null;
-      campaign["source"] = user.attribution.utm_source ? user.attribution.utm_source : null;
-      campaign["medium"] = user.attribution.utm_medium ? user.attribution.utm_medium : null;
-      campaign["term"] = user.attribution.utm_term ? user.attribution.utm_term : null;
-      campaign["content"] = user.attribution.utm_content ? user.attribution.utm_content : null;
+    if (user.current.attribution) {
+      campaign["name"] = user.current.attribution.utm_campaign ? user.current.attribution.utm_campaign : null;
+      campaign["source"] = user.current.attribution.utm_source ? user.current.attribution.utm_source : null;
+      campaign["medium"] = user.current.attribution.utm_medium ? user.current.attribution.utm_medium : null;
+      campaign["term"] = user.current.attribution.utm_term ? user.current.attribution.utm_term : null;
+      campaign["content"] = user.current.attribution.utm_content ? user.current.attribution.utm_content : null;
     }
     campaign = Object.keys(campaign).length > 0 ? campaign : null;
 
-    analytics.identify(`${authUser.uid}`, {
+    analytics.identify(`${authUser.current.uid}`, {
       createdAt,
       firstName,
       lastName,
@@ -194,10 +195,10 @@
 
   function featureIsEnabled(featureName) {
     if (user?.testGroups) {
-      if (user.testGroups.includes('alpha')) {
+      if (user.current.testGroups.includes('alpha')) {
         return featureConfig.alpha[featureName]
       }
-      if (user.testGroups.includes('beta')) {
+      if (user.current.testGroups.includes('beta')) {
         return featureConfig.beta[featureName]
       }
     } else {

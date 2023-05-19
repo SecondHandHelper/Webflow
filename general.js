@@ -63,7 +63,7 @@ async function updateFirestoreUserDocument(userId, email, phone) {
     let fields = {};
     if (email) { fields["email"] = email; }
     if (phone) { fields["phoneNumber"] = phone; }
-    const signInMethod = authUser.providerData[0].providerId;
+    const signInMethod = authUser.current.providerData[0].providerId;
     if (signInMethod) { fields["signInMethod"] = signInMethod; }
     const docRef = db.collection("users").doc(userId);
 
@@ -91,7 +91,7 @@ async function updateFirestoreUserDocument(userId, email, phone) {
             db.collection("users").doc(userId).set(fields)
                 .then(() => {
                     console.log(`User document was created with id ${userId} and these fields: `, fields);
-                    user.val = fields;
+                    user.current = fields;
                     identify();
 
                     // Connect referral user from invite cookie only when creating user doc
@@ -697,13 +697,13 @@ async function addUserDetails() {
     personalId = personalId ? formatPersonalId(personalId) : null;
 
     // Write to Firestore
-    const itemRef = db.collection('users').doc(authUser.uid);
+    const itemRef = db.collection('users').doc(authUser.current.uid);
     itemRef.update({
         ...addressFields,
         personalId: personalId
     })
         .then(() => {
-            console.log(`User address of ${authUser.uid} is now updated`);
+            console.log(`User address of ${authUser.current.uid} is now updated`);
             itemConfirmationDiv.style.display = 'block';
             addressFormDiv.style.display = 'none';
         })
@@ -740,10 +740,10 @@ async function addUserAddress() {
     const addressFields = getFormAddressFields();
 
     // Write to Firestore
-    const itemRef = db.collection('users').doc(authUser.uid);
+    const itemRef = db.collection('users').doc(authUser.current.uid);
     itemRef.update(addressFields)
         .then(() => {
-            console.log(`User address of ${authUser.uid} is now updated`);
+            console.log(`User address of ${authUser.current.uid} is now updated`);
             window.location.href = window.location.origin + "/private";
         })
         .catch((error) => {
@@ -759,12 +759,12 @@ async function addPersonalId() {
 
     // Write to Firestore
     if (personalId) {
-        const itemRef = db.collection('users').doc(authUser.uid);
+        const itemRef = db.collection('users').doc(authUser.current.uid);
         itemRef.update({
             personalId: personalId
         })
             .then(() => {
-                console.log(`PersonalId of ${authUser.uid} is now updated`);
+                console.log(`PersonalId of ${authUser.current.uid} is now updated`);
                 personalIdConfirmationDiv.style.display = 'block';
                 personalIdFormDiv.style.display = 'none';
             })
@@ -861,7 +861,7 @@ function itemCoverImage(item) {
 
 
 function shareCode() {
-    const code = user.referralData.referralCode;
+    const code = user.current.referralData.referralCode;
     const text = `Hej, jag vill tipsa om Mai för att rensa ur garderoben. Mai är en tjänst som hjälper dig att sälja dina kläder på ett enkelt sätt. Man tar bilder på sina plagg, sedan sköter Mai resten, såsom värdering, publicering på plattformar, kontakt med köpare och frakt när det blir sålt. Man får själv behålla 80% av slutpriset, och blir det inte sålt kostar det ingenting.
 
 Som en uppmuntran till att komma igång ger Mai dig 100kr i välkomstgåva, när du registrerar dig med min kod ${code}.

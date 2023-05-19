@@ -4,7 +4,7 @@
     var phone;
 </script>
 <script>
-      authUser.onAuthStateChanged = privateMain;
+      user.whenSet(privateMain);
       async function privateMain(authUser) {
         if (authUser) {
             userId = authUser.uid;
@@ -41,7 +41,7 @@
                 }
             }
             // Create refCode
-            if (user && user.addressFirstName && user.addressLastName && !user?.referralData?.referralCode) { createReferralCode(); }
+            if (user.current && user.current.addressFirstName && user.current.addressLastName && !user?.referralData?.referralCode) { createReferralCode(); }
         }
     }
 
@@ -52,7 +52,7 @@
         let daysSinceLastPublished = 0;
 
         // Last viewed
-        const x = user.elementViews ? user.elementViews.reverse().find(e => e.elementID === 'npsSurvey') : null;
+        const x = user.current.elementViews ? user.current.elementViews.reverse().find(e => e.elementID === 'npsSurvey') : null;
         const surveyLastViewed = x ? x.timestamp.toDate() : null;
         const daysSinceSurveyLastViewed = surveyLastViewed ? Math.floor((nowDate.getTime() - surveyLastViewed.getTime()) / (1000 * 3600 * 24)) : null;
 

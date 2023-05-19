@@ -171,7 +171,7 @@
     })
 
     async function sellItemMain() {
-        if (authUser) {
+        if (authUser.current) {
             // Create item from sessionStorage
             console.log('document.referrer', document.referrer);
             if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
@@ -184,7 +184,7 @@
             }
 
             // Get user's item count to be able to send 'User Activated' event
-            var items = await getItems(authUser.uid);
+            var items = await getItems(authUser.current.uid);
             userItemsCount = items.size;
             console.log('main() userItemsCount: ', userItemsCount);
         }
