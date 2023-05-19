@@ -153,7 +153,7 @@ async function addItemInner(id) {
   }
 }
 
-async function storeItemAfterSignIn() {
+async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   console.log('itemFromStorage', itemFromStorage);
   const imageWithData = Object.keys(itemFromStorage.item.images).reduce((acc, imageName) => {
@@ -227,11 +227,11 @@ async function nextStep() {
     return
   }
   await nextStepSignedIn();
-  console.log('signedInNextStep completed');
+  console.log('nextStepSignedIn completed');
 }
 
 async function nextStepSignedIn() {
-  console.log('in signedInNextStep');
+  console.log('in nextStepSignedIn');
   const firstNameSet = user.addressFirstName;
   // If first name not set, show address form. Else, go to private page.
   if (!firstNameSet) {

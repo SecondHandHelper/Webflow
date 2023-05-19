@@ -1,5 +1,6 @@
 function setupAuthStateChangeListener() {
   firebase.auth().onAuthStateChanged(async (result) => {
+    console.log("onAuthStateChanged callback");
     const now = new Date().toISOString();
 
     if (result) {

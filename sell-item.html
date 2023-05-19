@@ -170,13 +170,12 @@
         personalId.setCustomValidity(error);
     })
 
-    main();
     async function main() {
         if (authUser) {
             // Create item from sessionStorage
             console.log('document.referrer', document.referrer);
             if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
-                await storeItemAfterSignIn();
+                await createItemAfterSignIn();
                 const shippingMethod = sessionStorage.getItem('shippingMethod')
                 if (shippingMethod) {
                   await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ "preferences.shippingMethod": shippingMethod });
@@ -229,4 +228,5 @@
     });
     /*initiate the autocomplete function on the "itemBrand" element, and pass along the brands array as possible autocomplete values:*/
     autocomplete(document.getElementById("itemBrand"), brands);
+    main();
 </script>
