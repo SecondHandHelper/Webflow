@@ -163,9 +163,9 @@
     firebase.auth().signInWithEmailAndPassword(email, password)
       .then((userCredential) => {
         // Signed in
-        var user = userCredential.user;
-        window.userId = user.uid;
-        console.log("Logged in user: ", user.uid);
+        user.val = userCredential.user;
+        window.userId = user.val.uid;
+        console.log("Logged in user: ", user.val.uid);
         window.location.replace('./private');
       })
       .catch((error) => {
