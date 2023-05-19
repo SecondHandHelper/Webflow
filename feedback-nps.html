@@ -50,7 +50,7 @@
         if (answer) { await db.collection('nps').doc(npsId).update({ followUpQuestion: question, followUpAnswer: answer }); }
     }
 
-    async function main() {
+    async function npsMain() {
         // Store elementViews to be able to hinder it to show again
         db.collection('users').doc(authUser.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "npsSurvey", timestamp: new Date() }) });
         // Track with segment
@@ -76,5 +76,5 @@
     });
     sharePersonalLinkFromNpsButton.addEventListener('click', shareCode);
 
-    main();
+    npsMain();
 </script>

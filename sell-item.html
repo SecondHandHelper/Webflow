@@ -170,7 +170,7 @@
         personalId.setCustomValidity(error);
     })
 
-    async function main() {
+    async function sellItemMain() {
         if (authUser) {
             // Create item from sessionStorage
             console.log('document.referrer', document.referrer);
@@ -228,5 +228,5 @@
     });
     /*initiate the autocomplete function on the "itemBrand" element, and pass along the brands array as possible autocomplete values:*/
     autocomplete(document.getElementById("itemBrand"), brands);
-    main();
+    sellItemMain();
 </script>
