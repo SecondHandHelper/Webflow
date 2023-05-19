@@ -177,7 +177,9 @@
             if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
                 await storeItemAfterSignIn();
                 const shippingMethod = sessionStorage.getItem('shippingMethod')
-                if (shippingMethod) { await db.collection('users').doc(authUser.uid).update({ "preferences.shippingMethod": shippingMethod }); }
+                if (shippingMethod) {
+                  await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ "preferences.shippingMethod": shippingMethod });
+                }
                 return await nextStep();
             }
 

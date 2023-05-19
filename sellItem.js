@@ -1,4 +1,5 @@
 const defectsChoicesInSwedish = new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
+const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
 
 async function addItem() {
   const id = uuidv4();
@@ -104,7 +105,7 @@ async function getShippingMethod() {
         if (method) {
           shippingMethod = method;
           if (authUser) {
-            await db.collection('users').doc(authUser.uid).update({ "preferences.shippingMethod": method });
+            await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ "preferences.shippingMethod": method });
             console.log(`Shipping method '${method}' stored as preference on user with ID: ${authUser.uid}`);
           } else {
             sessionStorage.setItem('shippingMethod', shippingMethod);
@@ -125,8 +126,7 @@ async function addItemInner(id) {
 
   const { modelCoverImageUrl, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
-  // TODO: wait with this until after the user is signed in if no authUser set?
-  const images = await uploadImages(id);
+  const images = authUser ? await uploadImagesFromForm(id) : await readImages(id);
   if (modelCoverImageUrl) {
     images['coverImage'] = modelCoverImageUrl;
     pageData['coverImageUpdatedAt'] = new Date();
@@ -139,7 +139,7 @@ async function addItemInner(id) {
   if (params.id) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
-    await db.collection('items').doc(id).set(item);
+    await firebase.app().functions("europe-west1").httpsCallable('createItem')(item);
   }
 
   // If first time: User submitted their phone number
@@ -156,32 +156,47 @@ async function addItemInner(id) {
 async function storeItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   console.log('itemFromStorage', itemFromStorage);
-  await db.collection('items').doc(itemFromStorage.id).set({ ...itemFromStorage.item, user: authUser.uid });
+  const images = await uploadImages(itemFromStorage.id, itemFromStorage.images);
+  await firebase.app().functions("europe-west1").httpsCallable('createItem')({ ...itemFromStorage, images });
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
 }
 
-async function getFilesFromPreviewUrl(imageElements) { // This is for the case the form have been prefilled with images
+// This is for the case the form have been prefilled with images
+async function getPrefilledImageUrls() {
   const files = {};
-  for (let i = 0; i < imageElements.length; i++) {
-    const elm = imageElements[i];
-    const url = sessionStorage.getItem(`${elm}PreviewUrl`);
+  for (const imageName of imageElements) {
+    const url = sessionStorage.getItem(`${imageName}PreviewUrl`);
     if (url) {
-      const response = await fetch(url); // Download to cache
-      const file = await response.blob();
-      files[elm] = file;
+      files[imageName] = url;
     }
   }
-  return files // Return object with blob files: { frontImage: <file object>, ... }
+  return files
 }
 
-async function uploadImages(itemId) {
-  const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
-  const filesFromPreviewUrl = await getFilesFromPreviewUrl(imageElements);
-  const imageData = imageElements.reduce((prev, current) => {
-    const file = document.getElementById(current).files[0] || filesFromPreviewUrl[current];
-    if (!file) return prev;
-    return { ...prev, [current]: file }
+async function readImages(itemId) {
+  const filesFromPreviewUrl = await getPrefilledImageUrls();
+  const fileContent = {};
+  for (const imageName of imageElements) {
+    if (document.getElementById(imageName).files[0]) {
+      fileContent[imageName] = document.getElementById(imageName).files[0].blob;
+    } else if (filesFromPreviewUrl[imageName]) {
+      const response = await fetch(filesFromPreviewUrl[imageName].url);
+      fileContent[imageName] = await response.blob();
+    }
+  }
+  return fileContent;
+}
+
+async function uploadImagesFromForm(itemId) {
+  const imageData = imageElements.reduce((accumulator, current) => {
+    const file = document.getElementById(current).files[0];
+    if (!file) return accumulator;
+    return { ...accumulator, [current]: file }
   }, {}); // { frontImage: <file object>, ... }
+  return await uploadImages(itemId, imageData);
+}
+
+async function uploadImages(itemId, imageData) {
   const storageRef = storage.ref();
   const promises = Object.keys(imageData).map(async (key) => {
     const imagePathReference = `images/${itemId}/${key}`;
@@ -211,8 +226,7 @@ async function nextStep() {
 
 async function signedInNextStep() {
   console.log('in signedInNextStep');
-  const doc = await db.collection("users").doc(authUser.uid).get();
-  const firstNameSet = doc.data().addressFirstName;
+  const firstNameSet = user.addressFirstName;
   // If first name not set, show address form. Else, go to private page.
   if (!firstNameSet) {
     addressFormDiv.style.display = 'block';
@@ -243,8 +257,6 @@ async function fillForm(itemId) {
     const age = data.age;
     const condition = data.condition;
     const images = data.images;
-
-    //TODO: Get other data that's not part of the form, to store that immediately as well. Such as category, color, max / min price etc...
 
     // Populate images
     function showPreview(x, url) {
