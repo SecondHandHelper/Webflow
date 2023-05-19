@@ -20,6 +20,7 @@
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test211/editItem.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.22/private.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.17/settings.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test246/signIn.js"></script>
 
 <script>
   // Firebase config
@@ -52,48 +53,6 @@
   // GET USER
   var user;
   var authUser;
-  firebase.auth().onAuthStateChanged((result) => {
-    const now = new Date().toISOString();
-
-    if (result) {
-      // Get and set current user
-      authUser = result;
-      db.collection("users").doc(authUser.uid).get().then((doc) => {
-        if (doc.exists) {
-          user = doc.data();
-          console.log("user:", user);
-          console.log("authUser", authUser);
-          console.log("featureIsEnabled('C2C')", featureIsEnabled('C2C'));
-          console.log("featureIsEnabled('modelDB')", featureIsEnabled('modelDB'));
-          identify();
-
-          setPreferredLogInMethodCookie(authUser.providerData[0].providerId);
-          // Go to logged in pages when user authenticated
-          const path = window.location.pathname;
-          var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-          if (isMobile && (path === "/" || path === "/sign-in")) { window.location.replace('./private'); }
-        }
-
-        // Run Main function if exists
-        if (typeof window.main === "function") { main(); }
-      }).catch((error) => { console.log("Error getting document:", error); });
-    } else {
-      console.log('No user');
-      // Go to landing page if no user and on logged in pages
-      const path = window.location.pathname;
-      if (path === "/private" || path === "/personal-id-form" || path === "/address-form" || path === "/item" || path === "/ship-item" || path === "/edit-item" || path === "/order-bags") {
-        window.location.replace('./');
-      }
-
-      // Latest page view for logged out users
-      analytics.identify({ latestPageView: now });
-
-      // Run main function
-      if (typeof window.main === "function") {
-        main();
-      }
-    }
-  });
 
   // Set attribution cookies (could be put on any campaign page)
   checkCookie("utm_campaign");
