@@ -17,8 +17,8 @@ function setupAuthStateChangeListener() {
           setPreferredLogInMethodCookie(authUser.providerData[0].providerId);
           // Go to logged in pages when user authenticated
           const path = window.location.pathname;
-          var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-          if (isMobile) {
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          if (isMobile && (path === "/" || path === "/sign-in")) {
             await signedInNextStep();
           }
         }
