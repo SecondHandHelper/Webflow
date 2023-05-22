@@ -5,16 +5,16 @@
 </script>
 <script>
       user.whenSet(privateMain);
-      async function privateMain(authUser) {
-        if (authUser) {
-            userId = authUser.uid;
-            email = authUser.email || sessionStorage.getItem("email");
-            phone = authUser.phoneNumber || sessionStorage.getItem("phoneNumber");
-            emailVerified = authUser.emailVerified;
+      async function privateMain() {
+        if (authUser.current) {
+            userId = authUser.current.uid;
+            email = authUser.current.email || sessionStorage.getItem("email");
+            phone = authUser.current.phoneNumber || sessionStorage.getItem("phoneNumber");
+            emailVerified = authUser.current.emailVerified;
             updateIC(userId, email, phone);
             askForAdditionalUserDetails(userId);
             loadSoldByOthers(userId);
-            setPreferredLogInMethodCookie(authUser.providerData[0].providerId);
+            setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
 
             //For testing purposes only - To see what a certain user sees
             if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
@@ -23,7 +23,7 @@
             const items = await getItems(userId);
 
             // If user has items since before, they'll add the shipping method from this page. If not, they'll add it when they add their first item
-            if (items.size > 0 && !user?.preferences?.shippingMethod) window.location.replace('./choose-shipping-method');
+            if (items.size > 0 && !user.current?.preferences?.shippingMethod) window.location.replace('./choose-shipping-method');
 
             showNpsSurvey(items);
             showInviteToast(items);
@@ -41,7 +41,7 @@
                 }
             }
             // Create refCode
-            if (user.current && user.current.addressFirstName && user.current.addressLastName && !user?.referralData?.referralCode) { createReferralCode(); }
+            if (user.current && user.current.addressFirstName && user.current.addressLastName && !user.current?.referralData?.referralCode) { createReferralCode(); }
         }
     }
 

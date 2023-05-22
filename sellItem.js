@@ -97,7 +97,7 @@ function collect() {
 async function getShippingMethod() {
   // If first time: User chooses shipping method preference in sell item form
   let shippingMethod = 'Service point';
-  if (!user?.preferences?.shippingMethod) {
+  if (!user.current?.preferences?.shippingMethod) {
     var radioButtons = document.getElementsByName("shippingMethod");
     for (var x = 0; x < radioButtons.length; x++) {
       if (radioButtons[x].checked) {
@@ -114,7 +114,7 @@ async function getShippingMethod() {
       }
     }
   } else {
-    shippingMethod = user?.preferences?.shippingMethod;
+    shippingMethod = user.current?.preferences?.shippingMethod;
     console.log(`Shipping method preference from user is '${shippingMethod}' and is now set on item`);
   }
 
