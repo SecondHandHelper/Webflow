@@ -50,12 +50,12 @@
         if (answer) { await db.collection('nps').doc(npsId).update({ followUpQuestion: question, followUpAnswer: answer }); }
     }
 
-    async function npsMain() {
+    user.whenSet(async () => {
         // Store elementViews to be able to hinder it to show again
         db.collection('users').doc(authUser.current.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "npsSurvey", timestamp: new Date() }) });
         // Track with segment
         analytics.track("Element Viewed", { elementID: "npsSurvey" });
-    }
+    });
 
 
     npsSubmitButton.addEventListener("click", addNpsScore);
@@ -76,5 +76,4 @@
     });
     sharePersonalLinkFromNpsButton.addEventListener('click', shareCode);
 
-    npsMain();
 </script>

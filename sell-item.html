@@ -173,7 +173,6 @@
     async function sellItemMain() {
         if (authUser.current) {
             // Create item from sessionStorage
-            console.log('document.referrer', document.referrer);
             if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
                 await createItemAfterSignIn();
                 const shippingMethod = sessionStorage.getItem('shippingMethod')
@@ -184,9 +183,8 @@
             }
 
             // Get user's item count to be able to send 'User Activated' event
-            var items = await getItems(authUser.current.uid);
+            const items = await getItems(authUser.current.uid);
             userItemsCount = items.size;
-            console.log('main() userItemsCount: ', userItemsCount);
         }
 
         // Be om telefonnummer i formuläret
@@ -195,7 +193,7 @@
             document.getElementById("itemPhoneNumber").required = true;
         }
 
-        // Be om det i formuläret
+        // Be om shippingMethod i formuläret
         if (!user.current?.preferences?.shippingMethod) {
             $('#servicePointRadioButton').val("Service point");
             $('#pickupRadioButton').val("Pickup");
@@ -203,7 +201,9 @@
         }
 
         // Fill form if the user comes from a prefill link
-        if (params.id) { fillForm(params.id); }
+        if (params.id) {
+          fillForm(params.id);
+        }
         else {
             document.getElementById("frontImage").required = true;
             document.getElementById("brandTagImage").required = true;
@@ -228,5 +228,8 @@
     });
     /*initiate the autocomplete function on the "itemBrand" element, and pass along the brands array as possible autocomplete values:*/
     autocomplete(document.getElementById("itemBrand"), brands);
+
+    // Call sellItemMain directly but also make sure we call it after a user has logged in
     sellItemMain();
+    user.whenSet(sellItemMain);
 </script>
