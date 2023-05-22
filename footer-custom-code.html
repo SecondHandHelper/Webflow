@@ -61,18 +61,18 @@
 </script>
 
 
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.23/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test252/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.10/infoRequestsFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.10/referralFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test251/cookieManagement.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test252/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test252/cookieManagement.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.15/autocomplete-brands.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.11/loadItemCards.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test251/sellItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test252/sellItem.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.16/sellItemModelSearch.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test251/editItem.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.22/private.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test252/editItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test252/private.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.17/settings.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test251/signIn.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test252/signIn.js"></script>
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>
@@ -195,7 +195,7 @@
   };
 
   function featureIsEnabled(featureName) {
-    if (user?.testGroups) {
+    if (user.current?.testGroups) {
       if (user.current.testGroups.includes('alpha')) {
         return featureConfig.alpha[featureName]
       }

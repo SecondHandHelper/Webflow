@@ -190,13 +190,13 @@
         }
 
         // Be om telefonnummer i formuläret
-        if (!user?.phoneNumber) {
+        if (!user.current?.phoneNumber) {
             phoneNumberDiv.style.display = "block";
             document.getElementById("itemPhoneNumber").required = true;
         }
 
         // Be om det i formuläret
-        if (!user?.preferences?.shippingMethod) {
+        if (!user.current?.preferences?.shippingMethod) {
             $('#servicePointRadioButton').val("Service point");
             $('#pickupRadioButton').val("Pickup");
             shippingMethodDiv.style.display = "block";

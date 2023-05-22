@@ -62,7 +62,7 @@
     followUpSubmitButton.addEventListener("click", async function () {
         await addFollowUp();
         // Show thank you div
-        if (user?.referralData?.referralCode && npsScore >= 9 && npsScore <= 10){
+        if (user.current?.referralData?.referralCode && npsScore >= 9 && npsScore <= 10){
             referralCodeText.innerHTML = user.current.referralData.referralCode;
             thankYouNoPromotorDiv.style.display = 'none';
             thankYouPromotorDiv.style.display = 'block';
@@ -71,7 +71,7 @@
         triggerShowThankYou.click();
     });
     closeThankYouButton.addEventListener("click", function () {
-        if (authUser?.current) { window.location.href = window.location.origin + "/private"; }
+        if (authUser.current) { window.location.href = window.location.origin + "/private"; }
         else { window.location.href = window.location.origin; }
     });
     sharePersonalLinkFromNpsButton.addEventListener('click', shareCode);

@@ -50,7 +50,7 @@ function showInviteToast(items) {
         });
     }
 
-    if (daysSinceLatestSold <= 3 && soldItemsCount >= 2 && oneSoldNotSentItemExist && user?.referralData?.referralCode && !viewedToastBefore) {
+    if (daysSinceLatestSold <= 3 && soldItemsCount >= 2 && oneSoldNotSentItemExist && user.current?.referralData?.referralCode && !viewedToastBefore) {
         referralCodeText.innerHTML = user.current.referralData.referralCode;
         triggerInviteToastOpen.click();
 
