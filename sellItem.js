@@ -10,7 +10,7 @@ function addItem() {
       // Track with segment 'User Activated'
       if (userItemsCount === 0) { analytics.track('User Activated'); }
 
-      //nextStep().then(() => console.log('nextStep completed'));
+      nextStep().then(() => console.log('nextStep completed'));
     })
     .catch((e) => {
       console.error('addItem failed', e);
