@@ -305,3 +305,47 @@ async function fillForm(itemId) {
   }
   document.getElementById('cover-spin').style.display = 'none';
 }
+
+function checkBrand(value) {
+  if (words.some(words => value.toLowerCase().includes(words.toLowerCase()))) {
+    hardToSellText.innerHTML = `Vi säljer i regel inte ${value}-plagg på grund av för lågt andrahandsvärde. Undantag kan finnas.`;
+    hardToSellDiv.style.display = 'block';
+    return true;
+  } else {
+    hardToSellDiv.style.display = 'none';
+  }
+}
+
+async function checkAndDisplayShareSold(value) {
+  const response = await firebase.app().functions("europe-west1").httpsCallable(
+    'fetchBrandShareSoldInfo',
+  )({ cleanedBrandName: value })
+
+  if (response.data && response.data.cleanedBrand) {
+    if (response.data.shareSold > '95%') {
+      shareSoldText.innerHTML = `95% av plaggen från ${response.data.cleanedBrand} säljs`
+      shareSoldDiv.style.display = 'block';
+      return;
+    }
+
+    if (response.data.shareSold > '55%') {
+      shareSoldText.innerHTML = `${response.data.shareSold} av plaggen från ${response.data.cleanedBrand} säljs`
+      shareSoldDiv.style.display = 'block';
+      return;
+    }
+    if (response.data.shareSold >= '45%') {
+      shareSoldText.innerHTML = `Hälften av plaggen från ${response.data.cleanedBrand} säljs`
+      shareSoldDiv.style.display = 'block';
+      return;
+    }
+
+    shareSoldText.innerHTML = `Mindre än hälften av plaggen från ${response.data.cleanedBrand} säljs`
+    shareSoldDiv.style.display = 'block';
+    demandLevelText.innerHTML = `Låg efterfrågan`;
+    demandLevelText.style.display = 'block';
+  } else {
+    demandLevelText.innerHTML = '';
+    shareSoldText.innerHTML = ''
+    shareSoldDiv.style.display = 'none'
+  }
+}
