@@ -1,20 +1,22 @@
 const defectsChoicesInSwedish = new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
 
-function addItem() {
+async function addItem() {
   const id = uuidv4();
   console.log(`addItem called, new id: ${id}`);
-  addItemInner(id)
-    .then(() => {
-      console.log('addItem completed');
+  try {
+    await addItemInner(id);
+    console.log('addItem completed');
 
-      // Track with segment 'User Activated'
-      if (userItemsCount === 0) { analytics.track('User Activated'); }
+    // Track with segment 'User Activated'
+    if (userItemsCount === 0) {
+      analytics.track('User Activated');
+    }
 
-      nextStep().then(() => console.log('nextStep completed'));
-    })
-    .catch((e) => {
-      console.error('addItem failed', e);
-    });
+    await nextStep();
+    console.log('nextStep completed');
+  } catch (e) {
+    console.error('addItem failed', e);
+  }
 }
 
 function collect() {
@@ -154,6 +156,7 @@ async function storeItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   console.log('itemFromStorage', itemFromStorage);
   await db.collection('items').doc(itemFromStorage.id).set(itemFromStorage.item);
+  sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
 }
 
 async function getFilesFromPreviewUrl(imageElements) { // This is for the case the form have been prefilled with images
@@ -201,13 +204,13 @@ async function nextStep() {
     window.location.href = window.location.origin + "/sign-in";
     return
   }
-  signedInNextStep().then(() => console.log('signedInNextStep completed'));
+  await signedInNextStep();
+  console.log('signedInNextStep completed');
 }
 
 async function signedInNextStep() {
   console.log('in signedInNextStep');
-  const docRef = db.collection("users").doc(authUser.uid);
-  const doc = await docRef.get();
+  const doc = await db.collection("users").doc(authUser.uid).get();
   const firstNameSet = doc.data().addressFirstName;
   // If first name not set, show address form. Else, go to private page.
   if (!firstNameSet) {
@@ -224,95 +227,94 @@ function fieldLabelToggle(labelId) {
   }
 }
 
-function fillForm(itemId) {
-  db.collection("items").doc(itemId)
-    .get().then((doc) => {
-      if (doc.exists) {
-        data = doc.data();
-        console.log("Item data:", doc.data());
-        const size = data.size;
-        const material = data.material;
-        const brand = data.brand;
-        const model = data.model;
-        let originalPrice = data.originalPrice;
-        if (originalPrice <= 0) { originalPrice = null; }
-        const age = data.age;
-        const condition = data.condition;
-        const images = data.images;
+async function fillForm(itemId) {
+  try {
+    const item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId})
+    const data = item.data;
+    const size = data.size;
+    const material = data.material;
+    const brand = data.brand;
+    const model = data.model;
+    let originalPrice = data.originalPrice;
+    if (originalPrice <= 0) {
+      originalPrice = null;
+    }
+    const age = data.age;
+    const condition = data.condition;
+    const images = data.images;
 
-        //TODO: Get other data that's not part of the form, to store that immediately as well. Such as category, color, max / min price etc...
+    //TODO: Get other data that's not part of the form, to store that immediately as well. Such as category, color, max / min price etc...
 
-        // Populate images
-        function showPreview(x, url) {
-          document.getElementById(`${x}Preview`).style.backgroundImage = `url('${url}')`;
-          siblings = document.getElementById(x).parentNode.parentNode.childNodes;
-          for (var i = 0; i < siblings.length; i++) {
-            if (siblings[i].className.includes("success-state")) {
-              siblings[i].style.display = 'block';
-            } else {
-              siblings[i].style.display = 'none'; // Hide other states of file input field "empty-state" and "error-state"
-            }
-          }
+    // Populate images
+    function showPreview(x, url) {
+      document.getElementById(`${x}Preview`).style.backgroundImage = `url('${url}')`;
+      const siblings = document.getElementById(x).parentNode.parentNode.childNodes;
+      for (let i = 0; i < siblings.length; i++) {
+        if (siblings[i].className.includes("success-state")) {
+          siblings[i].style.display = 'block';
+        } else {
+          // Hide other states of file input field "empty-state" and "error-state"
+          siblings[i].style.display = 'none';
         }
-        for (const x in images) {
-          const possibleElmts = ["frontImage", "brandTagImage", "materialTagImage", "defectImage", "productImage", "extraImage"];
-          const url = images[x] || images[`${x}Large`] || images[`${x}Medium`] || images[`${x}Small`];
-          if (possibleElmts.includes(x)) {
-            showPreview(x, url);
-            sessionStorage.setItem(`${x}PreviewUrl`, url); // Store preview url to create image from on submit
-          }
-        }
-
-        // Populate text input fields
-        itemBrand.value = brand;
-        fieldLabelToggle('itemBrandLabel'); // Didn't want to use the setFieldValue for the brand since that triggered a dropdown to open
-        setFieldValue('itemSize', size);
-        setFieldValue('itemMaterial', material);
-        setFieldValue('itemModel', model);
-        setFieldValue('itemOriginalPrice', originalPrice);
-        //itemUserComment.value = userComment; //Textarea
-        //itemDefectDescription.value = defectDescription; //Textarea
-
-        // Populate select fields
-        let options = itemAge.options;
-        for (let i = 0; i < options.length; i++) {
-          if (age == options[i].attributes.value.value) {
-            itemAge.selectedIndex = i;
-            if (age != "") {
-              itemAge.style.color = "#333";
-              itemAge.dispatchEvent(new Event('input'));
-            }
-          }
-        }
-        options = itemCondition.options;
-        for (let i = 0; i < options.length; i++) {
-          if (condition == options[i].innerText) {
-            itemCondition.selectedIndex = i;
-            itemCondition.style.color = "#333";
-            itemCondition.dispatchEvent(new Event('input'));
-            if (options[i].innerText == "Använd, tecken på slitage") {
-              defectInfoDiv.style.display = 'block';
-            }
-          }
-        }
-
-        // Populate radio-buttons
-        document.getElementById('Woman').previousElementSibling.classList.remove("w--redirected-checked"); // Unselect radio button 'Woman'
-        document.getElementById('Woman').checked = false;
-        document.getElementById(data.sex).previousElementSibling.classList.add("w--redirected-checked"); // Populate the right one
-        document.getElementById(data.sex).checked = true;
-
-        // Populate checkboxes
-        defectsChoicesInSwedish.forEach((value, key) => {
-          if (data.defects.includes(value)) {
-            document.getElementById(key).previousElementSibling.classList.add("w--redirected-checked");
-            document.getElementById(key).checked = true;
-          }
-        });
-      } else {
-        console.log("No such document!");
       }
-    }).catch((error) => {
-      console.log("Error getting item document:", error);
+    }
+
+    for (const x in images) {
+      const possibleElmts = ["frontImage", "brandTagImage", "materialTagImage", "defectImage", "productImage", "extraImage"];
+      const url = images[x] || images[`${x}Large`] || images[`${x}Medium`] || images[`${x}Small`];
+      if (possibleElmts.includes(x)) {
+        showPreview(x, url);
+        sessionStorage.setItem(`${x}PreviewUrl`, url); // Store preview url to create image from on submit
+      }
+    }
+
+    // Populate text input fields
+    itemBrand.value = brand;
+    fieldLabelToggle('itemBrandLabel'); // Didn't want to use the setFieldValue for the brand since that triggered a dropdown to open
+    setFieldValue('itemSize', size);
+    setFieldValue('itemMaterial', material);
+    setFieldValue('itemModel', model);
+    setFieldValue('itemOriginalPrice', originalPrice);
+    //itemUserComment.value = userComment; //Textarea
+    //itemDefectDescription.value = defectDescription; //Textarea
+
+    // Populate select fields
+    let options = itemAge.options;
+    for (let i = 0; i < options.length; i++) {
+      if (age == options[i].attributes.value.value) {
+        itemAge.selectedIndex = i;
+        if (age != "") {
+          itemAge.style.color = "#333";
+          itemAge.dispatchEvent(new Event('input'));
+        }
+      }
+    }
+    options = itemCondition.options;
+    for (let i = 0; i < options.length; i++) {
+      if (condition == options[i].innerText) {
+        itemCondition.selectedIndex = i;
+        itemCondition.style.color = "#333";
+        itemCondition.dispatchEvent(new Event('input'));
+        if (options[i].innerText == "Använd, tecken på slitage") {
+          defectInfoDiv.style.display = 'block';
+        }
+      }
+    }
+
+    // Populate radio-buttons
+    document.getElementById('Woman').previousElementSibling.classList.remove("w--redirected-checked"); // Unselect radio button 'Woman'
+    document.getElementById('Woman').checked = false;
+    document.getElementById(data.sex).previousElementSibling.classList.add("w--redirected-checked"); // Populate the right one
+    document.getElementById(data.sex).checked = true;
+
+    // Populate checkboxes
+    defectsChoicesInSwedish.forEach((value, key) => {
+      if (data.defects.includes(value)) {
+        document.getElementById(key).previousElementSibling.classList.add("w--redirected-checked");
+        document.getElementById(key).checked = true;
+      }
     });
+  } catch (error) {
+      console.log("Error getting item document:", error);
+  }
 }
