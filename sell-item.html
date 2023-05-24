@@ -176,7 +176,7 @@
         await createItemAfterSignIn();
         const shippingMethod = sessionStorage.getItem('shippingMethod')
         if (shippingMethod) {
-          await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ "preferences.shippingMethod": shippingMethod });
+          await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
         }
         return await nextStep();
       }

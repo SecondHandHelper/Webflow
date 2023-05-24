@@ -105,7 +105,7 @@ async function getShippingMethod() {
         if (method) {
           shippingMethod = method;
           if (authUser.current) {
-            await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ "preferences.shippingMethod": method });
+            await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
             console.log(`Shipping method '${method}' stored as preference on user with ID: ${authUser.current.uid}`);
           } else {
             sessionStorage.setItem('shippingMethod', shippingMethod);
@@ -136,7 +136,7 @@ async function addItemInner(id) {
 
   console.log('Storing item: ', item);
 
-  if (params.id) {
+  if (params.id && !authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
     await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
