@@ -126,7 +126,7 @@ async function addItemInner(id) {
 
   const { modelCoverImageUrl, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
-  const images = authUser.current ? await uploadImagesFromForm(id) : await readImages();
+  const images = await uploadUserImagesFromForm(id);
   if (modelCoverImageUrl) {
     images['coverImage'] = modelCoverImageUrl;
     pageData['coverImageUpdatedAt'] = new Date();
@@ -139,7 +139,7 @@ async function addItemInner(id) {
   if (params.id) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
-    await firebase.app().functions("europe-west1").httpsCallable('createItem')(item);
+    await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
   }
 
   // If first time: User submitted their phone number
@@ -156,45 +156,12 @@ async function addItemInner(id) {
 async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   console.log('itemFromStorage', itemFromStorage);
-  const imageWithData = Object.keys(itemFromStorage.item.images).reduce((acc, imageName) => {
-    const img = itemFromStorage.item.images[imageName];
-    acc[imageName] = new Blob([img.data], { type: img.type });
-    return acc;
-  }, {});
-  const images = await uploadImages(itemFromStorage.id, imageWithData);
-  await firebase.app().functions("europe-west1").httpsCallable('createItem')({ ...itemFromStorage.item, images });
+  await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
 }
 
-// This is for the case the form have been prefilled with images
-async function getPrefilledImageUrls() {
-  const files = {};
-  for (const imageName of imageElements) {
-    const url = sessionStorage.getItem(`${imageName}PreviewUrl`);
-    if (url) {
-      files[imageName] = url;
-    }
-  }
-  return files
-}
-
-async function readImages() {
-  const filesFromPreviewUrl = await getPrefilledImageUrls();
-  const fileContent = {};
-  for (const imageName of imageElements) {
-    if (document.getElementById(imageName).files[0]) {
-      const blob = new Blob(document.getElementById(imageName).files[0].arrayBuffer());
-      fileContent[imageName] = { data: await blob.text(), type: blob.type };
-    } else if (filesFromPreviewUrl[imageName]) {
-      const response = await fetch(filesFromPreviewUrl[imageName]);
-      fileContent[imageName] = { data: await response.text(), type: 'image/jpeg' };
-    }
-  }
-  return fileContent;
-}
-
-async function uploadImagesFromForm(itemId) {
-  const imageData = imageElements.reduce((accumulator, current) => {
+async function uploadUserImagesFromForm(itemId) {
+  const imageData = imageElements.reduce(async (accumulator, current) => {
     const file = document.getElementById(current).files[0];
     if (!file) return accumulator;
     return { ...accumulator, [current]: file }
@@ -250,6 +217,7 @@ function fieldLabelToggle(labelId) {
 
 async function fillForm(itemId) {
   try {
+    document.getElementById('cover-spin').style.display = 'block';
     const item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId})
     const data = item.data;
     const size = data.size;
@@ -265,9 +233,9 @@ async function fillForm(itemId) {
     const images = data.images;
 
     // Populate images
-    function showPreview(x, url) {
-      document.getElementById(`${x}Preview`).style.backgroundImage = `url('${url}')`;
-      const siblings = document.getElementById(x).parentNode.parentNode.childNodes;
+    function showPreview(imageName, url) {
+      document.getElementById(`${imageName}Preview`).style.backgroundImage = `url('${url}')`;
+      const siblings = document.getElementById(imageName).parentNode.parentNode.childNodes;
       for (let i = 0; i < siblings.length; i++) {
         if (siblings[i].className.includes("success-state")) {
           siblings[i].style.display = 'block';
@@ -278,12 +246,11 @@ async function fillForm(itemId) {
       }
     }
 
-    for (const x in images) {
-      const possibleElmts = ["frontImage", "brandTagImage", "materialTagImage", "defectImage", "productImage", "extraImage"];
-      const url = images[x] || images[`${x}Large`] || images[`${x}Medium`] || images[`${x}Small`];
-      if (possibleElmts.includes(x)) {
-        showPreview(x, url);
-        sessionStorage.setItem(`${x}PreviewUrl`, url); // Store preview url to create image from on submit
+    for (const imageName in images) {
+      const url = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
+      if (imageElements.includes(imageName)) {
+        showPreview(imageName, url);
+        sessionStorage.setItem(`${imageName}PreviewUrl`, url); // Store preview url to create image from on submit
       }
     }
 
@@ -336,4 +303,5 @@ async function fillForm(itemId) {
   } catch (error) {
       console.log("Error getting item document:", error);
   }
+  document.getElementById('cover-spin').style.display = 'none';
 }

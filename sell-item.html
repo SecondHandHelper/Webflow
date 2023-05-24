@@ -170,23 +170,23 @@
         personalId.setCustomValidity(error);
     })
 
-    async function sellItemMain() {
-        if (authUser.current) {
-            // Create item from sessionStorage
-            if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
-                await createItemAfterSignIn();
-                const shippingMethod = sessionStorage.getItem('shippingMethod')
-                if (shippingMethod) {
-                  await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ "preferences.shippingMethod": shippingMethod });
-                }
-                return await nextStep();
-            }
-
-            // Get user's item count to be able to send 'User Activated' event
-            const items = await getItems(authUser.current.uid);
-            userItemsCount = items.size;
+    async function sellItemMainAuthenticated() {
+      // Create item from sessionStorage
+      if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
+        await createItemAfterSignIn();
+        const shippingMethod = sessionStorage.getItem('shippingMethod')
+        if (shippingMethod) {
+          await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ "preferences.shippingMethod": shippingMethod });
         }
+        return await nextStep();
+      }
 
+      // Get user's item count to be able to send 'User Activated' event
+      const items = await getItems(authUser.current.uid);
+      userItemsCount = items.size;
+    }
+
+    async function sellItemMain() {
         // Be om telefonnummer i formuläret
         if (!user.current?.phoneNumber) {
             phoneNumberDiv.style.display = "block";
@@ -229,7 +229,8 @@
     /*initiate the autocomplete function on the "itemBrand" element, and pass along the brands array as possible autocomplete values:*/
     autocomplete(document.getElementById("itemBrand"), brands);
 
-    // Call sellItemMain directly but also make sure we call it after a user has logged in
+    // Call sellItemMain directly
     sellItemMain();
-    user.whenSet(sellItemMain);
+    // and call sellItemMainAuthenticated after/when a user has logged in
+    user.whenSet(sellItemMainAuthenticated);
 </script>
