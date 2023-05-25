@@ -127,7 +127,6 @@
     })
 
     async function sellItemMainAuthenticated() {
-      console.log("sellItemMainAuthenticated")
       if (user.current?.phoneNumber) {
         phoneNumberDiv.style.display = "none";
         document.getElementById("itemPhoneNumber").required = false;
@@ -139,10 +138,8 @@
       // Create item from sessionStorage
       if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
         // populate form and show spinner while item is created
-        const itemWithId = sessionStorage.getItem('itemToBeCreatedAfterSignIn');
-        console.log({itemWithId});
+        const itemWithId = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
         await fillForm(itemWithId.id, itemWithId.item);
-        console.log("calling createItemAfterSignIn");
         await createItemAfterSignIn();
         const shippingMethod = sessionStorage.getItem('shippingMethod');
         if (shippingMethod) {
@@ -157,8 +154,6 @@
     }
 
     function sellItemMain() {
-        console.log("sellItemMain")
-
         // Be om telefonnummer i formuläret
         if (!user.current?.phoneNumber) {
             phoneNumberDiv.style.display = "block";

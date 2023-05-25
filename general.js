@@ -585,6 +585,9 @@ async function storeFeedback() {
 function signOut() {
     firebase.auth().signOut().then(() => {
         console.log('User signed out');
+        authUser.current = null;
+        user.current = null;
+        userId = null;
         window.location.href = window.location.origin;
     }).catch((error) => {
         console.log(error);

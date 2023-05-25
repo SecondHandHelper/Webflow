@@ -3,10 +3,8 @@ const imageElements = ["frontImage", "brandTagImage", "productImage", "defectIma
 
 async function addItem() {
   const id = uuidv4();
-  console.log(`addItem called, new id: ${id}`);
   try {
     await addItemInner(id);
-    console.log('addItem completed');
 
     // Track with segment 'User Activated'
     if (userItemsCount === 0) {
@@ -14,7 +12,6 @@ async function addItem() {
     }
 
     await nextStep();
-    console.log('nextStep completed');
   } catch (e) {
     console.error('addItem failed', e);
   }
@@ -106,7 +103,6 @@ async function getShippingMethod() {
           shippingMethod = method;
           if (authUser.current) {
             await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
-            console.log(`Shipping method '${method}' stored as preference on user with ID: ${authUser.current.uid}`);
           } else {
             sessionStorage.setItem('shippingMethod', shippingMethod);
           }
@@ -115,14 +111,12 @@ async function getShippingMethod() {
     }
   } else {
     shippingMethod = user.current?.preferences?.shippingMethod;
-    console.log(`Shipping method preference from user is '${shippingMethod}' and is now set on item`);
   }
 
   return shippingMethod;
 }
 
 async function addItemInner(id) {
-  console.log("addItemInner called");
 
   const { modelCoverImageUrl, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
@@ -133,8 +127,6 @@ async function addItemInner(id) {
   }
   const createdFromItem = params.id ? { createdFromItem: params.id } : {};
   const item = { ...pageData, shippingMethod, images, ...createdFromItem, version: "2" };
-
-  console.log('Storing item: ', item);
 
   if (params.id && !authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
@@ -155,7 +147,6 @@ async function addItemInner(id) {
 
 async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
-  console.log('itemFromStorage', itemFromStorage);
   await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
 }
@@ -185,7 +176,6 @@ async function uploadImages(itemId, imageData) {
 }
 
 async function nextStep() {
-  console.log('in nextStep');
   if (!authUser.current) {
     // If user isn't logged in they will be taken through these steps:
     // 1. Logg in or create account on the /sign-in page
@@ -194,11 +184,9 @@ async function nextStep() {
     return
   }
   await nextStepSignedIn();
-  console.log('nextStepSignedIn completed');
 }
 
 async function nextStepSignedIn() {
-  console.log('in nextStepSignedIn');
   const firstNameSet = user.current.addressFirstName;
   // If first name not set, show address form. Else, go to private page.
   if (!firstNameSet) {
@@ -219,9 +207,7 @@ async function fillForm(itemId, savedItem) {
   try {
     document.getElementById('cover-spin').style.display = 'block';
     let item = { data: savedItem };
-    console.log({itemId, item});
     if (!savedItem) {
-      console.log("no savedItem fetching from backend");
       item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId});
     }
     const data = item.data;
