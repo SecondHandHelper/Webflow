@@ -120,7 +120,7 @@ async function addItemInner(id) {
 
   const { modelCoverImageUrl, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
-  const images = await uploadUserImagesFromForm(id);
+  const images = await uploadImagesFromForm(id);
   if (modelCoverImageUrl) {
     images['coverImage'] = modelCoverImageUrl;
     pageData['coverImageUpdatedAt'] = new Date();
@@ -151,9 +151,9 @@ async function createItemAfterSignIn() {
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
 }
 
-async function uploadUserImagesFromForm(itemId) {
+async function uploadImagesFromForm(itemId) {
   const imageData = imageElements.reduce(async (accumulator, current) => {
-    const file = document.getElementById(current).files[0];
+    const file = document.getElementById(current).files[0] || sessionStorage.getItem(`${current}PreviewUrl`);
     if (!file) return accumulator;
     return { ...accumulator, [current]: file }
   }, {}); // { frontImage: <file object>, ... }
@@ -205,7 +205,6 @@ function fieldLabelToggle(labelId) {
 
 async function fillForm(itemId, savedItem) {
   try {
-    console.log(`fillForm called ${new Date()} ${itemId} ${savedItem?.brand}`);
     document.getElementById('cover-spin').style.display = 'block';
     let item = { data: savedItem };
     if (!savedItem) {
@@ -239,10 +238,11 @@ async function fillForm(itemId, savedItem) {
     }
 
     for (const imageName in images) {
-      const url = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
+      const urlSmall = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName] || images[`${imageName}Large`];
+      const urlLarge = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
       if (imageElements.includes(imageName)) {
-        showPreview(imageName, url);
-        sessionStorage.setItem(`${imageName}PreviewUrl`, url); // Store preview url to create image from on submit
+        showPreview(imageName, urlSmall);
+        sessionStorage.setItem(`${imageName}PreviewUrl`, urlLarge); // Store large preview url to create image from on submit
       }
     }
 

@@ -1,4 +1,7 @@
 <script>
+    if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
+      document.getElementById('cover-spin').style.display = 'block';
+    }
     var userItemsCount;
 </script>
 <script>
@@ -138,11 +141,6 @@
       }
       // Create item from sessionStorage
       if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
-        // populate form and show spinner while item is created
-        const itemWithId = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
-        console.log(`Calling fillForm with item  ${new Date()} ${itemWithId.id} ${JSON.stringify(itemWithId.item)}`);
-        await fillForm(itemWithId.id, itemWithId.item);
-        console.log("Calling createItemAfterSignIn" + new Date());
         await createItemAfterSignIn();
         const shippingMethod = sessionStorage.getItem('shippingMethod');
         if (shippingMethod) {
