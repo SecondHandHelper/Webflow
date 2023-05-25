@@ -215,10 +215,14 @@ function fieldLabelToggle(labelId) {
   }
 }
 
-async function fillForm(itemId, savedItem = null) {
+async function fillForm(itemId, savedItem) {
   try {
     document.getElementById('cover-spin').style.display = 'block';
-    const item = savedItem ? { data: savedItem } : await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId});
+    let item = { data: savedItem };
+    console.log({item});
+    if (!savedItem) {
+      item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId});
+    }
     const data = item.data;
     const size = data.size;
     const material = data.material;
