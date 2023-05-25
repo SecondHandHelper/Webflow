@@ -137,6 +137,8 @@
       }
       // Create item from sessionStorage
       if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
+        // populate form and show spinner while item is created
+        fillForm(sessionStorage.getItem('itemToBeCreatedAfterSignIn').item)
         await createItemAfterSignIn();
         const shippingMethod = sessionStorage.getItem('shippingMethod')
         if (shippingMethod) {

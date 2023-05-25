@@ -215,10 +215,10 @@ function fieldLabelToggle(labelId) {
   }
 }
 
-async function fillForm(itemId) {
+async function fillForm(itemId, savedItem = null) {
   try {
     document.getElementById('cover-spin').style.display = 'block';
-    const item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId})
+    const item = savedItem ? { data: savedItem } : await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId});
     const data = item.data;
     const size = data.size;
     const material = data.material;
