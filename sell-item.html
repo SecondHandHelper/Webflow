@@ -127,6 +127,7 @@
     })
 
     async function sellItemMainAuthenticated() {
+      console.log("sellItemMainAuthenticated " + new Date());
       if (user.current?.phoneNumber) {
         phoneNumberDiv.style.display = "none";
         document.getElementById("itemPhoneNumber").required = false;
@@ -139,7 +140,9 @@
       if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
         // populate form and show spinner while item is created
         const itemWithId = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
+        console.log(`Calling fillForm with item  ${new Date()} ${itemWithId.id} ${JSON.stringify(itemWithId.item)}`);
         await fillForm(itemWithId.id, itemWithId.item);
+        console.log("Calling createItemAfterSignIn" + new Date());
         await createItemAfterSignIn();
         const shippingMethod = sessionStorage.getItem('shippingMethod');
         if (shippingMethod) {

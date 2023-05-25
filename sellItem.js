@@ -205,6 +205,7 @@ function fieldLabelToggle(labelId) {
 
 async function fillForm(itemId, savedItem) {
   try {
+    console.log(`fillForm called ${new Date()} ${itemId} ${savedItem.brand}`);
     document.getElementById('cover-spin').style.display = 'block';
     let item = { data: savedItem };
     if (!savedItem) {

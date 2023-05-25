@@ -6,7 +6,6 @@ firebase.auth().onAuthStateChanged(async (result) => {
     // Get and set current user
     authUser.current = result;
     try {
-      console.log({authUserCurrent: authUser.current})
       const doc = await db.collection("users").doc(authUser.current.uid).get();
       if (doc.exists) {
         user.current = doc.data();
