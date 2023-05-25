@@ -219,8 +219,9 @@ async function fillForm(itemId, savedItem) {
   try {
     document.getElementById('cover-spin').style.display = 'block';
     let item = { data: savedItem };
-    console.log({item});
+    console.log({itemId, item});
     if (!savedItem) {
+      console.log("no savedItem fetching from backend");
       item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId});
     }
     const data = item.data;
@@ -323,7 +324,7 @@ function checkBrand(value) {
 async function checkAndDisplayShareSold(value) {
   const response = await firebase.app().functions("europe-west1").httpsCallable(
     'fetchBrandShareSoldInfo',
-  )({ cleanedBrandName: value })
+  )({ cleanedBrandName: value });
 
   if (response.data && response.data.cleanedBrand) {
     if (response.data.shareSold > '95%') {

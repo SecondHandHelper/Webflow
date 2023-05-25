@@ -139,12 +139,12 @@
       // Create item from sessionStorage
       if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
         // populate form and show spinner while item is created
-        const itemWithId = sessionStorage.getItem('itemToBeCreatedAfterSignIn')
-        console.log(itemWithId);
-        await fillForm(itemWithId.id, itemWithId.item)
-        console.log("calling createItemAfterSignIn")
+        const itemWithId = sessionStorage.getItem('itemToBeCreatedAfterSignIn');
+        console.log({itemWithId});
+        await fillForm(itemWithId.id, itemWithId.item);
+        console.log("calling createItemAfterSignIn");
         await createItemAfterSignIn();
-        const shippingMethod = sessionStorage.getItem('shippingMethod')
+        const shippingMethod = sessionStorage.getItem('shippingMethod');
         if (shippingMethod) {
           await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
         }
