@@ -4,9 +4,10 @@
     var phone;
 </script>
 <script>
-      user.whenSet(privateMain);
+      authUser.whenSet(privateMain);
       async function privateMain() {
         if (authUser.current) {
+          console.log("authUser.current: " + authUser.current);
             userId = authUser.current.uid;
             email = authUser.current.email || sessionStorage.getItem("email");
             phone = authUser.current.phoneNumber || sessionStorage.getItem("phoneNumber");
@@ -52,7 +53,7 @@
         let daysSinceLastPublished = 0;
 
         // Last viewed
-        const x = user.current.elementViews ? user.current.elementViews.reverse().find(e => e.elementID === 'npsSurvey') : null;
+        const x = user.current?.elementViews ? user.current.elementViews.reverse().find(e => e.elementID === 'npsSurvey') : null;
         const surveyLastViewed = x ? x.timestamp.toDate() : null;
         const daysSinceSurveyLastViewed = surveyLastViewed ? Math.floor((nowDate.getTime() - surveyLastViewed.getTime()) / (1000 * 3600 * 24)) : null;
 

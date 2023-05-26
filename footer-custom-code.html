@@ -54,24 +54,32 @@
     },
     set current(newVal) {
       this.value = newVal;
-      this.callbacks.forEach((cb) => cb(newVal));
+      this.callbacks.forEach((cb) => {
+        typeof cb === 'function' && cb(newVal)
+      });
+    },
+    whenSet(cb) {
+      this.callbacks.push(cb);
+      if (this.value) {
+        cb(this.value);
+      }
     },
   };
 </script>
 
 
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test262/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test265/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/infoRequestsFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test254/referralFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test254/cookieManagement.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test265/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test265/cookieManagement.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/autocomplete-brands.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/loadItemCards.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test263/sellItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test265/sellItem.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/sellItemModelSearch.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test254/editItem.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test254/private.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test265/editItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test265/private.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/settings.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test262/signIn.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test265/signIn.js"></script>
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>
