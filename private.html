@@ -4,46 +4,46 @@
     var phone;
 </script>
 <script>
-      authUser.whenSet(privateMain);
+      user.whenSet(privateMain);
       async function privateMain() {
-        if (authUser.current) {
-          console.log("authUser.current: " + authUser.current);
-            userId = authUser.current.uid;
-            email = authUser.current.email || sessionStorage.getItem("email");
-            phone = authUser.current.phoneNumber || sessionStorage.getItem("phoneNumber");
-            emailVerified = authUser.current.emailVerified;
-            updateIC(userId, email, phone);
-            askForAdditionalUserDetails(userId);
-            loadSoldByOthers(userId);
-            setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
-
-            //For testing purposes only - To see what a certain user sees
-            if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
-                userId = "3OkW5av20HP8ScpUDS8ip9fBEZr1";
-            }
-            const items = await getItems(userId);
-
-            // If user has items since before, they'll add the shipping method from this page. If not, they'll add it when they add their first item
-            if (items.size > 0 && !user.current?.preferences?.shippingMethod) window.location.replace('./choose-shipping-method');
-
-            showNpsSurvey(items);
-            showInviteToast(items);
-            loadItemCards(items);
-            loadInfoRequests(userId);
-            showOrderBagsSection();
-            showReferralSection();
-            showAccountInfo();
-
-            if (!emailVerified && email) {
-                let res = getCookie('viewedVerifyEmailDiv');
-                viewedVerifyEmailDiv = res === 'true';
-                if (!viewedVerifyEmailDiv) {
-                    window.location.replace('./user-management?mode=sendEmailVerification');
-                }
-            }
-            // Create refCode
-            if (user.current && user.current.addressFirstName && user.current.addressLastName && !user.current?.referralData?.referralCode) { createReferralCode(); }
+        if (!user.current) {
+          return;
         }
+        userId = authUser.current.uid;
+        email = authUser.current.email || sessionStorage.getItem("email");
+        phone = authUser.current.phoneNumber || sessionStorage.getItem("phoneNumber");
+        emailVerified = authUser.current.emailVerified;
+        updateIC(userId, email, phone);
+        askForAdditionalUserDetails(userId);
+        loadSoldByOthers(userId);
+        setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
+
+        //For testing purposes only - To see what a certain user sees
+        if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
+            userId = "3OkW5av20HP8ScpUDS8ip9fBEZr1";
+        }
+        const items = await getItems(userId);
+
+        // If user has items since before, they'll add the shipping method from this page. If not, they'll add it when they add their first item
+        if (items.size > 0 && !user.current?.preferences?.shippingMethod) window.location.replace('./choose-shipping-method');
+
+        showNpsSurvey(items);
+        showInviteToast(items);
+        loadItemCards(items);
+        loadInfoRequests(userId);
+        showOrderBagsSection();
+        showReferralSection();
+        showAccountInfo();
+
+        if (!emailVerified && email) {
+            let res = getCookie('viewedVerifyEmailDiv');
+            viewedVerifyEmailDiv = res === 'true';
+            if (!viewedVerifyEmailDiv) {
+                window.location.replace('./user-management?mode=sendEmailVerification');
+            }
+        }
+        // Create refCode
+        if (user.current && user.current.addressFirstName && user.current.addressLastName && !user.current?.referralData?.referralCode) { createReferralCode(); }
     }
 
     async function showNpsSurvey(items) {

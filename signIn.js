@@ -9,17 +9,17 @@ firebase.auth().onAuthStateChanged(async (result) => {
       const doc = await db.collection("users").doc(authUser.current.uid).get();
       if (doc.exists) {
         user.current = doc.data();
-        console.log("user:", user);
-        console.log("authUser", authUser.current);
-        identify();
+      }
+      console.log("user:", user);
+      console.log("authUser", authUser.current);
+      identify();
 
-        setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
-        // Go to logged in pages when user authenticated
-        const path = window.location.pathname;
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        if (isMobile && (path === "/" || path === "/sign-in")) {
-          await signedInNextStep();
-        }
+      setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
+      // Go to logged in pages when user authenticated
+      const path = window.location.pathname;
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      if (isMobile && (path === "/" || path === "/sign-in")) {
+        await signedInNextStep();
       }
     } catch (error) {
       console.log("Error getting document:", error);
