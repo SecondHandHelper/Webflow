@@ -157,12 +157,15 @@ async function uploadImagesFromForm(itemId) {
     if (!file) return accumulator;
     return { ...accumulator, [current]: file }
   }, {}); // { frontImage: <file object>, ... }
-  return await uploadImages(itemId, imageData);
+  return await uploadUserImages(itemId, imageData);
 }
 
-async function uploadImages(itemId, imageData) {
+async function uploadUserImages(itemId, imageData) {
   const storageRef = storage.ref();
   const promises = Object.keys(imageData).map(async (key) => {
+    if (typeof imageData === 'string') {
+      return { key, url: imageData };
+    }
     const imagePathReference = `images/${itemId}/${key}`;
     const file = imageData[key];
     let fileRef = storageRef.child(imagePathReference);
