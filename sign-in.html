@@ -89,8 +89,8 @@
       const user = result.user;
 
       if (typeof (Storage) !== "undefined") {
-        sessionStorage.setItem("userId", user.current.uid);
-        sessionStorage.setItem("phone", user.current.phoneNumber);
+        sessionStorage.setItem("userId", user.uid);
+        sessionStorage.setItem("phone", user.phoneNumber);
       } else {
         console.log("Sorry, your browser does not support Web Storage...");
       }
@@ -190,8 +190,8 @@
       .then((userCredential) => {
         // Signed in
         var user = userCredential.user;
-        window.userId = user.current.uid;
-        console.log("Logged in user: ", user.current.uid);
+        window.userId = user.uid;
+        console.log("Logged in user: ", user.uid);
         const emailVerified = firebase.auth().currentUser.emailVerified;
         if (!emailVerified) {
           firebase.auth().currentUser.sendEmailVerification()
