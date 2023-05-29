@@ -8,7 +8,7 @@ firebase.auth().onAuthStateChanged(async (result) => {
     try {
       setPreferredLogInMethodCookie(authenticated.providerData[0].providerId);
       authUser.current = authenticated;
-      console.log("authUser", authenticated.current);
+      console.log("authUser", authUser.current);
       const doc = await db.collection("users").doc(authenticated.uid).get();
       if (doc.exists) {
         identify(authenticated, doc.data);
@@ -31,7 +31,11 @@ firebase.auth().onAuthStateChanged(async (result) => {
   }
 });
 
-async function signedInNextStep() {
+function userIsSellingNewItem() {
+  return sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sell-item')
+}
+
+async function signedInNextStep(fallbackRedirect) {
     // User is signed in
     if (authUser.current) {
       const email = authUser.current.email || sessionStorage.getItem("email");
@@ -40,8 +44,10 @@ async function signedInNextStep() {
     }
     console.log({referrer: document.referrer});
     // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item
-    if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sell-item')) {
+    if (userIsSellingNewItem()) {
         window.location.replace('./sell-item');
+    } else if (fallbackRedirect) {
+        window.location.replace(fallbackRedirect);
     } else {
         window.location.replace('./private');
     }

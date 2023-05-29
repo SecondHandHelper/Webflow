@@ -1,4 +1,6 @@
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test269/signIn.js"></script>
 <script>
+
   window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sendCodeButton', {
     'size': 'invisible',
     'callback': (response) => {
@@ -191,16 +193,10 @@
         // Signed in
         const user = userCredential.user;
         window.userId = user.uid;
-        console.log("Logged in user: ", user.uid);
-        const emailVerified = firebase.auth().currentUser.emailVerified;
-        if (!emailVerified) {
-          firebase.auth().currentUser.sendEmailVerification()
-            .then(() => {
-              // Email verification sent! wait for user.
-            });
-        } else {
-          authUser.whenSet(signedInNextStep);
-        }
+        console.log("Logged in user: ", user);
+        firebase.auth().currentUser.sendEmailVerification().then(() => {
+          authUser.whenSet(() => signedInNextStep('./user-management?mode=sendEmailVerification'));
+        });
       })
       .catch((error) => {
         var errorCode = error.code;
@@ -253,9 +249,6 @@
   }
 
   emailNextStepButton.addEventListener('click', checkEmail);
-  skipEmail.addEventListener('click', function() {
-    authUser.whenSet(signedInNextStep);
-  })
   tipsEmailButton.addEventListener('click', addEmailAndNavigate)
   resetPasswordLink.addEventListener('click', sendPasswordReset);
   emailAndPasswordButton.addEventListener('click', function () {
@@ -266,14 +259,5 @@
   signInWithEmailButton.addEventListener('click', signInWithEmailPassword);
   showOtherSignInMethodsButton.addEventListener('click', function () {
     triggerOtherSignInMethodsView.click();
-  });
-
-  window.addEventListener('focus', function () {
-    emailVerificationText.innerText += ".";
-    const divDisplayed = waitOnVerificationDiv.style.display;
-    console.log("window focused callback waitOnVerificationDiv display=" + divDisplayed);
-    if (divDisplayed === "block") {
-      authUser.whenSet(signedInNextStep);
-    }
   });
 </script>

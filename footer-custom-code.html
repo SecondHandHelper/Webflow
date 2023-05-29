@@ -35,14 +35,16 @@
     },
     set current(newVal) {
       this.value = newVal;
-      this.callbacks.forEach(async (cb) => {
-        typeof cb === 'function' && await cb(newVal)
+      this.callbacks.forEach((cb) => {
+        typeof cb === 'function' && cb(newVal)
       });
+      this.callbacks = [];
     },
     async whenSet(cb) {
-      this.callbacks.push(cb);
       if (this.value) {
-        await cb(this.value);
+        cb(this.value);
+      } else {
+        this.callbacks.push(cb);
       }
     },
   };
@@ -54,13 +56,14 @@
     },
     set current(newVal) {
       this.value = newVal;
-      this.callbacks.forEach(async (cb) => {
-        typeof cb === 'function' && await cb(newVal)
+      this.callbacks.forEach((cb) => {
+        typeof cb === 'function' && cb(newVal)
       });
+      this.callbacks = [];
     },
-    async whenSet(cb) {
+    whenSet(cb) {
       if (this.value) {
-        await cb(this.value);
+        cb(this.value);
       } else {
         this.callbacks.push(cb);
       }
@@ -69,18 +72,18 @@
 </script>
 
 
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test269/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test270/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/infoRequestsFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test268/referralFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test268/cookieManagement.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test270/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test270/cookieManagement.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/autocomplete-brands.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/loadItemCards.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test268/sellItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test270/sellItem.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/sellItemModelSearch.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test268/editItem.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test268/private.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test270/editItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test270/private.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/settings.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test268/signIn.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test270/signIn.js"></script>
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>

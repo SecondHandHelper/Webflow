@@ -37,7 +37,7 @@
 
         if (!emailVerified && email) {
             let res = getCookie('viewedVerifyEmailDiv');
-            viewedVerifyEmailDiv = res === 'true';
+            const viewedVerifyEmailDiv = res === 'true';
             if (!viewedVerifyEmailDiv) {
                 window.location.replace('./user-management?mode=sendEmailVerification');
             }
