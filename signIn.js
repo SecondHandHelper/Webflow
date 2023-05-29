@@ -15,12 +15,6 @@ firebase.auth().onAuthStateChanged(async (result) => {
       identify();
 
       setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
-      // Go to logged in pages when user authenticated
-      const path = window.location.pathname;
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      if (isMobile && (path === "/" || path === "/sign-in")) {
-        await signedInNextStep();
-      }
     } catch (error) {
       console.log("Error getting document:", error);
     }

@@ -160,6 +160,6 @@
     };
 
     saveChangesButton.addEventListener('click', saveChanges);
-    user.whenSet(() => fillForm(params.id));  // Fill form
+    user.whenSet(async () => fillForm(params.id));
     autocomplete(document.getElementById("itemBrand"), brands); // Enable autocomplete
 </script>

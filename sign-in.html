@@ -9,6 +9,15 @@
 </script>
 
 <script>
+  function displayPerferredSignInMethod(buttonId) {
+    var outerDiv = document.getElementById(buttonId).parentElement;
+    var innerDiv = document.getElementById(buttonId);
+    preferredSignInMethodDiv.appendChild(outerDiv.removeChild(innerDiv));
+    preferredSignInMethodDiv.style.display = 'block';
+    showOtherSignInMethodsButton.style.display = 'flex';
+    otherSignInMethodsDiv.style.display = 'none';
+  }
+
   //Get preferred sign in method
   const preferredSignInMethod = getPreferredLogInMethod();
 
@@ -23,15 +32,6 @@
     if (preferredSignInMethod === 'password') {
       displayPerferredSignInMethod('emailAndPasswordButton');
     }
-  }
-
-  function displayPerferredSignInMethod(buttonId) {
-    var outerDiv = document.getElementById(buttonId).parentElement;
-    var innerDiv = document.getElementById(buttonId);
-    preferredSignInMethodDiv.appendChild(outerDiv.removeChild(innerDiv));
-    preferredSignInMethodDiv.style.display = 'block';
-    showOtherSignInMethodsButton.style.display = 'flex';
-    otherSignInMethodsDiv.style.display = 'none';
   }
 
   // Disable Webflow form submit
@@ -86,11 +86,11 @@
     console.log('Verify screen. My code: ' + code);
     console.log('VerificationID' + confirmationResult.verificationId);
     confirmationResult.confirm(code).then((result) => {
-      user.current = result.user;
+      const user = result.user;
 
       if (typeof (Storage) !== "undefined") {
-        sessionStorage.setItem("userId", user.current.uid);
-        sessionStorage.setItem("phone", user.current.phoneNumber);
+        sessionStorage.setItem("userId", user.uid);
+        sessionStorage.setItem("phone", user.phoneNumber);
       } else {
         console.log("Sorry, your browser does not support Web Storage...");
       }
@@ -99,7 +99,7 @@
         emailForTipsDiv.style.display = 'block';
         verifyDiv.style.display = 'none';
       } else {
-        window.location.replace('./private');
+        signedInNextStep();
       }
     }).catch((error) => {
       console.log('My error: ' + error.message);
@@ -117,7 +117,7 @@
         console.log("Sorry, your browser does not support Web Storage...");
       }
 
-      window.location.replace('./private');
+      signedInNextStep();
     } catch (e) {
       console.log('failed to add email', e)
       loadingSpinnerDiv.style.display = 'none'
@@ -142,8 +142,8 @@
 
     //NEW POPUP SIGNIN
     try {
-      await firebase.auth().signInWithPopup(provider);
-      /** @type {firebase.auth.OAuthCredential} */
+      await firebase.auth().signInWithPopup(provider)
+      signedInNextStep();
     } catch (error) {
       const errorText = `[webflow] Error signing in with Google: ${error.code}, ${error.message}, ${error.email}, ${error}`;
       console.log(errorText);
@@ -163,14 +163,14 @@
     firebase.auth().signInWithEmailAndPassword(email, password)
       .then((userCredential) => {
         // Signed in
-        user.current = userCredential.user;
-        window.userId = user.current.uid;
-        console.log("Logged in user: ", user.current.uid);
-        window.location.replace('./private');
+        const user = userCredential.user;
+        window.userId = user.uid;
+        console.log("Logged in user: ", user.uid);
+        signedInNextStep();
       })
       .catch((error) => {
         console.log("Error message:", error.code, error.message);
-        if (error.code = "auth/wrong-password") {
+        if (error.code === "auth/wrong-password") {
           passwordFeedback.innerText = "Fel lösenord";
           passwordFeedback.style.display = 'block';
           signInWithEmailButton.style.display = 'block';
@@ -189,18 +189,17 @@
     firebase.auth().createUserWithEmailAndPassword(email, password)
       .then((userCredential) => {
         // Signed in
-        user.current = userCredential.user;
-        window.userId = user.current.uid;
-        console.log("Logged in user: ", user.current.uid);
+        const user = userCredential.user;
+        window.userId = user.uid;
+        console.log("Logged in user: ", user.uid);
         const emailVerified = firebase.auth().currentUser.emailVerified;
         if (!emailVerified) {
           firebase.auth().currentUser.sendEmailVerification()
             .then(() => {
-              // Email verification sent!
-              window.location.replace('./private');
+              // Email verification sent! wait for user.
             });
         } else {
-          window.location.replace('./private');
+          signedInNextStep();
         }
       })
       .catch((error) => {
@@ -255,7 +254,7 @@
 
   emailNextStepButton.addEventListener('click', checkEmail);
   skipEmail.addEventListener('click', function() {
-    window.location.replace('./private')
+    signedInNextStep();
   })
   tipsEmailButton.addEventListener('click', addEmailAndNavigate)
   resetPasswordLink.addEventListener('click', sendPasswordReset);
@@ -274,7 +273,7 @@
     const divDisplayed = waitOnVerificationDiv.style.display;
     console.log("window focused callback waitOnVerificationDiv display=" + divDisplayed);
     if (divDisplayed === "block") {
-      window.location.replace('./private');
+      signedInNextStep();
     }
   });
 </script>
