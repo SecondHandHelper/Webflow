@@ -1,6 +1,7 @@
 <script>
     if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
-      document.getElementById('cover-spin').style.display = 'block';
+      document.getElementById('addItemFormDiv').style.display = 'none';
+      document.getElementById('loadingDiv').style.display = 'flex';
     }
     var userItemsCount;
 </script>
