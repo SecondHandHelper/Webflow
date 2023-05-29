@@ -4,16 +4,17 @@ firebase.auth().onAuthStateChanged(async (result) => {
 
   if (result) {
     // Get and set current user
-    authUser.current = result;
+    const authenticated = result;
     try {
-      const doc = await db.collection("users").doc(authUser.current.uid).get();
+      setPreferredLogInMethodCookie(authenticated.providerData[0].providerId);
+      authUser.current = authenticated;
+      console.log("authUser", authenticated.current);
+      const doc = await db.collection("users").doc(authenticated.uid).get();
       if (doc.exists) {
+        identify(authenticated, doc.data);
+        console.log("user:", doc.data);
         user.current = doc.data();
-        console.log("user:", user);
-        identify();
       }
-      console.log("authUser", authUser.current);
-      setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
     } catch (error) {
       console.log("Error getting document:", error);
     }

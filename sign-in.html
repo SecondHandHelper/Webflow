@@ -99,7 +99,7 @@
         emailForTipsDiv.style.display = 'block';
         verifyDiv.style.display = 'none';
       } else {
-        signedInNextStep();
+        authUser.whenSet(signedInNextStep);
       }
     }).catch((error) => {
       console.log('My error: ' + error.message);
@@ -117,7 +117,7 @@
         console.log("Sorry, your browser does not support Web Storage...");
       }
 
-      signedInNextStep();
+      authUser.whenSet(signedInNextStep);
     } catch (e) {
       console.log('failed to add email', e)
       loadingSpinnerDiv.style.display = 'none'
@@ -143,7 +143,7 @@
     //NEW POPUP SIGNIN
     try {
       await firebase.auth().signInWithPopup(provider)
-      signedInNextStep();
+      await authUser.whenSet(signedInNextStep);
     } catch (error) {
       const errorText = `[webflow] Error signing in with Google: ${error.code}, ${error.message}, ${error.email}, ${error}`;
       console.log(errorText);
@@ -166,7 +166,7 @@
         const user = userCredential.user;
         window.userId = user.uid;
         console.log("Logged in user: ", user.uid);
-        signedInNextStep();
+        authUser.whenSet(signedInNextStep);
       })
       .catch((error) => {
         console.log("Error message:", error.code, error.message);
@@ -199,7 +199,7 @@
               // Email verification sent! wait for user.
             });
         } else {
-          signedInNextStep();
+          authUser.whenSet(signedInNextStep);
         }
       })
       .catch((error) => {
@@ -254,7 +254,7 @@
 
   emailNextStepButton.addEventListener('click', checkEmail);
   skipEmail.addEventListener('click', function() {
-    signedInNextStep();
+    authUser.whenSet(signedInNextStep);
   })
   tipsEmailButton.addEventListener('click', addEmailAndNavigate)
   resetPasswordLink.addEventListener('click', sendPasswordReset);
@@ -273,7 +273,7 @@
     const divDisplayed = waitOnVerificationDiv.style.display;
     console.log("window focused callback waitOnVerificationDiv display=" + divDisplayed);
     if (divDisplayed === "block") {
-      signedInNextStep();
+      authUser.whenSet(signedInNextStep);
     }
   });
 </script>

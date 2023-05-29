@@ -54,15 +54,22 @@
     },
     set current(newVal) {
       this.value = newVal;
-      this.callbacks.forEach((cb) => {
-        typeof cb === 'function' && cb(newVal)
+      this.callbacks.forEach(async (cb) => {
+        typeof cb === 'function' && await cb(newVal)
       });
+    },
+    async whenSet(cb) {
+      if (this.value) {
+        await cb(this.value);
+      } else {
+        this.callbacks.push(cb);
+      }
     },
   };
 </script>
 
 
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test268/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test269/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/infoRequestsFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test268/referralFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test268/cookieManagement.js"></script>
@@ -129,30 +136,30 @@
   document.querySelectorAll("a").forEach(link => link.addEventListener('click', linkClickTracker) );
 
   // SEGMENT IDENTIFY
-  function identify() {
+  function identify(authenticatedUser, dbUser) {
     const now = new Date().toISOString();
-    let createdAt = new Date(authUser.current.metadata.creationTime).toISOString();
-    let latestLogin = new Date(authUser.current.metadata.lastSignInTime).toISOString();
-    let signInMethod = authUser.current.providerData[0].providerId;
-    const firstName = user.current.addressFirstName ? user.current.addressFirstName : null;
-    const lastName = user.current.addressLastName ? user.current.addressLastName : null;
-    const email = user.current.email ? user.current.email : null;
-    const phone = user.current.phoneNumber ? user.current.phoneNumber : null;
-    const street = user.current.addressStreetAddress ? user.current.addressStreetAddress : null;
-    const city = user.current.addressCity ? user.current.addressCity : null;
-    const postalCode = user.current.addressPostalCode ? user.current.addressPostalCode : null;
-    const doorCode = user.current.addressDoorCode ? user.current.addressDoorCode : null;
+    let createdAt = new Date(authenticatedUser.metadata.creationTime).toISOString();
+    let latestLogin = new Date(authenticatedUser.metadata.lastSignInTime).toISOString();
+    let signInMethod = authenticatedUser.providerData[0].providerId;
+    const firstName = authenticatedUser.addressFirstName ? user.current.addressFirstName : null;
+    const lastName = authenticatedUser.addressLastName ? user.current.addressLastName : null;
+    const email = authenticatedUser.email ? dbUser.email : null;
+    const phone = authenticatedUser.phoneNumber ? dbUser.phoneNumber : null;
+    const street = dbUser.addressStreetAddress ? dbUser.addressStreetAddress : null;
+    const city = dbUser.addressCity ? dbUser.addressCity : null;
+    const postalCode = dbUser.addressPostalCode ? dbUser.addressPostalCode : null;
+    const doorCode = dbUser.addressDoorCode ? dbUser.addressDoorCode : null;
     let campaign = {};
-    if (user.current.attribution) {
-      campaign["name"] = user.current.attribution.utm_campaign ? user.current.attribution.utm_campaign : null;
-      campaign["source"] = user.current.attribution.utm_source ? user.current.attribution.utm_source : null;
-      campaign["medium"] = user.current.attribution.utm_medium ? user.current.attribution.utm_medium : null;
-      campaign["term"] = user.current.attribution.utm_term ? user.current.attribution.utm_term : null;
-      campaign["content"] = user.current.attribution.utm_content ? user.current.attribution.utm_content : null;
+    if (dbUser.attribution) {
+      campaign["name"] = dbUser.attribution.utm_campaign ? dbUser.attribution.utm_campaign : null;
+      campaign["source"] = dbUser.attribution.utm_source ? dbUser.attribution.utm_source : null;
+      campaign["medium"] = dbUser.attribution.utm_medium ? dbUser.attribution.utm_medium : null;
+      campaign["term"] = dbUser.attribution.utm_term ? dbUser.attribution.utm_term : null;
+      campaign["content"] = dbUser.attribution.utm_content ? dbUser.attribution.utm_content : null;
     }
     campaign = Object.keys(campaign).length > 0 ? campaign : null;
 
-    analytics.identify(`${authUser.current.uid}`, {
+    analytics.identify(`${authenticatedUser.uid}`, {
       createdAt,
       firstName,
       lastName,
