@@ -88,19 +88,16 @@ async function updateFirestoreUserDocument(userId, email, phone) {
             if (Object.keys(a).length > 0) { fields["attribution"] = a }
 
             // Create User Document
-            db.collection("users").doc(userId).set(fields)
-                .then(() => {
-                    console.log(`User document was created with id ${userId} and these fields: `, fields);
-                    user.current = fields;
-                    identify();
+            await docRef.set(fields);
+            console.log(`User document was created with id ${userId} and these fields: `, fields);
+            user.current = fields;
+            identify();
 
-                    // Connect referral user from invite cookie only when creating user doc
-                    const inputCode = checkCookie("invite");
-                    if (inputCode) { connectReferralUsers(inputCode); }
-                })
-                .catch((error) => {
-                    console.error("Error writing document: ", error);
-                });
+            // Connect referral user from invite cookie only when creating user doc
+            const inputCode = checkCookie("invite");
+            if (inputCode) {
+                await connectReferralUsers(inputCode);
+            }
         }
     } catch (e) {
         console.log("Something went wrong:", e);
