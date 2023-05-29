@@ -1,4 +1,5 @@
 <script>
+  console.log(`showing loading div ${sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')}`)
     if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
       document.getElementById('addItemFormDiv').style.display = 'none';
       document.getElementById('loadingDiv').style.display = 'flex';

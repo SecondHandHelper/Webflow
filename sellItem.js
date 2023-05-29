@@ -195,6 +195,7 @@ async function nextStepSignedIn() {
   if (!firstNameSet) {
     addressFormDiv.style.display = 'block';
     addItemFormDiv.style.display = 'none';
+    loadingDiv.style.display = 'none';
   } else {
     window.location.href = window.location.origin + "/private";
   }

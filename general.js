@@ -700,7 +700,7 @@ async function addUserDetails() {
     const itemRef = db.collection('users').doc(authUser.current.uid);
     itemRef.update({
         ...addressFields,
-        personalId: personalId
+        personalId
     })
         .then(() => {
             console.log(`User address of ${authUser.current.uid} is now updated`);
@@ -777,7 +777,8 @@ async function addPersonalId() {
     }
 }
 
-function formatPersonalId(personalId) {
+function formatPersonalId(personalIdInput) {
+    let personalId = personalIdInput.replace('-', '');
     if (personalId.length !== 12 && (personalId.substring(0, 2) !== '19' || personalId.substring(0, 2) !== '20')) {
         console.log("Number(personalId.substring(0, 2)", Number(personalId.substring(0, 2)));
         if (Number(personalId.substring(0, 2)) <= 99 && Number(personalId.substring(0, 2)) > 25) {
@@ -791,6 +792,7 @@ function formatPersonalId(personalId) {
         console.log("return ", personalId);
         return personalId;
     }
+    return null;
 }
 
 // FUNCTIONS FOR SELL ITEM PAGE
