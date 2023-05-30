@@ -149,7 +149,6 @@ async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
-  imageElements.map(sessionStorage.removeItem);
 }
 
 async function uploadImagesFromForm(itemId) {
@@ -239,7 +238,7 @@ async function fillForm(itemId, savedItem) {
       }
     }
 
-    imageElements.map(sessionStorage.removeItem);
+    imageElements.map(img => sessionStorage.removeItem(`${img}PreviewUrl`));
     for (const imageName in images) {
       const urlSmall = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName] || images[`${imageName}Large`];
       const urlLarge = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
