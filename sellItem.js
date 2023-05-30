@@ -149,6 +149,7 @@ async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
+  imageElements.map(sessionStorage.removeItem);
 }
 
 async function uploadImagesFromForm(itemId) {
@@ -244,6 +245,8 @@ async function fillForm(itemId, savedItem) {
       if (imageElements.includes(imageName)) {
         showPreview(imageName, urlSmall);
         sessionStorage.setItem(`${imageName}PreviewUrl`, urlLarge); // Store large preview url to create image from on submit
+      } else {
+        sessionStorage.removeItem(`${imageName}PreviewUrl`); // Remove any previously stored images
       }
     }
 
