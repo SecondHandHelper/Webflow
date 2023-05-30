@@ -239,14 +239,13 @@ async function fillForm(itemId, savedItem) {
       }
     }
 
+    imageElements.map(sessionStorage.removeItem);
     for (const imageName in images) {
       const urlSmall = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName] || images[`${imageName}Large`];
       const urlLarge = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
       if (imageElements.includes(imageName)) {
         showPreview(imageName, urlSmall);
         sessionStorage.setItem(`${imageName}PreviewUrl`, urlLarge); // Store large preview url to create image from on submit
-      } else {
-        sessionStorage.removeItem(`${imageName}PreviewUrl`); // Remove any previously stored images
       }
     }
 
