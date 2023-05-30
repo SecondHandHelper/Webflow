@@ -46,7 +46,7 @@ async function signedInNextStep(fallbackRedirect) {
     // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item
     if (userIsSellingNewItem()) {
         window.location.replace('./sell-item');
-    } else if (fallbackRedirect) {
+    } else if (fallbackRedirect && typeof fallbackRedirect === 'string') {
         window.location.replace(fallbackRedirect);
     } else {
         window.location.replace('./private');
