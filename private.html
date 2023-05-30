@@ -43,7 +43,9 @@
             }
         }
         // Create refCode
-        if (user.current && user.current.addressFirstName && user.current.addressLastName && !user.current?.referralData?.referralCode) { createReferralCode(); }
+        if (user.current && user.current.addressFirstName && user.current.addressLastName && !user.current?.referralData?.referralCode) {
+          await createReferralCode();
+        }
     }
 
     async function showNpsSurvey(items) {

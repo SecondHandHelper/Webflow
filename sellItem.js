@@ -152,7 +152,7 @@ async function createItemAfterSignIn() {
 }
 
 async function uploadImagesFromForm(itemId) {
-  const imageData = imageElements.reduce(async (accumulator, current) => {
+  const imageData = imageElements.reduce((accumulator, current) => {
     const file = document.getElementById(current).files[0] || sessionStorage.getItem(`${current}PreviewUrl`);
     if (!file) return accumulator;
     return { ...accumulator, [current]: file }
@@ -162,20 +162,17 @@ async function uploadImagesFromForm(itemId) {
 
 async function uploadUserImages(itemId, imageData) {
   const storageRef = storage.ref();
-  const promises = Object.keys(imageData).map(async (key) => {
-    if (typeof imageData === 'string') {
-      return { key, url: imageData };
+  const promises = await Promise.all(Object.keys(imageData).map(async (key) => {
+    if (typeof imageData[key] === 'string') {
+      return { [key]: await Promise.resolve(imageData[key]) };
     }
     const imagePathReference = `images/${itemId}/${key}`;
     const file = imageData[key];
     let fileRef = storageRef.child(imagePathReference);
     await fileRef.put(file);
-    return { key, url: await fileRef.getDownloadURL() };
-  });
-  const imageUrls = await Promise.all(promises);
-  return imageUrls.reduce((prev, curr) => {
-    return { ...prev, [curr.key]: curr.url };
-  }, {});
+    return { [key]: await fileRef.getDownloadURL() };
+  }));
+  return Object.assign(...promises);
 }
 
 async function nextStep() {

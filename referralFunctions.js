@@ -47,7 +47,7 @@ async function createReferralCode() {
     if (!user.current?.referralData?.referralCode) {
       const referralCode = await firebase.app().functions("europe-west3").httpsCallable('setUserReferralCode')();
       console.log("New referral code stored: ", referralCode?.data?.referralCode);
-      user.current.referralData.referralCode = referralCode?.data?.referralCode;
+      user.current.referralData = { ...user.current.referralData, referralCode: referralCode?.data?.referralCode };
       await showReferralSection();
     }
 }
