@@ -127,28 +127,28 @@
     })
 
     async function sellItemMainAuthenticated() {
-      console.log("sellItemMainAuthenticated " + new Date());
-      if (user.current?.phoneNumber) {
-        phoneNumberDiv.style.display = "none";
-        document.getElementById("itemPhoneNumber").required = false;
-      }
-      // Be om shippingMethod i formuläret
-      if (user.current?.preferences?.shippingMethod) {
-        shippingMethodDiv.style.display = "none";
-      }
-      // Create item from sessionStorage
-      if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
-        await createItemAfterSignIn();
-        const shippingMethod = sessionStorage.getItem('shippingMethod');
-        if (shippingMethod) {
-          await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
+        console.log("sellItemMainAuthenticated " + new Date());
+        if (user.current?.phoneNumber) {
+            phoneNumberDiv.style.display = "none";
+            document.getElementById("itemPhoneNumber").required = false;
         }
-        return await nextStep({ itemCreatedFromPrefill: true });
-      }
+        // Be om shippingMethod i formuläret
+        if (user.current?.preferences?.shippingMethod) {
+            shippingMethodDiv.style.display = "none";
+        }
+        // Create item from sessionStorage
+        if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
+            await createItemAfterSignIn();
+            const shippingMethod = sessionStorage.getItem('shippingMethod');
+            if (shippingMethod) {
+                await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
+            }
+            return await nextStep({ itemCreatedFromPrefill: true });
+        }
 
-      // Get user's item count to be able to send 'User Activated' event
-      const items = await getItems(authUser.current.uid);
-      userItemsCount = items.size;
+        // Get user's item count to be able to send 'User Activated' event
+        const items = await getItems(authUser.current.uid);
+        userItemsCount = items.size;
     }
 
     async function sellItemMain() {
@@ -167,14 +167,17 @@
 
         // Fill form if the user comes from a prefill link
         if (params.id) {
-            document.getElementById('maiIntroForPrefill').style.display = 'block';
+            auth.onAuthStateChanged(function (user) { 
+                if (!user) {document.getElementById('maiIntro').style.display = 'block';}
+            });
+            document.getElementById('resellIntro').style.display = 'block';
             await fillForm(params.id);
             document.getElementById('loadingDiv').style.display = 'none';
             document.getElementById('addItemFormDiv').style.display = 'block';
-        } else if(sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+        } else if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
             document.getElementById('addItemFormDiv').style.display = 'none';
             document.getElementById('loadingDiv').style.display = 'flex';
-         } else {
+        } else {
             document.getElementById('addItemFormDiv').style.display = 'block';
             document.getElementById('loadingDiv').style.display = 'none';
             document.getElementById("frontImage").required = true;
