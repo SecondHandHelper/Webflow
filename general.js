@@ -63,7 +63,7 @@ async function updateFirestoreUserDocument(userId, email, phone) {
     let fields = {};
     if (email) { fields["email"] = email; }
     if (phone) { fields["phoneNumber"] = phone; }
-    const signInMethod = authUser.providerData[0].providerId;
+    const signInMethod = authUser.current.providerData[0].providerId;
     if (signInMethod) { fields["signInMethod"] = signInMethod; }
     const docRef = db.collection("users").doc(userId);
 
@@ -88,19 +88,16 @@ async function updateFirestoreUserDocument(userId, email, phone) {
             if (Object.keys(a).length > 0) { fields["attribution"] = a }
 
             // Create User Document
-            db.collection("users").doc(userId).set(fields)
-                .then(() => {
-                    console.log(`User document was created with id ${userId} and these fields: `, fields);
-                    user = fields;
-                    identify();
+            await docRef.set(fields);
+            console.log(`User document was created with id ${userId} and these fields: `, fields);
+            user.current = fields;
+            identify(authUser.current, user.current);
 
-                    // Connect referral user from invite cookie only when creating user doc
-                    const inputCode = checkCookie("invite");
-                    if (inputCode) { connectReferralUsers(inputCode); }
-                })
-                .catch((error) => {
-                    console.error("Error writing document: ", error);
-                });
+            // Connect referral user from invite cookie only when creating user doc
+            const inputCode = checkCookie("invite");
+            if (inputCode) {
+                await connectReferralUsers(inputCode);
+            }
         }
     } catch (e) {
         console.log("Something went wrong:", e);
@@ -585,6 +582,9 @@ async function storeFeedback() {
 function signOut() {
     firebase.auth().signOut().then(() => {
         console.log('User signed out');
+        authUser.current = null;
+        user.current = null;
+        userId = null;
         window.location.href = window.location.origin;
     }).catch((error) => {
         console.log(error);
@@ -697,13 +697,13 @@ async function addUserDetails() {
     personalId = personalId ? formatPersonalId(personalId) : null;
 
     // Write to Firestore
-    const itemRef = db.collection('users').doc(authUser.uid);
+    const itemRef = db.collection('users').doc(authUser.current.uid);
     itemRef.update({
         ...addressFields,
-        personalId: personalId
+        personalId
     })
         .then(() => {
-            console.log(`User address of ${authUser.uid} is now updated`);
+            console.log(`User address of ${authUser.current.uid} is now updated`);
             itemConfirmationDiv.style.display = 'block';
             addressFormDiv.style.display = 'none';
         })
@@ -740,10 +740,10 @@ async function addUserAddress() {
     const addressFields = getFormAddressFields();
 
     // Write to Firestore
-    const itemRef = db.collection('users').doc(authUser.uid);
+    const itemRef = db.collection('users').doc(authUser.current.uid);
     itemRef.update(addressFields)
         .then(() => {
-            console.log(`User address of ${authUser.uid} is now updated`);
+            console.log(`User address of ${authUser.current.uid} is now updated`);
             window.location.href = window.location.origin + "/private";
         })
         .catch((error) => {
@@ -759,12 +759,12 @@ async function addPersonalId() {
 
     // Write to Firestore
     if (personalId) {
-        const itemRef = db.collection('users').doc(authUser.uid);
+        const itemRef = db.collection('users').doc(authUser.current.uid);
         itemRef.update({
             personalId: personalId
         })
             .then(() => {
-                console.log(`PersonalId of ${authUser.uid} is now updated`);
+                console.log(`PersonalId of ${authUser.current.uid} is now updated`);
                 personalIdConfirmationDiv.style.display = 'block';
                 personalIdFormDiv.style.display = 'none';
             })
@@ -777,7 +777,8 @@ async function addPersonalId() {
     }
 }
 
-function formatPersonalId(personalId) {
+function formatPersonalId(personalIdInput) {
+    let personalId = personalIdInput.replace('-', '');
     if (personalId.length !== 12 && (personalId.substring(0, 2) !== '19' || personalId.substring(0, 2) !== '20')) {
         console.log("Number(personalId.substring(0, 2)", Number(personalId.substring(0, 2)));
         if (Number(personalId.substring(0, 2)) <= 99 && Number(personalId.substring(0, 2)) > 25) {
@@ -791,6 +792,7 @@ function formatPersonalId(personalId) {
         console.log("return ", personalId);
         return personalId;
     }
+    return null;
 }
 
 // FUNCTIONS FOR SELL ITEM PAGE
@@ -861,7 +863,7 @@ function itemCoverImage(item) {
 
 
 function shareCode() {
-    const code = user.referralData.referralCode;
+    const code = user.current.referralData.referralCode;
     const text = `Hej, jag vill tipsa om Mai för att rensa ur garderoben. Mai är en tjänst som hjälper dig att sälja dina kläder på ett enkelt sätt. Man tar bilder på sina plagg, sedan sköter Mai resten, såsom värdering, publicering på plattformar, kontakt med köpare och frakt när det blir sålt. Man får själv behålla 80% av slutpriset, och blir det inte sålt kostar det ingenting.
 
 Som en uppmuntran till att komma igång ger Mai dig 100kr i välkomstgåva, när du registrerar dig med min kod ${code}.

@@ -1,6 +1,6 @@
 // REFERRAL PROGRAM FUNCTIONS
 async function showReferralSection() {
-    const userCreatedDate = new Date(authUser.metadata.creationTime);
+    const userCreatedDate = new Date(authUser.current.metadata.creationTime);
     const now = new Date();
     let daysDiff = (now.getTime() - userCreatedDate.getTime()) / (1000 * 3600 * 24);
     console.log("Days since user registered", daysDiff);
@@ -13,29 +13,29 @@ async function showReferralSection() {
         }
     });
 
-    if (user?.referralData?.referralCode && soldItemExist) {
-        document.getElementById("myReferralCodeText").innerHTML = user.referralData.referralCode;
-        if (user?.referralData?.activatedReferredUsersCount > 0) {
+    if (user.current?.referralData?.referralCode && soldItemExist) {
+        document.getElementById("myReferralCodeText").innerHTML = user.current.referralData.referralCode;
+        if (user.current?.referralData?.activatedReferredUsersCount > 0) {
             // shareCodeState 'block', but should also show the bonus received... TODO"
             shareCodeState.style.display = 'block';
         } else {
             shareCodeState.style.display = 'block';
         }
-    } else if (user?.referralData?.referredBy && !user?.referralData?.referredByBonusPaid) {
+    } else if (user.current?.referralData?.referredBy && !user.current?.referralData?.referredByBonusPaid) {
         // Get inviters first name
-        const inviter = user?.referralData?.referredBy;
+        const inviter = user.current?.referralData?.referredBy;
 
         const inviterName = await firebase.app().functions("europe-west3").httpsCallable('referrerName')({referrerId: inviter});
         if (inviterName?.data?.name) {
           document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + inviterName.data.name;
         }
         referredByBonusState.style.display = 'block';
-    } else if ((user?.referralData?.referredBy ? false : true) && daysDiff < 100) {
+    } else if ((user.current?.referralData?.referredBy ? false : true) && daysDiff < 100) {
         enterCodeState.style.display = 'block';
     }
 
     //START - Temporary showing enter code DIV for all users during Black Friday, delete this row after Black Friday 
-    if ((user?.referralData?.referredBy ? false : true)) {
+    if ((user.current?.referralData?.referredBy ? false : true)) {
         enterCodeState.style.display = 'block'; 
     }
     //END
@@ -44,10 +44,10 @@ async function showReferralSection() {
 }
 
 async function createReferralCode() {
-    if (!user?.referralData?.referralCode) {
+    if (!user.current?.referralData?.referralCode) {
       const referralCode = await firebase.app().functions("europe-west3").httpsCallable('setUserReferralCode')();
       console.log("New referral code stored: ", referralCode?.data?.referralCode);
-      user.referralData.referralCode = referralCode?.data?.referralCode;
+      user.current.referralData = { ...user.current.referralData, referralCode: referralCode?.data?.referralCode };
       await showReferralSection();
     }
 }

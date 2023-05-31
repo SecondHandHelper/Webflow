@@ -1,25 +1,12 @@
 <!-- The core Firebase JS SDK is always required and must be listed first -->
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
-
-<!-- TODO: Add SDKs for Firebase products that you want to use
-     https://firebase.google.com/docs/web/setup#available-libraries -->
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-analytics.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-functions.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.24/general.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.24/infoRequestsFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.24/referralFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.24/cookieManagement.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.24/autocomplete-brands.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.24/loadItemCards.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuidv4.min.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/sellItem.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.24/sellItemModelSearch.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.24/editItem.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.24/private.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.24/settings.js"></script>
 
 <script>
   // Firebase config
@@ -39,7 +26,63 @@
   var functions = firebase.functions();
   var storage = firebase.storage();
   var auth = firebase.auth();
+
+  const user = {
+    value: null,
+    callbacks: [],
+    get current() {
+      return this.value;
+    },
+    set current(newVal) {
+      this.value = newVal;
+      this.callbacks.forEach((cb) => {
+        typeof cb === 'function' && cb(newVal)
+      });
+      this.callbacks = [];
+    },
+    async whenSet(cb) {
+      if (this.value) {
+        cb(this.value);
+      } else {
+        this.callbacks.push(cb);
+      }
+    },
+  };
+  const authUser = {
+    value: null,
+    callbacks: [],
+    get current() {
+      return this.value;
+    },
+    set current(newVal) {
+      this.value = newVal;
+      this.callbacks.forEach((cb) => {
+        typeof cb === 'function' && cb(newVal)
+      });
+      this.callbacks = [];
+    },
+    whenSet(cb) {
+      if (this.value) {
+        cb(this.value);
+      } else {
+        this.callbacks.push(cb);
+      }
+    },
+  };
 </script>
+
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test280/signIn.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test280/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/infoRequestsFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test280/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test280/cookieManagement.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/autocomplete-brands.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/loadItemCards.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test280/sellItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/sellItemModelSearch.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test280/editItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test280/private.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.25/settings.js"></script>
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>
@@ -49,51 +92,6 @@
 <!-- End Google Tag Manager (noscript) -->
 
 <script>
-  // GET USER
-  var user;
-  var authUser;
-  firebase.auth().onAuthStateChanged((result) => {
-    const now = new Date().toISOString();
-
-    if (result) {
-      // Get and set current user
-      authUser = result;
-      db.collection("users").doc(authUser.uid).get().then((doc) => {
-        if (doc.exists) {
-          user = doc.data();
-          console.log("user:", user);
-          console.log("authUser", authUser);
-          console.log("featureIsEnabled('C2C')", featureIsEnabled('C2C'));
-          console.log("featureIsEnabled('modelDB')", featureIsEnabled('modelDB'));
-          identify();
-
-          setPreferredLogInMethodCookie(authUser.providerData[0].providerId);
-          // Go to logged in pages when user authenticated
-          const path = window.location.pathname;
-          var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-          if (isMobile && (path === "/" || path === "/sign-in")) { window.location.replace('./private'); }
-        }
-
-        // Run Main function if exists
-        if (typeof window.main === "function") { main(); }
-      }).catch((error) => { console.log("Error getting document:", error); });
-    } else {
-      console.log('No user');
-      // Go to landing page if no user and on logged in pages
-      const path = window.location.pathname;
-      if (path === "/private" || path === "/personal-id-form" || path === "/address-form" || path === "/item" || path === "/ship-item" || path === "/edit-item" || path === "/order-bags") {
-        window.location.replace('./');
-      }
-
-      // Latest page view for logged out users
-      analytics.identify({ latestPageView: now });
-
-      // Run main function
-      if (typeof window.main === "function") {
-        main();
-      }
-    }
-  });
 
   // Set attribution cookies (could be put on any campaign page)
   checkCookie("utm_campaign");
@@ -140,31 +138,30 @@
   document.querySelectorAll("a").forEach(link => link.addEventListener('click', linkClickTracker) );
 
   // SEGMENT IDENTIFY
-  function identify() {
+  function identify(authenticatedUser, dbUser) {
     const now = new Date().toISOString();
-    let createdAt = new Date(authUser.metadata.creationTime).toISOString();
-    let latestLogin = new Date(authUser.metadata.lastSignInTime).toISOString();
-    let signInMethod = authUser.providerData[0].providerId;
-    const firstName = user.addressFirstName ? user.addressFirstName : null;
-    const lastName = user.addressLastName ? user.addressLastName : null;
-    const email = user.email ? user.email : null;
-    const phone = user.phoneNumber ? user.phoneNumber : null;
-    const street = user.addressStreetAddress ? user.addressStreetAddress : null;
-    const city = user.addressCity ? user.addressCity : null;
-    const postalCode = user.addressPostalCode ? user.addressPostalCode : null;
-    const doorCode = user.addressDoorCode ? user.addressDoorCode : null;
-    const replace = user.replace ? user.replace : null;
+    let createdAt = new Date(authenticatedUser.metadata.creationTime).toISOString();
+    let latestLogin = new Date(authenticatedUser.metadata.lastSignInTime).toISOString();
+    let signInMethod = authenticatedUser.providerData[0].providerId;
+    const firstName = authenticatedUser.addressFirstName ? user.current.addressFirstName : null;
+    const lastName = authenticatedUser.addressLastName ? user.current.addressLastName : null;
+    const email = authenticatedUser.email ? dbUser.email : null;
+    const phone = authenticatedUser.phoneNumber ? dbUser.phoneNumber : null;
+    const street = dbUser.addressStreetAddress ? dbUser.addressStreetAddress : null;
+    const city = dbUser.addressCity ? dbUser.addressCity : null;
+    const postalCode = dbUser.addressPostalCode ? dbUser.addressPostalCode : null;
+    const doorCode = dbUser.addressDoorCode ? dbUser.addressDoorCode : null;
     let campaign = {};
-    if (user.attribution) {
-      campaign["name"] = user.attribution.utm_campaign ? user.attribution.utm_campaign : null;
-      campaign["source"] = user.attribution.utm_source ? user.attribution.utm_source : null;
-      campaign["medium"] = user.attribution.utm_medium ? user.attribution.utm_medium : null;
-      campaign["term"] = user.attribution.utm_term ? user.attribution.utm_term : null;
-      campaign["content"] = user.attribution.utm_content ? user.attribution.utm_content : null;
+    if (dbUser.attribution) {
+      campaign["name"] = dbUser.attribution.utm_campaign ? dbUser.attribution.utm_campaign : null;
+      campaign["source"] = dbUser.attribution.utm_source ? dbUser.attribution.utm_source : null;
+      campaign["medium"] = dbUser.attribution.utm_medium ? dbUser.attribution.utm_medium : null;
+      campaign["term"] = dbUser.attribution.utm_term ? dbUser.attribution.utm_term : null;
+      campaign["content"] = dbUser.attribution.utm_content ? dbUser.attribution.utm_content : null;
     }
     campaign = Object.keys(campaign).length > 0 ? campaign : null;
 
-    analytics.identify(`${authUser.uid}`, {
+    analytics.identify(`${authenticatedUser.uid}`, {
       createdAt,
       firstName,
       lastName,
@@ -208,11 +205,11 @@
   };
 
   function featureIsEnabled(featureName) {
-    if (user?.testGroups) {
-      if (user.testGroups.includes('alpha')) {
+    if (user.current?.testGroups) {
+      if (user.current.testGroups.includes('alpha')) {
         return featureConfig.alpha[featureName]
       }
-      if (user.testGroups.includes('beta')) {
+      if (user.current.testGroups.includes('beta')) {
         return featureConfig.beta[featureName]
       }
     } else {

@@ -1,9 +1,9 @@
 function showAccountInfo() {
     let identifier;
-    if (authUser.phoneNumber) {
-        identifier = authUser.phoneNumber;
-    } else if (authUser.email) {
-        identifier = authUser.email;
+    if (authUser.current.phoneNumber) {
+        identifier = authUser.current.phoneNumber;
+    } else if (authUser.current.email) {
+        identifier = authUser.current.email;
     }
     if (identifier) {
         accountInfoText.innerHTML = `Inloggad med ${identifier}`;
@@ -23,7 +23,7 @@ function showInviteToast(items) {
     let daysSinceLatestSold = 10;
     let soldItemsCount = 0;
     let oneSoldNotSentItemExist = false;
-    let viewedToastBefore = user?.elementViews && user.elementViews.some(e => e.elementID === 'inviteToast') ? true : false;
+    let viewedToastBefore = user.current?.elementViews && user.current.elementViews.some(e => e.elementID === 'inviteToast') ? true : false;
 
     if (items) {
         items.forEach((doc) => { // Items is a global variable that equals to querySnapshot from loadCardLists.js
@@ -50,12 +50,12 @@ function showInviteToast(items) {
         });
     }
 
-    if (daysSinceLatestSold <= 3 && soldItemsCount >= 2 && oneSoldNotSentItemExist && user?.referralData?.referralCode && !viewedToastBefore) {
-        referralCodeText.innerHTML = user.referralData.referralCode;
+    if (daysSinceLatestSold <= 3 && soldItemsCount >= 2 && oneSoldNotSentItemExist && user.current?.referralData?.referralCode && !viewedToastBefore) {
+        referralCodeText.innerHTML = user.current.referralData.referralCode;
         triggerInviteToastOpen.click();
 
         // Store elementViews to be able to not show it again
-        db.collection('users').doc(authUser.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "inviteToast", timestamp: new Date() }) });
+        db.collection('users').doc(authUser.current.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "inviteToast", timestamp: new Date() }) });
         // Track with segment
         analytics.track("Element Viewed", { elementID: "inviteToast" });
     }

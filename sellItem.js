@@ -1,20 +1,20 @@
 const defectsChoicesInSwedish = new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
+const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
 
-function addItem() {
+async function addItem() {
   const id = uuidv4();
-  console.log(`addItem called, new id: ${id}`);
-  addItemInner(id)
-    .then(() => {
-      console.log('addItem completed');
+  try {
+    await addItemInner(id);
 
-      // Track with segment 'User Activated'
-      if (userItemsCount === 0) { analytics.track('User Activated'); }
+    // Track with segment 'User Activated'
+    if (userItemsCount === 0) {
+      analytics.track('User Activated');
+    }
 
-      nextStep().then(() => console.log('nextStep completed'));
-    })
-    .catch((e) => {
-      console.error('addItem failed', e);
-    });
+    await nextStep();
+  } catch (e) {
+    console.error('addItem failed', e);
+  }
 }
 
 function collect() {
@@ -68,7 +68,7 @@ function collect() {
   }
 
   return {
-    user: authUser.uid || null,
+    user: authUser.current?.uid || null,
     createdAt: now,
     status,
     shippingStatus,
@@ -92,18 +92,17 @@ function collect() {
 }
 
 async function getShippingMethod() {
-  // If first time: User choses shipping method preference in sell item form
+  // If first time: User chooses shipping method preference in sell item form
   let shippingMethod = 'Service point';
-  if (!user?.preferences?.shippingMethod) {
+  if (!user.current?.preferences?.shippingMethod) {
     var radioButtons = document.getElementsByName("shippingMethod");
     for (var x = 0; x < radioButtons.length; x++) {
       if (radioButtons[x].checked) {
         const method = radioButtons[x].value; // "Service point" or "Pickup"
         if (method) {
           shippingMethod = method;
-          if (authUser) {
-            await db.collection('users').doc(authUser.uid).update({ "preferences.shippingMethod": method });
-            console.log(`Shipping method '${method}' stored as preference on user with ID: ${authUser.uid}`);
+          if (authUser.current) {
+            await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
           } else {
             sessionStorage.setItem('shippingMethod', shippingMethod);
           }
@@ -111,19 +110,17 @@ async function getShippingMethod() {
       }
     }
   } else {
-    shippingMethod = user?.preferences?.shippingMethod;
-    console.log(`Shipping method preference from user is '${shippingMethod}' and is now set on item`);
+    shippingMethod = user.current?.preferences?.shippingMethod;
   }
 
   return shippingMethod;
 }
 
 async function addItemInner(id) {
-  console.log("addItemInner called");
 
   const { modelCoverImageUrl, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
-  const images = await uploadImages(id);
+  const images = await uploadImagesFromForm(id);
   if (modelCoverImageUrl) {
     images['coverImage'] = modelCoverImageUrl;
     pageData['coverImageUpdatedAt'] = new Date();
@@ -131,88 +128,74 @@ async function addItemInner(id) {
   const createdFromItem = params.id ? { createdFromItem: params.id } : {};
   const item = { ...pageData, shippingMethod, images, ...createdFromItem, version: "2" };
 
-  console.log('Storing item: ', item);
-
-  if (params.id) {
+  if (params.id && !authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
-    await db.collection('items').doc(id).set(item);
+    await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
   }
 
   // If first time: User submitted their phone number
   const phoneNumber = itemPhoneNumber.value;
   if (phoneNumber) {
-    if (authUser) {
-      await writePhoneNumberToFirestore(authUser.uid, phoneNumber);
+    if (authUser.current) {
+      await writePhoneNumberToFirestore(authUser.current.uid, phoneNumber);
     } else {
       sessionStorage.setItem('phoneNumber', phoneNumber);
     }
   }
 }
 
-async function storeItemAfterSignIn() {
+async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
-  console.log('itemFromStorage', itemFromStorage);
-  await db.collection('items').doc(itemFromStorage.id).set(itemFromStorage.item);
+  await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
+  sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
 }
 
-async function getFilesFromPreviewUrl(imageElements) { // This is for the case the form have been prefilled with images
-  const files = {};
-  for (let i = 0; i < imageElements.length; i++) {
-    const elm = imageElements[i];
-    const url = sessionStorage.getItem(`${elm}PreviewUrl`);
-    if (url) {
-      const response = await fetch(url); // Download to cache
-      const file = await response.blob();
-      files[elm] = file;
-    }
-  }
-  return files // Return object with blob files: { frontImage: <file object>, ... }
-}
-
-async function uploadImages(itemId) {
-  const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
-  const filesFromPreviewUrl = await getFilesFromPreviewUrl(imageElements);
-  const imageData = imageElements.reduce((prev, current) => {
-    const file = document.getElementById(current).files[0] || filesFromPreviewUrl[current];
-    if (!file) return prev;
-    return { ...prev, [current]: file }
+async function uploadImagesFromForm(itemId) {
+  const imageData = imageElements.reduce((accumulator, current) => {
+    const file = document.getElementById(current).files[0] || sessionStorage.getItem(`${current}PreviewUrl`);
+    if (!file) return accumulator;
+    return { ...accumulator, [current]: file }
   }, {}); // { frontImage: <file object>, ... }
+  return await uploadUserImages(itemId, imageData);
+}
+
+async function uploadUserImages(itemId, imageData) {
   const storageRef = storage.ref();
-  const promises = Object.keys(imageData).map(async (key) => {
+  const promises = await Promise.all(Object.keys(imageData).map(async (key) => {
+    if (typeof imageData[key] === 'string') {
+      return { [key]: await Promise.resolve(imageData[key]) };
+    }
     const imagePathReference = `images/${itemId}/${key}`;
     const file = imageData[key];
     let fileRef = storageRef.child(imagePathReference);
     await fileRef.put(file);
-    return { key, url: await fileRef.getDownloadURL() };
-  });
-  const imageUrls = await Promise.all(promises);
-  return imageUrls.reduce((prev, curr) => {
-    return { ...prev, [curr.key]: curr.url };
-  }, {});
+    return { [key]: await fileRef.getDownloadURL() };
+  }));
+  return Object.assign(...promises);
 }
 
-async function nextStep() {
-  console.log('in nextStep');
-  if (!authUser) {
+async function nextStep(options) {
+  if (!authUser.current) {
     // If user isn't logged in they will be taken through these steps:
     // 1. Logg in or create account on the /sign-in page
     // 2. Get back to /sell-item and continue normal flow (show address if no address, show confirmation div)
     window.location.href = window.location.origin + "/sign-in";
     return
   }
-  signedInNextStep().then(() => console.log('signedInNextStep completed'));
+  await nextStepSignedIn(options);
 }
 
-async function signedInNextStep() {
-  console.log('in signedInNextStep');
-  const docRef = db.collection("users").doc(authUser.uid);
-  const doc = await docRef.get();
-  const firstNameSet = doc.data().addressFirstName;
+async function nextStepSignedIn(options) {
+  const firstNameSet = user.current.addressFirstName;
   // If first name not set, show address form. Else, go to private page.
   if (!firstNameSet) {
+    if (options && options.itemCreatedFromPrefill) {
+      document.getElementById('maiIntroForPrefillAddress').style.display = 'block';
+    }
     addressFormDiv.style.display = 'block';
     addItemFormDiv.style.display = 'none';
+    loadingDiv.style.display = 'none';
   } else {
     window.location.href = window.location.origin + "/private";
   }
@@ -224,95 +207,141 @@ function fieldLabelToggle(labelId) {
   }
 }
 
-function fillForm(itemId) {
-  db.collection("items").doc(itemId)
-    .get().then((doc) => {
-      if (doc.exists) {
-        data = doc.data();
-        console.log("Item data:", doc.data());
-        const size = data.size;
-        const material = data.material;
-        const brand = data.brand;
-        const model = data.model;
-        let originalPrice = data.originalPrice;
-        if (originalPrice <= 0) { originalPrice = null; }
-        const age = data.age;
-        const condition = data.condition;
-        const images = data.images;
+async function fillForm(itemId, savedItem) {
+  try {
+    let item = { data: savedItem };
+    if (!savedItem) {
+      item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId});
+    }
+    const data = item.data;
+    const size = data.size;
+    const material = data.material;
+    const brand = data.brand;
+    const model = data.model;
+    let originalPrice = data.originalPrice;
+    if (originalPrice <= 0) {
+      originalPrice = null;
+    }
+    const age = data.age;
+    const condition = data.condition;
+    const images = data.images;
 
-        //TODO: Get other data that's not part of the form, to store that immediately as well. Such as category, color, max / min price etc...
-
-        // Populate images
-        function showPreview(x, url) {
-          document.getElementById(`${x}Preview`).style.backgroundImage = `url('${url}')`;
-          siblings = document.getElementById(x).parentNode.parentNode.childNodes;
-          for (var i = 0; i < siblings.length; i++) {
-            if (siblings[i].className.includes("success-state")) {
-              siblings[i].style.display = 'block';
-            } else {
-              siblings[i].style.display = 'none'; // Hide other states of file input field "empty-state" and "error-state"
-            }
-          }
+    // Populate images
+    function showPreview(imageName, url) {
+      document.getElementById(`${imageName}Preview`).style.backgroundImage = `url('${url}')`;
+      const siblings = document.getElementById(imageName).parentNode.parentNode.childNodes;
+      for (let i = 0; i < siblings.length; i++) {
+        if (siblings[i].className.includes("success-state")) {
+          siblings[i].style.display = 'block';
+        } else {
+          // Hide other states of file input field "empty-state" and "error-state"
+          siblings[i].style.display = 'none';
         }
-        for (const x in images) {
-          const possibleElmts = ["frontImage", "brandTagImage", "materialTagImage", "defectImage", "productImage", "extraImage"];
-          const url = images[x] || images[`${x}Large`] || images[`${x}Medium`] || images[`${x}Small`];
-          if (possibleElmts.includes(x)) {
-            showPreview(x, url);
-            sessionStorage.setItem(`${x}PreviewUrl`, url); // Store preview url to create image from on submit
-          }
-        }
-
-        // Populate text input fields
-        itemBrand.value = brand;
-        fieldLabelToggle('itemBrandLabel'); // Didn't want to use the setFieldValue for the brand since that triggered a dropdown to open
-        setFieldValue('itemSize', size);
-        setFieldValue('itemMaterial', material);
-        setFieldValue('itemModel', model);
-        setFieldValue('itemOriginalPrice', originalPrice);
-        //itemUserComment.value = userComment; //Textarea
-        //itemDefectDescription.value = defectDescription; //Textarea
-
-        // Populate select fields
-        let options = itemAge.options;
-        for (let i = 0; i < options.length; i++) {
-          if (age == options[i].attributes.value.value) {
-            itemAge.selectedIndex = i;
-            if (age != "") {
-              itemAge.style.color = "#333";
-              itemAge.dispatchEvent(new Event('input'));
-            }
-          }
-        }
-        options = itemCondition.options;
-        for (let i = 0; i < options.length; i++) {
-          if (condition == options[i].innerText) {
-            itemCondition.selectedIndex = i;
-            itemCondition.style.color = "#333";
-            itemCondition.dispatchEvent(new Event('input'));
-            if (options[i].innerText == "Använd, tecken på slitage") {
-              defectInfoDiv.style.display = 'block';
-            }
-          }
-        }
-
-        // Populate radio-buttons
-        document.getElementById('Woman').previousElementSibling.classList.remove("w--redirected-checked"); // Unselect radio button 'Woman'
-        document.getElementById('Woman').checked = false;
-        document.getElementById(data.sex).previousElementSibling.classList.add("w--redirected-checked"); // Populate the right one
-        document.getElementById(data.sex).checked = true;
-
-        // Populate checkboxes
-        defectsChoicesInSwedish.forEach((value, key) => {
-          if (data.defects.includes(value)) {
-            document.getElementById(key).previousElementSibling.classList.add("w--redirected-checked");
-            document.getElementById(key).checked = true;
-          }
-        });
-      } else {
-        console.log("No such document!");
       }
-    }).catch((error) => {
-      console.log("Error getting item document:", error);
+    }
+
+    imageElements.map(img => sessionStorage.removeItem(`${img}PreviewUrl`));
+    for (const imageName in images) {
+      const urlSmall = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName] || images[`${imageName}Large`];
+      const urlLarge = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
+      if (imageElements.includes(imageName)) {
+        showPreview(imageName, urlSmall);
+        sessionStorage.setItem(`${imageName}PreviewUrl`, urlLarge); // Store large preview url to create image from on submit
+      }
+    }
+
+    // Populate text input fields
+    itemBrand.value = brand;
+    fieldLabelToggle('itemBrandLabel'); // Didn't want to use the setFieldValue for the brand since that triggered a dropdown to open
+    setFieldValue('itemSize', size);
+    setFieldValue('itemMaterial', material);
+    setFieldValue('itemModel', model);
+    setFieldValue('itemOriginalPrice', originalPrice);
+    //itemUserComment.value = userComment; //Textarea
+    //itemDefectDescription.value = defectDescription; //Textarea
+
+    // Populate select fields
+    let options = itemAge.options;
+    for (let i = 0; i < options.length; i++) {
+      if (age == options[i].attributes.value.value) {
+        itemAge.selectedIndex = i;
+        if (age != "") {
+          itemAge.style.color = "#333";
+          itemAge.dispatchEvent(new Event('input'));
+        }
+      }
+    }
+    options = itemCondition.options;
+    for (let i = 0; i < options.length; i++) {
+      if (condition == options[i].innerText) {
+        itemCondition.selectedIndex = i;
+        itemCondition.style.color = "#333";
+        itemCondition.dispatchEvent(new Event('input'));
+        if (options[i].innerText == "Använd, tecken på slitage") {
+          defectInfoDiv.style.display = 'block';
+        }
+      }
+    }
+
+    // Populate radio-buttons
+    document.getElementById('Woman').previousElementSibling.classList.remove("w--redirected-checked"); // Unselect radio button 'Woman'
+    document.getElementById('Woman').checked = false;
+    document.getElementById(data.sex).previousElementSibling.classList.add("w--redirected-checked"); // Populate the right one
+    document.getElementById(data.sex).checked = true;
+
+    // Populate checkboxes
+    defectsChoicesInSwedish.forEach((value, key) => {
+      if (data.defects.includes(value)) {
+        document.getElementById(key).previousElementSibling.classList.add("w--redirected-checked");
+        document.getElementById(key).checked = true;
+      }
     });
+  } catch (error) {
+      console.log("Error getting item document:", error);
+  }
+  document.getElementById('loadingDiv').style.display = 'none';
+}
+
+function checkBrand(value) {
+  if (words.some(words => value.toLowerCase().includes(words.toLowerCase()))) {
+    hardToSellText.innerHTML = `Vi säljer i regel inte ${value}-plagg på grund av för lågt andrahandsvärde. Undantag kan finnas.`;
+    hardToSellDiv.style.display = 'block';
+    return true;
+  } else {
+    hardToSellDiv.style.display = 'none';
+  }
+}
+
+async function checkAndDisplayShareSold(value) {
+  const response = await firebase.app().functions("europe-west1").httpsCallable(
+    'fetchBrandShareSoldInfo',
+  )({ cleanedBrandName: value });
+
+  if (response.data && response.data.cleanedBrand) {
+    if (response.data.shareSold > '95%') {
+      shareSoldText.innerHTML = `95% av plaggen från ${response.data.cleanedBrand} säljs`
+      shareSoldDiv.style.display = 'block';
+      return;
+    }
+
+    if (response.data.shareSold > '55%') {
+      shareSoldText.innerHTML = `${response.data.shareSold} av plaggen från ${response.data.cleanedBrand} säljs`
+      shareSoldDiv.style.display = 'block';
+      return;
+    }
+    if (response.data.shareSold >= '45%') {
+      shareSoldText.innerHTML = `Hälften av plaggen från ${response.data.cleanedBrand} säljs`
+      shareSoldDiv.style.display = 'block';
+      return;
+    }
+
+    shareSoldText.innerHTML = `Mindre än hälften av plaggen från ${response.data.cleanedBrand} säljs`
+    shareSoldDiv.style.display = 'block';
+    demandLevelText.innerHTML = `Låg efterfrågan`;
+    demandLevelText.style.display = 'block';
+  } else {
+    demandLevelText.innerHTML = '';
+    shareSoldText.innerHTML = ''
+    shareSoldDiv.style.display = 'none'
+  }
 }

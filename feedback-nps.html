@@ -17,14 +17,14 @@
             npsErrorMessage.style.display = 'block';
             return;
         }
-        if (!authUser) {
+        if (!authUser.current) {
             npsErrorMessage.innerHTML = 'Du måste vara inloggad för att svara';
             npsErrorMessage.style.display = 'block';
             return;
         }
 
         // Store score
-        const docRef = await db.collection("nps").add({ score, answeredAt: new Date(), user: authUser.uid });
+        const docRef = await db.collection("nps").add({ score, answeredAt: new Date(), user: authUser.current.uid });
         npsId = docRef.id;
         console.log(`Score '${score}' stored in DB with npsId: `, npsId);
 
@@ -50,20 +50,20 @@
         if (answer) { await db.collection('nps').doc(npsId).update({ followUpQuestion: question, followUpAnswer: answer }); }
     }
 
-    async function main() {
+    user.whenSet(async () => {
         // Store elementViews to be able to hinder it to show again
-        db.collection('users').doc(authUser.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "npsSurvey", timestamp: new Date() }) });
+        db.collection('users').doc(authUser.current.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "npsSurvey", timestamp: new Date() }) });
         // Track with segment
         analytics.track("Element Viewed", { elementID: "npsSurvey" });
-    }
+    });
 
 
     npsSubmitButton.addEventListener("click", addNpsScore);
     followUpSubmitButton.addEventListener("click", async function () {
         await addFollowUp();
         // Show thank you div
-        if (user?.referralData?.referralCode && npsScore >= 9 && npsScore <= 10){
-            referralCodeText.innerHTML = user.referralData.referralCode;
+        if (user.current?.referralData?.referralCode && npsScore >= 9 && npsScore <= 10){
+            referralCodeText.innerHTML = user.current.referralData.referralCode;
             thankYouNoPromotorDiv.style.display = 'none';
             thankYouPromotorDiv.style.display = 'block';
             analytics.track("Element Viewed", { elementID: "thankYouPromotorDiv" });
@@ -71,8 +71,9 @@
         triggerShowThankYou.click();
     });
     closeThankYouButton.addEventListener("click", function () {
-        if (authUser) { window.location.href = window.location.origin + "/private"; }
+        if (authUser.current) { window.location.href = window.location.origin + "/private"; }
         else { window.location.href = window.location.origin; }
     });
     sharePersonalLinkFromNpsButton.addEventListener('click', shareCode);
+
 </script>

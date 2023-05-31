@@ -10,15 +10,15 @@
             }
         }
 
-        await db.collection('users').doc(authUser.uid).update({ "preferences.shippingMethod": method }).then(async (docRef) => {
-            console.log(`Shipping method '${method}' stored as preference on user with ID: `, authUser.uid);
+        await db.collection('users').doc(authUser.current.uid).update({ "preferences.shippingMethod": method }).then(async (docRef) => {
+            console.log(`Shipping method '${method}' stored as preference on user with ID: `, authUser.current.uid);
             await batchUpdateShippingMethod(method);
             triggerShippingMethodConfirmationView.click();
         });
     }
 
     async function batchUpdateShippingMethod(shippingMethod) {
-        const items = await getItems(authUser.uid);
+        const items = await getItems(authUser.current.uid);
 
         // Prepare the batch
         let batch = db.batch();
