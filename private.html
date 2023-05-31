@@ -35,13 +35,6 @@
         showReferralSection();
         showAccountInfo();
 
-        if (!emailVerified && email) {
-            let res = getCookie('viewedVerifyEmailDiv');
-            const viewedVerifyEmailDiv = res === 'true';
-            if (!viewedVerifyEmailDiv) {
-                window.location.replace('./user-management?mode=sendEmailVerification');
-            }
-        }
         // Create refCode
         if (user.current && user.current.addressFirstName && user.current.addressLastName && !user.current?.referralData?.referralCode) {
           await createReferralCode();

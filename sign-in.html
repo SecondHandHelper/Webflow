@@ -1,5 +1,4 @@
 <script>
-
   window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sendCodeButton', {
     'size': 'invisible',
     'callback': (response) => {
@@ -33,6 +32,10 @@
     if (preferredSignInMethod === 'password') {
       displayPerferredSignInMethod('emailAndPasswordButton');
     }
+  }
+
+  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+    document.getElementById('maiIntroForPrefillLogin').style.display = 'block';
   }
 
   // Disable Webflow form submit
@@ -167,7 +170,13 @@
         const user = userCredential.user;
         window.userId = user.uid;
         console.log("Logged in user: ", user.uid);
-        authUser.whenSet(signedInNextStep);
+        authUser.whenSet(() => {
+          if (!authUser.current.emailVerified && getCookie('viewedVerifyEmailDiv') !== 'true') {
+            signedInNextStep('./user-management?mode=sendEmailVerification');
+          } else {
+            signedInNextStep();
+          }
+        });
       })
       .catch((error) => {
         console.log("Error message:", error.code, error.message);

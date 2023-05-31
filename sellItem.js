@@ -175,7 +175,7 @@ async function uploadUserImages(itemId, imageData) {
   return Object.assign(...promises);
 }
 
-async function nextStep() {
+async function nextStep(options) {
   if (!authUser.current) {
     // If user isn't logged in they will be taken through these steps:
     // 1. Logg in or create account on the /sign-in page
@@ -183,13 +183,16 @@ async function nextStep() {
     window.location.href = window.location.origin + "/sign-in";
     return
   }
-  await nextStepSignedIn();
+  await nextStepSignedIn(options);
 }
 
-async function nextStepSignedIn() {
+async function nextStepSignedIn(options) {
   const firstNameSet = user.current.addressFirstName;
   // If first name not set, show address form. Else, go to private page.
   if (!firstNameSet) {
+    if (options && options.itemCreatedFromPrefill) {
+      document.getElementById('maiIntroForPrefillAddress').style.display = 'block';
+    }
     addressFormDiv.style.display = 'block';
     addItemFormDiv.style.display = 'none';
     loadingDiv.style.display = 'none';
@@ -206,7 +209,6 @@ function fieldLabelToggle(labelId) {
 
 async function fillForm(itemId, savedItem) {
   try {
-    document.getElementById('cover-spin').style.display = 'block';
     let item = { data: savedItem };
     if (!savedItem) {
       item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId});
@@ -297,7 +299,7 @@ async function fillForm(itemId, savedItem) {
   } catch (error) {
       console.log("Error getting item document:", error);
   }
-  document.getElementById('cover-spin').style.display = 'none';
+  document.getElementById('loadingDiv').style.display = 'none';
 }
 
 function checkBrand(value) {

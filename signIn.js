@@ -42,7 +42,6 @@ async function signedInNextStep(fallbackRedirect) {
       const phone = authUser.current.phoneNumber || sessionStorage.getItem("phoneNumber");
       await updateFirestoreUserDocument(authUser.current.uid, email, phone); //Important that this happens first, since many other functions depend on an existing user document
     }
-    console.log({referrer: document.referrer});
     // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item
     if (userIsSellingNewItem()) {
         window.location.replace('./sell-item');

@@ -1,8 +1,10 @@
 <script>
-  console.log(`showing loading div ${sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')}`)
-    if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
+    if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
       document.getElementById('addItemFormDiv').style.display = 'none';
       document.getElementById('loadingDiv').style.display = 'flex';
+    } else {
+      document.getElementById('addItemFormDiv').style.display = 'block';
+      document.getElementById('loadingDiv').style.display = 'none';
     }
     var userItemsCount;
 </script>
@@ -148,7 +150,7 @@
         if (shippingMethod) {
           await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
         }
-        return await nextStep();
+        return await nextStep({ itemCreatedFromPrefill: true });
       }
 
       // Get user's item count to be able to send 'User Activated' event
@@ -156,7 +158,7 @@
       userItemsCount = items.size;
     }
 
-    function sellItemMain() {
+    async function sellItemMain() {
         // Be om telefonnummer i formuläret
         if (!user.current?.phoneNumber) {
             phoneNumberDiv.style.display = "block";
@@ -172,9 +174,12 @@
 
         // Fill form if the user comes from a prefill link
         if (params.id) {
-          fillForm(params.id);
-        }
-        else {
+          document.getElementById('maiIntroForPrefill').style.display = 'block';
+          await fillForm(params.id);
+          document.getElementById('loadingDiv').style.display = 'none';
+          document.getElementById('addItemFormDiv').style.display = 'block';
+        } else {
+            document.getElementById('addItemFormDiv').style.display = 'block';
             document.getElementById("frontImage").required = true;
             document.getElementById("brandTagImage").required = true;
         }
