@@ -225,7 +225,7 @@ async function fillForm(itemId, savedItem) {
     const age = data.age;
     const condition = data.condition;
     const images = data.images;
-    const coverImageUrl = images.coverImageLarge || images.coverImage;
+    const coverImageUrl = images.coverImageLarge || images.coverImage || null;
 
     // Populate images
     function showPreview(imageName, url) {
@@ -253,7 +253,7 @@ async function fillForm(itemId, savedItem) {
 
     // Show cover image preview
     if (coverImageUrl){
-      document.getElementById('coverImageContainer').style.backgroundImage = coverImageUrl;
+      document.getElementById('coverImageContainer').style.backgroundImage = `url('${coverImageUrl}')`;
       document.getElementById('coverImagePreview').style.display = 'block';
     }
 
