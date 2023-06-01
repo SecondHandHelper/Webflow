@@ -180,7 +180,7 @@ async function nextStep(options) {
     // If user isn't logged in they will be taken through these steps:
     // 1. Logg in or create account on the /sign-in page
     // 2. Get back to /sell-item and continue normal flow (show address if no address, show confirmation div)
-    window.location.href = window.location.origin + "/sign-in";
+    location.href = "/sign-in";
     return
   }
   await nextStepSignedIn(options);
