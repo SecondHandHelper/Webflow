@@ -225,6 +225,7 @@ async function fillForm(itemId, savedItem) {
     const age = data.age;
     const condition = data.condition;
     const images = data.images;
+    const coverImageUrl = data.images.coverImageLarge || data.images.coverImage;
 
     // Populate images
     function showPreview(imageName, url) {
@@ -248,6 +249,12 @@ async function fillForm(itemId, savedItem) {
         showPreview(imageName, urlSmall);
         sessionStorage.setItem(`${imageName}PreviewUrl`, urlLarge); // Store large preview url to create image from on submit
       }
+    }
+
+    // Show cover image preview
+    if (coverImageUrl){
+      document.getElementById('coverImagePreview').style.backgroundImage = coverImageUrl;
+      document.getElementById('coverImagePreview').style.display = 'block';
     }
 
     // Populate text input fields
