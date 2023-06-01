@@ -26,7 +26,7 @@ firebase.auth().onAuthStateChanged(async (result) => {
     analytics.identify({latestPageView: now});
 
     if (path === "/private" || path === "/personal-id-form" || path === "/address-form" || path === "/item" || path === "/ship-item" || path === "/edit-item" || path === "/order-bags") {
-      window.location.replace('./');
+      location.href = './';
     }
   }
 });
@@ -44,10 +44,10 @@ async function signedInNextStep(fallbackRedirect) {
     }
     // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item
     if (userIsSellingNewItem()) {
-        window.location.replace('./sell-item');
+        location.href = './sell-item';
     } else if (fallbackRedirect && typeof fallbackRedirect === 'string') {
-        window.location.replace(fallbackRedirect);
+        location.href = fallbackRedirect;
     } else {
-        window.location.replace('./private');
+        location.href = './private';
     }
 }

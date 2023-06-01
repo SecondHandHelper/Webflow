@@ -197,7 +197,7 @@ async function nextStepSignedIn(options) {
     addItemFormDiv.style.display = 'none';
     loadingDiv.style.display = 'none';
   } else {
-    window.location.href = window.location.origin + "/private";
+    location.href = "/private";
   }
 }
 
