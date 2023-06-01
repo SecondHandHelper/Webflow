@@ -252,7 +252,8 @@ async function fillForm(itemId, savedItem) {
 
     // Populate text input fields
     itemBrand.value = brand;
-    fieldLabelToggle('itemBrandLabel'); // Didn't want to use the setFieldValue for the brand since that triggered a dropdown to open
+    // Don't use the setFieldValue for the brand since that triggers a dropdown to open
+    document.getElementById('itemBrandLabel').style.display = 'inline-block'
     setFieldValue('itemSize', size);
     setFieldValue('itemMaterial', material);
     setFieldValue('itemModel', model);
