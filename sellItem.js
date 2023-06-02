@@ -4,6 +4,12 @@ const imageElements = ["frontImage", "brandTagImage", "productImage", "defectIma
 async function addItem() {
   const id = uuidv4();
   try {
+    const pn = formatPhoneNumber(itemPhoneNumber.value);
+    const pnError = pn.length >= 12 && pn.includes('+') ? '' : 'Ogiltigt mobilnummer';
+    if (pnError) {
+      itemPhoneNumber.setCustomValidity(pnError);
+      return;
+    }
     await addItemInner(id);
 
     // Track with segment 'User Activated'
