@@ -135,7 +135,7 @@
             // Sign in
             firebase.auth().signInWithEmailAndPassword(accountEmail, password)
                 .then((userCredential) => {
-                    window.location.replace('./private');
+                    location.href = './private';
                 })
                 .catch((error) => {
                     console.log("Error message:", error.code, error.message);

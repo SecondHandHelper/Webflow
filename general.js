@@ -148,12 +148,12 @@ async function askForAdditionalUserDetails(userID) {
 
     // Redirect user if user has no address and at least one item that's sold but not shipped
     if (oneItemNotSent == true && addressFirstName == undefined) {
-        window.location.href = window.location.origin + "/address-form";
+        location.href = "/address-form";
     }
 
     // Redirect user to personalId form if they haven't added it yet
     if (oneItemNotPaid == true && personalIdExists == false) {
-        window.location.href = window.location.origin + "/personal-id-form";
+        location.href = "/personal-id-form";
     }
 }
 
@@ -585,7 +585,7 @@ function signOut() {
         authUser.current = null;
         user.current = null;
         userId = null;
-        window.location.href = window.location.origin;
+        location.href = '/';
     }).catch((error) => {
         console.log(error);
     });
@@ -744,7 +744,7 @@ async function addUserAddress() {
     itemRef.update(addressFields)
         .then(() => {
             console.log(`User address of ${authUser.current.uid} is now updated`);
-            window.location.href = window.location.origin + "/private";
+            location.href = "/private";
         })
         .catch((error) => {
             // The document probably doesn't exist.
@@ -773,7 +773,7 @@ async function addPersonalId() {
                 console.error("Error updating document: ", error);
             });
     } else {
-        window.location.href = window.location.origin + "/private";
+        location.href = "/private";
     }
 }
 
