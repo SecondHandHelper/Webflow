@@ -124,6 +124,9 @@ async function addItemInner(id) {
   if (modelCoverImageUrl) {
     images['coverImage'] = modelCoverImageUrl;
     pageData['coverImageUpdatedAt'] = new Date();
+  } else if (sessionStorage.getItem('coverImagePreviewUrl')) {
+    images['coverImgae'] = sessionStorage.getItem('coverImagePreviewUrl');
+    pageData['coverImageUpdatedAt'] = new Date();
   }
   const createdFromItem = params.id ? { createdFromItem: params.id } : {};
   const item = { ...pageData, shippingMethod, images, ...createdFromItem, version: "2" };
@@ -225,7 +228,6 @@ async function fillForm(itemId, savedItem) {
     const age = data.age;
     const condition = data.condition;
     const images = data.images;
-    const coverImageUrl = images.coverImageLarge || images.coverImage || null;
 
     // Populate images
     function showPreview(imageName, url) {
@@ -252,9 +254,12 @@ async function fillForm(itemId, savedItem) {
     }
 
     // Show cover image preview
-    if (coverImageUrl){
-      document.getElementById('coverImageContainer').style.backgroundImage = `url('${coverImageUrl}')`;
+    const coverImageLarge = images.coverImageLarge || images.coverImage || null;
+    const coverImageSmall = images.coverImage || images.coverImageLarge || null;
+    if (coverImageLarge) {
+      document.getElementById('coverImageContainer').style.backgroundImage = `url('${coverImageSmall}')`;
       document.getElementById('coverImagePreview').style.display = 'block';
+      sessionStorage.setItem('coverImagePreviewUrl', coverImageLarge);
     }
 
     // Populate text input fields
