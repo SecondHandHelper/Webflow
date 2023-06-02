@@ -125,7 +125,7 @@ async function addItemInner(id) {
     images['coverImage'] = modelCoverImageUrl;
     pageData['coverImageUpdatedAt'] = new Date();
   } else if (sessionStorage.getItem('coverImagePreviewUrl')) {
-    images['coverImgae'] = sessionStorage.getItem('coverImagePreviewUrl');
+    images['coverImage'] = sessionStorage.getItem('coverImagePreviewUrl');
     pageData['coverImageUpdatedAt'] = new Date();
   }
   const createdFromItem = params.id ? { createdFromItem: params.id } : {};
