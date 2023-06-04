@@ -140,10 +140,11 @@ async function addItemInner(id) {
   // If first time: User submitted their phone number
   const phoneNumber = itemPhoneNumber.value;
   if (phoneNumber) {
+    const pn = formatPhoneNumber(phoneNumber);
     if (authUser.current) {
-      await writePhoneNumberToFirestore(authUser.current.uid, phoneNumber);
+      await writePhoneNumberToFirestore(authUser.current.uid, pn);
     } else {
-      sessionStorage.setItem('phoneNumber', phoneNumber);
+      sessionStorage.setItem('phoneNumber', pn);
     }
   }
 }
