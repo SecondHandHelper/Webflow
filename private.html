@@ -4,10 +4,10 @@
     var phone;
 </script>
 <script>
-      user.whenSet(privateMain);
-      async function privateMain() {
+    user.whenSet(privateMain);
+    async function privateMain() {
         if (!user.current) {
-          return;
+            return;
         }
         userId = authUser.current.uid;
         email = authUser.current.email || sessionStorage.getItem("email");
@@ -34,10 +34,34 @@
         showOrderBagsSection();
         showReferralSection();
         showAccountInfo();
+        showHolidayModeDiv(items);
 
         // Create refCode
         if (user.current && user.current.addressFirstName && user.current.addressLastName && !user.current?.referralData?.referralCode) {
-          await createReferralCode();
+            await createReferralCode();
+        }
+    }
+
+    function showHolidayModeDiv(items) {
+        if (items) {
+            items.forEach((doc) => { // Items is a global variable that equals to querySnapshot from loadCardLists.js
+                var itemId = doc.id;
+                var i = doc.data();
+                let publishedDate = i.publishedDate;
+                const status = i.status;
+                const archived = i.archived;
+
+                if (!archived && status === 'Published' && publishedDate) {
+                    if (publishedDate) {
+                        publishedDate = new Date(publishedDate);
+                        let nowDate = new Date();
+                        const daysDiff = Math.floor((nowDate.getTime() - publishedDate.getTime()) / (1000 * 3600 * 24));
+                        if (daysDiff <= 45) { 
+                            document.getElementById('holidayModeDiv').style.display = 'block';
+                        }
+                    }
+                }
+            });
         }
     }
 
