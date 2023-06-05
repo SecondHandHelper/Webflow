@@ -119,7 +119,6 @@ async function openNewPriceToast(itemId, status, max, min, brand, description, c
         newPrice.innerHTML = `${min}-${max} kr`;
         acceptNewPriceButton.innerHTML = "Sälj till värdering";
         denyNewPriceButton.innerHTML = "Avböj och avsluta";
-        extraInfoText.style.display = 'block';
     }
     if (description !== 'undefined' && description !== '' && description !== 'null') {
         newPriceText.innerHTML = description;
