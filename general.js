@@ -111,7 +111,7 @@ async function askForAdditionalUserDetails(userID) {
     let personalId;
     let personalIdExists = true;
     let oneItemNotPaid = false
-    let oneItemNotSent = false;
+    let pickupShippingMethod = false;
 
     // First, get items with status "Sold" and shippingStatus "Not sent"
     await db.collection("items")
@@ -122,6 +122,7 @@ async function askForAdditionalUserDetails(userID) {
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 status = doc.data().status;
+                shippingMethod = doc.data().shippingMethod;
                 shippingStatus = doc.data().shippingStatus;
                 payoutStatus = doc.data().payoutStatus;
                 if (shippingStatus === "Not sent") {
@@ -130,6 +131,9 @@ async function askForAdditionalUserDetails(userID) {
                 if (payoutStatus !== "Payed") {
                     oneItemNotPaid = true;
                 }
+                if (shippingMethod === "Pickup") {
+                    pickupShippingMethod = true;
+                }
             });
         });
 
@@ -137,6 +141,7 @@ async function askForAdditionalUserDetails(userID) {
     await db.collection("users").doc(userID).get().then((doc) => {
         addressFirstName = doc.data().addressFirstName;
         personalId = doc.data().personalId;
+        shippingMethod = doc.data()?.preferences?.shippingMethod;
         if (personalId) {
             if (personalId === "") {
                 personalIdExists = false;
@@ -144,15 +149,20 @@ async function askForAdditionalUserDetails(userID) {
         } else {
             personalIdExists = false;
         }
+
+        if (shippingMethod == 'Pickup') {
+            pickupShippingMethod = true;
+        }
+
     });
 
-    // Redirect user if user has no address and at least one item that's sold but not shipped
+    // Redirect user if user has no address and at least one item that's sold but not shipped (only if shippingMethod is pickup)
     if (oneItemNotSent == true && addressFirstName == undefined) {
         location.href = "/address-form";
     }
 
     // Redirect user to personalId form if they haven't added it yet
-    if (oneItemNotPaid == true && personalIdExists == false) {
+    if (oneItemNotPaid == true && personalIdExists == false && pickupShippingMethod) {
         location.href = "/personal-id-form";
     }
 }
