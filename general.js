@@ -122,7 +122,6 @@ async function askForAdditionalUserDetails(userID) {
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 status = doc.data().status;
-                shippingMethod = doc.data().shippingMethod;
                 shippingStatus = doc.data().shippingStatus;
                 payoutStatus = doc.data().payoutStatus;
                 if (shippingStatus === "Not sent") {
@@ -130,9 +129,6 @@ async function askForAdditionalUserDetails(userID) {
                 }
                 if (payoutStatus !== "Payed") {
                     oneItemNotPaid = true;
-                }
-                if (shippingMethod === "Pickup") {
-                    pickupShippingMethod = true;
                 }
             });
         });
@@ -149,20 +145,18 @@ async function askForAdditionalUserDetails(userID) {
         } else {
             personalIdExists = false;
         }
-
         if (shippingMethod == 'Pickup') {
             pickupShippingMethod = true;
         }
-
     });
 
     // Redirect user if user has no address and at least one item that's sold but not shipped (only if shippingMethod is pickup)
-    if (oneItemNotSent == true && addressFirstName == undefined) {
+    if (oneItemNotSent == true && addressFirstName == undefined && pickupShippingMethod) {
         location.href = "/address-form";
     }
 
     // Redirect user to personalId form if they haven't added it yet
-    if (oneItemNotPaid == true && personalIdExists == false && pickupShippingMethod) {
+    if (oneItemNotPaid == true && personalIdExists == false) {
         location.href = "/personal-id-form";
     }
 }
