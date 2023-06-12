@@ -127,6 +127,11 @@
         if (user.current?.preferences?.shippingMethod) {
             shippingMethodDiv.style.display = "none";
         }
+        if (featureIsEnabled('colorCategory')) {
+          document.getElementById('itemColorContainer').style.display='block';
+          document.getElementById('itemCategoryContainer').style.display='block';
+          await initializeCategorySelect();
+        }
         // Create item from sessionStorage
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
             await createItemAfterSignIn();
@@ -154,12 +159,6 @@
             $('#servicePointRadioButton').val("Service point");
             $('#pickupRadioButton').val("Pickup");
             shippingMethodDiv.style.display = "block";
-        }
-
-        if (featureIsEnabled('colorCategory')) {
-          document.getElementById('itemColorContainer').style.display='block';
-          document.getElementById('itemCategoryContainer').style.display='block';
-          await initializeCategorySelect();
         }
 
         // Fill form if the user comes from a prefill link
@@ -191,7 +190,6 @@
     itemMaterial.addEventListener('input', fieldLabelToggle('itemMaterialLabel'));
     itemOriginalPrice.addEventListener('input', fieldLabelToggle('itemOriginalPriceLabel'));
     itemAge.addEventListener('input', fieldLabelToggle('itemAgeLabel'));
-    itemCategory.addEventListener('change', fieldLabelToggle('itemCategoryLabel'));
     itemColor.addEventListener('input', fieldLabelToggle('itemColorLabel'))
 
     addItemForm.addEventListener("submit", addItem);

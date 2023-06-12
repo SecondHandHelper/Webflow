@@ -410,6 +410,7 @@ async function initializeCategorySelect() {
       $('.select2-dropdown--below').css('opacity', 1);
     }, 0);
   });
+  $('#itemCategory').on('change', fieldLabelToggle('itemCategoryLabel'));
 }
 
 const itemCategories = [

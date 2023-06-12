@@ -78,7 +78,7 @@
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.28/cookieManagement.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.28/autocomplete-brands.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.28/loadItemCards.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.29/sellItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test289/sellItem.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.28/sellItemModelSearch.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.28/editItem.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.28/private.js"></script>
@@ -198,10 +198,10 @@
   }
 
   // FEATURE TOGGLE FUNCTION
-  var featureConfig = {
-    alpha: { C2C: true, modelDB: true },
-    beta: { C2C: true, modelDB: true },
-    default: { C2C: true, modelDB: false }
+  const featureConfig = {
+    alpha: { C2C: true, modelDB: true, colorCategory: true },
+    beta: { C2C: true, modelDB: true, colorCategory: true },
+    default: { C2C: true, modelDB: false, colorCategory: false }
   };
 
   function featureIsEnabled(featureName) {

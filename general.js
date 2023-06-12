@@ -110,7 +110,8 @@ async function askForAdditionalUserDetails(userID) {
     let addressFirstName = "";
     let personalId;
     let personalIdExists = true;
-    let oneItemNotPaid = false
+    let oneItemNotPaid = false;
+    let oneItemNotSent = false;
     let pickupShippingMethod = false;
 
     // First, get items with status "Sold" and shippingStatus "Not sent"
