@@ -62,8 +62,6 @@ function collect() {
     modelVariantFields = {
       modelCoverImageUrl: modelData['coverImage'],
       atModelVariantId: modelData['atVariantId'],
-      category: modelData['category'],
-      color: modelData['maiColor'],
     }
   }
 
@@ -383,6 +381,13 @@ function initializeSelectColor() {
     }
   };
 }
+
+const toBase64 = file => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = reject;
+});
 
 async function initializeCategorySelect() {
   const optgroupState = {};

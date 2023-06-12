@@ -20,12 +20,19 @@
     let extraImagePreview = document.getElementById("extraImagePreview");
 
     // display image when file has been selected
-    frontImageUpload.onchange = function () {
+    frontImageUpload.onchange = async function () {
         let input = this.files[0];
         if (input) {
             let src = URL.createObjectURL(input);
             frontImagePreviewUploading.style.backgroundImage = `url('${src}')`;
             frontImagePreview.style.backgroundImage = `url('${src}')`;
+            try {
+              const fileAsBase64 = await toBase64(input);
+              const colors = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ base64Img: fileAsBase64 });
+              console.log(colors); // TODO: prefill itemColor
+            } catch (e) {
+              console.log('Error calling detectItemColor', e);
+            }
         }
     };
     brandTagImageUpload.onchange = function () {
