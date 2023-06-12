@@ -75,6 +75,8 @@ function collect() {
     sex,
     size,
     material,
+    color: itemColor.value,
+    category: itemCategory.value,
     brand,
     model,
     originalPrice,
@@ -359,3 +361,372 @@ async function checkAndDisplayShareSold(value) {
     shareSoldDiv.style.display = 'none'
   }
 }
+
+function initializeSelectColor() {
+  const itemColor = document.getElementById("itemColor");
+  itemColor.onchange = function () {
+    let input = this.value;
+    if (input !== "") {
+      itemColor.style.color = "#333";
+    } else {
+      itemColor.style.color = "#929292";
+    }
+  };
+  // Change font color of dropdown itemAge when user selects a value
+  const itemAge = document.getElementById("itemAge");
+  itemAge.onchange = function () {
+    let input = this.value;
+    if (input !== "") {
+      itemAge.style.color = "#333";
+    } else {
+      itemAge.style.color = "#929292";
+    }
+  };
+}
+
+async function initializeCategorySelect() {
+  const optgroupState = {};
+  $('#itemCategory').select2({ selectionCssClass: 'form-field', placeholder: 'Kategori', data: itemCategories });
+
+  $("body").on('click', '.select2-container--open .select2-results__group', function() {
+    $(this).siblings().toggle();
+    let id = $(this).closest('.select2-results__options').attr('id');
+    let index = $('.select2-results__group').index(this);
+    optgroupState[id][index] = !optgroupState[id][index];
+  });
+
+  $('#itemCategory').on('select2:open', function() {
+    $('.select2-dropdown--below').css('opacity', 0);
+    setTimeout(() => {
+      let groups = $('.select2-container--open .select2-results__group');
+      let id = $('.select2-results__options').attr('id');
+      if (!optgroupState[id]) {
+        optgroupState[id] = {};
+      }
+      $.each(groups, (index, v) => {
+        optgroupState[id][index] = optgroupState[id][index] || false;
+        optgroupState[id][index] ? $(v).siblings().show() : $(v).siblings().hide();
+      })
+      $('.select2-dropdown--below').css('opacity', 1);
+    }, 0);
+  });
+}
+
+const itemCategories = [
+  {
+    "id": "",
+    "text": "",
+  },
+  {
+    "text": "Ytterkläder",
+    "children" : [
+      {
+        "id": "Kappa",
+        "text": "Kappa",
+      }, {
+        "id": "Rock",
+        "text": "Rock",
+      }, {
+        "id": "Fritidsjacka",
+        "text": "Fritidsjacka",
+      }, {
+        "id": "Trenchcoat",
+        "text": "Trenchcoat",
+      }, {
+        "id": "Skinnjacka",
+        "text": "Skinnjacka",
+      }, {
+        "id": "Dunjacka",
+        "text": "Dunjacka",
+      }, {
+        "id": "Regnjacka",
+        "text": "Regnjacka",
+      }, {
+        "id": "Pälsjacka",
+        "text": "Pälsjacka",
+      }
+    ]
+  },
+  {
+    "text": "Överdelar",
+    "children" : [
+      {
+        "id": "Tröja",
+        "text": "Tröja",
+      }, {
+        "id": "Blus",
+        "text": "Blus",
+      }, {
+        "id": "Skjorta",
+        "text": "Skjorta",
+      }, {
+        "id": "T-shirt",
+        "text": "T-shirt",
+      }, {
+        "id": "Kavaj",
+        "text": "Kavaj",
+      }, {
+        "id": "Hoodie",
+        "text": "Hoodie",
+      }, {
+        "id": "Topp",
+        "text": "Topp",
+      }, {
+        "id": "Väst",
+        "text": "Väst",
+      }, {
+        "id": "Polotröja",
+        "text": "Polotröja",
+      }, {
+        "id": "Tunika",
+        "text": "Tunika",
+      }, {
+        "id": "Kofta",
+        "text": "Kofta",
+      }, {
+        "id": "Linne",
+        "text": "Linne",
+      }, {
+        "id": "Träningströja",
+        "text": "Träningströja",
+      }, {
+        "id": "Poncho",
+        "text": "Poncho",
+      }, {
+        "id": "Sweatshirt",
+        "text": "Sweatshirt",
+      }, {
+        "id": "Piké",
+        "text": "Piké",
+      }, {
+        "id": "Långärmad T-shirt",
+        "text": "Långärmad T-shirt",
+      }, {
+        "id": "Kostymväst",
+        "text": "Kostymväst",
+      }, {
+        "id": "Linneskjorta",
+        "text": "Linneskjorta",
+      }
+    ]
+  },
+  {
+    "text": "Underdelar",
+    "children" : [
+      {
+        "id": "Byxor",
+        "text": "Byxor",
+      }, {
+        "id": "Shorts",
+        "text": "Shorts",
+      }, {
+        "id": "Kjol",
+        "text": "Kjol",
+      }, {
+        "id": "Jeans",
+        "text": "Jeans",
+      }, {
+        "id": "Fritidsbyxor",
+        "text": "Fritidsbyxor",
+      }, {
+        "id": "Träningsbyxor",
+        "text": "Träningsbyxor",
+      }, {
+        "id": "Tights",
+        "text": "Tights",
+      }, {
+        "id": "Strumpbyxor",
+        "text": "Strumpbyxor",
+      }, {
+        "id": "Mjukisbyxor",
+        "text": "Mjukisbyxor",
+      }, {
+        "id": "Kostymbyxor",
+        "text": "Kostymbyxor",
+      }, {
+        "id": "Chinos",
+        "text": "Chinos",
+      }, {
+        "id": "Sarong",
+        "text": "Sarong",
+      }
+    ]
+  },
+  {
+    "text": "Helkropp",
+    "children" : [
+      {
+        "id": "Jumpsuit",
+        "text": "Jumpsuit",
+      }, {
+        "id": "Klänning",
+        "text": "Klänning",
+      }, {
+        "id": "Kostym",
+        "text": "Kostym",
+      }, {
+        "id": "Set",
+        "text": "Set",
+      }, {
+        "id": "Pyjamas",
+        "text": "Pyjamas",
+      }, {
+        "id": "Baddräkt",
+        "text": "Baddräkt",
+      }, {
+        "id": "Bikini",
+        "text": "Bikini",
+      }, {
+        "id": "Morgonrock",
+        "text": "Morgonrock",
+      }, {
+        "id": "Bröllopsklänning",
+        "text": "Bröllopsklänning",
+      }, {
+        "id": "Balklänning",
+        "text": "Balklänning",
+      }, {
+        "id": "Bodysuit",
+        "text": "Bodysuit",
+      }, {
+        "id": "Underställ",
+        "text": "Underställ",
+      }, {
+        "id": "Kaftan",
+        "text": "Kaftan",
+      }
+    ]
+  },
+  {
+    "text": "Skor",
+    "children" : [
+      {
+        "id": "Ballerinaskor",
+        "text": "Ballerinaskor",
+      }, {
+        "id": "Sneakers",
+        "text": "Sneakers",
+      }, {
+        "id": "Sandaler",
+        "text": "Sandaler",
+      }, {
+        "id": "Klackar",
+        "text": "Klackar",
+      }, {
+        "id": "Boots",
+        "text": "Boots",
+      }, {
+        "id": "Kängor",
+        "text": "Kängor",
+      }, {
+        "id": "Vinterskor",
+        "text": "Vinterskor",
+      }, {
+        "id": "Flip-flops",
+        "text": "Flip-flops",
+      }, {
+        "id": "Loafers",
+        "text": "Loafers",
+      }, {
+        "id": "Annat (Skor)",
+        "text": "Annat (Skor)",
+      }
+    ]
+  },
+  {
+    "text": "Väskor",
+    "children" : [
+      {
+        "id": "Ryggsäck",
+        "text": "Ryggsäck",
+      }, {
+        "id": "Kuvertväska",
+        "text": "Kuvertväska",
+      }, {
+        "id": "Träningsväska",
+        "text": "Träningsväska",
+      }, {
+        "id": "Resväska",
+        "text": "Resväska",
+      }, {
+        "id": "Datorväska",
+        "text": "Datorväska",
+      }, {
+        "id": "Axelremsväska",
+        "text": "Axelremsväska",
+      }, {
+        "id": "Handväska",
+        "text": "Handväska",
+      }, {
+        "id": "Annat (Väska)",
+        "text": "Annat (Väska)",
+      }
+    ]
+  },
+  {
+    "text": "Accessoarer",
+    "children" : [
+      {
+        "id": "Halsduk",
+        "text": "Halsduk",
+      }, {
+        "id": "Hatt",
+        "text": "Hatt",
+      }, {
+        "id": "Mössa",
+        "text": "Mössa",
+      }, {
+        "id": "Vantar",
+        "text": "Vantar",
+      }, {
+        "id": "Örhänge",
+        "text": "Örhänge",
+      }, {
+        "id": "Halsband",
+        "text": "Halsband",
+      }, {
+        "id": "Armband",
+        "text": "Armband",
+      }, {
+        "id": "Glasögon",
+        "text": "Glasögon",
+      }, {
+        "id": "Solglasögon",
+        "text": "Solglasögon",
+      }, {
+        "id": "Keps",
+        "text": "Keps",
+      }, {
+        "id": "Krage",
+        "text": "Krage",
+      }, {
+        "id": "Sjal",
+        "text": "Sjal",
+      }, {
+        "id": "Bälte",
+        "text": "Bälte",
+      }, {
+        "id": "Plånbok",
+        "text": "Plånbok",
+      }, {
+        "id": "Ring",
+        "text": "Ring",
+      }, {
+        "id": "Brosch",
+        "text": "Brosch",
+      }, {
+        "id": "Necessär",
+        "text": "Necessär",
+      }, {
+        "id": "Slips",
+        "text": "Slips",
+      }, {
+        "id": "Handduk",
+        "text": "Handduk",
+      }, {
+        "id": "Klocka",
+        "text": "Klocka",
+      }
+    ]
+  }
+]
