@@ -397,16 +397,16 @@ async function frontImageUploadChangeHandler() {
     frontImagePreview.style.backgroundImage = `url('${src}')`;
     try {
       const fileAsBase64 = await toBase64(input);
-      const colors = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ base64Img: fileAsBase64 });
-      console.log(colors); // TODO: prefill itemColor
+      const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ base64Img: fileAsBase64 });
+      console.log(response); // TODO: prefill itemColor
       document.querySelectorAll('#itemColor option').forEach(opt => {
-        if (colors.result?.['color_names']?.[0].contains(opt.value)) {
+        if (response.data.colors?.['color_names']?.[0].contains(opt.value)) {
           itemColor.value = opt.value;
           $('#itemColor').trigger('change');
         }}
       );
 
-      colors.result?.['color_names']?.[0]
+      response.result?.['color_names']?.[0]
     } catch (e) {
       console.log('Error calling detectItemColor', e);
     }
@@ -440,6 +440,16 @@ async function initializeCategorySelect() {
     }, 0);
   });
   $('#itemCategory').on('change', fieldLabelToggle('itemCategoryLabel'));
+
+  // From https://github.com/select2/select2/issues/3015#issuecomment-570171720
+  $(".select2").on("select2:open", function(){
+    $(".select2-results").css("visibility","hidden");
+  });
+  $(".select2").on('select2:opening', function(){
+    setTimeout(function(){
+      $(".select2-results").css("visibility","visible");
+    },400);
+  });
 }
 
 const itemCategories = [
@@ -450,6 +460,10 @@ const itemCategories = [
   {
     "text": "Ytterkläder",
     "children" : [
+      {
+        "id": "Jacka",
+        "text": "Jacka",
+      },
       {
         "id": "Kappa",
         "text": "Kappa",
