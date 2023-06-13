@@ -389,6 +389,30 @@ const toBase64 = file => new Promise((resolve, reject) => {
   reader.onerror = reject;
 });
 
+async function frontImageUploadChangeHandler() {
+  let input = this.files[0];
+  if (input) {
+    let src = URL.createObjectURL(input);
+    frontImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+    frontImagePreview.style.backgroundImage = `url('${src}')`;
+    try {
+      const fileAsBase64 = await toBase64(input);
+      const colors = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ base64Img: fileAsBase64 });
+      console.log(colors); // TODO: prefill itemColor
+      document.querySelectorAll('#itemColor option').forEach(opt => {
+        if (colors.result?.['color_names']?.[0].contains(opt.value)) {
+          itemColor.value = opt.value;
+          $('#itemColor').trigger('change');
+        }}
+      );
+
+      colors.result?.['color_names']?.[0]
+    } catch (e) {
+      console.log('Error calling detectItemColor', e);
+    }
+  }
+}
+
 async function initializeCategorySelect() {
   const optgroupState = {};
   $('#itemCategory').select2({ selectionCssClass: 'form-field', placeholder: 'Kategori', data: itemCategories });
