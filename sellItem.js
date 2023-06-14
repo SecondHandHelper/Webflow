@@ -415,6 +415,7 @@ async function frontImageUploadChangeHandler() {
 
 async function initializeCategorySelect() {
   const optgroupState = {};
+  const openOptgroup = '';
   $('#itemCategory').select2({ selectionCssClass: 'form-field', placeholder: 'Kategori', data: itemCategories });
 
   $("body").on('click', '.select2-container--open .select2-results__group', function() {
@@ -422,9 +423,10 @@ async function initializeCategorySelect() {
     let id = $(this).closest('.select2-results__options').attr('id');
     let index = $('.select2-results__group').index(this);
     optgroupState[id][index] = !optgroupState[id][index];
+    // TODO: Close the currently open optgroup, if any
   });
 
-  $('#itemCategory').on('select2:open', function() {
+ /* $('#itemCategory').on('select2:open', function() {
     $('.select2-dropdown--below').css('opacity', 0);
     setTimeout(() => {
       let groups = $('.select2-container--open .select2-results__group');
@@ -438,7 +440,7 @@ async function initializeCategorySelect() {
       })
       $('.select2-dropdown--below').css('opacity', 1);
     }, 0);
-  });
+  });*/
   $('#itemCategory').on('change', fieldLabelToggle('itemCategoryLabel'));
 
   // From https://github.com/select2/select2/issues/3015#issuecomment-570171720
