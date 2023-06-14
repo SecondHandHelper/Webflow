@@ -430,7 +430,14 @@ async function initializeCategorySelect() {
   let headerAdded = false;
 
   $('#itemCategory').on('select2:open', function() {
-    document.querySelector('.select2-search__field').placeholder = 'Sök... (t.ex. Klänning, Sneakers)';
+    const searchField = document.querySelector('.select2-search__field');
+    searchField.addEventListener('input', (e) => {
+      if (e.target.value.length === 0) {
+        let groups = $('.select2-container--open .select2-results__group');
+        $.each(groups, (index, v) => $(v).siblings().hide() );
+      }
+    });
+    searchField.placeholder = 'Sök... (t.ex. Klänning, Sneakers)';
     if (!headerAdded) {
       const header = document.getElementById('categoryPopUpHeader');
       const container = document.querySelector('.select2-dropdown');
