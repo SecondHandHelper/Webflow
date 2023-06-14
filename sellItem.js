@@ -417,9 +417,7 @@ async function initializeCategorySelect() {
   let openOptgroup = '';
   $('#itemCategory').select2({ selectionCssClass: 'form-field', placeholder: 'Kategori', data: itemCategories });
 
-  $('body').on('click', '.select2-container', () =>
-    setTimeout(() => $('.select2-search__field').focus(), 50)
-  );
+  $('body').on('click', '.select2-container', () => $('.select2-search__field').focus());
 
   $("body").on('click', '.select2-container--open .select2-results__group', function() {
     $(this).siblings().toggle();
