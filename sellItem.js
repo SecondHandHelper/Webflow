@@ -414,34 +414,22 @@ async function frontImageUploadChangeHandler() {
 }
 
 async function initializeCategorySelect() {
-  const optgroupState = {};
   let openOptgroup = '';
   $('#itemCategory').select2({ selectionCssClass: 'form-field', placeholder: 'Kategori', data: itemCategories });
 
   $("body").on('click', '.select2-container--open .select2-results__group', function() {
     $(this).siblings().toggle();
-    let id = $(this).closest('.select2-results__options').attr('id');
-    let index = $('.select2-results__group').index(this);
-    optgroupState[id][index] = !optgroupState[id][index];
-    // TODO: Close the currently open optgroup, if any
+    // TODO: Make sure the other optgroups are closed
     if (openOptgroup) {
-      openOptgroup.siblings().toggle();
+      openOptgroup.siblings().hide();
     }
-    openOptgroup = $(this);
+    openOptgroup = $(this).siblings()[0].hidden ? '' : $(this);
   });
 
   $('#itemCategory').on('select2:open', function() {
     $('.select2-dropdown--below').css('opacity', 0);
     setTimeout(() => {
-      let groups = $('.select2-container--open .select2-results__group');
-      let id = $('.select2-results__options').attr('id');
-      if (!optgroupState[id]) {
-        optgroupState[id] = {};
-      }
-      $.each(groups, (index, v) => {
-        optgroupState[id][index] = optgroupState[id][index] || false;
-        optgroupState[id][index] ? $(v).siblings().show() : $(v).siblings().hide();
-      })
+      $(v).siblings().hide();
       $('.select2-dropdown--below').css('opacity', 1);
     }, 0);
   });
@@ -455,7 +443,7 @@ async function initializeCategorySelect() {
   $("#itemCategory").on('select2:opening', function(){
     setTimeout(function(){
       $(".select2-results").css("visibility","visible");
-    },400);
+    },50);
   });
 }
 
