@@ -447,12 +447,13 @@ async function initializeCategorySelect() {
       header.querySelector('#categorySelectClose').onclick = () => $('#itemCategory').select2('close');
       headerAdded = true;
     }
-    $('.select2-dropdown--below').css('opacity', 0);
+    $('.select2-dropdown').css('opacity', 0);
     setTimeout(() => {
       let groups = $('.select2-container--open .select2-results__group');
       $.each(groups, (index, v) => $(v).siblings().hide() );
-      $('.select2-dropdown--below').css('opacity', 1);
+      $('.select2-dropdown').css('opacity', 1);
     }, 0);
+    document.querySelector('.select2-results__options').addEventListener('scroll', () => document.activeElement.blur());
   });
 
   $('#itemCategory').on('change', fieldLabelToggle('itemCategoryLabel'));
