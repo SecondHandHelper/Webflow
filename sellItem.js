@@ -427,7 +427,18 @@ async function initializeCategorySelect() {
     openOptgroup = $(this).siblings()[0].hidden ? '' : $(this);
   });
 
+  let headerAdded = false;
+
   $('#itemCategory').on('select2:open', function() {
+    const searchField = document.querySelector('.select2-search__field');
+    searchField.placeholder = 'Sök... (t.ex. Klänning, Sneakers)';
+    if (!headerAdded) {
+      const header = document.getElementById('categoryPopUpHeader');
+      header.style.display = 'block';
+      header.getElementById('categorySelectClose').onclick = () => $('#itemCategory').select2('close');
+      searchField.insertBefore(header, searchField.firstChild);
+      headerAdded = true;
+    }
     $('.select2-dropdown--below').css('opacity', 0);
     setTimeout(() => {
       let groups = $('.select2-container--open .select2-results__group');
@@ -440,19 +451,13 @@ async function initializeCategorySelect() {
 
   // From https://github.com/select2/select2/issues/3015#issuecomment-570171720
   $("#itemCategory").on("select2:open", function(){
-    $(".select2-results").css("visibility","hidden");
+    $(".select2-results").css("visibility", "hidden");
   });
   $("#itemCategory").on('select2:opening', function(){
     setTimeout(function(){
-      $(".select2-results").css("visibility","visible");
+      $(".select2-results").css("visibility", "visible");
     },50);
   });
-  const searchField = document.querySelector('.select2-search__field');
-  searchField.placeholder = 'Sök... (t.ex. Klänning, Sneakers)';
-  const header = document.getElementById('categoryPopUpHeader');
-  header.style.display = 'block';
-  header.getElementById('categorySelectClose').onclick = () => $('#itemCategory').select2('close');
-  searchField.insertBefore(header, searchField.firstChild);
 }
 
 const itemCategories = [
