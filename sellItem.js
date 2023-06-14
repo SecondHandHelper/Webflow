@@ -444,10 +444,10 @@ async function initializeCategorySelect() {
   $('#itemCategory').on('change', fieldLabelToggle('itemCategoryLabel'));
 
   // From https://github.com/select2/select2/issues/3015#issuecomment-570171720
-  $(".select2").on("select2:open", function(){
+  $("#itemCategory").on("select2:open", function(){
     $(".select2-results").css("visibility","hidden");
   });
-  $(".select2").on('select2:opening', function(){
+  $("#itemCategory").on('select2:opening', function(){
     setTimeout(function(){
       $(".select2-results").css("visibility","visible");
     },400);
