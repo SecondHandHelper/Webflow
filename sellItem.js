@@ -447,13 +447,12 @@ async function initializeCategorySelect() {
       $(".select2-results").css("visibility","visible");
     },50);
   });
-
-  document.querySelector("#itemCategory").parentElement.addEventListener("click", function(){
-    const searchField = document.querySelector('.select2-search__field');
-    if (searchField) {
-      searchField.focus();
-    }
-  });
+  const searchField = document.querySelector('.select2-search__field');
+  searchField.placeholder = 'Sök... (t.ex. Klänning, Sneakers)';
+  const header = document.getElementById('categoryPopUpHeader');
+  header.style.display = 'block';
+  header.getElementById('categorySelectClose').onclick = () => $('#itemCategory').select2('close');
+  searchField.insertBefore(header, searchField.firstChild);
 }
 
 const itemCategories = [
