@@ -429,7 +429,8 @@ async function initializeCategorySelect() {
   $('#itemCategory').on('select2:open', function() {
     $('.select2-dropdown--below').css('opacity', 0);
     setTimeout(() => {
-      $(v).siblings().hide();
+      let groups = $('.select2-container--open .select2-results__group');
+      $.each(groups, (index, v) => $(v).siblings().hide() );
       $('.select2-dropdown--below').css('opacity', 1);
     }, 0);
   });
