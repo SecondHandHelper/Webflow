@@ -416,7 +416,6 @@ async function frontImageUploadChangeHandler() {
 async function initializeCategorySelect() {
   let openOptgroup = '';
   $('#itemCategory').select2({ selectionCssClass: 'form-field', placeholder: 'Kategori', data: itemCategories });
-
   $('body').on('click', '.select2-container', () => $('.select2-search__field').focus());
 
   $("body").on('click', '.select2-container--open .select2-results__group', function() {
@@ -429,7 +428,9 @@ async function initializeCategorySelect() {
 
   let headerAdded = false;
 
+  $('#itemCategory').on('select2:close', () => document.querySelector('body').style.overflow = 'auto');
   $('#itemCategory').on('select2:open', function() {
+    document.querySelector('body').style.overflow =  'hidden';
     const searchField = document.querySelector('.select2-search__field');
     searchField.addEventListener('input', (e) => {
       if (e.target.value.length === 0) {
