@@ -430,13 +430,13 @@ async function initializeCategorySelect() {
   let headerAdded = false;
 
   $('#itemCategory').on('select2:open', function() {
-    const searchField = document.querySelector('.select2-search__field');
-    searchField.placeholder = 'Sök... (t.ex. Klänning, Sneakers)';
+    document.querySelector('.select2-search__field').placeholder = 'Sök... (t.ex. Klänning, Sneakers)';
     if (!headerAdded) {
       const header = document.getElementById('categoryPopUpHeader');
+      const container = document.querySelector('.select2-dropdown');
+      container.insertBefore(header, container.firstChild);
       header.style.display = 'block';
-      header.getElementById('categorySelectClose').onclick = () => $('#itemCategory').select2('close');
-      searchField.insertBefore(header, searchField.firstChild);
+      header.querySelector('#categorySelectClose').onclick = () => $('#itemCategory').select2('close');
       headerAdded = true;
     }
     $('.select2-dropdown--below').css('opacity', 0);
