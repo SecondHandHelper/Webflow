@@ -417,9 +417,12 @@ async function initializeCategorySelect() {
   let openOptgroup = '';
   $('#itemCategory').select2({ selectionCssClass: 'form-field', placeholder: 'Kategori', data: itemCategories });
 
+  $('.select2-container').on('click', function() {
+    $('.select2-search__field').focus()
+  });
+
   $("body").on('click', '.select2-container--open .select2-results__group', function() {
     $(this).siblings().toggle();
-    // TODO: Make sure the other optgroups are closed
     if (openOptgroup) {
       openOptgroup.siblings().hide();
     }
@@ -445,6 +448,13 @@ async function initializeCategorySelect() {
     setTimeout(function(){
       $(".select2-results").css("visibility","visible");
     },50);
+  });
+
+  document.querySelector("#itemCategory").parentElement.addEventListener("click", function(){
+    const searchField = document.querySelector('.select2-search__field');
+    if (searchField) {
+      searchField.focus();
+    }
   });
 }
 
