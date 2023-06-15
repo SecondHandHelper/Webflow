@@ -30,6 +30,10 @@ const selectSize = (modelClicked) => (event) => {
     document.getElementById('itemAge').style.color = 'rgb(51, 51, 51)';
     document.getElementById('itemAge').dispatchEvent(new Event('input'));
   }
+  document.getElementById('itemCategory').value = model['category'];
+  $('#itemCategory').trigger('change');
+  document.getElementById('itemColor').value = model['color'];
+  $('#itemColor').trigger('change');
   document.getElementById('findModelDiv').scrollIntoView(true);
 }
 
