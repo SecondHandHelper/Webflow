@@ -400,7 +400,7 @@ async function frontImageUploadChangeHandler() {
       const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ base64Img: fileAsBase64 });
       console.log(response); // TODO: prefill itemColor
       document.querySelectorAll('#itemColor option').forEach(opt => {
-        if (response.data.colors?.['color_names']?.[0].contains(opt.value)) {
+        if (response.data.colors?.['color_names']?.[0].indexOf(opt.value) >= 0) {
           itemColor.value = opt.value;
           $('#itemColor').trigger('change');
         }}
