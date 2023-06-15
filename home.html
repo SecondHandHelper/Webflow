@@ -8,8 +8,16 @@
   }
 </script>
 <script>
+  authUser.whenSet(signedInNextStep);
   loadRecentlySold();
   fetchAndLoadRecentlyAddedItems()
+
+  // Set attribution cookies (could be put on any campaign page)
+  checkCookie("utm_campaign");
+  checkCookie("utm_source");
+  checkCookie("utm_medium");
+  checkCookie("utm_term");
+  checkCookie("utm_content");
 
   // Set invite code cookie
   checkCookie("invite");
