@@ -420,7 +420,7 @@ async function initializeCategorySelect() {
     if ($(this).parent().attr('class').match(/expanded-group/)) {
       $(this).parent().removeClass('expanded-group');
     } else {
-      $('.expandedGroup').first().removeClass('expanded-group');
+      $('.expanded-group').first().removeClass('expanded-group');
       $(this).parent().addClass('expanded-group');
     }
   });
