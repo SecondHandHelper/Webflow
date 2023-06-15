@@ -1,3 +1,5 @@
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.full.min.js"></script>
 <script>
     var userItemsCount;
 </script>
@@ -18,14 +20,7 @@
     let extraImagePreview = document.getElementById("extraImagePreview");
 
     // display image when file has been selected
-    frontImageUpload.onchange = function () {
-        let input = this.files[0];
-        if (input) {
-            let src = URL.createObjectURL(input);
-            frontImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-            frontImagePreview.style.backgroundImage = `url('${src}')`;
-        }
-    };
+    frontImageUpload.onchange = frontImageUploadChangeHandler;
     brandTagImageUpload.onchange = function () {
         let input = this.files[0];
         if (input) {
@@ -67,17 +62,6 @@
             let src = URL.createObjectURL(input);
             extraImagePreviewUploading.style.backgroundImage = `url('${src}')`;
             extraImagePreview.style.backgroundImage = `url('${src}')`;
-        }
-    };
-
-    // Change font color of dropdown itemAge when user selects a value
-    let itemAge = document.getElementById("itemAge");
-    itemAge.onchange = function () {
-        let input = this.value;
-        if (input != "") {
-            itemAge.style.color = "#333";
-        } else {
-            itemAge.style.color = "#929292";
         }
     };
 
@@ -136,6 +120,11 @@
         if (user.current?.preferences?.shippingMethod) {
             shippingMethodDiv.style.display = "none";
         }
+        if (featureIsEnabled('colorCategory')) {
+          document.getElementById('itemColorContainer').style.display='block';
+          document.getElementById('itemCategoryContainer').style.display='block';
+          await initializeCategorySelect();
+        }
         // Create item from sessionStorage
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
             await createItemAfterSignIn();
@@ -167,7 +156,7 @@
 
         // Fill form if the user comes from a prefill link
         if (params.id) {
-            auth.onAuthStateChanged(function (user) { 
+            auth.onAuthStateChanged(function (user) {
                 if (!user) {document.getElementById('maiIntro').style.display = 'block';}
             });
             document.getElementById('resellIntro').style.display = 'block';
@@ -186,13 +175,15 @@
     }
 
     // Initial state
+    setupModelSearchEventListeners();
+    initializeSelectColor();
     itemBrand.addEventListener('input', fieldLabelToggle('itemBrandLabel'));
     itemModel.addEventListener('input', fieldLabelToggle('itemModelLabel'));
     itemSize.addEventListener('input', fieldLabelToggle('itemSizeLabel'));
     itemMaterial.addEventListener('input', fieldLabelToggle('itemMaterialLabel'));
     itemOriginalPrice.addEventListener('input', fieldLabelToggle('itemOriginalPriceLabel'));
     itemAge.addEventListener('input', fieldLabelToggle('itemAgeLabel'));
-    setupModelSearchEventListeners();
+    itemColor.addEventListener('input', fieldLabelToggle('itemColorLabel'))
 
     addItemForm.addEventListener("submit", addItem);
     userAddressForm.addEventListener("submit", addUserDetails);

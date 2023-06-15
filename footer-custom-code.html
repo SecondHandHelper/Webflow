@@ -72,14 +72,14 @@
 </script>
 
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.33/signIn.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.33/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test307/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.33/infoRequestsFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.33/referralFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.33/cookieManagement.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.33/autocomplete-brands.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.33/loadItemCards.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.33/sellItem.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.33/sellItemModelSearch.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test307/sellItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test307/sellItemModelSearch.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.33/editItem.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.33/private.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.33/settings.js"></script>
@@ -198,10 +198,10 @@
   }
 
   // FEATURE TOGGLE FUNCTION
-  var featureConfig = {
-    alpha: { C2C: true, modelDB: true },
-    beta: { C2C: true, modelDB: true },
-    default: { C2C: true, modelDB: false }
+  const featureConfig = {
+    alpha: { C2C: true, modelDB: true, colorCategory: true },
+    beta: { C2C: true, modelDB: true, colorCategory: true },
+    default: { C2C: true, modelDB: false, colorCategory: false }
   };
 
   function featureIsEnabled(featureName) {
