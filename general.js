@@ -90,8 +90,8 @@ async function updateFirestoreUserDocument(userId, email, phone) {
             // Create User Document
             await docRef.set(fields);
             console.log(`User document was created with id ${userId} and these fields: `, fields);
+            identify(authUser.current, fields);
             user.current = fields;
-            identify(authUser.current, user.current);
 
             // Connect referral user from invite cookie only when creating user doc
             const inputCode = checkCookie("invite");

@@ -143,10 +143,10 @@
     let createdAt = new Date(authenticatedUser.metadata.creationTime).toISOString();
     let latestLogin = new Date(authenticatedUser.metadata.lastSignInTime).toISOString();
     let signInMethod = authenticatedUser.providerData[0].providerId;
-    const firstName = authenticatedUser.addressFirstName ? user.current.addressFirstName : null;
-    const lastName = authenticatedUser.addressLastName ? user.current.addressLastName : null;
-    const email = authenticatedUser.email ? dbUser.email : null;
-    const phone = authenticatedUser.phoneNumber ? dbUser.phoneNumber : null;
+    const firstName = dbUser.addressFirstName ? dbUser.addressFirstName : null;
+    const lastName = dbUser.addressLastName ? dbUser.addressLastName : null;
+    const email = dbUser.email ? dbUser.email : null;
+    const phone = dbUser.phoneNumber ? dbUser.phoneNumber : null;
     const street = dbUser.addressStreetAddress ? dbUser.addressStreetAddress : null;
     const city = dbUser.addressCity ? dbUser.addressCity : null;
     const postalCode = dbUser.addressPostalCode ? dbUser.addressPostalCode : null;
