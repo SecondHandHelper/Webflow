@@ -416,13 +416,19 @@ async function frontImageUploadChangeHandler() {
 async function initializeCategorySelect() {
   let openOptgroup = '';
   $('#itemCategory').select2({ selectionCssClass: 'form-field', placeholder: 'Kategori', data: itemCategories });
-
-  $("body").on('click', '.select2-container--open .select2-results__group', function() {
-    $(this).siblings().toggle();
-    if (openOptgroup) {
-      openOptgroup.siblings().hide();
+  $("body").on('click', '.select2-container--open .select2-results__option[role=group]', function() {
+    if ($(this).siblings()[0].hidden) {
+      $(this).siblings().show();
+      $(this).style.transform = 'rotate(180deg)';
+      if (openOptgroup) {
+        openOptgroup.siblings().hide();
+        openOptgroup = $(this);
+      }
+    } else {
+      $(this).siblings().hide();
+      $(this).style.transform = '';
+      openOptgroup = null;
     }
-    openOptgroup = $(this).siblings()[0].hidden ? '' : $(this);
   });
 
   let headerAdded = false;
