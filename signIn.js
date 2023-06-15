@@ -11,9 +11,8 @@ firebase.auth().onAuthStateChanged(async (result) => {
       const doc = await db.collection("users").doc(authenticated.uid).get();
       authUser.current = authenticated;
       if (doc.exists) {
-        console.log(`calling identify with ${JSON.stringify(authenticated)} - ${JSON.stringify(doc.data)}`)
-        identify(authenticated, doc.data);
-        console.log("user:", doc.data);
+        identify(authenticated, doc.data());
+        console.log("user:", doc.data());
         user.current = doc.data();
       }
     } catch (error) {
