@@ -425,12 +425,18 @@ async function initializeCategorySelect() {
   });
 
   let headerAdded = false;
-
   $('#itemCategory').on('select2:close', () => document.querySelector('body').style.overflow = 'auto');
   $('#itemCategory').on('select2:open', function() {
     document.querySelector('body').style.overflow =  'hidden';
     const searchField = document.querySelector('.select2-search__field');
     searchField.placeholder = 'Sök... (t.ex. Klänning, Sneakers)';
+    $('.select2-search__field').on('input', (e) => {
+      if (e.target.value.length > 0) {
+        $('.select2-results__option[role=group]').each((idx, elm) => $(elm).addClass('expanded-group'));
+      } else {
+        $('.expanded-group').each((idx, elm) => $(elm).removeClass('expanded-group'));
+      }
+    });
     if (!headerAdded) {
       const header = document.getElementById('categoryPopUpHeader');
       const container = document.querySelector('.select2-dropdown');
