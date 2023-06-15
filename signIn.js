@@ -7,10 +7,10 @@ firebase.auth().onAuthStateChanged(async (result) => {
     const authenticated = result;
     try {
       setPreferredLogInMethodCookie(authenticated.providerData[0].providerId);
-      console.log("authenticated", authenticated);
       console.log("authUser", authUser.current);
-      const doc = await db.collection("users").doc(authUser.current.uid).get();
+      const doc = await db.collection("users").doc(authenticated.uid).get();
       if (doc.exists) {
+        console.log(`calling identify with ${JSON.stringify(authenticated)} - ${JSON.stringify(doc.data)}`)
         identify(authenticated, doc.data);
         console.log("user:", doc.data);
         user.current = doc.data();

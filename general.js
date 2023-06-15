@@ -90,6 +90,7 @@ async function updateFirestoreUserDocument(userId, email, phone) {
             // Create User Document
             await docRef.set(fields);
             console.log(`User document was created with id ${userId} and these fields: `, fields);
+            console.log(`calling identify with ${JSON.stringify(authUser.current)} - ${JSON.stringify(fields)}`)
             identify(authUser.current, fields);
             user.current = fields;
 
