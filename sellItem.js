@@ -429,7 +429,7 @@ async function initializeCategorySelect() {
   $('#itemCategory').on('select2:open', function() {
     document.querySelector('body').style.overflow =  'hidden';
     const searchField = document.querySelector('.select2-search__field');
-    searchField.placeholder = 'Sök... (t.ex. Klänning, Sneakers)';
+    searchField.placeholder = 'Sök... (t.ex. Klänning/Sneakers/Blus)';
     $('.select2-search__field').on('input', (e) => {
       if (e.target.value.length > 0) {
         $('.select2-results__option[role=group]').each((idx, elm) => $(elm).addClass('expanded-group'));
@@ -465,40 +465,6 @@ const itemCategories = [
   {
     "id": "",
     "text": "",
-  },
-  {
-    "text": "Ytterkläder",
-    "children" : [
-      {
-        "id": "Jacka",
-        "text": "Jacka",
-      },
-      {
-        "id": "Kappa",
-        "text": "Kappa",
-      }, {
-        "id": "Rock",
-        "text": "Rock",
-      }, {
-        "id": "Fritidsjacka",
-        "text": "Fritidsjacka",
-      }, {
-        "id": "Trenchcoat",
-        "text": "Trenchcoat",
-      }, {
-        "id": "Skinnjacka",
-        "text": "Skinnjacka",
-      }, {
-        "id": "Dunjacka",
-        "text": "Dunjacka",
-      }, {
-        "id": "Regnjacka",
-        "text": "Regnjacka",
-      }, {
-        "id": "Pälsjacka",
-        "text": "Pälsjacka",
-      }
-    ]
   },
   {
     "text": "Överdelar",
@@ -647,6 +613,40 @@ const itemCategories = [
       }, {
         "id": "Kaftan",
         "text": "Kaftan",
+      }
+    ]
+  },
+  {
+    "text": "Ytterkläder",
+    "children" : [
+      {
+        "id": "Jacka",
+        "text": "Jacka",
+      },
+      {
+        "id": "Kappa",
+        "text": "Kappa",
+      }, {
+        "id": "Rock",
+        "text": "Rock",
+      }, {
+        "id": "Fritidsjacka",
+        "text": "Fritidsjacka",
+      }, {
+        "id": "Trenchcoat",
+        "text": "Trenchcoat",
+      }, {
+        "id": "Skinnjacka",
+        "text": "Skinnjacka",
+      }, {
+        "id": "Dunjacka",
+        "text": "Dunjacka",
+      }, {
+        "id": "Regnjacka",
+        "text": "Regnjacka",
+      }, {
+        "id": "Pälsjacka",
+        "text": "Pälsjacka",
       }
     ]
   },
