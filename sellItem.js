@@ -425,9 +425,15 @@ async function initializeCategorySelect() {
   });
 
   let headerAdded = false;
-  $('#itemCategory').on('select2:close', () => document.querySelector('body').style.overflow = 'auto');
+  $('#itemCategory').on('select2:close', () => {
+    document.querySelector('body').style.overflow = 'auto'
+    document.querySelector('body').style.position =  'static';
+    document.querySelector('html').style.overflow =  'static';
+  });
   $('#itemCategory').on('select2:open', function() {
     document.querySelector('body').style.overflow =  'hidden';
+    document.querySelector('body').style.position =  'fixed';
+    document.querySelector('html').style.overflow =  'fixed';
     const searchField = document.querySelector('.select2-search__field');
     searchField.placeholder = 'Sök... (t.ex. Klänning, Sneakers)';
     $('.select2-search__field').on('input', (e) => {
