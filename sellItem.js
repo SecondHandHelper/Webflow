@@ -687,7 +687,7 @@ const itemCategories = [
         "id": "Loafers",
         "text": "Loafers",
       }, {
-        "id": "Annat (Skor)",
+        "id": "Skor",
         "text": "Annat (Skor)",
       }
     ]
@@ -717,7 +717,7 @@ const itemCategories = [
         "id": "Handväska",
         "text": "Handväska",
       }, {
-        "id": "Annat (Väska)",
+        "id": "Väska",
         "text": "Annat (Väska)",
       }
     ]
