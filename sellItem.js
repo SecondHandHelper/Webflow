@@ -445,8 +445,6 @@ async function detectAndFillColor(input) {
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
     document.querySelector('#itemColorContainer').classList.add('confirm-value');
-    document.querySelector('#itemColor').disabled = 'disabled';
-
   } catch (e) {
     console.log('Error calling detectItemColor', e);
   }
