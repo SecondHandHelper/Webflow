@@ -427,7 +427,7 @@ async function frontImageUploadChangeHandler() {
   }
 }
 
-async function detectAndFillColor() {
+async function detectAndFillColor(input) {
   try {
     const fileAsBase64 = await toBase64(input);
     const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ base64Img: fileAsBase64 });
