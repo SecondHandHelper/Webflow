@@ -422,7 +422,7 @@ async function frontImageUploadChangeHandler() {
     frontImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     frontImagePreview.style.backgroundImage = `url('${src}')`;
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillColor();
+      await detectAndFillColor(input);
     }
   }
 }
