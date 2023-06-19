@@ -438,9 +438,11 @@ async function detectAndFillColor(input) {
     }
     if (response.data.colors.length > 2) {
       document.querySelector('#itemColor').value = 'Multicolour';
-    }
-    if (apiColorMapping[response.data.colors?.[0]]) {
+    } else if (apiColorMapping[response.data.colors?.[0]]) {
       document.querySelector('#itemColor').value = apiColorMapping[response.data.colors?.[0]];
+    } else {
+      console.log("Unable to set color from", response.data.colors?.[0]);
+      return;
     }
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
