@@ -124,6 +124,7 @@
           document.getElementById('itemColorContainer').style.display='block';
           document.getElementById('itemCategoryContainer').style.display='block';
           await initializeCategorySelect();
+          await initializeColorSelect();
         }
         // Create item from sessionStorage
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
@@ -183,7 +184,7 @@
     itemMaterial.addEventListener('input', fieldLabelToggle('itemMaterialLabel'));
     itemOriginalPrice.addEventListener('input', fieldLabelToggle('itemOriginalPriceLabel'));
     itemAge.addEventListener('input', fieldLabelToggle('itemAgeLabel'));
-    itemColor.addEventListener('input', fieldLabelToggle('itemColorLabel'))
+    itemColor.addEventListener('input', fieldLabelToggle('itemColorLabel'));
 
     addItemForm.addEventListener("submit", addItem);
     userAddressForm.addEventListener("submit", addUserDetails);

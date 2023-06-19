@@ -389,28 +389,77 @@ const toBase64 = file => new Promise((resolve, reject) => {
   reader.onerror = reject;
 });
 
+const apiColorMapping = {
+  "black": "Black",
+  "white":"White",
+  "gray": "Grey",
+  "blue": "Blue",
+  "dark_blue": "Navy",
+  "multicolor/colorful": 'Multicolour',
+  "red": "Red",
+  "pink": "Pink",
+  "brown": "Brown",
+  "beige": "Beige",
+  "light_blue": "Blue",
+  "green": "Green",
+  "silver": "Silver",
+  "purple": "Purple",
+  "maroon": "Burgundy",
+  "gold": "Gold",
+  "orange": "Orange",
+  "yellow": "Yellow",
+  "teal": "Turquoise",
+  "olive": "Green",
+  "cyan": "Turquoise",
+  "magenta": "Pink",
+  "mustard": "Yellow"
+};
+
 async function frontImageUploadChangeHandler() {
   let input = this.files[0];
   if (input) {
     let src = URL.createObjectURL(input);
     frontImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     frontImagePreview.style.backgroundImage = `url('${src}')`;
-    try {
-      const fileAsBase64 = await toBase64(input);
-      const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ base64Img: fileAsBase64 });
-      console.log(response); // TODO: prefill itemColor
-      document.querySelectorAll('#itemColor option').forEach(opt => {
-        if (response.data.colors?.['color_names']?.[0].indexOf(opt.value) >= 0) {
-          itemColor.value = opt.value;
-          $('#itemColor').trigger('change');
-        }}
-      );
-
-      response.result?.['color_names']?.[0]
-    } catch (e) {
-      console.log('Error calling detectItemColor', e);
+    if (featureIsEnabled('colorCategory')) {
+      await detectAndFillColor();
     }
   }
+}
+
+async function detectAndFillColor() {
+  try {
+    const fileAsBase64 = await toBase64(input);
+    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ base64Img: fileAsBase64 });
+    console.log(response);
+    if (!response.data?.colors || !response.data.colors.length) {
+      console.log("Unable to detect product color");
+      return;
+    }
+    if (response.data.colors.length > 2) {
+      document.querySelector('#itemColor').value = 'Multicolour';
+    }
+    if (apiColorMapping[response.data.colors?.[0]]) {
+      document.querySelector('#itemColor').value = apiColorMapping[response.data.colors?.[0]];
+    }
+    document.querySelector('#itemColor').dispatchEvent(new Event('change'));
+    document.querySelector('#itemColor').dispatchEvent(new Event('input'));
+    document.querySelector('#itemColorContainer').classList.add('confirm-value');
+  } catch (e) {
+    console.log('Error calling detectItemColor', e);
+  }
+}
+
+async function initializeColorSelect() {
+  document.getElementById('rejectColor').addEventListener('click', () => {
+    document.querySelector('#itemColor').value = '';
+    document.querySelector('#itemColor').dispatchEvent(new Event('change'));
+    document.querySelector('#itemColor').dispatchEvent(new Event('input'));
+    document.querySelector('#itemColorContainer').classList.remove('confirm-value');
+  });
+  document.getElementById('confirmColor').addEventListener('click', () => {
+    document.querySelector('#itemColorContainer').classList.remove('confirm-value');
+  })
 }
 
 async function initializeCategorySelect() {
