@@ -450,7 +450,7 @@ async function detectAndFillBrand(input) {
     }
     document.querySelector('#itemBrand').value = response.data.brand;
     document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
-    fieldLabelToggle('itemBrandLabel')();
+    document.getElementById('itemBrandLabel').style.display = 'inline-block';
     document.querySelector('#itemBrandContainer').classList.add('confirm-value');
   } catch (e) {
     console.log('Error calling detectItemBrand', e);
