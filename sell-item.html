@@ -118,6 +118,7 @@
           document.getElementById('itemCategoryContainer').style.display='block';
           await initializeCategorySelect();
           await initializeColorSelect();
+          await initializeBrandConfirm();
         }
         // Create item from sessionStorage
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {

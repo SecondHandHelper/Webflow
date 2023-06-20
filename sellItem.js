@@ -482,6 +482,18 @@ async function detectAndFillColor(input) {
   }
 }
 
+async function initializeBrandConfirm() {
+  document.getElementById('rejectBrand').addEventListener('click', () => {
+    document.querySelector('#itemBrand').value = '';
+    document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
+    document.querySelector('#itemBrand').dispatchEvent(new Event('input'));
+    document.querySelector('#itemBrandContainer').classList.remove('confirm-value');
+  });
+  document.getElementById('confirmBrand').addEventListener('click', () => {
+    document.querySelector('#itemBrandContainer').classList.remove('confirm-value');
+  })
+}
+
 async function initializeColorSelect() {
   document.getElementById('rejectColor').addEventListener('click', () => {
     document.querySelector('#itemColor').value = '';
