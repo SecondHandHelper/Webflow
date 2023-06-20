@@ -430,7 +430,7 @@ async function frontImageUploadChangeHandler() {
 async function brandTagImageUploadChangeHandler() {
   let input = this.files[0];
   if (input) {
-    let src = URL.createObjectURL(input);
+    const src = URL.createObjectURL(input);
     brandTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     brandTagImagePreview.style.backgroundImage = `url('${src}')`;
     if (featureIsEnabled('colorCategory')) {
@@ -450,7 +450,7 @@ async function detectAndFillBrand(input) {
     }
     document.querySelector('#itemBrand').value = response.data.brand;
     document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
-    document.querySelector('#itemBrand').dispatchEvent(new Event('input'));
+    fieldLabelToggle('itemBrandLabel')();
     document.querySelector('#itemBrandContainer').classList.add('confirm-value');
   } catch (e) {
     console.log('Error calling detectItemBrand', e);
