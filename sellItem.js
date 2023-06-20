@@ -4,10 +4,10 @@ const imageElements = ["frontImage", "brandTagImage", "productImage", "defectIma
 async function addItem(event) {
   if (document.querySelector('.confirm-value')) {
     event.preventDefault();
-    document.querySelectorAll('.confirm-value').forEach(element => {
+    for (const element of document.querySelectorAll('.confirm-value input')) {
       element.setCustomValidity('Du måste bekräfta eller ta bort det ifyllda värdet');
       element.reportValidity();
-    });
+    }
     return false;
   }
   const id = uuidv4();
