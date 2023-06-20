@@ -1,7 +1,14 @@
 const defectsChoicesInSwedish = new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
 const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
 
-async function addItem() {
+async function addItem(event) {
+  if (document.querySelector('.confirm-value')) {
+    event.preventDefault();
+    document.querySelectorAll('.confirm-value').forEach(element => {
+      element.setCustomValidity('Du måste bekräfta eller ta bort det ifyllda värdet');
+    });
+    return false;
+  }
   const id = uuidv4();
   try {
     await addItemInner(id);
