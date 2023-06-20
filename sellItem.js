@@ -413,6 +413,76 @@ async function frontImageUploadChangeHandler() {
   }
 }
 
+<<<<<<< Updated upstream
+=======
+async function brandTagImageUploadChangeHandler() {
+  let input = this.files[0];
+  if (input) {
+    let src = URL.createObjectURL(input);
+    brandTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+    brandTagImagePreview.style.backgroundImage = `url('${src}')`;
+    if (featureIsEnabled('colorCategory')) {
+      await detectAndFillBrand(input);
+    }
+  }
+}
+
+async function detectAndFillBrand(input) {
+  try {
+    const fileAsBase64 = await toBase64(input);
+    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrand')({ base64Img: fileAsBase64 });
+    console.log(response);
+    if (!response.data?.brand) {
+      console.log("Unable to detect product brand");
+      return;
+    }
+    document.querySelector('#itemBrand').value = response.data.brand;
+    document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
+    document.querySelector('#itemBrand').dispatchEvent(new Event('input'));
+    document.querySelector('#itemBrandContainer').classList.add('confirm-value');
+  } catch (e) {
+    console.log('Error calling detectItemBrand', e);
+  }
+}
+
+async function detectAndFillColor(input) {
+  try {
+    const fileAsBase64 = await toBase64(input);
+    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ base64Img: fileAsBase64 });
+    console.log(response);
+    if (!response.data?.colors || !response.data.colors.length) {
+      console.log("Unable to detect product color");
+      return;
+    }
+    if (response.data.colors.length > 2) {
+      document.querySelector('#itemColor').value = 'Multicolour';
+    } else if (apiColorMapping[response.data.colors?.[0]]) {
+      document.querySelector('#itemColor').value = apiColorMapping[response.data.colors?.[0]];
+    } else {
+      console.log("Unable to set color from", response.data.colors?.[0]);
+      return;
+    }
+    document.querySelector('#itemColor').dispatchEvent(new Event('change'));
+    document.querySelector('#itemColor').dispatchEvent(new Event('input'));
+    document.querySelector('#itemColorContainer').classList.add('confirm-value');
+  } catch (e) {
+    console.log('Error calling detectItemColor', e);
+  }
+}
+
+async function initializeColorSelect() {
+  document.getElementById('rejectColor').addEventListener('click', () => {
+    document.querySelector('#itemColor').value = '';
+    document.querySelector('#itemColor').dispatchEvent(new Event('change'));
+    document.querySelector('#itemColor').dispatchEvent(new Event('input'));
+    document.querySelector('#itemColorContainer').classList.remove('confirm-value');
+  });
+  document.getElementById('confirmColor').addEventListener('click', () => {
+    document.querySelector('#itemColorContainer').classList.remove('confirm-value');
+  })
+}
+
+>>>>>>> Stashed changes
 async function initializeCategorySelect() {
   $('#itemCategory').select2({ selectionCssClass: 'form-field', placeholder: 'Kategori', data: itemCategories });
   $("body").on('click', '.select2-container--open .select2-results__group', function() {
