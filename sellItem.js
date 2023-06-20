@@ -427,6 +427,36 @@ async function frontImageUploadChangeHandler() {
   }
 }
 
+async function brandTagImageUploadChangeHandler() {
+  let input = this.files[0];
+  if (input) {
+    let src = URL.createObjectURL(input);
+    brandTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+    brandTagImagePreview.style.backgroundImage = `url('${src}')`;
+    if (featureIsEnabled('colorCategory')) {
+      await detectAndFillBrand(input);
+    }
+  }
+}
+
+async function detectAndFillBrand(input) {
+  try {
+    const fileAsBase64 = await toBase64(input);
+    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrand')({ base64Img: fileAsBase64 });
+    console.log(response);
+    if (!response.data?.brand) {
+      console.log("Unable to detect product brand");
+      return;
+    }
+    document.querySelector('#itemBrand').value = response.data.brand;
+    document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
+    document.querySelector('#itemBrand').dispatchEvent(new Event('input'));
+    document.querySelector('#itemBrandContainer').classList.add('confirm-value');
+  } catch (e) {
+    console.log('Error calling detectItemBrand', e);
+  }
+}
+
 async function detectAndFillColor(input) {
   try {
     const fileAsBase64 = await toBase64(input);
