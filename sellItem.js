@@ -2,14 +2,6 @@ const defectsChoicesInSwedish = new Map().set("hole", "Hål").set("stain", "Flä
 const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
 
 async function addItem(event) {
-  if (document.querySelector('.confirm-value')) {
-    event.preventDefault();
-    for (const element of document.querySelectorAll('.confirm-value input')) {
-      element.setCustomValidity('Du måste bekräfta eller ta bort det ifyllda värdet');
-      element.reportValidity();
-    }
-    return false;
-  }
   const id = uuidv4();
   try {
     await addItemInner(id);
@@ -457,9 +449,11 @@ async function detectAndFillBrand(input) {
       return;
     }
     document.querySelector('#itemBrand').value = response.data.brand;
+    document.querySelector('#itemBrand').setCustomValidity('Bekräfta eller ta bort det ifyllda värdet');
     document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
     document.getElementById('itemBrandLabel').style.display = 'inline-block';
     document.querySelector('#itemBrandContainer').classList.add('confirm-value');
+
   } catch (e) {
     console.log('Error calling detectItemBrand', e);
   }
@@ -482,6 +476,7 @@ async function detectAndFillColor(input) {
       console.log("Unable to set color from", response.data.colors?.[0]);
       return;
     }
+    document.querySelector('#itemColor').setCustomValidity('Bekräfta eller ta bort det ifyllda värdet');
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
     document.querySelector('#itemColorContainer').classList.add('confirm-value');
@@ -499,6 +494,7 @@ async function initializeBrandConfirm() {
   });
   document.getElementById('confirmBrand').addEventListener('click', () => {
     document.querySelector('#itemBrandContainer').classList.remove('confirm-value');
+    document.querySelector('#itemBrand').setCustomValidity('');
   })
 }
 
@@ -511,6 +507,7 @@ async function initializeColorSelect() {
   });
   document.getElementById('confirmColor').addEventListener('click', () => {
     document.querySelector('#itemColorContainer').classList.remove('confirm-value');
+    document.querySelector('#itemColor').setCustomValidity('');
   })
 }
 
