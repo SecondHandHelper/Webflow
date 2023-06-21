@@ -21,14 +21,7 @@
 
     // display image when file has been selected
     frontImageUpload.onchange = frontImageUploadChangeHandler;
-    brandTagImageUpload.onchange = function () {
-        let input = this.files[0];
-        if (input) {
-            let src = URL.createObjectURL(input);
-            brandTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-            brandTagImagePreview.style.backgroundImage = `url('${src}')`;
-        }
-    };
+    brandTagImageUpload.onchange = brandTagImageUploadChangeHandler;
     productImageUpload.onchange = function () {
         let input = this.files[0];
         if (input) {
@@ -125,6 +118,7 @@
           document.getElementById('itemCategoryContainer').style.display='block';
           await initializeCategorySelect();
           await initializeColorSelect();
+          await initializeBrandConfirm();
         }
         // Create item from sessionStorage
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {

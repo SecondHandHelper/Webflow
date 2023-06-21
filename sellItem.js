@@ -1,7 +1,7 @@
 const defectsChoicesInSwedish = new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
 const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
 
-async function addItem() {
+async function addItem(event) {
   const id = uuidv4();
   try {
     await addItemInner(id);
@@ -427,6 +427,38 @@ async function frontImageUploadChangeHandler() {
   }
 }
 
+async function brandTagImageUploadChangeHandler() {
+  let input = this.files[0];
+  if (input) {
+    const src = URL.createObjectURL(input);
+    brandTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+    brandTagImagePreview.style.backgroundImage = `url('${src}')`;
+    if (featureIsEnabled('colorCategory')) {
+      await detectAndFillBrand(input);
+    }
+  }
+}
+
+async function detectAndFillBrand(input) {
+  try {
+    const fileAsBase64 = await toBase64(input);
+    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrand')({ base64Img: fileAsBase64 });
+    console.log(response);
+    if (!response.data?.brand) {
+      console.log("Unable to detect product brand");
+      return;
+    }
+    document.querySelector('#itemBrand').value = response.data.brand;
+    document.querySelector('#itemBrand').setCustomValidity('Bekräfta eller ta bort det ifyllda värdet');
+    document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
+    document.getElementById('itemBrandLabel').style.display = 'inline-block';
+    document.querySelector('#itemBrandContainer').classList.add('confirm-value');
+
+  } catch (e) {
+    console.log('Error calling detectItemBrand', e);
+  }
+}
+
 async function detectAndFillColor(input) {
   try {
     const fileAsBase64 = await toBase64(input);
@@ -444,12 +476,26 @@ async function detectAndFillColor(input) {
       console.log("Unable to set color from", response.data.colors?.[0]);
       return;
     }
+    document.querySelector('#itemColor').setCustomValidity('Bekräfta eller ta bort det ifyllda värdet');
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
     document.querySelector('#itemColorContainer').classList.add('confirm-value');
   } catch (e) {
     console.log('Error calling detectItemColor', e);
   }
+}
+
+async function initializeBrandConfirm() {
+  document.getElementById('rejectBrand').addEventListener('click', () => {
+    document.querySelector('#itemBrand').value = '';
+    document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
+    document.querySelector('#itemBrand').dispatchEvent(new Event('input'));
+    document.querySelector('#itemBrandContainer').classList.remove('confirm-value');
+  });
+  document.getElementById('confirmBrand').addEventListener('click', () => {
+    document.querySelector('#itemBrandContainer').classList.remove('confirm-value');
+    document.querySelector('#itemBrand').setCustomValidity('');
+  })
 }
 
 async function initializeColorSelect() {
@@ -461,6 +507,7 @@ async function initializeColorSelect() {
   });
   document.getElementById('confirmColor').addEventListener('click', () => {
     document.querySelector('#itemColorContainer').classList.remove('confirm-value');
+    document.querySelector('#itemColor').setCustomValidity('');
   })
 }
 
