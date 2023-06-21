@@ -67,7 +67,7 @@ function collect() {
 
   return {
     user: authUser.current?.uid || null,
-    createdAt: now,
+    createdAt: now.toISOString(),
     status,
     shippingStatus,
     sex,
