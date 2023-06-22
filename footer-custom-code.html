@@ -103,7 +103,7 @@
   // GET ITEMS
   // This function returns all the users items from DB in the form of a firestore "querySnapshot"
   async function getItems(userId) {
-    return db.collection("items")
+    return await db.collection("items")
       .where("user", "==", userId)
       .where("createdAt", "!=", false)
       .orderBy('createdAt', 'desc')
