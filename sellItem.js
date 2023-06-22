@@ -123,10 +123,10 @@ async function addItemInner(id) {
   const images = await uploadImagesFromForm(id);
   if (modelCoverImageUrl) {
     images['coverImage'] = modelCoverImageUrl;
-    pageData['coverImageUpdatedAt'] = new Date();
+    pageData['coverImageUpdatedAt'] = new Date().toISOString();
   } else if (sessionStorage.getItem('coverImagePreviewUrl')) {
     images['coverImage'] = sessionStorage.getItem('coverImagePreviewUrl');
-    pageData['coverImageUpdatedAt'] = new Date();
+    pageData['coverImageUpdatedAt'] = new Date().toISOString();
   }
   const createdFromItem = params.id ? { createdFromItem: params.id } : {};
   const item = { ...pageData, shippingMethod, images, ...createdFromItem, version: "2" };
@@ -491,6 +491,7 @@ async function initializeBrandConfirm() {
     document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
     document.querySelector('#itemBrand').dispatchEvent(new Event('input'));
     document.querySelector('#itemBrandContainer').classList.remove('confirm-value');
+    document.querySelector('#itemBrand').setCustomValidity('');
   });
   document.getElementById('confirmBrand').addEventListener('click', () => {
     document.querySelector('#itemBrandContainer').classList.remove('confirm-value');
@@ -504,6 +505,7 @@ async function initializeColorSelect() {
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
     document.querySelector('#itemColorContainer').classList.remove('confirm-value');
+    document.querySelector('#itemColor').setCustomValidity('');
   });
   document.getElementById('confirmColor').addEventListener('click', () => {
     document.querySelector('#itemColorContainer').classList.remove('confirm-value');
