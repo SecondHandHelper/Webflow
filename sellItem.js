@@ -452,8 +452,9 @@ async function detectAndFillBrand(input) {
     document.querySelector('#itemBrand').setCustomValidity('Bekräfta eller ta bort det ifyllda värdet');
     document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
     document.getElementById('itemBrandLabel').style.display = 'inline-block';
-    document.querySelector('#brandSuggestButtons').style.display = 'block';
     document.querySelector('#itemBrandContainer').classList.add('confirm-value');
+    document.querySelector('#brandSuggestButtons').style.display = 'block';
+    analytics.track("Element Viewed", { elementID: "brandSuggestButtons" });
   } catch (e) {
     console.log('Error calling detectItemBrand', e);
   }
@@ -479,8 +480,9 @@ async function detectAndFillColor(input) {
     document.querySelector('#itemColor').setCustomValidity('Bekräfta eller ta bort det ifyllda värdet');
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
-    document.querySelector('#colorSuggestButtons').style.display = 'block';
     document.querySelector('#itemColorContainer').classList.add('confirm-value');
+    document.querySelector('#colorSuggestButtons').style.display = 'block';
+    analytics.track("Element Viewed", { elementID: "colorSuggestButtons" });
   } catch (e) {
     console.log('Error calling detectItemColor', e);
   }
