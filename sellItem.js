@@ -479,6 +479,7 @@ async function detectAndFillColor(input) {
     document.querySelector('#itemColor').setCustomValidity('Bekräfta eller ta bort det ifyllda värdet');
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
+    document.querySelector('#colorSuggestionButtons').style.display = 'block';
     document.querySelector('#itemColorContainer').classList.add('confirm-value');
   } catch (e) {
     console.log('Error calling detectItemColor', e);
