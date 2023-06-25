@@ -453,6 +453,7 @@ async function detectAndFillBrand(input) {
     document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
     document.getElementById('itemBrandLabel').style.display = 'inline-block';
     document.querySelector('#brandSuggestButtons').style.display = 'block';
+    document.querySelector('#itemBrandContainer').classList.add('confirm-value');
   } catch (e) {
     console.log('Error calling detectItemBrand', e);
   }
@@ -479,6 +480,7 @@ async function detectAndFillColor(input) {
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
     document.querySelector('#colorSuggestButtons').style.display = 'block';
+    document.querySelector('#itemColorContainer').classList.add('confirm-value');
   } catch (e) {
     console.log('Error calling detectItemColor', e);
   }
@@ -490,10 +492,12 @@ async function initializeBrandConfirm() {
     document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
     document.querySelector('#itemBrand').dispatchEvent(new Event('input'));
     document.querySelector('#brandSuggestButtons').style.display = 'none';
+    document.querySelector('#itemBrandContainer').classList.remove('confirm-value');
     document.querySelector('#itemBrand').setCustomValidity('');
   });
   document.getElementById('confirmBrand').addEventListener('click', () => {
     document.querySelector('#brandSuggestButtons').style.display = 'none';
+    document.querySelector('#itemBrandContainer').classList.remove('confirm-value');
     document.querySelector('#itemBrand').setCustomValidity('');
   })
 }
@@ -504,10 +508,12 @@ async function initializeColorSelect() {
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
     document.querySelector('#colorSuggestButtons').style.display = 'none';
+    document.querySelector('#itemColorContainer').classList.remove('confirm-value');
     document.querySelector('#itemColor').setCustomValidity('');
   });
   document.getElementById('confirmColor').addEventListener('click', () => {
     document.querySelector('#colorSuggestButtons').style.display = 'none';
+    document.querySelector('#itemColorContainer').classList.remove('confirm-value');
     document.querySelector('#itemColor').setCustomValidity('');
   })
 }
