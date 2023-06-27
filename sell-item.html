@@ -86,8 +86,9 @@
           document.getElementById('itemColorContainer').style.display='block';
           document.getElementById('itemCategoryContainer').style.display='block';
           await initializeCategorySelect();
-          await initializeColorSelect();
+          await initializeColorConfirm();
           await initializeBrandConfirm();
+          await initializeMaterialConfirm();
         }
         // Create item from sessionStorage
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {

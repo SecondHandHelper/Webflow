@@ -549,6 +549,22 @@ async function detectAndFillColor(input) {
   }
 }
 
+async function initializeMaterialConfirm() {
+  document.getElementById('rejectMaterial').addEventListener('click', () => {
+    document.querySelector('#itemMaterial').value = '';
+    document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
+    document.querySelector('#itemMaterial').dispatchEvent(new Event('input'));
+    document.querySelector('#materialSuggestButtons').style.display = 'none';
+    document.querySelector('#itemMaterialContainer').classList.remove('confirm-value');
+    document.querySelector('#itemMaterial').setCustomValidity('');
+  });
+  document.getElementById('confirmMaterial').addEventListener('click', () => {
+    document.querySelector('#materialSuggestButtons').style.display = 'none';
+    document.querySelector('#itemMaterialContainer').classList.remove('confirm-value');
+    document.querySelector('#itemMaterial').setCustomValidity('');
+  })
+}
+
 async function initializeBrandConfirm() {
   document.getElementById('rejectBrand').addEventListener('click', () => {
     document.querySelector('#itemBrand').value = '';
@@ -565,7 +581,7 @@ async function initializeBrandConfirm() {
   })
 }
 
-async function initializeColorSelect() {
+async function initializeColorConfirm() {
   document.getElementById('rejectColor').addEventListener('click', () => {
     document.querySelector('#itemColor').value = '';
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
