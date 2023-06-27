@@ -351,8 +351,6 @@ async function checkAndDisplayShareSold(value) {
 
     shareSoldText.innerHTML = `Mindre än hälften av plaggen från ${response.data.cleanedBrand} säljs`
     shareSoldDiv.style.display = 'block';
-    demandLevelText.innerHTML = `Låg efterfrågan`;
-    demandLevelText.style.display = 'block';
   } else {
     demandLevelText.innerHTML = '';
     shareSoldText.innerHTML = ''
