@@ -421,6 +421,7 @@ async function frontImageUploadChangeHandler() {
     frontImagePreview.style.backgroundImage = `url('${src}')`;
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillColor(input);
+      await detectAndFillBrandAndMaterial(input);
     }
   }
 }
@@ -432,29 +433,89 @@ async function brandTagImageUploadChangeHandler() {
     brandTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     brandTagImagePreview.style.backgroundImage = `url('${src}')`;
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrand(input);
+      await detectAndFillBrandAndMaterial(input);
     }
   }
 }
 
-async function detectAndFillBrand(input) {
+async function productImageUploadChangeHandler() {
+  let input = this.files[0];
+  if (input) {
+    let src = URL.createObjectURL(input);
+    productImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+    productImagePreview.style.backgroundImage = `url('${src}')`;
+    if (featureIsEnabled('colorCategory')) {
+      await detectAndFillBrandAndMaterial(input);
+    }
+  }
+}
+
+async function defectImageUploadChangeHandler() {
+  let input = this.files[0];
+  if (input) {
+    let src = URL.createObjectURL(input);
+    defectImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+    defectImagePreview.style.backgroundImage = `url('${src}')`;
+    if (featureIsEnabled('colorCategory')) {
+      await detectAndFillBrandAndMaterial(input);
+    }
+  }
+}
+
+async function materialTagImageUploadChangeHandler() {
+  let input = this.files[0];
+  if (input) {
+    let src = URL.createObjectURL(input);
+    materialTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+    materialTagImagePreview.style.backgroundImage = `url('${src}')`;
+    if (featureIsEnabled('colorCategory')) {
+      await detectAndFillBrandAndMaterial(input);
+    }
+  }
+}
+
+async function extraImageUploadChangeHandler() {
+    let input = this.files[0];
+    if (input) {
+      let src = URL.createObjectURL(input);
+      extraImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+      extraImagePreview.style.backgroundImage = `url('${src}')`;
+      if (featureIsEnabled('colorCategory')) {
+        await detectAndFillBrandAndMaterial(input);
+      }
+    }
+}
+
+async function detectAndFillBrandAndMaterial(input) {
   try {
     const fileAsBase64 = await toBase64(input);
-    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrand')({ base64Img: fileAsBase64 });
-    console.log(response);
-    if (!response.data?.brand) {
-      console.log("Unable to detect product brand");
+    if (document.querySelector('#itemBrand').value.length && document.querySelector('#itemMaterial').value.length) {
+      // Don't do anything if both brand and material already filled in
       return;
     }
-    document.querySelector('#itemBrand').value = response.data.brand;
-    document.querySelector('#itemBrand').setCustomValidity('Bekräfta eller ta bort det ifyllda värdet');
-    document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
-    document.getElementById('itemBrandLabel').style.display = 'inline-block';
-    document.querySelector('#itemBrandContainer').classList.add('confirm-value');
-    document.querySelector('#brandSuggestButtons').style.display = 'block';
-    analytics.track("Element Viewed", { elementID: "brandSuggestButtons" });
+    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrandAndMaterial')({ base64Img: fileAsBase64 });
+    console.log(response);
+    if (!document.querySelector('#itemBrand').value.length && response.data?.brand) {
+      document.querySelector('#itemBrand').value = response.data.brand;
+      document.querySelector('#itemBrand').setCustomValidity('Bekräfta eller ta bort det ifyllda värdet');
+      document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
+      document.getElementById('itemBrandLabel').style.display = 'inline-block';
+      document.querySelector('#itemBrandContainer').classList.add('confirm-value');
+      document.querySelector('#brandSuggestButtons').style.display = 'block';
+      analytics.track("Element Viewed", {elementID: "brandSuggestButtons"});
+    }
+    if (!document.querySelector('#itemMaterial').value.length && response.data?.materials) {
+      document.querySelector('#itemMaterial').value = response.data.materials;
+      document.querySelector('#itemMaterial').setCustomValidity('Bekräfta eller ta bort det ifyllda värdet');
+      document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
+      document.getElementById('itemMaterial').style.display = 'inline-block';
+      document.querySelector('#itemMaterialContainer').classList.add('confirm-value');
+      document.querySelector('#materialSuggestButtons').style.display = 'block';
+      analytics.track("Element Viewed", {elementID: "materialSuggestButtons"});
+    }
+
   } catch (e) {
-    console.log('Error calling detectItemBrand', e);
+    console.log('Error calling detectItemBrandAndMaterial', e);
   }
 }
 
@@ -486,6 +547,22 @@ async function detectAndFillColor(input) {
   }
 }
 
+async function initializeMaterialConfirm() {
+  document.getElementById('rejectMaterial').addEventListener('click', () => {
+    document.querySelector('#itemMaterial').value = '';
+    document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
+    document.querySelector('#itemMaterial').dispatchEvent(new Event('input'));
+    document.querySelector('#materialSuggestButtons').style.display = 'none';
+    document.querySelector('#itemMaterialContainer').classList.remove('confirm-value');
+    document.querySelector('#itemMaterial').setCustomValidity('');
+  });
+  document.getElementById('confirmMaterial').addEventListener('click', () => {
+    document.querySelector('#materialSuggestButtons').style.display = 'none';
+    document.querySelector('#itemMaterialContainer').classList.remove('confirm-value');
+    document.querySelector('#itemMaterial').setCustomValidity('');
+  })
+}
+
 async function initializeBrandConfirm() {
   document.getElementById('rejectBrand').addEventListener('click', () => {
     document.querySelector('#itemBrand').value = '';
@@ -502,7 +579,7 @@ async function initializeBrandConfirm() {
   })
 }
 
-async function initializeColorSelect() {
+async function initializeColorConfirm() {
   document.getElementById('rejectColor').addEventListener('click', () => {
     document.querySelector('#itemColor').value = '';
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
