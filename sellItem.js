@@ -488,7 +488,7 @@ async function extraImageUploadChangeHandler() {
 
 function hideConfirmButtons(event) {
   event.currentTarget.setCustomValidity('');
-  event.currentTarget.closest('confirm-value').classList.remove('confirm-value');
+  event.currentTarget.closest('.confirm-value').classList.remove('confirm-value');
 }
 
 async function detectAndFillBrandAndMaterial(input) {
