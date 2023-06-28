@@ -603,7 +603,11 @@ async function initializeCategorySelect() {
   });
 
   let headerAdded = false;
+  $('#itemCategory').on('select2:select', () => {
+    analytics.track('Click', { elementID: 'itemCategoryValue' });
+  });
   $('#itemCategory').on('select2:close', () => {
+    analytics.track("Element Viewed", {elementID: "itemCategoryContainer"});
     document.querySelector('body').style.overflow = 'auto'
     document.querySelector('body').style.position =  'static';
     document.querySelector('html').style.overflow =  'static';
