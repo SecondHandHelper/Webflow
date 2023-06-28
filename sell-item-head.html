@@ -1,211 +1,232 @@
 <style>
-    #defectInfoDiv {display: none;}
-	  #youGetDivHappyPrice {display: none;}
-    #youGetDivAcceptPrice{ display: none;}
-    #phoneNumberDiv{display: none;}
-    #shippingMethodDiv{display: none;}
-    #addressFormDiv{display: none;}
-    #itemConfirmationDiv{display: none;}
-		#brandWarningBanner{display: none;}
-    #hardToSellDiv{display: none;}
-    #fotoGuideDiv{display: none;}
-    #shareSoldDiv{display: none;}
-    #demandLevelText{display: none;}
-    #findModelDiv{display: none;}
-    #modelSelectDiv{display: none;}
-    #findModelBoxCard{display: none;}
-    #modelSizeTemplate{display: none;}
-    #modelCardTemplate{display: none;}
-		#findNewModel{display: none;}
-    #itemBrandLabel{display: none;}
-    #itemModelLabel{display: none;}
-    #itemSizeLabel{display: none;}
-    #itemMaterialLabel{display: none;}
-    #itemOriginalPriceLabel{display: none;}
-    #itemAgeLabel{display: none;}
-    #loadingDiv{display: none;}
-    #addItemFormDiv{display: none;}
-    #maiIntroForPrefillAddress{display: none;}
-    #maiIntro{display:none;}
-    #resellIntro{display:none;}
-    #coverImagePreview{display:none;}
-    /* itemColor and itemCategory are hidden until we release the feature */
-    #itemColorContainer{display:none;}
-    #itemCategoryContainer{display:none;}
-    #itemColorLabel{display:none;}
-    #itemCategoryLabel{display:none;}
-    #categoryPopUpHeader{display:none;}
-    
-    #modelSearchInput { -webkit-border-radius: 0; }
-    
-    .form-field {
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-    }
-   
-    .select2.select2-container {
-      width: 100% !important;
-    }
-    
-    .select2-container .select2-selection.select2-selection--single {
-      height: 55px;
-      padding: 11px 3px;
-      border: 1px solid #ccc;      
-    }
-   
-    .select2.select2-container--default .select2-selection--single .select2-selection__arrow b {
-      border: 0px;
-    }
+  #defectInfoDiv {display: none;}
+  #youGetDivHappyPrice {display: none;}
+  #youGetDivAcceptPrice{ display: none;}
+  #phoneNumberDiv{display: none;}
+  #shippingMethodDiv{display: none;}
+  #addressFormDiv{display: none;}
+  #itemConfirmationDiv{display: none;}
+  #brandWarningBanner{display: none;}
+  #hardToSellDiv{display: none;}
+  #fotoGuideDiv{display: none;}
+  #shareSoldDiv{display: none;}
+  #demandLevelText{display: none;}
+  #findModelDiv{display: none;}
+  #modelSelectDiv{display: none;}
+  #findModelBoxCard{display: none;}
+  #modelSizeTemplate{display: none;}
+  #modelCardTemplate{display: none;}
+  #findNewModel{display: none;}
+  #itemBrandLabel{display: none;}
+  #itemModelLabel{display: none;}
+  #itemSizeLabel{display: none;}
+  #itemMaterialLabel{display: none;}
+  #itemOriginalPriceLabel{display: none;}
+  #itemAgeLabel{display: none;}
+  #loadingDiv{display: none;}
+  #addItemFormDiv{display: none;}
+  #maiIntroForPrefillAddress{display: none;}
+  #maiIntro{display:none;}
+  #resellIntro{display:none;}
+  #coverImagePreview{display:none;}
+  /* itemColor and itemCategory are hidden until we release the feature */
+  #itemColorContainer{display:none;}
+  #itemCategoryContainer{display:none;}
+  #itemColorLabel{display:none;}
+  #itemCategoryLabel{display:none;}
+  #categoryPopUpHeader{display:none;}
+  
+  #modelSearchInput { -webkit-border-radius: 0; }
+  .suggest-buttons{display:none;}
+  .suggest-help-text{display:none;}
 
-    .select2-container--open .select2-dropdown {
-      position: fixed !important;
-      top: 0px !important;
-      width: 100% !important;
-      height: 100vh !important;
-    }
-    .select2-results {
-      visibility: hidden;
-      width: 90%;
-      margin: 0px auto;
-    }
-    .select2-results li:hover {
-      background-color: white;
-      color: #101010;
-    }
-    .select2-container--default .select2-results__option[role=group] {
-      border-bottom: 1px solid #dcdcdc;
-    }
-    .select2-container--default .select2-results .select2-results__group {
-      padding: 12px 0px;
-      display: flex;
-      font-weight: 500;
-    }
-    .select2-results__option ul {
-      display: none;
-    }
-    .select2-results__option.expanded-group ul {
-        margin-bottom: 10px;
-        margin-top: -5px;
-      display: block;
-    }
-    .select2-container .select2-dropdown .select2-results .select2-results__options[role=tree] {
-      max-height: unset;
-      height: 100vh;
-      padding-bottom: 120px;
-    }
-    .select2-container--default .select2-results .select2-results__option[role=treeitem] {
-        padding: 8px 0px;
-    }
-    .select2-container--default .select2-results .select2-results__option--highlighted[aria-selected] {
-      background-color: white;
-      color: #101010;
-    }
-    .select2-container .select2-search--dropdown {
-      display: flex;
-      justify-content: center;
-      padding: 0px;
-      margin-top: -10px;
-    }
-    .select2-container .select2-dropdown input.select2-search__field {
-      font-size: 16px;
-      outline: 0;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-      border: 0px;
-      border-bottom: 1px solid #dcdcdc;
-      border-radius: 0px;
-      margin: 0px auto;
-      width: 90%;
-      padding-left: 29px;
-      padding-top: 15px;
-      padding-bottom: 15px;
-      padding-right: 0px;
-      background-color: white;
-      background-size: 22px;
-			background-repeat: no-repeat;
-			background-position-y: center;
-      background-image: url("data:image/svg+xml;utf8,<svg width='55' height='55' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M37.3318 35.4461L47.6096 45.7239C48.1301 46.2444 48.1301 47.0886 47.6096 47.6096C47.0891 48.1301 46.2449 48.1301 45.7239 47.6096L35.446 37.3318C31.6853 40.6519 26.7441 42.6667 21.3328 42.6667C9.55095 42.6667 0 33.1157 0 21.3339C0 9.55209 9.55141 0 21.3339 0C33.1164 0 42.6678 9.55141 42.6678 21.3339C42.6678 26.7452 40.6531 31.6858 37.3329 35.4472L37.3318 35.4461ZM21.3339 40.0002C31.6434 40.0002 40.0004 31.6429 40.0004 21.3337C40.0004 11.0244 31.6432 2.66608 21.3339 2.66608C11.0247 2.66608 2.66631 11.0238 2.66631 21.3337C2.66631 31.6436 11.024 40.0002 21.3339 40.0002ZM21.3339 7.99985C22.0701 7.99985 22.6674 8.59673 22.6674 9.33335C22.6674 10.0695 22.0705 10.6668 21.3339 10.6668C15.4428 10.6668 10.6673 15.4423 10.6673 21.3335C10.6673 22.0696 10.0704 22.667 9.3338 22.667C8.59719 22.6665 8.0003 22.0696 8.0003 21.3335C8.0003 13.9695 13.97 7.99962 21.3341 7.99962L21.3339 7.99985Z' fill='black'/></svg>");
-    }
-    .select2-results__option.expanded-group .select2-results__group:after {
-      transform: rotate(180deg)
-    }
-    .select2-results__group:after {
-      width: 1.25rem;
-      height: 1.25rem;
-      display: inline-block;
-      margin-left: auto;
-      margin-right: 5px;
-      content: "";
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23d9d9d9'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-      background-repeat: no-repeat;
-      background-size: 1.25rem;
-    }
-    .select-field, .select2-selection--single {
-      background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='grey'><polygon points='0,0 100,0 50,50'/></svg>") no-repeat;
-      background-size: 12px;
-      background-position: calc(100% - 20px) center;
-      background-repeat: no-repeat;
-    }
-   
-    input#modelSearchInput {
-      outline: 0;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-      background-size: 30px;
-      background-repeat: no-repeat;
-      background-position-y: center;
-      background-image: url("data:image/svg+xml;utf8,<svg width='55' height='55' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M37.3318 35.4461L47.6096 45.7239C48.1301 46.2444 48.1301 47.0886 47.6096 47.6096C47.0891 48.1301 46.2449 48.1301 45.7239 47.6096L35.446 37.3318C31.6853 40.6519 26.7441 42.6667 21.3328 42.6667C9.55095 42.6667 0 33.1157 0 21.3339C0 9.55209 9.55141 0 21.3339 0C33.1164 0 42.6678 9.55141 42.6678 21.3339C42.6678 26.7452 40.6531 31.6858 37.3329 35.4472L37.3318 35.4461ZM21.3339 40.0002C31.6434 40.0002 40.0004 31.6429 40.0004 21.3337C40.0004 11.0244 31.6432 2.66608 21.3339 2.66608C11.0247 2.66608 2.66631 11.0238 2.66631 21.3337C2.66631 31.6436 11.024 40.0002 21.3339 40.0002ZM21.3339 7.99985C22.0701 7.99985 22.6674 8.59673 22.6674 9.33335C22.6674 10.0695 22.0705 10.6668 21.3339 10.6668C15.4428 10.6668 10.6673 15.4423 10.6673 21.3335C10.6673 22.0696 10.0704 22.667 9.3338 22.667C8.59719 22.6665 8.0003 22.0696 8.0003 21.3335C8.0003 13.9695 13.97 7.99962 21.3341 7.99962L21.3339 7.99985Z' fill='black'/></svg>")
-    }
+  .form-field {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+ 
+  .select2.select2-container {
+    width: 100% !important;
+  }
+  
+  .select2-selection__placeholder {
+    font-size: 16px;
+  }
+  
+  .select2-container .select2-selection.select2-selection--single {
+    height: 55px;
+    padding: 12px;
+    border: 1px solid #ccc;      
+  }
+  
+  .select2-container .select2-selection.select2-selection--single .select2-selection__rendered {
+    padding: 0px;
+    font-size: 16px;
+    color: #333333;
+  }
+ 
+  .select2.select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border: 0px;
+  }
+
+  .select2-container--open .select2-dropdown {
+    position: fixed !important;
+    top: 0px !important;
+    width: 100% !important;
+    height: 100vh !important;
+  }
+  .select2-results {
+    visibility: hidden;
+    width: 90%;
+    margin: 0px auto;
+  }
+  .select2-results li:hover {
+    background-color: white;
+    color: #101010;
+  }
+  .select2-container--default .select2-results__option[role=group] {
+    border-bottom: 1px solid #dcdcdc;
+  }
+  .select2-container--default .select2-results .select2-results__group {
+    padding: 12px 0px;
+    display: flex;
+    font-weight: 500;
+  }
+  .select2-results__option ul {
+    display: none;
+  }
+  .select2-results__option.expanded-group ul {
+    margin-bottom: 10px;
+    margin-top: -5px;
+    display: block;
+  }
+  .select2-container .select2-dropdown .select2-results .select2-results__options[role=tree] {
+    max-height: unset;
+    height: 100vh;
+    padding-bottom: 120px;
+  }
+  .select2-container--default .select2-results .select2-results__option[role=treeitem] {
+      padding: 8px 0px;
+  }
+  .select2-container--default .select2-results .select2-results__option--highlighted[aria-selected] {
+    background-color: white;
+    color: #101010;
+  }
+  .select2-container .select2-search--dropdown {
+    display: flex;
+    justify-content: center;
+    padding: 0px;
+    margin-top: -10px;
+  }
+  .select2-container .select2-dropdown input.select2-search__field {
+    font-size: 16px;
+    outline: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 0px;
+    border-bottom: 1px solid #dcdcdc;
+    border-radius: 0px;
+    margin: 0px auto;
+    width: 90%;
+    padding-left: 29px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-right: 0px;
+    background-color: white;
+    background-size: 22px;
+    background-repeat: no-repeat;
+    background-position-y: center;
+    background-image: url("data:image/svg+xml;utf8,<svg width='55' height='55' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M37.3318 35.4461L47.6096 45.7239C48.1301 46.2444 48.1301 47.0886 47.6096 47.6096C47.0891 48.1301 46.2449 48.1301 45.7239 47.6096L35.446 37.3318C31.6853 40.6519 26.7441 42.6667 21.3328 42.6667C9.55095 42.6667 0 33.1157 0 21.3339C0 9.55209 9.55141 0 21.3339 0C33.1164 0 42.6678 9.55141 42.6678 21.3339C42.6678 26.7452 40.6531 31.6858 37.3329 35.4472L37.3318 35.4461ZM21.3339 40.0002C31.6434 40.0002 40.0004 31.6429 40.0004 21.3337C40.0004 11.0244 31.6432 2.66608 21.3339 2.66608C11.0247 2.66608 2.66631 11.0238 2.66631 21.3337C2.66631 31.6436 11.024 40.0002 21.3339 40.0002ZM21.3339 7.99985C22.0701 7.99985 22.6674 8.59673 22.6674 9.33335C22.6674 10.0695 22.0705 10.6668 21.3339 10.6668C15.4428 10.6668 10.6673 15.4423 10.6673 21.3335C10.6673 22.0696 10.0704 22.667 9.3338 22.667C8.59719 22.6665 8.0003 22.0696 8.0003 21.3335C8.0003 13.9695 13.97 7.99962 21.3341 7.99962L21.3339 7.99985Z' fill='black'/></svg>");
+  }
+  .select2-results__option.expanded-group .select2-results__group:after {
+    transform: rotate(180deg)
+  }
+  .select2-results__group:after {
+    width: 1.25rem;
+    height: 1.25rem;
+    display: inline-block;
+    margin-left: auto;
+    margin-right: 5px;
+    content: "";
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23d9d9d9'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-size: 1.25rem;
+  }
+  .confirm-value .form-field {
+    background-image: none;
+  }
+  .confirm-value .suggest-help-text {
+    display: flex;
+  }
+  .confirm-value .suggest-buttons{
+    display: block;
+  }
+  .select-field, .select2-selection--single {
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='grey'><polygon points='0,0 100,0 50,50'/></svg>") no-repeat;
+    background-size: 14px;
+    background-position: calc(100% - 20px) center;
+    background-repeat: no-repeat;
+  }
+ 
+  input#modelSearchInput {
+    outline: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-size: 30px;
+    background-repeat: no-repeat;
+    background-position-y: center;
+    background-image: url("data:image/svg+xml;utf8,<svg width='55' height='55' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M37.3318 35.4461L47.6096 45.7239C48.1301 46.2444 48.1301 47.0886 47.6096 47.6096C47.0891 48.1301 46.2449 48.1301 45.7239 47.6096L35.446 37.3318C31.6853 40.6519 26.7441 42.6667 21.3328 42.6667C9.55095 42.6667 0 33.1157 0 21.3339C0 9.55209 9.55141 0 21.3339 0C33.1164 0 42.6678 9.55141 42.6678 21.3339C42.6678 26.7452 40.6531 31.6858 37.3329 35.4472L37.3318 35.4461ZM21.3339 40.0002C31.6434 40.0002 40.0004 31.6429 40.0004 21.3337C40.0004 11.0244 31.6432 2.66608 21.3339 2.66608C11.0247 2.66608 2.66631 11.0238 2.66631 21.3337C2.66631 31.6436 11.024 40.0002 21.3339 40.0002ZM21.3339 7.99985C22.0701 7.99985 22.6674 8.59673 22.6674 9.33335C22.6674 10.0695 22.0705 10.6668 21.3339 10.6668C15.4428 10.6668 10.6673 15.4423 10.6673 21.3335C10.6673 22.0696 10.0704 22.667 9.3338 22.667C8.59719 22.6665 8.0003 22.0696 8.0003 21.3335C8.0003 13.9695 13.97 7.99962 21.3341 7.99962L21.3339 7.99985Z' fill='black'/></svg>")
+  }
 </style>
 
 <style>
 /*CSS for the autocomplete box for brands*/ 
 .autocomplete-items {
-  position: absolute;
-  z-index: 99;
-  top: 100%;
-  left: 0;
-  right: 0;
-  max-height: 300px;
-  overflow: scroll;
-  border: 1px solid #101010;
-  border-top: 0px;
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
-  background-color: #fff;
+position: absolute;
+z-index: 99;
+top: 100%;
+left: 0;
+right: 0;
+max-height: 300px;
+overflow: scroll;
+border: 1px solid #101010;
+border-top: 0px;
+border-bottom-left-radius: 6px;
+border-bottom-right-radius: 6px;
+background-color: #fff;
 }
 
 .autocomplete-items div {
-  padding: 15px 12px;
-  width: 100%;
-  cursor: pointer;
-  transition: all 200ms ease;
-  border-top: 1px solid rgb(231, 231, 231);
+padding: 15px 12px;
+width: 100%;
+cursor: pointer;
+transition: all 200ms ease;
+border-top: 1px solid rgb(231, 231, 231);
 }
 /*
 .autocomplete-items div:hover {
-  background-color: #000;
-  color: #fff;
+background-color: #000;
+color: #fff;
 }
 */
 /*when navigating through the items using the arrow keys:*/
 .autocomplete-active {
-  background-color: #fff !important; 
-  color: #101010; 
+background-color: #fff !important; 
+color: #101010; 
 }
 #cover-spin {
-	position: fixed;
-  width: 100%;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background-color: rgba(255,255,255,1);
-  z-index: 9999;
-  display: none;
+position: fixed;
+width: 100%;
+left: 0;
+right: 0;
+top: 0;
+bottom: 0;
+background-color: rgba(255,255,255,1);
+z-index: 9999;
+display: none;
 }
 </style>
 <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
