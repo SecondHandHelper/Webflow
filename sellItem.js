@@ -606,10 +606,14 @@ async function initializeCategorySelect() {
   $('#itemCategory').on('select2:select', () => {
     analytics.track('Click', { elementID: 'itemCategoryValue' });
   });
+  let searchClickTracked = false;
   $('#itemCategory').on('select2:open', () => {
-    $('input.select2-search__field').on('click', () => {
-      analytics.track('Click', { elementID: 'itemCategorySearch' });
-    });
+    if (!searchClickTracked) {
+      searchClickTracked = true;
+      $('input.select2-search__field').on('click', () => {
+        analytics.track('Click', { elementID: 'itemCategorySearch' });
+      });
+    }
   });
 
   $('#itemCategory').on('select2:close', () => {
