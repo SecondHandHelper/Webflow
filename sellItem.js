@@ -606,7 +606,7 @@ async function initializeCategorySelect() {
   $('#itemCategory').on('select2:select', () => {
     analytics.track('Click', { elementID: 'itemCategoryValue' });
   });
-  $('input.select2-search__field').on('focus', () => {
+  document.querySelector('input.select2-search__field').addEventListener('click', () => {
     analytics.track('Click', { elementID: 'itemCategorySearch' });
   });
   $('#itemCategory').on('select2:close', () => {
