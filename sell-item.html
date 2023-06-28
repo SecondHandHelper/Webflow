@@ -83,12 +83,12 @@
             shippingMethodDiv.style.display = "none";
         }
         if (featureIsEnabled('colorCategory')) {
-          document.getElementById('itemColorContainer').style.display='block';
-          document.getElementById('itemCategoryContainer').style.display='block';
-          await initializeCategorySelect();
-          await initializeColorConfirm();
-          await initializeBrandConfirm();
-          await initializeMaterialConfirm();
+            document.getElementById('itemColorContainer').style.display = 'block';
+            document.getElementById('itemCategoryContainer').style.display = 'block';
+            await initializeCategorySelect();
+            await initializeColorConfirm();
+            await initializeBrandConfirm();
+            await initializeMaterialConfirm();
         }
         // Create item from sessionStorage
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
@@ -122,18 +122,15 @@
         // Fill form if the user comes from a prefill link
         if (params.id) {
             auth.onAuthStateChanged(function (user) {
-                if (!user) {document.getElementById('maiIntro').style.display = 'block';}
+                if (!user) { document.getElementById('maiIntro').style.display = 'block'; }
             });
             document.getElementById('resellIntro').style.display = 'block';
             await fillForm(params.id);
-            document.getElementById('loadingDiv').style.display = 'none';
-            document.getElementById('addItemFormDiv').style.display = 'block';
+            document.getElementById("triggerShowSellItemContent").click();
         } else if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-            document.getElementById('addItemFormDiv').style.display = 'none';
-            document.getElementById('loadingDiv').style.display = 'flex';
+            document.getElementById('creatingItemText').style.display = 'block';
         } else {
-            document.getElementById('addItemFormDiv').style.display = 'block';
-            document.getElementById('loadingDiv').style.display = 'none';
+            document.getElementById("triggerShowSellItemContent").click();
             document.getElementById("frontImage").required = true;
             document.getElementById("brandTagImage").required = true;
         }
@@ -160,6 +157,10 @@
         const error = pn.length >= 12 && pn.includes('+') ? '' : 'Ogiltigt mobilnummer';
         itemPhoneNumber.setCustomValidity(error);
     });
+    window.addEventListener("load", (event) => {
+        console.log('Page fully loaded');
+    });
+
     /*initiate the autocomplete function on the "itemBrand" element, and pass along the brands array as possible autocomplete values:*/
     autocomplete(document.getElementById("itemBrand"), brands);
 
