@@ -554,12 +554,10 @@ async function initializeMaterialConfirm() {
     document.querySelector('#itemMaterial').value = '';
     document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
     document.querySelector('#itemMaterial').dispatchEvent(new Event('input'));
-    document.querySelector('#materialSuggestButtons').style.display = 'none';
     document.querySelector('#itemMaterialContainer').classList.remove('confirm-value');
     document.querySelector('#itemMaterial').setCustomValidity('');
   });
   document.getElementById('confirmMaterial').addEventListener('click', () => {
-    document.querySelector('#materialSuggestButtons').style.display = 'none';
     document.querySelector('#itemMaterialContainer').classList.remove('confirm-value');
     document.querySelector('#itemMaterial').setCustomValidity('');
   })
@@ -570,12 +568,10 @@ async function initializeBrandConfirm() {
     document.querySelector('#itemBrand').value = '';
     document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
     document.querySelector('#itemBrand').dispatchEvent(new Event('input'));
-    document.querySelector('#brandSuggestButtons').style.display = 'none';
     document.querySelector('#itemBrandContainer').classList.remove('confirm-value');
     document.querySelector('#itemBrand').setCustomValidity('');
   });
   document.getElementById('confirmBrand').addEventListener('click', () => {
-    document.querySelector('#brandSuggestButtons').style.display = 'none';
     document.querySelector('#itemBrandContainer').classList.remove('confirm-value');
     document.querySelector('#itemBrand').setCustomValidity('');
   })
@@ -586,12 +582,10 @@ async function initializeColorConfirm() {
     document.querySelector('#itemColor').value = '';
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
-    document.querySelector('#colorSuggestButtons').style.display = 'none';
     document.querySelector('#itemColorContainer').classList.remove('confirm-value');
     document.querySelector('#itemColor').setCustomValidity('');
   });
   document.getElementById('confirmColor').addEventListener('click', () => {
-    document.querySelector('#colorSuggestButtons').style.display = 'none';
     document.querySelector('#itemColorContainer').classList.remove('confirm-value');
     document.querySelector('#itemColor').setCustomValidity('');
   })
