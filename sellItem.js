@@ -606,6 +606,9 @@ async function initializeCategorySelect() {
   $('#itemCategory').on('select2:select', () => {
     analytics.track('Click', { elementID: 'itemCategoryValue' });
   });
+  $('input.select2-search__field').on('focus', () => {
+    analytics.track('Click', { elementID: 'itemCategorySearch' });
+  });
   $('#itemCategory').on('select2:close', () => {
     analytics.track("Element Viewed", {elementID: "itemCategoryContainer"});
     document.querySelector('body').style.overflow = 'auto'
