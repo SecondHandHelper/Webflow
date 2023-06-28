@@ -664,8 +664,14 @@ const itemCategories = [
         "id": "Blus",
         "text": "Blus",
       }, {
+        "id": "Topp",
+        "text": "Topp",
+      },  {
         "id": "Skjorta",
         "text": "Skjorta",
+      }, {
+        "id": "Linneskjorta",
+        "text": "Linneskjorta",
       }, {
         "id": "T-shirt",
         "text": "T-shirt",
@@ -673,20 +679,20 @@ const itemCategories = [
         "id": "Kavaj",
         "text": "Kavaj",
       }, {
+        "id": "Sweatshirt",
+        "text": "Sweatshirt",
+      }, {
         "id": "Hoodie",
         "text": "Hoodie",
-      }, {
-        "id": "Topp",
-        "text": "Topp",
-      }, {
-        "id": "Väst",
-        "text": "Väst",
       }, {
         "id": "Polotröja",
         "text": "Polotröja",
       }, {
         "id": "Tunika",
         "text": "Tunika",
+      }, {
+        "id": "Väst",
+        "text": "Väst",
       }, {
         "id": "Kofta",
         "text": "Kofta",
@@ -700,9 +706,6 @@ const itemCategories = [
         "id": "Poncho",
         "text": "Poncho",
       }, {
-        "id": "Sweatshirt",
-        "text": "Sweatshirt",
-      }, {
         "id": "Piké",
         "text": "Piké",
       }, {
@@ -711,9 +714,6 @@ const itemCategories = [
       }, {
         "id": "Kostymväst",
         "text": "Kostymväst",
-      }, {
-        "id": "Linneskjorta",
-        "text": "Linneskjorta",
       }
     ]
   },
@@ -721,17 +721,17 @@ const itemCategories = [
     "text": "Underdelar",
     "children" : [
       {
-        "id": "Byxor",
-        "text": "Byxor",
-      }, {
-        "id": "Shorts",
-        "text": "Shorts",
-      }, {
         "id": "Kjol",
         "text": "Kjol",
       }, {
+        "id": "Byxor",
+        "text": "Byxor",
+      }, {
         "id": "Jeans",
         "text": "Jeans",
+      }, {
+        "id": "Chinos",
+        "text": "Chinos",
       }, {
         "id": "Fritidsbyxor",
         "text": "Fritidsbyxor",
@@ -751,8 +751,8 @@ const itemCategories = [
         "id": "Kostymbyxor",
         "text": "Kostymbyxor",
       }, {
-        "id": "Chinos",
-        "text": "Chinos",
+        "id": "Shorts",
+        "text": "Shorts",
       }, {
         "id": "Sarong",
         "text": "Sarong",
@@ -763,11 +763,11 @@ const itemCategories = [
     "text": "Helkropp",
     "children" : [
       {
-        "id": "Jumpsuit",
-        "text": "Jumpsuit",
-      }, {
         "id": "Klänning",
         "text": "Klänning",
+      }, {
+        "id": "Kaftan",
+        "text": "Kaftan",
       }, {
         "id": "Kostym",
         "text": "Kostym",
@@ -775,14 +775,17 @@ const itemCategories = [
         "id": "Set",
         "text": "Set",
       }, {
-        "id": "Pyjamas",
-        "text": "Pyjamas",
+        "id": "Jumpsuit",
+        "text": "Jumpsuit",
       }, {
         "id": "Baddräkt",
         "text": "Baddräkt",
       }, {
         "id": "Bikini",
         "text": "Bikini",
+      }, {
+        "id": "Pyjamas",
+        "text": "Pyjamas",
       }, {
         "id": "Morgonrock",
         "text": "Morgonrock",
@@ -798,9 +801,6 @@ const itemCategories = [
       }, {
         "id": "Underställ",
         "text": "Underställ",
-      }, {
-        "id": "Kaftan",
-        "text": "Kaftan",
       }
     ]
   },
@@ -842,9 +842,6 @@ const itemCategories = [
     "text": "Skor",
     "children" : [
       {
-        "id": "Ballerinaskor",
-        "text": "Ballerinaskor",
-      }, {
         "id": "Sneakers",
         "text": "Sneakers",
       }, {
@@ -854,6 +851,15 @@ const itemCategories = [
         "id": "Klackar",
         "text": "Klackar",
       }, {
+        "id": "Ballerinaskor",
+        "text": "Ballerinaskor",
+      }, {
+        "id": "Loafers",
+        "text": "Loafers",
+      }, {
+        "id": "Flip-flops",
+        "text": "Flip-flops",
+      },{
         "id": "Boots",
         "text": "Boots",
       }, {
@@ -862,12 +868,6 @@ const itemCategories = [
       }, {
         "id": "Vinterskor",
         "text": "Vinterskor",
-      }, {
-        "id": "Flip-flops",
-        "text": "Flip-flops",
-      }, {
-        "id": "Loafers",
-        "text": "Loafers",
       }, {
         "id": "Skor",
         "text": "Annat (Skor)",
@@ -878,11 +878,17 @@ const itemCategories = [
     "text": "Väskor",
     "children" : [
       {
-        "id": "Ryggsäck",
-        "text": "Ryggsäck",
+        "id": "Axelremsväska",
+        "text": "Axelremsväska",
+      }, {
+        "id": "Handväska",
+        "text": "Handväska",
       }, {
         "id": "Kuvertväska",
         "text": "Kuvertväska",
+      }, {
+        "id": "Ryggsäck",
+        "text": "Ryggsäck",
       }, {
         "id": "Träningsväska",
         "text": "Träningsväska",
@@ -892,13 +898,7 @@ const itemCategories = [
       }, {
         "id": "Datorväska",
         "text": "Datorväska",
-      }, {
-        "id": "Axelremsväska",
-        "text": "Axelremsväska",
-      }, {
-        "id": "Handväska",
-        "text": "Handväska",
-      }, {
+      },  {
         "id": "Väska",
         "text": "Annat (Väska)",
       }
@@ -908,6 +908,42 @@ const itemCategories = [
     "text": "Accessoarer",
     "children" : [
       {
+        "id": "Solglasögon",
+        "text": "Solglasögon",
+      }, {
+        "id": "Glasögon",
+        "text": "Glasögon",
+      }, {
+        "id": "Örhänge",
+        "text": "Örhänge",
+      }, {
+        "id": "Halsband",
+        "text": "Halsband",
+      }, {
+        "id": "Armband",
+        "text": "Armband",
+      }, {
+        "id": "Ring",
+        "text": "Ring",
+      }, {
+        "id": "Brosch",
+        "text": "Brosch",
+      }, {
+        "id": "Keps",
+        "text": "Keps",
+      }, {
+        "id": "Sjal",
+        "text": "Sjal",
+      }, {
+        "id": "Krage",
+        "text": "Krage",
+      }, {
+        "id": "Bälte",
+        "text": "Bälte",
+      }, {
+        "id": "Plånbok",
+        "text": "Plånbok",
+      }, {
         "id": "Halsduk",
         "text": "Halsduk",
       }, {
@@ -919,42 +955,6 @@ const itemCategories = [
       }, {
         "id": "Vantar",
         "text": "Vantar",
-      }, {
-        "id": "Örhänge",
-        "text": "Örhänge",
-      }, {
-        "id": "Halsband",
-        "text": "Halsband",
-      }, {
-        "id": "Armband",
-        "text": "Armband",
-      }, {
-        "id": "Glasögon",
-        "text": "Glasögon",
-      }, {
-        "id": "Solglasögon",
-        "text": "Solglasögon",
-      }, {
-        "id": "Keps",
-        "text": "Keps",
-      }, {
-        "id": "Krage",
-        "text": "Krage",
-      }, {
-        "id": "Sjal",
-        "text": "Sjal",
-      }, {
-        "id": "Bälte",
-        "text": "Bälte",
-      }, {
-        "id": "Plånbok",
-        "text": "Plånbok",
-      }, {
-        "id": "Ring",
-        "text": "Ring",
-      }, {
-        "id": "Brosch",
-        "text": "Brosch",
       }, {
         "id": "Necessär",
         "text": "Necessär",
