@@ -606,9 +606,12 @@ async function initializeCategorySelect() {
   $('#itemCategory').on('select2:select', () => {
     analytics.track('Click', { elementID: 'itemCategoryValue' });
   });
-  document.querySelector('input.select2-search__field').addEventListener('click', () => {
-    analytics.track('Click', { elementID: 'itemCategorySearch' });
+  $('#itemCategory').on('select2:open', () => {
+    $('input.select2-search__field').on('click', () => {
+      analytics.track('Click', { elementID: 'itemCategorySearch' });
+    });
   });
+
   $('#itemCategory').on('select2:close', () => {
     analytics.track("Element Viewed", {elementID: "itemCategoryContainer"});
     document.querySelector('body').style.overflow = 'auto'
