@@ -605,6 +605,7 @@ async function initializeCategorySelect() {
   let headerAdded = false;
   $('#itemCategory').on('select2:select', () => {
     analytics.track('Click', { elementID: 'itemCategoryValue' });
+    console.log('Clicked itemCategoryValue');
   });
   let searchClickTracked = false;
   $('#itemCategory').on('select2:open', () => {
@@ -612,12 +613,14 @@ async function initializeCategorySelect() {
       searchClickTracked = true;
       $('input.select2-search__field').on('click', () => {
         analytics.track('Click', { elementID: 'itemCategorySearch' });
+        console.log('Clicked itemCategorySearch');
       });
     }
   });
 
   $('#itemCategory').on('select2:close', () => {
     analytics.track("Element Viewed", {elementID: "itemCategoryContainer"});
+    console.log('Viewed itemCategoryContainer');
     document.querySelector('body').style.overflow = 'auto'
     document.querySelector('body').style.position =  'static';
     document.querySelector('html').style.overflow =  'static';
