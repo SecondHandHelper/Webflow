@@ -619,13 +619,13 @@ async function initializeCategorySelect() {
   });
 
   $('#itemCategory').on('select2:close', () => {
-    analytics.track("Element Viewed", {elementID: "itemCategoryContainer"});
-    console.log('Viewed itemCategoryContainer');
     document.querySelector('body').style.overflow = 'auto'
     document.querySelector('body').style.position =  'static';
     document.querySelector('html').style.overflow =  'static';
   });
   $('#itemCategory').on('select2:open', function() {
+    analytics.track("Element Viewed", {elementID: "itemCategoryContainer"});
+    console.log('Viewed itemCategoryContainer');
     document.querySelector('body').style.overflow =  'hidden';
     document.querySelector('body').style.position =  'fixed';
     document.querySelector('html').style.overflow =  'fixed';
