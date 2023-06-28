@@ -199,9 +199,9 @@
 
   // FEATURE TOGGLE FUNCTION
   const featureConfig = {
-    alpha: { C2C: true, modelDB: true, colorCategory: true },
-    beta: { C2C: true, modelDB: false, colorCategory: false },
-    default: { C2C: true, modelDB: false, colorCategory: false }
+    alpha: { modelDB: false, colorCategory: true },
+    beta: { modelDB: false, colorCategory: true },
+    default: { modelDB: false, colorCategory: false }
   };
 
   function featureIsEnabled(featureName) {
