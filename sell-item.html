@@ -22,41 +22,10 @@
     // display image when file has been selected
     frontImageUpload.onchange = frontImageUploadChangeHandler;
     brandTagImageUpload.onchange = brandTagImageUploadChangeHandler;
-    productImageUpload.onchange = function () {
-        let input = this.files[0];
-        if (input) {
-            let src = URL.createObjectURL(input);
-            productImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-            productImagePreview.style.backgroundImage = `url('${src}')`;
-        }
-
-    };
-    defectImageUpload.onchange = function () {
-        let input = this.files[0];
-        if (input) {
-            let src = URL.createObjectURL(input);
-            defectImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-            defectImagePreview.style.backgroundImage = `url('${src}')`;
-        }
-
-    };
-    materialTagImageUpload.onchange = function () {
-        let input = this.files[0];
-        if (input) {
-            let src = URL.createObjectURL(input);
-            materialTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-            materialTagImagePreview.style.backgroundImage = `url('${src}')`;
-        }
-
-    };
-    extraImageUpload.onchange = function () {
-        let input = this.files[0];
-        if (input) {
-            let src = URL.createObjectURL(input);
-            extraImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-            extraImagePreview.style.backgroundImage = `url('${src}')`;
-        }
-    };
+    productImageUpload.onchange = productImageUploadChangeHandler;
+    defectImageUpload.onchange = defectImageUploadChangeHandler;
+    materialTagImageUpload.onchange = materialTagImageUploadChangeHandler;
+    extraImageUpload.onchange = extraImageUploadChangeHandler;
 
     // Hide/Show warning about difficulty to sell certain brands
     let brand = document.getElementById("itemBrand");
@@ -117,8 +86,9 @@
           document.getElementById('itemColorContainer').style.display='block';
           document.getElementById('itemCategoryContainer').style.display='block';
           await initializeCategorySelect();
-          await initializeColorSelect();
+          await initializeColorConfirm();
           await initializeBrandConfirm();
+          await initializeMaterialConfirm();
         }
         // Create item from sessionStorage
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
