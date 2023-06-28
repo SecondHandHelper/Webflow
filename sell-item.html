@@ -143,9 +143,12 @@
     setupModelSearchEventListeners();
     initializeSelectColor();
     itemBrand.addEventListener('input', fieldLabelToggle('itemBrandLabel'));
+    itemBrand.addEventListener('input', hideConfirmButtons);
     itemModel.addEventListener('input', fieldLabelToggle('itemModelLabel'));
+    itemModel.addEventListener('input', hideConfirmButtons);
     itemSize.addEventListener('input', fieldLabelToggle('itemSizeLabel'));
     itemMaterial.addEventListener('input', fieldLabelToggle('itemMaterialLabel'));
+    itemMaterial.addEventListener('input', hideConfirmButtons);
     itemOriginalPrice.addEventListener('input', fieldLabelToggle('itemOriginalPriceLabel'));
     itemAge.addEventListener('input', fieldLabelToggle('itemAgeLabel'));
     itemColor.addEventListener('input', fieldLabelToggle('itemColorLabel'));

@@ -486,6 +486,11 @@ async function extraImageUploadChangeHandler() {
     }
 }
 
+function hideConfirmButtons(event) {
+  event.currentTarget.setCustomValidity('');
+  event.currentTarget.parentNode.classList.remove('confirm-value');
+}
+
 async function detectAndFillBrandAndMaterial(input) {
   try {
     const fileAsBase64 = await toBase64(input);
@@ -501,16 +506,14 @@ async function detectAndFillBrandAndMaterial(input) {
       document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
       document.getElementById('itemBrandLabel').style.display = 'inline-block';
       document.querySelector('#itemBrandContainer').classList.add('confirm-value');
-      document.querySelector('#brandSuggestButtons').style.display = 'block';
       analytics.track("Element Viewed", {elementID: "brandSuggestButtons"});
     }
     if (!document.querySelector('#itemMaterial').value.length && response.data?.materials) {
       document.querySelector('#itemMaterial').value = response.data.materials;
       document.querySelector('#itemMaterial').setCustomValidity('Bekräfta eller ändra det ifyllda materialet');
       document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
-      document.getElementById('itemMaterial').style.display = 'inline-block';
+      document.getElementById('itemMaterialLabel').style.display = 'inline-block';
       document.querySelector('#itemMaterialContainer').classList.add('confirm-value');
-      document.querySelector('#materialSuggestButtons').style.display = 'block';
       analytics.track("Element Viewed", {elementID: "materialSuggestButtons"});
     }
 
@@ -540,7 +543,6 @@ async function detectAndFillColor(input) {
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
     document.querySelector('#itemColorContainer').classList.add('confirm-value');
-    document.querySelector('#colorSuggestButtons').style.display = 'block';
     analytics.track("Element Viewed", { elementID: "colorSuggestButtons" });
   } catch (e) {
     console.log('Error calling detectItemColor', e);
