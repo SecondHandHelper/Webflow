@@ -30,19 +30,8 @@
     // Hide/Show warning about difficulty to sell certain brands
     let brand = document.getElementById("itemBrand");
     let hardToSellDiv = document.getElementById("hardToSellDiv");
-    let words = ["H&M", "HM", "Zara", "ASOS", "Nelly", "Gina Tricot", "BikBok", "Bik Bok", "Lindex", "Kappahl", "Cubus", "NA-KD", "NAKD", "Mango", "Ellos", "Primark", "Shein", "Vila", "Forever 21", "Pull & Bear", "Bershka", "Stradivarius", "Okänt", "Unknown", "Vet ej"];
+    let words = ["H&M", "HM", "Zara", "ASOS", "Nelly", "Gina Tricot", "BikBok", "Bik Bok", "Lindex", "Kappahl", "Cubus", "NA-KD", "NAKD", "Mango", "Ellos", "Primark", "Shein", "Vila", "Forever 21", "Pull & Bear", "Bershka", "Stradivarius", "Okänt", "Unknown", "Vet ej", "...", "Vet inte", "Okänd", "-", "Se bild"];
 
-
-    brand.onchange = function () {
-        let value = this.value;
-        setTimeout(function () {
-            value = brand.value;
-            if (!checkBrand(value)) {
-                checkAndDisplayShareSold(value);
-                displayFindModelDiv(value);
-            }
-        }, 5);
-    };
     brand.oninput = function () {
         shareSoldDiv.style.display = 'none';
         let value = this.value;
