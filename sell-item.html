@@ -37,7 +37,7 @@
         let value = this.value;
         if (!checkBrand(value)) {
             checkAndDisplayShareSold(value);
-            displayFindModelDiv(value);
+            //displayFindModelDiv(value);
         }
     };
 
@@ -81,6 +81,7 @@
         }
         // Create item from sessionStorage
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
+            document.getElementById('creatingItemText').style.display = 'block';
             await createItemAfterSignIn();
             const shippingMethod = sessionStorage.getItem('shippingMethod');
             if (shippingMethod) {
@@ -116,9 +117,7 @@
             document.getElementById('resellIntro').style.display = 'block';
             await fillForm(params.id);
             document.getElementById("triggerShowSellItemContent").click();
-        } else if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-            document.getElementById('creatingItemText').style.display = 'block';
-        } else {
+        } else if (!sessionStorage.getItem('itemToBeCreatedAfterSignIn') && !document.referrer.includes('/sign-in')) {
             document.getElementById("triggerShowSellItemContent").click();
             document.getElementById("frontImage").required = true;
             document.getElementById("brandTagImage").required = true;

@@ -33,8 +33,10 @@
       displayPerferredSignInMethod('emailAndPasswordButton');
     }
   }
-
+  
   if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+    const brand = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')).item.brand;
+    document.getElementById('notificationText').innerHTML = `Du behöver logga in eller skapa konto för att vi ska kunna sälja ditt ${brand}-plagg`;
     document.getElementById('maiIntroForPrefillLogin').style.display = 'block';
   }
 

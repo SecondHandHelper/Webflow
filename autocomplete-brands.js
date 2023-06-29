@@ -46,6 +46,10 @@ function autocomplete(inp, arr) {
         a.appendChild(b);
       }
     }
+    // If no match, don't show list at all
+    if (!a.innerHTML){
+      closeAllLists();
+    }
   });
   /*execute a function presses a key on the keyboard:*/
   inp.addEventListener("keydown", function (e) {
