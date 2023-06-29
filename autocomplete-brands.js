@@ -30,6 +30,7 @@ function autocomplete(inp, arr) {
         b.addEventListener("click", function (e) {
           /*insert the value for the autocomplete text field:*/
           inp.value = this.getElementsByTagName("input")[0].value;
+          inp.dispatchEvent(new Event('input'));
 
           // TODO: Temporary fix to the problem that Levi's is cut after quotation mark
           if (inp.value === "Levi") {

@@ -333,7 +333,7 @@ async function checkAndDisplayShareSold(value) {
   if (response.data && response.data.cleanedBrand) {
     console.log('data.shareSold', response.data.shareSold, 'data.cleanedBrand', response.data.cleanedBrand);
     if (response.data.shareSold >= '65%') {
-      shareSoldText.innerHTML = `Bra att veta: Hög efterfrågan på ${response.data.cleanedBrand}`;
+      shareSoldText.innerHTML = `Det är hög efterfrågan på ${response.data.cleanedBrand}`;
       shareSoldDiv.style.display = 'block';
       return;
     }
