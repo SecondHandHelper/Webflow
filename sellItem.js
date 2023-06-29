@@ -170,7 +170,9 @@ async function uploadUserImages(itemId, imageData) {
       return { [fileName]: imageData[fileName] };
     }
     const fileContent = await toBase64(imageData[fileName]);
+    console.log(`Uploading image request ${itemId}, ${fileName} ${fileContent.slice(0,10)}`);
     const response = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({ itemId, fileName, file: fileContent });
+    console.log(`upload image response ${JSON.stringify(response)}`)
     return { [fileName]: response.data.url };
   }));
   return Object.assign(...promises);
