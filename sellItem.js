@@ -169,7 +169,7 @@ async function uploadUserImages(itemId, imageData) {
     if (typeof imageData[fileName] === 'string') {
       return { [fileName]: imageData[fileName] };
     }
-    const fileContent = toBase64(imageData[fileName]);
+    const fileContent = await toBase64(imageData[fileName]);
     const response = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({ itemId, fileName, file: fileContent });
     return { [fileName]: response.data.url };
   }));
