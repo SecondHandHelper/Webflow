@@ -131,7 +131,7 @@ async function addItemInner(id) {
   const createdFromItem = params.id ? { createdFromItem: params.id } : {};
   const item = { ...pageData, shippingMethod, images, ...createdFromItem, version: "2" };
 
-  if (params.id && !authUser.current) {
+  if (!authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
     await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
