@@ -332,25 +332,11 @@ async function checkAndDisplayShareSold(value) {
 
   if (response.data && response.data.cleanedBrand) {
     console.log('data.shareSold', response.data.shareSold, 'data.cleanedBrand', response.data.cleanedBrand);
-    if (response.data.shareSold > '95%') {
-      shareSoldText.innerHTML = `95% av plaggen från ${response.data.cleanedBrand} säljs`;
+    if (response.data.shareSold >= '65%') {
+      shareSoldText.innerHTML = `Bra att veta: Hög efterfrågan på ${response.data.cleanedBrand}`;
       shareSoldDiv.style.display = 'block';
       return;
     }
-
-    if (response.data.shareSold > '55%') {
-      shareSoldText.innerHTML = `${response.data.shareSold} av plaggen från ${response.data.cleanedBrand} säljs`;
-      shareSoldDiv.style.display = 'block';
-      return;
-    }
-    if (response.data.shareSold >= '45%') {
-      shareSoldText.innerHTML = `Hälften av plaggen från ${response.data.cleanedBrand} säljs`;
-      shareSoldDiv.style.display = 'block';
-      return;
-    }
-
-    shareSoldText.innerHTML = `Mindre än hälften av plaggen från ${response.data.cleanedBrand} säljs`;
-    shareSoldDiv.style.display = 'block';
   } else {
     shareSoldText.innerHTML = '';
     shareSoldDiv.style.display = 'none';
