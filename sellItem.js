@@ -165,16 +165,13 @@ async function uploadImagesFromForm(itemId) {
 }
 
 async function uploadUserImages(itemId, imageData) {
-  const storageRef = storage.ref();
-  const promises = await Promise.all(Object.keys(imageData).map(async (key) => {
-    if (typeof imageData[key] === 'string') {
-      return { [key]: await Promise.resolve(imageData[key]) };
+  const promises = await Promise.all(Object.keys(imageData).map(async (fileName) => {
+    if (typeof imageData[fileName] === 'string') {
+      return { [fileName]: imageData[fileName] };
     }
-    const imagePathReference = `images/${itemId}/${key}`;
-    const file = imageData[key];
-    let fileRef = storageRef.child(imagePathReference);
-    await fileRef.put(file);
-    return { [key]: await fileRef.getDownloadURL() };
+    const fileContent = toBase64(imageData[fileName]);
+    const response = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({ itemId, fileName, file: fileContent });
+    return { [fileName]: response.data.url };
   }));
   return Object.assign(...promises);
 }
