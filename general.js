@@ -523,8 +523,8 @@ function loadRecentlySold() {
                     const itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="conten-block with-image">
                     <div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div>
                     <div class="text-block-14">${soldPrice} kr</div>
-                    <div class='text-block-34'>${brand}</div>
-                    <div class='text-block-34'>${soldTimeText}</div></div>`;
+                    <div class='text-block-34'>${brand}</div>`;
+                    //I cut out the "Idag / Igår" during summer, since so little is sold every day. Add this last to show it again: <div class='text-block-34'>${soldTimeText}</div></div>
                     itemListRecentlySoldStartPage.innerHTML += itemCardHTML;
                 }
             }
