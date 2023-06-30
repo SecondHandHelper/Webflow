@@ -123,7 +123,7 @@
             document.getElementById('resellIntro').style.display = 'block';
             await fillForm(params.id);
             document.getElementById("triggerShowSellItemContent").click();
-        } else if (!sessionStorage.getItem('itemToBeCreatedAfterSignIn') && !document.referrer.includes('/sign-in')) {
+        } else if (!(sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in'))) {
             document.getElementById("triggerShowSellItemContent").click();
             document.getElementById("frontImage").required = true;
             document.getElementById("brandTagImage").required = true;
