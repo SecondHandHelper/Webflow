@@ -4,6 +4,7 @@
     var phone;
 </script>
 <script>
+    sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
     user.whenSet(privateMain);
     async function privateMain() {
         if (!user.current) {

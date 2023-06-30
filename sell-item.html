@@ -80,14 +80,20 @@
             await initializeMaterialConfirm();
         }
         // Create item from sessionStorage
-        if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
+        if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+          // ... if we are redirected here from the sign-in page
+          if (document.referrer.includes('/sign-in')) {
             document.getElementById('creatingItemText').style.display = 'block';
             await createItemAfterSignIn();
             const shippingMethod = sessionStorage.getItem('shippingMethod');
             if (shippingMethod) {
-                await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
+              await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({preferences: {shippingMethod}});
             }
-            return await nextStep({ itemCreatedFromPrefill: true });
+            return await nextStep({itemCreatedFromPrefill: true});
+          } else {
+            // otherwise make sure to remove any previously saved item as a precaution
+            sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
+          }
         }
 
         // Get user's item count to be able to send 'User Activated' event
