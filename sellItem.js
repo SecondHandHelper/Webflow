@@ -254,6 +254,7 @@ async function fillForm(itemId, savedItem) {
     }
 
     // Show cover image preview
+    sessionStorage.removeItem('coverImagePreviewUrl');
     const coverImageLarge = images.coverImageLarge || images.coverImage || null;
     const coverImageSmall = images.coverImage || images.coverImageLarge || null;
     if (coverImageLarge) {
