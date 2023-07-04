@@ -472,9 +472,9 @@ async function extraImageUploadChangeHandler() {
     }
 }
 
-function hideConfirmButtons(event) {
+function hideConfirmButtons(event, elementID) {
   event.currentTarget.setCustomValidity('');
-  event.currentTarget.closest('.suggest-buttons').style.display = 'none';
+  event.currentTarget.closest('.text-input-container').querySelector('.suggest-buttons').style.display = 'none';
 }
 
 async function detectAndFillBrandAndMaterial(input) {
@@ -540,7 +540,7 @@ async function initializeMaterialConfirm() {
     document.querySelector('#itemMaterial').value = '';
     document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
     document.querySelector('#itemMaterial').dispatchEvent(new Event('input'));
-    document.querySelector('#itemMaterialContainer').style.display = 'none';
+    document.querySelector('#materialSuggestButtons').style.display = 'none';
     document.querySelector('#itemMaterial').setCustomValidity('');
   });
   document.getElementById('confirmMaterial').addEventListener('click', () => {
@@ -553,7 +553,7 @@ async function initializeBrandConfirm() {
     document.querySelector('#itemBrand').value = '';
     document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
     document.querySelector('#itemBrand').dispatchEvent(new Event('input'));
-    document.querySelector('#itemBrandContainer').style.display = 'none';
+    document.querySelector('#brandSuggestButtons').style.display = 'none';
     document.querySelector('#itemBrand').setCustomValidity('');
   });
   document.getElementById('confirmBrand').addEventListener('click', () => {
@@ -566,7 +566,7 @@ async function initializeColorConfirm() {
     document.querySelector('#itemColor').value = '';
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
-    document.querySelector('#itemColorContainer').style.display = 'none';
+    document.querySelector('#colorSuggestButtons').style.display = 'none';
     document.querySelector('#itemColor').setCustomValidity('');
   });
   document.getElementById('confirmColor').addEventListener('click', () => {
