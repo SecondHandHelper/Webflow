@@ -67,33 +67,22 @@
             phoneNumberDiv.style.display = "none";
             document.getElementById("itemPhoneNumber").required = false;
         }
-        // Be om shippingMethod i formuläret
-        if (user.current?.preferences?.shippingMethod) {
-            shippingMethodDiv.style.display = "none";
-        }
-        if (featureIsEnabled('colorCategory')) {
-            document.getElementById('itemColorContainer').style.display = 'block';
-            document.getElementById('itemCategoryContainer').style.display = 'block';
-            await initializeCategorySelect();
-            await initializeColorConfirm();
-            await initializeBrandConfirm();
-            await initializeMaterialConfirm();
-        }
+
         // Create item from sessionStorage
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-          // ... if we are redirected here from the sign-in page
-          if (document.referrer.includes('/sign-in')) {
-            document.getElementById('creatingItemText').style.display = 'block';
-            await createItemAfterSignIn();
-            const shippingMethod = sessionStorage.getItem('shippingMethod');
-            if (shippingMethod) {
-              await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({preferences: {shippingMethod}});
+            // ... if we are redirected here from the sign-in page
+            if (document.referrer.includes('/sign-in')) {
+                document.getElementById('creatingItemText').style.display = 'block';
+                await createItemAfterSignIn();
+                const shippingMethod = sessionStorage.getItem('shippingMethod');
+                if (shippingMethod) {
+                    await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
+                }
+                return await nextStep({ itemCreatedFromPrefill: true });
+            } else {
+                // otherwise make sure to remove any previously saved item as a precaution
+                sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
             }
-            return await nextStep({itemCreatedFromPrefill: true});
-          } else {
-            // otherwise make sure to remove any previously saved item as a precaution
-            sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
-          }
         }
 
         // Get user's item count to be able to send 'User Activated' event
@@ -102,17 +91,15 @@
     }
 
     async function sellItemMain() {
+        await initializeCategorySelect();
+        await initializeColorConfirm();
+        await initializeBrandConfirm();
+        await initializeMaterialConfirm();
+
         // Be om telefonnummer i formuläret
         if (!user.current?.phoneNumber) {
             phoneNumberDiv.style.display = "block";
             document.getElementById("itemPhoneNumber").required = true;
-        }
-
-        // Be om shippingMethod i formuläret
-        if (!user.current?.preferences?.shippingMethod) {
-            $('#servicePointRadioButton').val("Service point");
-            $('#pickupRadioButton').val("Pickup");
-            shippingMethodDiv.style.display = "block";
         }
 
         // Fill form if the user comes from a prefill link
