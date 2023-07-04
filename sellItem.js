@@ -491,7 +491,7 @@ async function detectAndFillBrandAndMaterial(input) {
       document.querySelector('#itemBrand').setCustomValidity('Bekräfta eller ändra det ifyllda märket');
       document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
       document.getElementById('itemBrandLabel').style.display = 'inline-block';
-      document.querySelector('#itemBrandContainer').classList.add('confirm-value');
+      document.querySelector('#brandSuggestButtons').style.display = 'block';
       analytics.track("Element Viewed", {elementID: "brandSuggestButtons"});
     }
     if (!document.querySelector('#itemMaterial').value.length && response.data?.materials) {
@@ -499,7 +499,7 @@ async function detectAndFillBrandAndMaterial(input) {
       document.querySelector('#itemMaterial').setCustomValidity('Bekräfta eller ändra det ifyllda materialet');
       document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
       document.getElementById('itemMaterialLabel').style.display = 'inline-block';
-      document.querySelector('#itemMaterialContainer').classList.add('confirm-value');
+      document.querySelector('#materialSuggestButtons').style.display = 'block';
       analytics.track("Element Viewed", {elementID: "materialSuggestButtons"});
     }
 
@@ -528,7 +528,7 @@ async function detectAndFillColor(input) {
     document.querySelector('#itemColor').setCustomValidity('Bekräfta eller ändra den ifyllda färgen');
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
-    document.querySelector('#itemColorContainer').classList.add('confirm-value');
+    document.querySelector('#colorSuggestButtons').style.display = 'block';
     analytics.track("Element Viewed", { elementID: "colorSuggestButtons" });
   } catch (e) {
     console.log('Error calling detectItemColor', e);
@@ -544,7 +544,6 @@ async function initializeMaterialConfirm() {
     document.querySelector('#itemMaterial').setCustomValidity('');
   });
   document.getElementById('confirmMaterial').addEventListener('click', () => {
-    //document.querySelector('#itemMaterialContainer').classList.remove('confirm-value');
     document.querySelector('#itemMaterial').setCustomValidity('');
   })
 }
@@ -558,7 +557,6 @@ async function initializeBrandConfirm() {
     document.querySelector('#itemBrand').setCustomValidity('');
   });
   document.getElementById('confirmBrand').addEventListener('click', () => {
-    //document.querySelector('#itemBrandContainer').classList.remove('confirm-value');
     document.querySelector('#itemBrand').setCustomValidity('');
   })
 }
@@ -572,7 +570,6 @@ async function initializeColorConfirm() {
     document.querySelector('#itemColor').setCustomValidity('');
   });
   document.getElementById('confirmColor').addEventListener('click', () => {
-    //document.querySelector('#itemColorContainer').classList.remove('confirm-value');
     document.querySelector('#itemColor').setCustomValidity('');
   })
 }
