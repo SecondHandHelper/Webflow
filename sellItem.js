@@ -544,7 +544,7 @@ async function initializeMaterialConfirm() {
     document.querySelector('#itemMaterial').setCustomValidity('');
   });
   document.getElementById('confirmMaterial').addEventListener('click', () => {
-    document.querySelector('#itemMaterialContainer').classList.remove('confirm-value');
+    //document.querySelector('#itemMaterialContainer').classList.remove('confirm-value');
     document.querySelector('#itemMaterial').setCustomValidity('');
   })
 }
@@ -572,7 +572,7 @@ async function initializeColorConfirm() {
     document.querySelector('#itemColor').setCustomValidity('');
   });
   document.getElementById('confirmColor').addEventListener('click', () => {
-    document.querySelector('#itemColorContainer').classList.remove('confirm-value');
+    //document.querySelector('#itemColorContainer').classList.remove('confirm-value');
     document.querySelector('#itemColor').setCustomValidity('');
   })
 }
