@@ -95,24 +95,14 @@ async function getShippingMethod() {
   // If first time: User chooses shipping method preference in sell item form
   let shippingMethod = 'Service point';
   if (!user.current?.preferences?.shippingMethod) {
-    var radioButtons = document.getElementsByName("shippingMethod");
-    for (var x = 0; x < radioButtons.length; x++) {
-      if (radioButtons[x].checked) {
-        const method = radioButtons[x].value; // "Service point" or "Pickup"
-        if (method) {
-          shippingMethod = method;
-          if (authUser.current) {
-            await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
-          } else {
-            sessionStorage.setItem('shippingMethod', shippingMethod);
-          }
-        }
-      }
+    if (authUser.current) {
+      await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
+    } else {
+      sessionStorage.setItem('shippingMethod', shippingMethod);
     }
   } else {
     shippingMethod = user.current?.preferences?.shippingMethod;
   }
-
   return shippingMethod;
 }
 
@@ -170,7 +160,7 @@ async function uploadUserImages(itemId, imageData) {
       return { [fileName]: imageData[fileName] };
     }
     const fileContent = await toBase64(imageData[fileName]);
-    console.log(`Uploading image request ${itemId}, ${fileName} ${fileContent.slice(0,10)}`);
+    console.log(`Uploading image request ${itemId}, ${fileName} ${fileContent.slice(0, 10)}`);
     const response = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({ itemId, fileName, file: fileContent });
     console.log(`upload image response ${JSON.stringify(response)}`)
     return { [fileName]: response.data.url };
@@ -214,7 +204,7 @@ async function fillForm(itemId, savedItem) {
   try {
     let item = { data: savedItem };
     if (!savedItem) {
-      item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId});
+      item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId });
     }
     const data = item.data;
     const size = data.size;
@@ -311,7 +301,7 @@ async function fillForm(itemId, savedItem) {
       }
     });
   } catch (error) {
-      console.log("Error getting item document:", error);
+    console.log("Error getting item document:", error);
   }
   document.getElementById('loadingDiv').style.display = 'none';
 }
@@ -375,7 +365,7 @@ const toBase64 = file => new Promise((resolve, reject) => {
 
 const apiColorMapping = {
   "black": "Black",
-  "white":"White",
+  "white": "White",
   "gray": "Grey",
   "blue": "Blue",
   "dark_blue": "Navy",
@@ -461,15 +451,15 @@ async function materialTagImageUploadChangeHandler() {
 }
 
 async function extraImageUploadChangeHandler() {
-    let input = this.files[0];
-    if (input) {
-      let src = URL.createObjectURL(input);
-      extraImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-      extraImagePreview.style.backgroundImage = `url('${src}')`;
-      if (featureIsEnabled('colorCategory')) {
-        await detectAndFillBrandAndMaterial(input);
-      }
+  let input = this.files[0];
+  if (input) {
+    let src = URL.createObjectURL(input);
+    extraImagePreviewUploading.style.backgroundImage = `url('${src}')`;
+    extraImagePreview.style.backgroundImage = `url('${src}')`;
+    if (featureIsEnabled('colorCategory')) {
+      await detectAndFillBrandAndMaterial(input);
     }
+  }
 }
 
 function hideConfirmButtons(event, elementID) {
@@ -492,7 +482,7 @@ async function detectAndFillBrandAndMaterial(input) {
       document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
       document.getElementById('itemBrandLabel').style.display = 'inline-block';
       document.querySelector('#brandSuggestButtons').style.display = 'block';
-      analytics.track("Element Viewed", {elementID: "brandSuggestButtons"});
+      analytics.track("Element Viewed", { elementID: "brandSuggestButtons" });
     }
     if (!document.querySelector('#itemMaterial').value.length && response.data?.materials) {
       document.querySelector('#itemMaterial').value = response.data.materials;
@@ -500,7 +490,7 @@ async function detectAndFillBrandAndMaterial(input) {
       document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
       document.getElementById('itemMaterialLabel').style.display = 'inline-block';
       document.querySelector('#materialSuggestButtons').style.display = 'block';
-      analytics.track("Element Viewed", {elementID: "materialSuggestButtons"});
+      analytics.track("Element Viewed", { elementID: "materialSuggestButtons" });
     }
 
   } catch (e) {
@@ -576,7 +566,7 @@ async function initializeColorConfirm() {
 
 async function initializeCategorySelect() {
   $('#itemCategory').select2({ selectionCssClass: 'form-field', placeholder: 'Kategori', data: itemCategories });
-  $("body").on('click', '.select2-container--open .select2-results__group', function() {
+  $("body").on('click', '.select2-container--open .select2-results__group', function () {
     if ($(this).parent().attr('class').match(/expanded-group/)) {
       $(this).parent().removeClass('expanded-group');
     } else {
@@ -603,15 +593,15 @@ async function initializeCategorySelect() {
 
   $('#itemCategory').on('select2:close', () => {
     document.querySelector('body').style.overflow = 'auto'
-    document.querySelector('body').style.position =  'static';
-    document.querySelector('html').style.overflow =  'static';
+    document.querySelector('body').style.position = 'static';
+    document.querySelector('html').style.overflow = 'static';
   });
-  $('#itemCategory').on('select2:open', function() {
-    analytics.track("Element Viewed", {elementID: "itemCategoryContainer"});
+  $('#itemCategory').on('select2:open', function () {
+    analytics.track("Element Viewed", { elementID: "itemCategoryContainer" });
     console.log('Viewed itemCategoryContainer');
-    document.querySelector('body').style.overflow =  'hidden';
-    document.querySelector('body').style.position =  'fixed';
-    document.querySelector('html').style.overflow =  'fixed';
+    document.querySelector('body').style.overflow = 'hidden';
+    document.querySelector('body').style.position = 'fixed';
+    document.querySelector('html').style.overflow = 'fixed';
     const searchField = document.querySelector('.select2-search__field');
     searchField.placeholder = 'Sök... (t.ex. Klänning/Sneakers/Blus)';
     $('.select2-search__field').on('input', (e) => {
@@ -635,13 +625,13 @@ async function initializeCategorySelect() {
   $('#itemCategory').on('change', fieldLabelToggle('itemCategoryLabel'));
 
   // From https://github.com/select2/select2/issues/3015#issuecomment-570171720
-  $("#itemCategory").on("select2:open", function(){
+  $("#itemCategory").on("select2:open", function () {
     $(".select2-results").css("visibility", "hidden");
   });
-  $("#itemCategory").on('select2:opening', function(){
-    setTimeout(function(){
+  $("#itemCategory").on('select2:opening', function () {
+    setTimeout(function () {
       $(".select2-results").css("visibility", "visible");
-    },50);
+    }, 50);
   });
 }
 
@@ -652,7 +642,7 @@ const itemCategories = [
   },
   {
     "text": "Överdelar",
-    "children" : [
+    "children": [
       {
         "id": "Tröja",
         "text": "Tröja",
@@ -662,7 +652,7 @@ const itemCategories = [
       }, {
         "id": "Topp",
         "text": "Topp",
-      },  {
+      }, {
         "id": "Skjorta",
         "text": "Skjorta",
       }, {
@@ -715,7 +705,7 @@ const itemCategories = [
   },
   {
     "text": "Underdelar",
-    "children" : [
+    "children": [
       {
         "id": "Kjol",
         "text": "Kjol",
@@ -757,7 +747,7 @@ const itemCategories = [
   },
   {
     "text": "Helkropp",
-    "children" : [
+    "children": [
       {
         "id": "Klänning",
         "text": "Klänning",
@@ -802,7 +792,7 @@ const itemCategories = [
   },
   {
     "text": "Ytterkläder",
-    "children" : [
+    "children": [
       {
         "id": "Jacka",
         "text": "Jacka",
@@ -836,7 +826,7 @@ const itemCategories = [
   },
   {
     "text": "Skor",
-    "children" : [
+    "children": [
       {
         "id": "Sneakers",
         "text": "Sneakers",
@@ -855,7 +845,7 @@ const itemCategories = [
       }, {
         "id": "Flip-flops",
         "text": "Flip-flops",
-      },{
+      }, {
         "id": "Boots",
         "text": "Boots",
       }, {
@@ -872,7 +862,7 @@ const itemCategories = [
   },
   {
     "text": "Väskor",
-    "children" : [
+    "children": [
       {
         "id": "Axelremsväska",
         "text": "Axelremsväska",
@@ -894,7 +884,7 @@ const itemCategories = [
       }, {
         "id": "Datorväska",
         "text": "Datorväska",
-      },  {
+      }, {
         "id": "Väska",
         "text": "Annat (Väska)",
       }
@@ -902,7 +892,7 @@ const itemCategories = [
   },
   {
     "text": "Accessoarer",
-    "children" : [
+    "children": [
       {
         "id": "Solglasögon",
         "text": "Solglasögon",
