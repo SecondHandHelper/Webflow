@@ -558,7 +558,7 @@ async function initializeBrandConfirm() {
     document.querySelector('#itemBrand').setCustomValidity('');
   });
   document.getElementById('confirmBrand').addEventListener('click', () => {
-    document.querySelector('#itemBrandContainer').classList.remove('confirm-value');
+    //document.querySelector('#itemBrandContainer').classList.remove('confirm-value');
     document.querySelector('#itemBrand').setCustomValidity('');
   })
 }
