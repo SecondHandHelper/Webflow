@@ -125,7 +125,7 @@ async function addItemInner(id) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
     await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
-    sessionStorage.setItem('latestItemCreated', JSON.stringify({ item }));
+    sessionStorage.setItem('latestItemCreated', JSON.stringify( item ));
   }
 
   // If first time: User submitted their phone number
