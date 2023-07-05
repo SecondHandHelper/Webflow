@@ -180,18 +180,10 @@ async function nextStep(options) {
 }
 
 async function nextStepSignedIn(options) {
-  const firstNameSet = user.current.addressFirstName;
-  // If first name not set, show address form. Else, go to private page.
-  if (!firstNameSet) {
-    if (options && options.itemCreatedFromPrefill) {
-      document.getElementById('maiIntroForPrefillAddress').style.display = 'block';
-    }
-    addressFormDiv.style.display = 'block';
-    addItemFormDiv.style.display = 'none';
-    loadingDiv.style.display = 'none';
-  } else {
-    location.href = "/private";
-  }
+  // Show confirmation
+  itemConfirmationDiv.style.display = 'block';
+  addItemFormDiv.style.display = 'none';
+  loadingDiv.style.display = 'none';
 }
 
 function fieldLabelToggle(labelId) {
