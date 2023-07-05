@@ -180,10 +180,8 @@ async function nextStep(options) {
 }
 
 async function nextStepSignedIn(options) {
-  // Show confirmation
-  itemConfirmationDiv.style.display = 'block';
-  addItemFormDiv.style.display = 'none';
-  loadingDiv.style.display = 'none';
+  // Show item confirmation screen
+  triggerShowItemConfirmation.click();
 }
 
 function fieldLabelToggle(labelId) {
