@@ -183,9 +183,10 @@ async function nextStep(options) {
 
 async function nextStepSignedIn(options) {
   // Show item confirmation screen
-  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')){
-    const frontImageUrl = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
-    itemConfirmationImage.style.backgroundImage = `url('${frontImageUrl}')`;
+  if (sessionStorage.getItem('latestItemCreated')) {
+    const frontImageUrl = JSON.parse(sessionStorage.getItem('latestItemCreated'))?.images?.frontImage;
+    if (frontImageUrl) { itemConfirmationImage.style.backgroundImage = `url('${frontImageUrl}')`; console.log("Found front image"); }
+    else { console.log("Couldn't find front image"); }
   }
   triggerShowItemConfirmation.click();
 }
