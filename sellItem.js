@@ -125,6 +125,7 @@ async function addItemInner(id) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
     await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
+    sessionStorage.setItem('latestItemCreated', JSON.stringify({ item }));
   }
 
   // If first time: User submitted their phone number
@@ -141,8 +142,9 @@ async function addItemInner(id) {
 
 async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
-  await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
+  await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
+  sessionStorage.setItem('latestItemCreated', JSON.stringify({ item }));
 }
 
 async function uploadImagesFromForm(itemId) {
@@ -181,6 +183,10 @@ async function nextStep(options) {
 
 async function nextStepSignedIn(options) {
   // Show item confirmation screen
+  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')){
+    const frontImageUrl = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
+    itemConfirmationImage.style.backgroundImage = `url('${frontImageUrl}')`;
+  }
   triggerShowItemConfirmation.click();
 }
 
