@@ -144,7 +144,7 @@ async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
   await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
-  sessionStorage.setItem('latestItemCreated', JSON.stringify({ item }));
+  sessionStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
 }
 
 async function uploadImagesFromForm(itemId) {
