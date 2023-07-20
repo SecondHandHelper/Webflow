@@ -614,7 +614,7 @@ async function addUserDetails() {
     })
         .then(() => {
             console.log(`User address of ${authUser.current.uid} is now updated`);
-            itemConfirmationDiv.style.display = 'block';
+            itemConfirmationScreen.style.display = 'block';
             addressFormDiv.style.display = 'none';
         })
         .catch((error) => {

@@ -189,6 +189,8 @@ async function nextStepSignedIn(options) {
     else { console.log("Couldn't find front image"); }
   }
   triggerShowItemConfirmation.click();
+  // Track with segment
+  analytics.track("Element Viewed", { elementID: "itemConfirmationScreen" });
 }
 
 function fieldLabelToggle(labelId) {
