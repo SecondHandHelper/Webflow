@@ -138,7 +138,7 @@ async function addItemInner(id) {
       sessionStorage.setItem('phoneNumber', pn);
     }
   }
-  let personalId = itempersonalId.value;
+  let personalId = itemPersonalId.value;
   if (personalId) {
     personalId = formatPersonalId(personalId);
     if (authUser.current) {
