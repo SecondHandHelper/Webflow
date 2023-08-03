@@ -63,10 +63,15 @@
 
     async function sellItemMainAuthenticated() {
         console.log("sellItemMainAuthenticated " + new Date());
+
+        // Be inte om telefonnummer i formuläret
         if (user.current?.phoneNumber) {
             phoneNumberDiv.style.display = "none";
             document.getElementById("itemPhoneNumber").required = false;
         }
+
+        // Visa alla "viktiga" fält om man är inloggad
+        toggleMoreInfoFields.click();
 
         // Create item from sessionStorage
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
@@ -137,6 +142,18 @@
         const pn = formatPhoneNumber(itemPhoneNumber.value);
         const error = pn.length >= 12 && pn.includes('+') ? '' : 'Ogiltigt mobilnummer';
         itemPhoneNumber.setCustomValidity(error);
+    });
+    itemPersonalId.addEventListener("input", () => {
+        const pid = itemPersonalId.value;
+        formattedPid = formatPersonalId(pid) || '' ;
+        const error = isValidSwedishSsn(formattedPid) ? '' : 'Ogiltigt personnummer';
+        itemPersonalId.setCustomValidity(error);
+        if (pid){
+            itemPersonalId.required = true;
+        } else {
+            itemPersonalId.required = false; // This row doesn't seem to work, therefor the safe guard below.
+            itemPersonalId.setCustomValidity('');
+        }
     });
     window.addEventListener("load", (event) => {
         console.log('Page fully loaded');

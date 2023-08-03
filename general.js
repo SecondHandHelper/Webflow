@@ -691,7 +691,6 @@ async function addPersonalId() {
 function formatPersonalId(personalIdInput) {
     let personalId = personalIdInput.replace('-', '');
     if (personalId.length !== 12 && (personalId.substring(0, 2) !== '19' || personalId.substring(0, 2) !== '20')) {
-        console.log("Number(personalId.substring(0, 2)", Number(personalId.substring(0, 2)));
         if (Number(personalId.substring(0, 2)) <= 99 && Number(personalId.substring(0, 2)) > 25) {
             personalId = "19" + personalId;
         } else {
@@ -700,7 +699,6 @@ function formatPersonalId(personalIdInput) {
     }
     console.log(personalId);
     if (personalId.length === 12) {
-        console.log("return ", personalId);
         return personalId;
     }
     return null;

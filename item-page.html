@@ -160,6 +160,12 @@ itemStatusText.style.fontWeight = "500";
         }
         if (event.type === 'listingRenewal') { text = `Annonser förnyades`; }
         if (event.type === 'platformAdded') { 
+            const platformsText = '';
+            for (let p in event.data.platforms){ // E.g. "Tradera, Vestiaire Collective och Mai Shop"
+                if(p != 'Google Shopping' && p != 'Instagram Shop' && p != 'Facebook Shop'){
+                    
+                }
+            }
             if (event.data.platforms) {text = `Publicerades på ${event.data.platforms[0]}`;}
             if (event.data.platforms.includes('Mai Shop')) { text += '<br>(Google Shopping, Instagram Shop, Facebook Shop)'}
         }
