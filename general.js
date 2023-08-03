@@ -59,10 +59,11 @@ function updateIC(userId, em, ph) {
     });
 }
 
-async function updateFirestoreUserDocument(userId, email, phone) {
+async function updateFirestoreUserDocument(userId, email, phone, ssn) {
     let fields = {};
     if (email) { fields["email"] = email; }
     if (phone) { fields["phoneNumber"] = phone; }
+    if (ssn) { fields["personalId"] = ssn; }
     const signInMethod = authUser.current.providerData[0].providerId;
     if (signInMethod) { fields["signInMethod"] = signInMethod; }
     const docRef = db.collection("users").doc(userId);

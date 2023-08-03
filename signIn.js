@@ -40,7 +40,8 @@ async function signedInNextStep(fallbackRedirect) {
     if (authUser.current) {
       const email = authUser.current.email || sessionStorage.getItem("email");
       const phone = authUser.current.phoneNumber || sessionStorage.getItem("phoneNumber");
-      await updateFirestoreUserDocument(authUser.current.uid, email, phone); //Important that this happens first, since many other functions depend on an existing user document
+      const ssn = authUser.current.personalId || sessionStorage.getItem("personalId");
+      await updateFirestoreUserDocument(authUser.current.uid, email, phone, ssn); //Important that this happens first, since many other functions depend on an existing user document
     }
     // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item
     if (userIsSellingNewItem()) {
