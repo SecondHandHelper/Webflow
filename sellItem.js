@@ -125,7 +125,7 @@ async function addItemInner(id) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
     await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
-    sessionStorage.setItem('latestItemCreated', JSON.stringify( item ));
+    sessionStorage.setItem('latestItemCreated', JSON.stringify(item));
   }
 
   // If first time: User submitted their phone number
@@ -136,6 +136,19 @@ async function addItemInner(id) {
       await writePhoneNumberToFirestore(authUser.current.uid, pn);
     } else {
       sessionStorage.setItem('phoneNumber', pn);
+    }
+  }
+  let personalId = itempersonalId.value;
+  if (personalId) {
+    personalId = formatPersonalId(personalId);
+    if (authUser.current) {
+      // Write to Firestore
+      const itemRef = db.collection('users').doc(authUser.current.uid);
+      itemRef.update({ personalId }).then(() => {
+          console.log(`Personal id of ${authUser.current.uid} is now updated`);
+        });
+    } else {
+      sessionStorage.setItem('personalId', personalId);
     }
   }
 }
