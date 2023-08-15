@@ -490,7 +490,7 @@ async function detectAndFillBrandAndMaterial(input) {
     console.log(response);
     if (!document.querySelector('#itemBrand').value.length && response.data?.brand) {
       document.querySelector('#itemBrand').value = response.data.brand;
-      document.querySelector('#itemBrand').setCustomValidity('Bekräfta eller ändra det ifyllda märket');
+      document.querySelector('#itemBrand').setCustomValidity('Bekräfta eller ändra märket');
       document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
       document.getElementById('itemBrandLabel').style.display = 'inline-block';
       document.querySelector('#brandSuggestButtons').style.display = 'block';
@@ -498,7 +498,7 @@ async function detectAndFillBrandAndMaterial(input) {
     }
     if (!document.querySelector('#itemMaterial').value.length && response.data?.materials) {
       document.querySelector('#itemMaterial').value = response.data.materials;
-      document.querySelector('#itemMaterial').setCustomValidity('Bekräfta eller ändra det ifyllda materialet');
+      document.querySelector('#itemMaterial').setCustomValidity('Bekräfta eller ändra materialet');
       document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
       document.getElementById('itemMaterialLabel').style.display = 'inline-block';
       document.querySelector('#materialSuggestButtons').style.display = 'block';
@@ -527,7 +527,7 @@ async function detectAndFillColor(input) {
       console.log("Unable to set color from", response.data.colors?.[0]);
       return;
     }
-    document.querySelector('#itemColor').setCustomValidity('Bekräfta eller ändra den ifyllda färgen');
+    document.querySelector('#itemColor').setCustomValidity('Bekräfta eller ändra färgen');
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
     document.querySelector('#colorSuggestButtons').style.display = 'block';
