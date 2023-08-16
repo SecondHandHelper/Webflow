@@ -212,9 +212,8 @@
       if (user.current.testGroups.includes('beta')) {
         return featureConfig.beta[featureName]
       }
-    } else {
-      return featureConfig.default[featureName]
     }
+    return featureConfig.default[featureName]
   }
 
   // SEND SLACK PING
