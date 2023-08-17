@@ -33,7 +33,7 @@ firebase.auth().onAuthStateChanged(async (result) => {
 
 async function saveRefreshToken() {
   const refreshToken = authUser.current.refreshToken
-  const idToken = authUser.current.getIdToken();
+  const idToken = await authUser.current.getIdToken();
   try {
     // TODO: Change to maiapp.se to go live
     return await fetch('https://api.shh-test.page/maiappAuth', {
