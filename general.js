@@ -497,6 +497,7 @@ function signOut() {
         user.current = null;
         userId = null;
         location.href = '/';
+        deleteCookie('maiAuth');
     }).catch((error) => {
         console.log(error);
     });

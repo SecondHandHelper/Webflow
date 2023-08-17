@@ -8,6 +8,10 @@ function setCookie(cname, cvalue, exdays) {
     //console.log("Cookie set: ", cname + "=" + cvalue);
 }
 
+function deleteCookie(cname) {
+  document.cookie = cname +'=; Path=/;  Domain=' + location.host +  '; Expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=None; Secure';
+}
+
 function getCookie(cname) {
     let name = cname + "=";
     let ca = document.cookie.split(';');
