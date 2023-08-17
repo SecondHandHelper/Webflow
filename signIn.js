@@ -6,7 +6,6 @@ firebase.auth().onAuthStateChanged(async (result) => {
     const authenticated = result;
     try {
       setPreferredLogInMethodCookie(authenticated.providerData[0].providerId);
-      await saveRefreshToken();
       console.log("authUser", authUser.current);
       const doc = await db.collection("users").doc(authenticated.uid).get();
       authUser.current = authenticated;
@@ -15,6 +14,7 @@ firebase.auth().onAuthStateChanged(async (result) => {
         console.log("user:", doc.data());
         user.current = doc.data();
       }
+      await saveRefreshToken();
     } catch (error) {
       console.log("Error getting document:", error);
     }
