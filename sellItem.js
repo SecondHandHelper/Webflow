@@ -160,6 +160,38 @@ async function createItemAfterSignIn() {
   sessionStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
 }
 
+async function enhanceFrontImage(input) {
+  const apiKey = '0b2a0607442c0d1329056d09ecc78f1dcd8b6c3b';
+  const standardTemplate = 'bd51c6f8-32ba-4add-b54c-d87a4869f2cb';
+  const dressTemplate = 'f490f16e-cb43-4fd7-86a9-60c37bef470e';
+
+  const form = new FormData();
+  form.append('templateId', standardTemplate);
+  form.append('imageFile', input);
+  try {
+    const response = await fetch('https://beta-sdk.photoroom.com/v1/render', {
+      method: 'POST',
+      headers: {
+        Accept: 'image/png, application/json',
+        'x-api-key': apiKey
+      },
+      body: form
+    });
+    console.log("Got response");
+    if (!response.ok) {
+      throw new Error("Network response was not OK");
+    }
+    const imageBlob = await response.blob();
+    const imageBase64 = await toBase64(imageBlob);
+    const enhancedFileResponse = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({
+      itemId: 'tempFrontImages', fileName: 'frontImage', file: imageBase64
+    });
+    showImagePreview('frontImage', enhancedFileResponse.data.url);
+  } catch (ex) {
+    console.error(ex);
+  }
+}
+
 async function uploadImagesFromForm(itemId) {
   const imageData = imageElements.reduce((accumulator, current) => {
     const file = document.getElementById(current).files[0] || sessionStorage.getItem(`${current}PreviewUrl`);
@@ -212,6 +244,19 @@ function fieldLabelToggle(labelId) {
   }
 }
 
+function showImagePreview(imageName, url) {
+  document.getElementById(`${imageName}Preview`).style.backgroundImage = `url('${url}')`;
+  const siblings = document.getElementById(imageName).parentNode.parentNode.childNodes;
+  for (let i = 0; i < siblings.length; i++) {
+    if (siblings[i].className.includes("success-state")) {
+      siblings[i].style.display = 'block';
+    } else {
+      // Hide other states of file input field "empty-state" and "error-state"
+      siblings[i].style.display = 'none';
+    }
+  }
+}
+
 async function fillForm(itemId, savedItem) {
   try {
     let item = { data: savedItem };
@@ -232,25 +277,12 @@ async function fillForm(itemId, savedItem) {
     const images = data.images;
 
     // Populate images
-    function showPreview(imageName, url) {
-      document.getElementById(`${imageName}Preview`).style.backgroundImage = `url('${url}')`;
-      const siblings = document.getElementById(imageName).parentNode.parentNode.childNodes;
-      for (let i = 0; i < siblings.length; i++) {
-        if (siblings[i].className.includes("success-state")) {
-          siblings[i].style.display = 'block';
-        } else {
-          // Hide other states of file input field "empty-state" and "error-state"
-          siblings[i].style.display = 'none';
-        }
-      }
-    }
-
     imageElements.map(img => sessionStorage.removeItem(`${img}PreviewUrl`));
     for (const imageName in images) {
       const urlSmall = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName] || images[`${imageName}Large`];
       const urlLarge = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
       if (imageElements.includes(imageName)) {
-        showPreview(imageName, urlSmall);
+        showImagePreview(imageName, urlSmall);
         sessionStorage.setItem(`${imageName}PreviewUrl`, urlLarge); // Store large preview url to create image from on submit
       }
     }
@@ -407,10 +439,14 @@ async function frontImageUploadChangeHandler() {
     let src = URL.createObjectURL(input);
     frontImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     frontImagePreview.style.backgroundImage = `url('${src}')`;
+    const promises = [];
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillColor(input);
-      await detectAndFillBrandAndMaterial(input);
+      promises.push(detectAndFillColor(input), detectAndFillBrandAndMaterial(input));
     }
+    if (featureIsEnabled('enhanceImage')) {
+      promises.push(enhanceFrontImage(input));
+    }
+    await Promise.all(promises);
   }
 }
 
