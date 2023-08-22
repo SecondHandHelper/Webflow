@@ -105,7 +105,7 @@
     async function saveChanges() {
         saveChangesButtonText.style.color = "#e2dede";
         console.log("changedImages: ", changedImages);
-        updateItem(params.id, changedImages);
+        await updateItem(params.id, changedImages);
     }
 
     // EVENT LISTENERS
@@ -122,6 +122,14 @@
                 elemPreview.style.backgroundImage = `url('${src}')`;
             }
         });
+    });
+    document.getElementById('frontImage').addEventListener('change', async function () {
+      let input = this.files[0];
+      if (input) {
+        const enhancedImage = await createEnhancedImage(input);
+        document.getElementById('frontImagePreviewUploading').style.backgroundImage = `url('${enhancedImage}')`;
+        document.getElementById('frontImagePreview').style.backgroundImage = `url('${enhancedImage}')`;
+      }
     });
 
     let changedImages = [];

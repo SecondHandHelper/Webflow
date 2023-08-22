@@ -69,6 +69,49 @@
       }
     },
   };
+
+  // SEGMENT IDENTIFY
+  function identify(authenticatedUser, dbUser) {
+    const now = new Date().toISOString();
+    let createdAt = new Date(authenticatedUser.metadata.creationTime).toISOString();
+    let latestLogin = new Date(authenticatedUser.metadata.lastSignInTime).toISOString();
+    let signInMethod = authenticatedUser.providerData[0].providerId;
+    const firstName = dbUser.addressFirstName ? dbUser.addressFirstName : null;
+    const lastName = dbUser.addressLastName ? dbUser.addressLastName : null;
+    const email = dbUser.email ? dbUser.email : null;
+    const phone = dbUser.phoneNumber ? dbUser.phoneNumber : null;
+    const street = dbUser.addressStreetAddress ? dbUser.addressStreetAddress : null;
+    const city = dbUser.addressCity ? dbUser.addressCity : null;
+    const postalCode = dbUser.addressPostalCode ? dbUser.addressPostalCode : null;
+    const doorCode = dbUser.addressDoorCode ? dbUser.addressDoorCode : null;
+    let campaign = {};
+    if (dbUser.attribution) {
+      campaign["name"] = dbUser.attribution.utm_campaign ? dbUser.attribution.utm_campaign : null;
+      campaign["source"] = dbUser.attribution.utm_source ? dbUser.attribution.utm_source : null;
+      campaign["medium"] = dbUser.attribution.utm_medium ? dbUser.attribution.utm_medium : null;
+      campaign["term"] = dbUser.attribution.utm_term ? dbUser.attribution.utm_term : null;
+      campaign["content"] = dbUser.attribution.utm_content ? dbUser.attribution.utm_content : null;
+    }
+    campaign = Object.keys(campaign).length > 0 ? campaign : null;
+
+    analytics.identify(`${authenticatedUser.uid}`, {
+      createdAt,
+      firstName,
+      lastName,
+      email,
+      phone,
+      address: {
+        street,
+        city,
+        postalCode,
+        doorCode
+      },
+      latestLogin,
+      latestPageView: now,
+      signInMethod,
+      campaign
+    });
+  }
 </script>
 
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.43/general.js"></script>
@@ -136,49 +179,6 @@
   }
   document.querySelectorAll("a").forEach(link => link.addEventListener('click', linkClickTracker) );
   document.querySelectorAll('[type=submit]').forEach(link => link.addEventListener('click', linkClickTracker) );
-
-  // SEGMENT IDENTIFY
-  function identify(authenticatedUser, dbUser) {
-    const now = new Date().toISOString();
-    let createdAt = new Date(authenticatedUser.metadata.creationTime).toISOString();
-    let latestLogin = new Date(authenticatedUser.metadata.lastSignInTime).toISOString();
-    let signInMethod = authenticatedUser.providerData[0].providerId;
-    const firstName = dbUser.addressFirstName ? dbUser.addressFirstName : null;
-    const lastName = dbUser.addressLastName ? dbUser.addressLastName : null;
-    const email = dbUser.email ? dbUser.email : null;
-    const phone = dbUser.phoneNumber ? dbUser.phoneNumber : null;
-    const street = dbUser.addressStreetAddress ? dbUser.addressStreetAddress : null;
-    const city = dbUser.addressCity ? dbUser.addressCity : null;
-    const postalCode = dbUser.addressPostalCode ? dbUser.addressPostalCode : null;
-    const doorCode = dbUser.addressDoorCode ? dbUser.addressDoorCode : null;
-    let campaign = {};
-    if (dbUser.attribution) {
-      campaign["name"] = dbUser.attribution.utm_campaign ? dbUser.attribution.utm_campaign : null;
-      campaign["source"] = dbUser.attribution.utm_source ? dbUser.attribution.utm_source : null;
-      campaign["medium"] = dbUser.attribution.utm_medium ? dbUser.attribution.utm_medium : null;
-      campaign["term"] = dbUser.attribution.utm_term ? dbUser.attribution.utm_term : null;
-      campaign["content"] = dbUser.attribution.utm_content ? dbUser.attribution.utm_content : null;
-    }
-    campaign = Object.keys(campaign).length > 0 ? campaign : null;
-
-    analytics.identify(`${authenticatedUser.uid}`, {
-      createdAt,
-      firstName,
-      lastName,
-      email,
-      phone,
-      address: {
-        street,
-        city,
-        postalCode,
-        doorCode
-      },
-      latestLogin,
-      latestPageView: now,
-      signInMethod,
-      campaign
-    });
-  }
 
   // FUNCTIONS PRIVATE PAGE
   function formatPhoneNumber(str) {

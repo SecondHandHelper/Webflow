@@ -124,6 +124,7 @@ async function addItemInner(id) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
     await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
+    sessionStorage.removeItem('enhancedFrontImage');
     sessionStorage.setItem('latestItemCreated', JSON.stringify(item));
   }
 
@@ -156,6 +157,7 @@ async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
   await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
+  sessionStorage.removeItem('enhancedFrontImage');
   sessionStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
 }
 
@@ -170,30 +172,8 @@ async function enhanceFrontImage(input) {
   const form = new FormData();
   form.append('templateId', standardTemplate);
   form.append('imageFile', input);
-  try {
-    const response = await fetch('https://beta-sdk.photoroom.com/v1/render', {
-      method: 'POST',
-      headers: {
-        Accept: 'image/png, application/json',
-        'x-api-key': apiKey
-      },
-      body: form
-    });
-    console.log("Got response");
-    if (!response.ok) {
-      throw new Error("Network response was not OK");
-    }
-    const imageBlob = await response.blob();
-    const imageBase64 = await toBase64(imageBlob);
-    const tempId = uuidv4();
-    const enhancedFileResponse = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({
-      itemId: 'tempFrontImages', fileName: `${tempId}-frontImage`, file: imageBase64
-    });
-    showImagePreview('frontImage', enhancedFileResponse.data.url);
-    sessionStorage.setItem('enhancedFrontImage', enhancedFileResponse.data.url)
-  } catch (ex) {
-    console.error(ex);
-  }
+  const enhancedImage = await createEnhancedImage(input);
+  showImagePreview('frontImage', enhancedImage);
   document.getElementById('loadingFrontImageIcon').style.display = 'none';
   document.getElementById('deleteFrontImageIcon').style.display = 'inline-block';
 }
@@ -239,8 +219,8 @@ async function nextStep(options) {
 async function nextStepSignedIn(options) {
   // Show item confirmation screen
   if (sessionStorage.getItem('latestItemCreated')) {
-    const frontImageUrl = JSON.parse(sessionStorage.getItem('latestItemCreated'))?.images?.frontImage;
-    if (frontImageUrl) { itemConfirmationImage.style.backgroundImage = `url('${frontImageUrl}')`; console.log("Found front image"); }
+    const enhancedFrontImageUrl = JSON.parse(sessionStorage.getItem('latestItemCreated'))?.images?.enhancedFrontImage;
+    if (enhancedFrontImageUrl) { itemConfirmationImage.style.backgroundImage = `url('${enhancedFrontImageUrl}')`; console.log("Found front image"); }
     else { console.log("Couldn't find front image"); }
   }
   triggerShowItemConfirmation.click();

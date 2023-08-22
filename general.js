@@ -768,7 +768,8 @@ function calculateSellerGets(value, elementId, feeElementId) {
 
 function itemCoverImage(item) {
     const images = item.images;
-    return images.coverImage ? (images.coverImageSmall || images.coverImage) : (images.frontImageSmall || images.frontImage);
+    return images.coverImage ? (images.coverImageSmall || images.coverImage) :
+      (images.enhancedFrontImage ? (images.enhancedFrontImageSmall || images.enhancedFrontImage) : (images.frontImageSmall || images.frontImage));
 }
 
 
@@ -791,4 +792,39 @@ Läs mer och registrera dig här:`
         linkCopiedBanner.style.display = 'flex';
         setTimeout(function () { linkCopiedBanner.style.display = 'none'; }, 1500);
     }
+}
+
+async function createEnhancedImage(input) {
+  const apiKey = '0b2a0607442c0d1329056d09ecc78f1dcd8b6c3b';
+  const standardTemplate = 'bd51c6f8-32ba-4add-b54c-d87a4869f2cb';
+  const dressTemplate = 'f490f16e-cb43-4fd7-86a9-60c37bef470e';
+
+  const form = new FormData();
+  form.append('templateId', standardTemplate);
+  form.append('imageFile', input);
+  try {
+    const response = await fetch('https://beta-sdk.photoroom.com/v1/render', {
+      method: 'POST',
+      headers: {
+        Accept: 'image/png, application/json',
+        'x-api-key': apiKey
+      },
+      body: form
+    });
+    console.log("Got response");
+    if (!response.ok) {
+      throw new Error("Network response was not OK");
+    }
+    const imageBlob = await response.blob();
+    const imageBase64 = await toBase64(imageBlob);
+    const tempId = uuidv4();
+    const enhancedFileResponse = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({
+      itemId: 'tempFrontImages', fileName: `${tempId}-frontImage`, file: imageBase64
+    });
+    sessionStorage.setItem('enhancedFrontImage', enhancedFileResponse.data.url)
+    return enhancedFileResponse.data.url;
+  } catch (ex) {
+    console.error(ex);
+    return '';
+  }
 }
