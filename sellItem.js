@@ -107,7 +107,6 @@ async function getShippingMethod() {
 }
 
 async function addItemInner(id) {
-
   const { modelCoverImageUrl, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
   const images = await uploadImagesFromForm(id);
@@ -161,6 +160,9 @@ async function createItemAfterSignIn() {
 }
 
 async function enhanceFrontImage(input) {
+  document.getElementById('loadingFrontImageIcon').style.display = 'inline-block';
+  document.getElementById('deleteFrontImageIcon').style.display = 'none';
+
   const apiKey = '0b2a0607442c0d1329056d09ecc78f1dcd8b6c3b';
   const standardTemplate = 'bd51c6f8-32ba-4add-b54c-d87a4869f2cb';
   const dressTemplate = 'f490f16e-cb43-4fd7-86a9-60c37bef470e';
@@ -187,9 +189,12 @@ async function enhanceFrontImage(input) {
       itemId: 'tempFrontImages', fileName: 'frontImage', file: imageBase64
     });
     showImagePreview('frontImage', enhancedFileResponse.data.url);
+    sessionStorage.setItem('enhancedFrontImage', enhancedFileResponse.data.url)
   } catch (ex) {
     console.error(ex);
   }
+  document.getElementById('loadingFrontImageIcon').style.display = 'none';
+  document.getElementById('deleteFrontImageIcon').style.display = 'inline-block';
 }
 
 async function uploadImagesFromForm(itemId) {
@@ -198,7 +203,11 @@ async function uploadImagesFromForm(itemId) {
     if (!file) return accumulator;
     return { ...accumulator, [current]: file }
   }, {}); // { frontImage: <file object>, ... }
-  return await uploadUserImages(itemId, imageData);
+  const images = await uploadUserImages(itemId, imageData);
+  if (sessionStorage.getItem('enhancedFrontImage')) {
+    images['enhancedFrontImage'] = sessionStorage.getItem('enhancedFrontImage');
+  }
+  return images;
 }
 
 async function uploadUserImages(itemId, imageData) {
