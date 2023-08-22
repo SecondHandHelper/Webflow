@@ -185,8 +185,9 @@ async function enhanceFrontImage(input) {
     }
     const imageBlob = await response.blob();
     const imageBase64 = await toBase64(imageBlob);
+    const tempId = uuidv4();
     const enhancedFileResponse = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({
-      itemId: 'tempFrontImages', fileName: 'frontImage', file: imageBase64
+      itemId: 'tempFrontImages', fileName: `${tempId}-frontImage`, file: imageBase64
     });
     showImagePreview('frontImage', enhancedFileResponse.data.url);
     sessionStorage.setItem('enhancedFrontImage', enhancedFileResponse.data.url)
