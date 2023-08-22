@@ -43,7 +43,7 @@ async function updateItem(itemId, changedImages) {
         });
         // Uploads files and add the new imageUrls to the changes object
         const storageRef = storage.ref();
-        await Promise.all(images.map(async (value, key) => {
+        await Promise.all(Array.from(images).map(async ([key, value]) => {
           console.log(`${key}: ${value}`);
           // If images was changed, set photo directions to default, since an 'info request' of images could have been shown
           photoDirectionsText.style.display = 'block';
