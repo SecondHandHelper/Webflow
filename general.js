@@ -768,8 +768,13 @@ function calculateSellerGets(value, elementId, feeElementId) {
 
 function itemCoverImage(item) {
     const images = item.images;
-    return images.coverImage ? (images.coverImageSmall || images.coverImage) :
-      (images.enhancedFrontImage ? (images.enhancedFrontImageSmall || images.enhancedFrontImage) : (images.frontImageSmall || images.frontImage));
+    return images.coverImage ?
+      (images.coverImageSmall || images.coverImage) :
+      (images.enhancedFrontImage ?
+        // If enhancedFrontImageSmall does not exist yet it's because the image was updated recently so add a random query
+        // param to make sure we get the right image and bypass caching
+        (images.enhancedFrontImageSmall || `${images.enhancedFrontImage}?v=${Math.floor(Math.random() * 10)}`) :
+        (images.frontImageSmall || images.frontImage));
 }
 
 
