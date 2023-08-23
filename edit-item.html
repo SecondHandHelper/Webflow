@@ -44,11 +44,16 @@
           }
 
           for (const x in images) {
-            const possibleElmts = ["frontImage", "brandTagImage", "materialTagImage", "defectImage", "productImage", "extraImage"];
+            const possibleElmts = ["brandTagImage", "materialTagImage", "defectImage", "productImage", "extraImage"];
             const url = images[`${x}Small`] || images[`${x}Medium`] || images[`${x}Large`] || images[x];
             if (possibleElmts.includes(x)) {
               hideSiblings(x, url);
             }
+          }
+          // Special case for frontImage where we want to show the enhancedFrontImage
+          const frontImageUrl = images[`enhancedFrontImageSmall`] || images[`enhancedFrontImageMedium`] || images[`enhancedFrontImageLarge`] || images['enhancedFrontImage'];
+          if (frontImageUrl) {
+            hideSiblings('frontImage', frontImageUrl);
           }
 
           // Populate text input fields
@@ -126,9 +131,13 @@
     document.getElementById('frontImage').addEventListener('change', async function () {
       let input = this.files[0];
       if (input) {
+        document.getElementById('loadingFrontImageIcon').style.display = 'inline-block';
+        document.getElementById('deleteFrontImageIcon').style.display = 'none';
         const enhancedImage = await createEnhancedImage(input);
         document.getElementById('frontImagePreviewUploading').style.backgroundImage = `url('${enhancedImage}')`;
         document.getElementById('frontImagePreview').style.backgroundImage = `url('${enhancedImage}')`;
+        document.getElementById('loadingFrontImageIcon').style.display = 'none';
+        document.getElementById('deleteFrontImageIcon').style.display = 'inline-block';
       }
     });
 

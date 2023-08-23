@@ -1,5 +1,6 @@
 async function updateItem(itemId, changedImages) {
     console.log("updateItem()");
+    document.getElementsByClassName('goback')[0].data.disabled = true;
     const now = new Date();
     const size = itemSize.value;
     const material = itemMaterial.value;
@@ -84,5 +85,6 @@ async function updateItem(itemId, changedImages) {
         });
     }
   
-    uploadImages(itemId);
+    await uploadImages(itemId);
+    document.getElementsByClassName('goback')[0].data.disabled = false;
   }
