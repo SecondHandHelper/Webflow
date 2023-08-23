@@ -13,6 +13,7 @@ async function addItem(event) {
 
     await nextStep();
   } catch (e) {
+    errorHandler.report(e);
     console.error('addItem failed', e);
   }
 }
@@ -335,6 +336,7 @@ async function fillForm(itemId, savedItem) {
       }
     });
   } catch (error) {
+    errorHandler.report(error);
     console.log("Error getting item document:", error);
   }
   document.getElementById('loadingDiv').style.display = 'none';
@@ -532,6 +534,7 @@ async function detectAndFillBrandAndMaterial(input) {
     }
 
   } catch (e) {
+    errorHandler.report(e);
     console.log('Error calling detectItemBrandAndMaterial', e);
   }
 }
@@ -559,6 +562,7 @@ async function detectAndFillColor(input) {
     document.querySelector('#colorSuggestButtons').style.display = 'block';
     analytics.track("Element Viewed", { elementID: "colorSuggestButtons" });
   } catch (e) {
+    errorHandler.report(e);
     console.log('Error calling detectItemColor', e);
   }
 }

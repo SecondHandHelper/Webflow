@@ -55,6 +55,7 @@ function updateIC(userId, em, ph) {
             console.log("No such user document exist!");
         }
     }).catch((error) => {
+        errorHandler.report(error);
         console.log("Error getting document:", error);
     });
 }
@@ -101,6 +102,7 @@ async function updateFirestoreUserDocument(userId, email, phone, ssn) {
             }
         }
     } catch (e) {
+        errorHandler.report(e);
         console.log("Something went wrong:", e);
     }
 }
@@ -499,6 +501,7 @@ function signOut() {
         location.href = '/';
         deleteCookie('maiAuth');
     }).catch((error) => {
+        errorHandler.report(error);
         console.log(error);
     });
 }
@@ -532,6 +535,7 @@ function loadRecentlySold() {
             }
         })
         .catch((error) => {
+            errorHandler.report(error);
             // Getting the Error details.
             var code = error.code;
             var message = error.message;
@@ -560,6 +564,7 @@ async function fetchAndLoadRecentlyAddedItems() {
             itemList.innerHTML += itemCardHTML;
         }
     } catch (e) {
+        errorHandler.report(e);
         console.log('error', e)
     }
 }
@@ -620,6 +625,7 @@ async function addUserDetails() {
             addressFormDiv.style.display = 'none';
         })
         .catch((error) => {
+            errorHandler.report(error);
             console.error("Error updating document: ", error);
         });
 }
@@ -659,6 +665,7 @@ async function addUserAddress() {
             location.href = "/private";
         })
         .catch((error) => {
+            errorHandler.report(error);
             // The document probably doesn't exist.
             console.error("Error updating document: ", error);
         });
@@ -681,6 +688,7 @@ async function addPersonalId() {
                 personalIdFormDiv.style.display = 'none';
             })
             .catch((error) => {
+                errorHandler.report(error);
                 // The document probably doesn't exist.
                 console.error("Error updating document: ", error);
             });
@@ -722,6 +730,7 @@ async function writePhoneNumberToFirestore(userID, phoneNumber) {
             });
             console.log("User document successfully updated with phone number: ", formattedPhoneNumber);
         } catch (error) {
+            errorHandler.report(error);
             console.error("Error writing document: ", error);
         }
     } else {
@@ -734,6 +743,7 @@ async function writePhoneNumberToFirestore(userID, phoneNumber) {
             });
             console.log("User document successfully written!");
         } catch (error) {
+            errorHandler.report(error);
             console.error("Error writing document: ", error);
         }
     }
@@ -789,7 +799,10 @@ Läs mer och registrera dig här:`
         navigator.share({
             text: text,
             url: `https://maiapp.se/?invite=${code}`
-        }).then(() => { console.log('Thanks for sharing!'); }).catch(console.error);
+        }).then(() => { console.log('Thanks for sharing!'); }).catch((e) => {
+          console.error(e);
+          errorHandler.report(e);
+        });
     } else {
         console.log("Browser doesn't support navigator.share => Copy to clipboard!");
         const shareText = text + "\n" + `https://maiapp.se/?invite=${code}`;
@@ -801,7 +814,7 @@ Läs mer och registrera dig här:`
 
 async function createEnhancedImage(input) {
   const apiKey = '0b2a0607442c0d1329056d09ecc78f1dcd8b6c3b';
-  const standardTemplate = 'bd51c6f8-32ba-4add-b54c-d87a4869f2cb';
+  const standardTemplate = 'a1824171-6cb6-4c84-929b-bc96c377d054';
   const dressTemplate = 'f490f16e-cb43-4fd7-86a9-60c37bef470e';
 
   const form = new FormData();
@@ -829,6 +842,7 @@ async function createEnhancedImage(input) {
     sessionStorage.setItem('enhancedFrontImage', enhancedFileResponse.data.url)
     return enhancedFileResponse.data.url;
   } catch (ex) {
+    errorHandler.report(ex);
     console.error(ex);
     return '';
   }

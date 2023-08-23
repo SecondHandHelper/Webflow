@@ -113,6 +113,7 @@
       await firebase.app().functions("europe-west1").httpsCallable('orderSellerBags')({ numLargeBags, numSmallBags, numMediumBags });
       document.getElementById('bagsOrdered').innerText = `${numOrdered()} ${bagOrBags()} på väg!`;
     } catch (e) {
+      errorHandler.report(e);
       document.getElementById('orderBagsError').style.display = 'block';
       document.getElementById('orderBagsError').innerText = 'Något gick fel vid beställningen. Försök igen och kontakta oss om det fortfarande inte fungerar.';
       document.getElementById('orderBags').style.display = 'flex';

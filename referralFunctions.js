@@ -66,6 +66,7 @@ async function connectReferralUsers(inputCode) {
       console.log("Failed to use referral code", referrerUser?.data);
     }
   } catch(e) {
+    errorHandler.report(e);
     console.log("Failed to use referral code", e);
   }
 }

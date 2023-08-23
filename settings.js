@@ -6,6 +6,7 @@ async function updateUserAddress() {
         )({ ...await getFormAddressFields() })
         await onUpdateComplete()
     } catch (e) {
+        errorHandler.report(e);
         console.log('Error updating user', e)
     }
 }
@@ -33,7 +34,7 @@ async function updateContactNumbers(isSwish) {
         )({ ...getCleanedNumber(isSwish) })
         await onUpdateComplete()
     } catch (e) {
-
+      errorHandler.report(e);
     }
 }
 
@@ -45,6 +46,7 @@ async function updateUserPersonId() {
         )({ personalId: formatPersonalId(personalId.value.trim().replace(/\D/g, '')) })
         await onUpdateComplete()
     } catch (e) {
+        errorHandler.report(e);
         console.log('Error updating user', e)
     }
 }

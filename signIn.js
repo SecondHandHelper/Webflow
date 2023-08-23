@@ -16,6 +16,7 @@ firebase.auth().onAuthStateChanged(async (result) => {
       }
       await saveRefreshToken();
     } catch (error) {
+      errorHandler.report(error);
       console.log("Error getting document:", error);
     }
   } else {
@@ -44,6 +45,7 @@ async function saveRefreshToken() {
       }
     });
   } catch (ex) {
+    errorHandler.report(ex);
     console.log('Error setting cookie with refresh token', ex);
   }
 }
@@ -76,6 +78,7 @@ async function loginWithCookieToken() {
       }
     }
   } catch (ex) {
+    errorHandler.report(ex);
     console.log('Failed to log in using saved token', ex);
   }
 }

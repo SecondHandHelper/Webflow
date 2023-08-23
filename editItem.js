@@ -81,6 +81,7 @@ async function updateItem(itemId, changedImages) {
           saveChangesButtonText.innerHTML = "Sparat";
         })
         .catch((error) => {
+          errorHandler.report(error);
           console.error("Error adding document: ", error);
         });
     }

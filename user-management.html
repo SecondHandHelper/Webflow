@@ -46,6 +46,7 @@
             resetPasswordDiv.style.display = 'block';
             loadingDiv.style.display = 'none';
         }).catch((error) => {
+            errorHandler.report(error);
             console.log(error.code, error.message);
         });
     }
@@ -73,9 +74,11 @@
             auth.sendPasswordResetEmail(restoredEmail).then(() => {
                 // Password reset confirmation sent. Ask user to check their email.
             }).catch((error) => {
+                errorHandler.report(error);
                 // Error encountered while sending password reset code.
             });
         }).catch((error) => {
+          errorHandler.report(error);
             // Invalid code.
         });
     }
@@ -93,6 +96,7 @@
             loadingDiv.style.display = 'none';
             toMaiButton.style.display = 'block';
         }).catch((error) => {
+            errorHandler.report(error);
             emailVerificationFailedDiv.style.display = 'block';
             loadingDiv.style.display = 'none';
             // Code is invalid or expired. Ask the user to verify their email address
@@ -138,9 +142,11 @@
                     location.href = './private';
                 })
                 .catch((error) => {
+                    errorHandler.report(error);
                     console.log("Error message:", error.code, error.message);
                 });
         }).catch((error) => {
+            errorHandler.report(error);
             console.log("Error message:", error.code, error.message);
         });
     });
