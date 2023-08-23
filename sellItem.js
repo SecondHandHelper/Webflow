@@ -162,14 +162,13 @@ async function createItemAfterSignIn() {
   sessionStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
 }
 
-async function enhanceFrontImage(input) {
+async function enhanceFrontImage(imageUrl) {
   document.getElementById('loadingFrontImageIcon').style.display = 'inline-block';
   document.getElementById('deleteFrontImageIcon').style.display = 'none';
   showImageState('frontImage', 'uploading-state');
 
-  const base64Image = await createEnhancedImage(input);
-  showImagePreview('frontImage', base64Image);
-  await uploadEnhancedFrontImage(base64Image);
+  const enhancedImage = await createEnhancedImage(imageUrl);
+  showImagePreview('frontImage', enhancedImage);
   document.getElementById('loadingFrontImageIcon').style.display = 'none';
   document.getElementById('deleteFrontImageIcon').style.display = 'inline-block';
 }
@@ -424,78 +423,99 @@ const apiColorMapping = {
   "mustard": "Yellow"
 };
 
-async function frontImageUploadChangeHandler(event) {
+async function frontImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
     event.stopPropagation();
     let src = URL.createObjectURL(input);
     frontImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     frontImagePreview.style.backgroundImage = `url('${src}')`;
+    const imageUrl = await uploadImage(input, 'frontImage');
+    sessionStorage.setItem('frontImage', imageUrl);
     const promises = [];
     if (featureIsEnabled('colorCategory')) {
-      promises.push(detectAndFillColor(input), detectAndFillBrandAndMaterial(input));
+      promises.push(detectAndFillColor(imageUrl), detectAndFillBrandAndMaterial(imageUrl));
     }
     if (featureIsEnabled('enhanceImage')) {
-      promises.push(enhanceFrontImage(input));
+      promises.push(enhanceFrontImage(imageUrl));
     }
     await Promise.all(promises);
   }
 }
 
-async function brandTagImageUploadChangeHandler() {
+async function uploadImage(input, filename) {
+  const tempId = uuidv4();
+  const imageBase64 = await toBase64(input);
+  const response = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({
+    itemId: 'tempItemImages', fileName: `${tempId}-frontImage`, file: imageBase64
+  });
+  return response.data.url;
+}
+
+async function brandTagImageChangeHandler() {
   let input = this.files[0];
   if (input) {
     const src = URL.createObjectURL(input);
     brandTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     brandTagImagePreview.style.backgroundImage = `url('${src}')`;
+    const imageUrl = await uploadImage(input, 'frontImage');
+    sessionStorage.setItem('brandTagImage', imageUrl);
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterial(input);
+      await detectAndFillBrandAndMaterial(imageUrl);
     }
   }
 }
 
-async function productImageUploadChangeHandler() {
+async function productImageChangeHandler() {
   let input = this.files[0];
   if (input) {
     let src = URL.createObjectURL(input);
     productImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     productImagePreview.style.backgroundImage = `url('${src}')`;
+    const imageUrl = await uploadImage(input, 'productImage');
+    sessionStorage.setItem('productImage', imageUrl);
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterial(input);
     }
   }
 }
 
-async function defectImageUploadChangeHandler() {
+async function defectImageChangeHandler() {
   let input = this.files[0];
   if (input) {
     let src = URL.createObjectURL(input);
     defectImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     defectImagePreview.style.backgroundImage = `url('${src}')`;
+    const imageUrl = await uploadImage(input, 'defectImage');
+    sessionStorage.setItem('defectImage', imageUrl);
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterial(input);
     }
   }
 }
 
-async function materialTagImageUploadChangeHandler() {
+async function materialTagImageChangeHandler() {
   let input = this.files[0];
   if (input) {
     let src = URL.createObjectURL(input);
     materialTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     materialTagImagePreview.style.backgroundImage = `url('${src}')`;
+    const imageUrl = await uploadImage(input, 'materialImage');
+    sessionStorage.setItem('materialImage', imageUrl);
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterial(input);
     }
   }
 }
 
-async function extraImageUploadChangeHandler() {
+async function extraImageChangeHandler() {
   let input = this.files[0];
   if (input) {
     let src = URL.createObjectURL(input);
     extraImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     extraImagePreview.style.backgroundImage = `url('${src}')`;
+    const imageUrl = await uploadImage(input, 'extraImage');
+    sessionStorage.setItem('extraImage', imageUrl);
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterial(input);
     }
@@ -507,14 +527,13 @@ function hideConfirmButtons(event, elementID) {
   event.currentTarget.closest('.text-input-container').querySelector('.suggest-buttons').style.display = 'none';
 }
 
-async function detectAndFillBrandAndMaterial(input) {
+async function detectAndFillBrandAndMaterial(imageUrl) {
   try {
-    const fileAsBase64 = await toBase64(input);
     if (document.querySelector('#itemBrand').value.length && document.querySelector('#itemMaterial').value.length) {
       // Don't do anything if both brand and material already filled in
       return;
     }
-    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrandAndMaterial')({ base64Img: fileAsBase64 });
+    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrandAndMaterial')({ imageUrl });
     console.log(response);
     if (!document.querySelector('#itemBrand').value.length && response.data?.brand) {
       document.querySelector('#itemBrand').value = response.data.brand;
@@ -539,10 +558,9 @@ async function detectAndFillBrandAndMaterial(input) {
   }
 }
 
-async function detectAndFillColor(input) {
+async function detectAndFillColor(imageUrl) {
   try {
-    const fileAsBase64 = await toBase64(input);
-    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ base64Img: fileAsBase64 });
+    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ imageUrl });
     console.log(response);
     if (!response.data?.colors || !response.data.colors.length) {
       console.log("Unable to detect product color");

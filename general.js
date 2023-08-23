@@ -812,29 +812,11 @@ Läs mer och registrera dig här:`
     }
 }
 
-async function createEnhancedImage(input) {
-  const apiKey = '0b2a0607442c0d1329056d09ecc78f1dcd8b6c3b';
-  const standardTemplate = 'a1824171-6cb6-4c84-929b-bc96c377d054';
-  const dressTemplate = 'f490f16e-cb43-4fd7-86a9-60c37bef470e';
-
-  const form = new FormData();
-  form.append('templateId', standardTemplate);
-  form.append('imageFile', input);
+async function createEnhancedImage(imageUrl) {
   try {
-    const response = await fetch('https://beta-sdk.photoroom.com/v1/render', {
-      method: 'POST',
-      headers: {
-        Accept: 'image/png, application/json',
-        'x-api-key': apiKey
-      },
-      body: form
-    });
-    console.log("Got response");
-    if (!response.ok) {
-      throw new Error("Network response was not OK");
-    }
-    const imageBlob = await response.blob();
-    return await toBase64(imageBlob);
+    const enhancedFileUrl = await firebase.app().functions("europe-west1").httpsCallable('enhanceFrontImage')({ imageUrl });
+    sessionStorage.setItem('enhancedFrontImage', enhancedFileUrl)
+    return enhancedFileUrl;
   } catch (ex) {
     errorHandler.report(ex);
     console.error(ex);

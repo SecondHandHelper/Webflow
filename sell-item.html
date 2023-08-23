@@ -21,12 +21,12 @@
 
     // display image when file has been selected
     $('#frontImage').off('change');
-    frontImageUpload.onchange = frontImageUploadChangeHandler;
-    brandTagImageUpload.onchange = brandTagImageUploadChangeHandler;
-    productImageUpload.onchange = productImageUploadChangeHandler;
-    defectImageUpload.onchange = defectImageUploadChangeHandler;
-    materialTagImageUpload.onchange = materialTagImageUploadChangeHandler;
-    extraImageUpload.onchange = extraImageUploadChangeHandler;
+    frontImageUpload.onchange = frontImageChangeHandler;
+    brandTagImageUpload.onchange = brandTagImageChangeHandler;
+    productImageUpload.onchange = productImageChangeHandler;
+    defectImageUpload.onchange = defectImageChangeHandler;
+    materialTagImageUpload.onchange = materialTagImageChangeHandler;
+    extraImageUpload.onchange = extraImageChangeHandler;
 
     // Hide/Show warning about difficulty to sell certain brands
     let brand = document.getElementById("itemBrand");
