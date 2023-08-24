@@ -168,7 +168,7 @@ async function enhanceFrontImage(input) {
   showImageState('frontImage', 'uploading-state');
 
   const enhancedImage = await createEnhancedImage(input);
-  document.getElementById(`frontImagePreview`).style.backgroundImage = `url('${enhancedImage}')`;
+  showImagePreview('frontImage', enhancedImage);
   document.getElementById('loadingFrontImageIcon').style.display = 'none';
   document.getElementById('deleteFrontImageIcon').style.display = 'inline-block';
 }
