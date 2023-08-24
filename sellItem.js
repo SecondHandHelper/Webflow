@@ -165,16 +165,10 @@ async function createItemAfterSignIn() {
 async function enhanceFrontImage(input) {
   document.getElementById('loadingFrontImageIcon').style.display = 'inline-block';
   document.getElementById('deleteFrontImageIcon').style.display = 'none';
+  showImageState('frontImage', 'uploading-state');
 
-  const apiKey = '0b2a0607442c0d1329056d09ecc78f1dcd8b6c3b';
-  const standardTemplate = 'bd51c6f8-32ba-4add-b54c-d87a4869f2cb';
-  const dressTemplate = 'f490f16e-cb43-4fd7-86a9-60c37bef470e';
-
-  const form = new FormData();
-  form.append('templateId', standardTemplate);
-  form.append('imageFile', input);
   const enhancedImage = await createEnhancedImage(input);
-  showImagePreview('frontImage', enhancedImage);
+  document.getElementById(`frontImagePreview`).style.backgroundImage = `url('${enhancedImage}')`;
   document.getElementById('loadingFrontImageIcon').style.display = 'none';
   document.getElementById('deleteFrontImageIcon').style.display = 'inline-block';
 }
@@ -237,9 +231,13 @@ function fieldLabelToggle(labelId) {
 
 function showImagePreview(imageName, url) {
   document.getElementById(`${imageName}Preview`).style.backgroundImage = `url('${url}')`;
+  showImageState(imageName, 'success-state');
+}
+
+function showImageState(imageName, state) {
   const siblings = document.getElementById(imageName).parentNode.parentNode.childNodes;
   for (let i = 0; i < siblings.length; i++) {
-    if (siblings[i].className.includes("success-state")) {
+    if (siblings[i].className.includes(state)) {
       siblings[i].style.display = 'block';
     } else {
       // Hide other states of file input field "empty-state" and "error-state"

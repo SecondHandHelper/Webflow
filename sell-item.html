@@ -20,6 +20,7 @@
     let extraImagePreview = document.getElementById("extraImagePreview");
 
     // display image when file has been selected
+    $('#frontImage').off('change');
     frontImageUpload.onchange = frontImageUploadChangeHandler;
     brandTagImageUpload.onchange = brandTagImageUploadChangeHandler;
     productImageUpload.onchange = productImageUploadChangeHandler;
