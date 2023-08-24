@@ -834,16 +834,19 @@ async function createEnhancedImage(input) {
       throw new Error("Network response was not OK");
     }
     const imageBlob = await response.blob();
-    const imageBase64 = await toBase64(imageBlob);
-    const tempId = uuidv4();
-    const enhancedFileResponse = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({
-      itemId: 'tempFrontImages', fileName: `${tempId}-frontImage`, file: imageBase64
-    });
-    sessionStorage.setItem('enhancedFrontImage', enhancedFileResponse.data.url)
-    return enhancedFileResponse.data.url;
+    return await toBase64(imageBlob);
   } catch (ex) {
     errorHandler.report(ex);
     console.error(ex);
     return '';
   }
+}
+
+async function uploadEnhancedFrontImage(base64Image) {
+  const tempId = uuidv4();
+  const enhancedFileResponse = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({
+    itemId: 'tempFrontImages', fileName: `${tempId}-frontImage`, file: base64Image
+  });
+  sessionStorage.setItem('enhancedFrontImage', enhancedFileResponse.data.url)
+  return enhancedFileResponse.data.url;
 }

@@ -134,7 +134,8 @@
       if (input) {
         document.getElementById('loadingFrontImageIcon').style.display = 'inline-block';
         document.getElementById('deleteFrontImageIcon').style.display = 'none';
-        const enhancedImage = await createEnhancedImage(input);
+        const base64Image = await createEnhancedImage(input);
+        const enhancedImage = await uploadEnhancedFrontImage(base64Image);
         document.getElementById('frontImagePreviewUploading').style.backgroundImage = `url('${enhancedImage}')`;
         document.getElementById('frontImagePreview').style.backgroundImage = `url('${enhancedImage}')`;
         document.getElementById('loadingFrontImageIcon').style.display = 'none';
