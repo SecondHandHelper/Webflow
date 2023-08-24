@@ -424,9 +424,10 @@ const apiColorMapping = {
   "mustard": "Yellow"
 };
 
-async function frontImageUploadChangeHandler() {
+async function frontImageUploadChangeHandler(event) {
   let input = this.files[0];
   if (input) {
+    event.stopPropagation();
     let src = URL.createObjectURL(input);
     frontImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     frontImagePreview.style.backgroundImage = `url('${src}')`;
