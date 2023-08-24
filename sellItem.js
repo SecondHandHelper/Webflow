@@ -110,7 +110,7 @@ async function getShippingMethod() {
 async function addItemInner(id) {
   const { modelCoverImageUrl, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
-  const images = await uploadImagesFromForm(id);
+  const images = await uploadImagesFromForm(id); // TODO: not needed anymore - use temp uploaded files
   if (modelCoverImageUrl) {
     images['coverImage'] = modelCoverImageUrl;
     pageData['coverImageUpdatedAt'] = new Date().toISOString();
@@ -430,8 +430,8 @@ async function frontImageChangeHandler(event) {
     let src = URL.createObjectURL(input);
     frontImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     frontImagePreview.style.backgroundImage = `url('${src}')`;
-    const imageUrl = await uploadImage(input, 'frontImage');
-    sessionStorage.setItem('frontImage', imageUrl);
+    const imageUrl = await uploadTempImage(input, 'frontImage');
+    rememberNewItemField('frontImage', imageUrl);
     const promises = [];
     if (featureIsEnabled('colorCategory')) {
       promises.push(detectAndFillColor(imageUrl), detectAndFillBrandAndMaterial(imageUrl));
@@ -443,11 +443,17 @@ async function frontImageChangeHandler(event) {
   }
 }
 
-async function uploadImage(input, filename) {
+function rememberNewItemField(filedName, value) {
+  const newItem = JSON.parse(sessionStorage.getItem('newItem') || '{}');
+  newItem[filedName] = value;
+  sessionStorage.setItem('newItem', JSON.stringify(newItem));
+}
+
+async function uploadTempImage(input, filename) {
   const tempId = uuidv4();
   const imageBase64 = await toBase64(input);
   const response = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({
-    itemId: 'tempItemImages', fileName: `${tempId}-frontImage`, file: imageBase64
+    itemId: tempId, fileName: `${filename}`, file: imageBase64, temporary: true
   });
   return response.data.url;
 }
@@ -458,8 +464,8 @@ async function brandTagImageChangeHandler() {
     const src = URL.createObjectURL(input);
     brandTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     brandTagImagePreview.style.backgroundImage = `url('${src}')`;
-    const imageUrl = await uploadImage(input, 'frontImage');
-    sessionStorage.setItem('brandTagImage', imageUrl);
+    const imageUrl = await uploadTempImage(input, 'frontImage');
+    rememberNewItemField('brandTagImage', imageUrl);
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterial(imageUrl);
     }
@@ -472,8 +478,8 @@ async function productImageChangeHandler() {
     let src = URL.createObjectURL(input);
     productImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     productImagePreview.style.backgroundImage = `url('${src}')`;
-    const imageUrl = await uploadImage(input, 'productImage');
-    sessionStorage.setItem('productImage', imageUrl);
+    const imageUrl = await uploadTempImage(input, 'productImage');
+    rememberNewItemField('productImage', imageUrl);
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterial(input);
     }
@@ -486,8 +492,8 @@ async function defectImageChangeHandler() {
     let src = URL.createObjectURL(input);
     defectImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     defectImagePreview.style.backgroundImage = `url('${src}')`;
-    const imageUrl = await uploadImage(input, 'defectImage');
-    sessionStorage.setItem('defectImage', imageUrl);
+    const imageUrl = await uploadTempImage(input, 'defectImage');
+    rememberNewItemField('defectImage', imageUrl);
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterial(input);
     }
@@ -500,8 +506,8 @@ async function materialTagImageChangeHandler() {
     let src = URL.createObjectURL(input);
     materialTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     materialTagImagePreview.style.backgroundImage = `url('${src}')`;
-    const imageUrl = await uploadImage(input, 'materialImage');
-    sessionStorage.setItem('materialImage', imageUrl);
+    const imageUrl = await uploadTempImage(input, 'materialImage');
+    rememberNewItemField('materialImage', imageUrl);
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterial(input);
     }
@@ -514,8 +520,8 @@ async function extraImageChangeHandler() {
     let src = URL.createObjectURL(input);
     extraImagePreviewUploading.style.backgroundImage = `url('${src}')`;
     extraImagePreview.style.backgroundImage = `url('${src}')`;
-    const imageUrl = await uploadImage(input, 'extraImage');
-    sessionStorage.setItem('extraImage', imageUrl);
+    const imageUrl = await uploadTempImage(input, 'extraImage');
+    rememberNewItemField('extraImage', imageUrl);
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterial(input);
     }
