@@ -21,17 +21,17 @@
 
     // display image when file has been selected
     $('#frontImage').off('change');
-    frontImageUpload.onchange = frontImageChangeHandler;
+    frontImageUpload.addEventListener('change', frontImageChangeHandler, { capture: true });
     $('#brandTagImage').off('change');
-    brandTagImageUpload.onchange = brandTagImageChangeHandler;
+    brandTagImageUpload.addEventListener('change', brandTagImageChangeHandler, { capture: true });
     $('#productImage').off('change');
-    productImageUpload.onchange = productImageChangeHandler;
+    productImageUpload.addEventListener('change', productImageChangeHandler, { capture: true });
     $('#defectImage').off('change');
-    defectImageUpload.onchange = defectImageChangeHandler;
+    defectImageUpload.addEventListener('change', defectImageChangeHandler, { capture: true });
     $('#materialTag').off('change');
-    materialTagImageUpload.onchange = materialTagImageChangeHandler;
+    materialTagImageUpload.addEventListener('change', materialTagImageChangeHandler, { capture: true });
     $('#extraImage').off('change');
-    extraImageUpload.onchange = extraImageChangeHandler;
+    extraImageUpload.addEventListener('change', extraImageChangeHandler, { capture: true });
 
     // Hide/Show warning about difficulty to sell certain brands
     let brand = document.getElementById("itemBrand");
@@ -125,6 +125,7 @@
           sessionStorage.removeItem('newItem');
           document.getElementById("frontImage").required = true;
           document.getElementById("brandTagImage").required = true;
+          document.getElementById("triggerShowSellItemContent").click();
         } else if (params.id) {
             // Fill form if the user comes from a prefill link
             auth.onAuthStateChanged(function (user) {

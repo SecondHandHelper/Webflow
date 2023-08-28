@@ -438,7 +438,7 @@ function rememberNewItemImageField(filedName, value) {
     // Reset saved item if it's more than a day old
     newItem = { images: {} };
   }
-  newItem.updatedAt = Date.now;
+  newItem.updatedAt = Date.now();
   newItem['images'][filedName] = value;
   sessionStorage.setItem('newItem', JSON.stringify(newItem));
 }
