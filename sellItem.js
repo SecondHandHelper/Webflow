@@ -66,7 +66,7 @@ function collect() {
     }
   }
 
-  const images = JSON.parse(sessionStorage.getItem('newItem')).images
+  const images = JSON.parse(sessionStorage.getItem('newItem') || '{}').images
 
   return {
     user: authUser.current?.uid || null,

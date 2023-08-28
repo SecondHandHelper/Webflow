@@ -814,7 +814,8 @@ Läs mer och registrera dig här:`
 
 async function createEnhancedImage(imageUrl) {
   try {
-    const enhancedFileUrl = await firebase.app().functions("europe-west1").httpsCallable('enhanceFrontImage')({ imageUrl });
+    const response = await firebase.app().functions("europe-west1").httpsCallable('enhanceFrontImage')({ imageUrl });
+    const enhancedFileUrl = response.data.url;
     sessionStorage.setItem('enhancedFrontImage', enhancedFileUrl)
     return enhancedFileUrl;
   } catch (ex) {
