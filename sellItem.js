@@ -512,7 +512,8 @@ function hideConfirmButtons(event, elementID) {
 
 async function detectAndFillBrandAndMaterial(imageUrl) {
   try {
-    if (document.querySelector('#itemBrand').value.length && document.querySelector('#itemMaterial').value.length) {
+    if (document.querySelector('#itemBrand').value.length && document.querySelector('#itemMaterial').value.length
+      && document.querySelector('#itemSize').value.length) {
       // Don't do anything if both brand and material already filled in
       return;
     }
@@ -534,10 +535,17 @@ async function detectAndFillBrandAndMaterial(imageUrl) {
       document.querySelector('#materialSuggestButtons').style.display = 'block';
       analytics.track("Element Viewed", { elementID: "materialSuggestButtons" });
     }
-
+    if (!document.querySelector('#itemSize').value.length && response.data?.size) {
+      document.querySelector('#itemSize').value = response.data.size;
+      document.querySelector('#itemSize').setCustomValidity('Bekräfta eller ändra storlek');
+      document.querySelector('#itemSize').dispatchEvent(new Event('change'));
+      document.getElementById('itemSizeLabel').style.display = 'inline-block';
+      document.querySelector('#sizeSuggestButtons').style.display = 'block';
+      analytics.track("Element Viewed", { elementID: "sizeSuggestButtons" });
+    }
   } catch (e) {
     errorHandler.report(e);
-    console.log('Error calling detectItemBrandAndMaterial', e);
+    console.log('Error calling detectItemBrandAndMaterialAndSize', e);
   }
 }
 
@@ -591,6 +599,19 @@ async function initializeBrandConfirm() {
   });
   document.getElementById('confirmBrand').addEventListener('click', () => {
     document.querySelector('#itemBrand').setCustomValidity('');
+  })
+}
+
+async function initializeSizeConfirm() {
+  document.getElementById('rejectSize').addEventListener('click', () => {
+    document.querySelector('#itemSize').value = '';
+    document.querySelector('#itemSize').dispatchEvent(new Event('change'));
+    document.querySelector('#itemSize').dispatchEvent(new Event('input'));
+    document.querySelector('#sizeSuggestButtons').style.display = 'none';
+    document.querySelector('#itemSize').setCustomValidity('');
+  });
+  document.getElementById('confirmSize').addEventListener('click', () => {
+    document.querySelector('#itemSize').setCustomValidity('');
   })
 }
 
