@@ -243,7 +243,7 @@ async function fillForm(itemId, savedItem) {
     }
     const age = data.age;
     const condition = data.condition;
-    const images = data.images;
+    const images = data.images || {};
 
     // Populate images
     imageElements.map(img => sessionStorage.removeItem(`${img}PreviewUrl`));
@@ -538,7 +538,7 @@ async function detectAndFillBrandAndMaterial(imageUrl) {
       // Don't do anything if both brand and material already filled in
       return;
     }
-    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrandAndMaterial')({ imageUrl });
+    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrandAndMaterialAndSize')({ imageUrl });
     console.log(response);
     if (!document.querySelector('#itemBrand').value.length && response.data?.brand) {
       document.querySelector('#itemBrand').value = response.data.brand;

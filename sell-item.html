@@ -121,7 +121,7 @@
         // När tar vi då bort newItem? efter
 
         if (sessionStorage.getItem('newItem')) {
-          await fillForm('', sessionStorage.getItem('newItem'));
+          await fillForm('', JSON.parse(sessionStorage.getItem('newItem')));
           sessionStorage.removeItem('newItem');
           document.getElementById("frontImage").required = true;
           document.getElementById("brandTagImage").required = true;
