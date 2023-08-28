@@ -102,6 +102,8 @@
     }
 
     async function sellItemMain() {
+        sessionStorage.removeItem('latestItemCreated');
+        addEventListener('beforeunload', rememberUnsavedChanges);
         await initializeCategorySelect();
         await initializeColorConfirm();
         await initializeBrandConfirm();
@@ -114,8 +116,17 @@
             document.getElementById("itemPhoneNumber").required = true;
         }
 
-        // Fill form if the user comes from a prefill link
-        if (params.id) {
+        // Fall 1. det finns en newItem sparad
+        // => 1.a params.id är också satt => använd newItem annars förlorar de vad de fyllt i
+        // När tar vi då bort newItem? efter
+
+        if (sessionStorage.getItem('newItem')) {
+          await fillForm('', sessionStorage.getItem('newItem'));
+          sessionStorage.removeItem('newItem');
+          document.getElementById("frontImage").required = true;
+          document.getElementById("brandTagImage").required = true;
+        } else if (params.id) {
+            // Fill form if the user comes from a prefill link
             auth.onAuthStateChanged(function (user) {
                 if (!user) { document.getElementById('maiIntro').style.display = 'block'; }
             });

@@ -170,6 +170,16 @@ async function enhanceFrontImage(imageUrl) {
   showImagePreview('frontImage', enhancedImageUrl);
 }
 
+async function rememberUnsavedChanges(event) {
+  if (!sessionStorage.getItem('latestItemCreated')) {
+    const {
+      user, createdAt, status, shippingStatus, modelVariantFields, ...itemToSave
+    } = collect();
+    itemToSave.updatedAt = Date.now;
+    sessionStorage.setItem('newItem', JSON.stringify(itemToSave));
+  }
+}
+
 async function nextStep(options) {
   if (!authUser.current) {
     // If user isn't logged in they will be taken through these steps:
@@ -421,7 +431,13 @@ async function uploadImageAndShowPreview(input, imageName) {
 }
 
 function rememberNewItemImageField(filedName, value) {
-  const newItem = JSON.parse(sessionStorage.getItem('newItem') || '{}');
+  let newItem = JSON.parse(sessionStorage.getItem('newItem') || '{}');
+  const oneDay = 1000*60*60*24;
+  if (newItem.updatedAt && newItem.updatedAt - Date.now > oneDay) {
+    // Reset saved item if it's more than a day old
+    newItem = {};
+  }
+  newItem.updatedAt = Date.now;
   newItem['images'][filedName] = value;
   sessionStorage.setItem('newItem', JSON.stringify(newItem));
 }
