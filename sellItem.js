@@ -510,11 +510,12 @@ function hideConfirmButtons(event, elementID) {
 async function detectAndFillBrandAndMaterial(input) {
   try {
     const fileAsBase64 = await toBase64(input);
-    if (document.querySelector('#itemBrand').value.length && document.querySelector('#itemMaterial').value.length) {
-      // Don't do anything if both brand and material already filled in
+    if (document.querySelector('#itemBrand').value.length && document.querySelector('#itemMaterial').value.length
+      && document.querySelector('#itemSize').value.length) {
+      // Don't do anything if brand, material and size already filled in
       return;
     }
-    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrandAndMaterial')({ base64Img: fileAsBase64 });
+    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrandAndMaterialAndSize')({ base64Img: fileAsBase64 });
     console.log(response);
     if (!document.querySelector('#itemBrand').value.length && response.data?.brand) {
       document.querySelector('#itemBrand').value = response.data.brand;
@@ -532,10 +533,17 @@ async function detectAndFillBrandAndMaterial(input) {
       document.querySelector('#materialSuggestButtons').style.display = 'block';
       analytics.track("Element Viewed", { elementID: "materialSuggestButtons" });
     }
-
+    if (!document.querySelector('#itemSize').value.length && response.data?.size) {
+      document.querySelector('#itemSize').value = response.data.size;
+      document.querySelector('#itemSize').setCustomValidity('Bekräfta eller ändra storlek');
+      document.querySelector('#itemSize').dispatchEvent(new Event('change'));
+      document.getElementById('itemSizeLabel').style.display = 'inline-block';
+      document.querySelector('#sizeSuggestButtons').style.display = 'block';
+      analytics.track("Element Viewed", { elementID: "sizeSuggestButtons" });
+    }
   } catch (e) {
     errorHandler.report(e);
-    console.log('Error calling detectItemBrandAndMaterial', e);
+    console.log('Error calling detectItemBrandAndMaterialAndSize', e);
   }
 }
 
@@ -590,6 +598,19 @@ async function initializeBrandConfirm() {
   });
   document.getElementById('confirmBrand').addEventListener('click', () => {
     document.querySelector('#itemBrand').setCustomValidity('');
+  })
+}
+
+async function initializeSizeConfirm() {
+  document.getElementById('rejectSize').addEventListener('click', () => {
+    document.querySelector('#itemSize').value = '';
+    document.querySelector('#itemSize').dispatchEvent(new Event('change'));
+    document.querySelector('#itemSize').dispatchEvent(new Event('input'));
+    document.querySelector('#sizeSuggestButtons').style.display = 'none';
+    document.querySelector('#itemSize').setCustomValidity('');
+  });
+  document.getElementById('confirmSize').addEventListener('click', () => {
+    document.querySelector('#itemSize').setCustomValidity('');
   })
 }
 
