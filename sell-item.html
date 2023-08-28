@@ -22,10 +22,15 @@
     // display image when file has been selected
     $('#frontImage').off('change');
     frontImageUpload.onchange = frontImageChangeHandler;
+    $('#brandTagImage').off('change');
     brandTagImageUpload.onchange = brandTagImageChangeHandler;
+    $('#productImage').off('change');
     productImageUpload.onchange = productImageChangeHandler;
+    $('#defectImage').off('change');
     defectImageUpload.onchange = defectImageChangeHandler;
+    $('#materialTag').off('change');
     materialTagImageUpload.onchange = materialTagImageChangeHandler;
+    $('#extraImage').off('change');
     extraImageUpload.onchange = extraImageChangeHandler;
 
     // Hide/Show warning about difficulty to sell certain brands

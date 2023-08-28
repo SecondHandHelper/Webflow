@@ -66,6 +66,8 @@ function collect() {
     }
   }
 
+  const images = JSON.parse(sessionStorage.getItem('newItem')).images
+
   return {
     user: authUser.current?.uid || null,
     createdAt: now.toISOString(),
@@ -89,6 +91,7 @@ function collect() {
     acceptPrice,
     preferences: { userValuationApproval },
     ...modelVariantFields,
+    images,
   };
 }
 
@@ -108,9 +111,8 @@ async function getShippingMethod() {
 }
 
 async function addItemInner(id) {
-  const { modelCoverImageUrl, ...pageData } = collect();
+  const { modelCoverImageUrl, images, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
-  const images = await uploadImagesFromForm(id); // TODO: not needed anymore - use temp uploaded files
   if (modelCoverImageUrl) {
     images['coverImage'] = modelCoverImageUrl;
     pageData['coverImageUpdatedAt'] = new Date().toISOString();
@@ -125,7 +127,7 @@ async function addItemInner(id) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
     await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
-    sessionStorage.removeItem('enhancedFrontImage');
+    sessionStorage.removeItem('newItem');
     sessionStorage.setItem('latestItemCreated', JSON.stringify(item));
   }
 
@@ -158,46 +160,14 @@ async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
   await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
-  sessionStorage.removeItem('enhancedFrontImage');
+  sessionStorage.removeItem('newItem');
   sessionStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
 }
 
 async function enhanceFrontImage(imageUrl) {
-  document.getElementById('loadingFrontImageIcon').style.display = 'inline-block';
-  document.getElementById('deleteFrontImageIcon').style.display = 'none';
-  showImageState('frontImage', 'uploading-state');
-
-  const enhancedImage = await createEnhancedImage(imageUrl);
-  showImagePreview('frontImage', enhancedImage);
-  document.getElementById('loadingFrontImageIcon').style.display = 'none';
-  document.getElementById('deleteFrontImageIcon').style.display = 'inline-block';
-}
-
-async function uploadImagesFromForm(itemId) {
-  const imageData = imageElements.reduce((accumulator, current) => {
-    const file = document.getElementById(current).files[0] || sessionStorage.getItem(`${current}PreviewUrl`);
-    if (!file) return accumulator;
-    return { ...accumulator, [current]: file }
-  }, {}); // { frontImage: <file object>, ... }
-  const images = await uploadUserImages(itemId, imageData);
-  if (sessionStorage.getItem('enhancedFrontImage')) {
-    images['enhancedFrontImage'] = sessionStorage.getItem('enhancedFrontImage');
-  }
-  return images;
-}
-
-async function uploadUserImages(itemId, imageData) {
-  const promises = await Promise.all(Object.keys(imageData).map(async (fileName) => {
-    if (typeof imageData[fileName] === 'string') {
-      return { [fileName]: imageData[fileName] };
-    }
-    const fileContent = await toBase64(imageData[fileName]);
-    console.log(`Uploading image request ${itemId}, ${fileName} ${fileContent.slice(0, 10)}`);
-    const response = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({ itemId, fileName, file: fileContent });
-    console.log(`upload image response ${JSON.stringify(response)}`)
-    return { [fileName]: response.data.url };
-  }));
-  return Object.assign(...promises);
+  const enhancedImageUrl = await createEnhancedImage(imageUrl);
+  rememberNewItemImageField('enhancedFrontImage', enhancedImageUrl);
+  showImagePreview('frontImage', enhancedImageUrl);
 }
 
 async function nextStep(options) {
@@ -231,7 +201,7 @@ function fieldLabelToggle(labelId) {
 
 function showImagePreview(imageName, url) {
   document.getElementById(`${imageName}Preview`).style.backgroundImage = `url('${url}')`;
-  showImageState(imageName, 'success-state');
+  showDeleteImageIcon(imageName);
 }
 
 function showImageState(imageName, state) {
@@ -427,11 +397,7 @@ async function frontImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
     event.stopPropagation();
-    let src = URL.createObjectURL(input);
-    frontImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-    frontImagePreview.style.backgroundImage = `url('${src}')`;
-    const imageUrl = await uploadTempImage(input, 'frontImage');
-    rememberNewItemField('frontImage', imageUrl);
+    const imageUrl = uploadImageAndShowPreview(input, 'frontImage');
     const promises = [];
     if (featureIsEnabled('colorCategory')) {
       promises.push(detectAndFillColor(imageUrl), detectAndFillBrandAndMaterial(imageUrl));
@@ -443,9 +409,20 @@ async function frontImageChangeHandler(event) {
   }
 }
 
-function rememberNewItemField(filedName, value) {
+async function uploadImageAndShowPreview(input, imageName) {
+  let src = URL.createObjectURL(input);
+  document.getElementById(`${imageName}PreviewUploading`).style.backgroundImage = `url('${src}')`;
+  document.getElementById(`${imageName}Preview`).style.backgroundImage = `url('${src}')`;
+  showLoadingIcon(imageName)
+  showImageState(imageName, 'success-state');
+  const imageUrl = await uploadTempImage(input, imageName);
+  rememberNewItemImageField(imageName, imageUrl);
+  return imageUrl;
+}
+
+function rememberNewItemImageField(filedName, value) {
   const newItem = JSON.parse(sessionStorage.getItem('newItem') || '{}');
-  newItem[filedName] = value;
+  newItem['images'][filedName] = value;
   sessionStorage.setItem('newItem', JSON.stringify(newItem));
 }
 
@@ -458,72 +435,72 @@ async function uploadTempImage(input, filename) {
   return response.data.url;
 }
 
-async function brandTagImageChangeHandler() {
+async function brandTagImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
-    const src = URL.createObjectURL(input);
-    brandTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-    brandTagImagePreview.style.backgroundImage = `url('${src}')`;
-    const imageUrl = await uploadTempImage(input, 'frontImage');
-    rememberNewItemField('brandTagImage', imageUrl);
+    event.stopPropagation();
+    const imageUrl = uploadImageAndShowPreview(input, 'brandTagImage');
+    showDeleteImageIcon('brandTagImage')
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterial(imageUrl);
     }
   }
 }
 
-async function productImageChangeHandler() {
+function showLoadingIcon(imageName) {
+  document.getElementById(`loading${imageName}Icon`).style.display = 'inline-block';
+  document.getElementById(`delete${imageName}Icon`).style.display = 'none';
+}
+
+function showDeleteImageIcon(imageName) {
+  document.getElementById(`loading${imageName}Icon`).style.display = 'none';
+  document.getElementById(`delete${imageName}Icon`).style.display = 'inline-block';
+}
+
+async function productImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
-    let src = URL.createObjectURL(input);
-    productImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-    productImagePreview.style.backgroundImage = `url('${src}')`;
-    const imageUrl = await uploadTempImage(input, 'productImage');
-    rememberNewItemField('productImage', imageUrl);
+    event.stopPropagation();
+    const imageUrl = uploadImageAndShowPreview(input, 'productImage');
+    showDeleteImageIcon('productImage')
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterial(input);
+      await detectAndFillBrandAndMaterial(imageUrl);
     }
   }
 }
 
-async function defectImageChangeHandler() {
+async function defectImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
-    let src = URL.createObjectURL(input);
-    defectImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-    defectImagePreview.style.backgroundImage = `url('${src}')`;
-    const imageUrl = await uploadTempImage(input, 'defectImage');
-    rememberNewItemField('defectImage', imageUrl);
+    event.stopPropagation();
+    const imageUrl = uploadImageAndShowPreview(input, 'defectImage');
+    showDeleteImageIcon('defectImage')
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterial(input);
+      await detectAndFillBrandAndMaterial(imageUrl);
     }
   }
 }
 
-async function materialTagImageChangeHandler() {
+async function materialTagImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
-    let src = URL.createObjectURL(input);
-    materialTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-    materialTagImagePreview.style.backgroundImage = `url('${src}')`;
-    const imageUrl = await uploadTempImage(input, 'materialImage');
-    rememberNewItemField('materialImage', imageUrl);
+    event.stopPropagation();
+    const imageUrl = uploadImageAndShowPreview(input, 'materialImage');
+    showDeleteImageIcon('materialImage')
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterial(input);
+      await detectAndFillBrandAndMaterial(imageUrl);
     }
   }
 }
 
-async function extraImageChangeHandler() {
+async function extraImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
-    let src = URL.createObjectURL(input);
-    extraImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-    extraImagePreview.style.backgroundImage = `url('${src}')`;
-    const imageUrl = await uploadTempImage(input, 'extraImage');
-    rememberNewItemField('extraImage', imageUrl);
+    event.stopPropagation();
+    const imageUrl = uploadImageAndShowPreview(input, 'extraImage');
+    showDeleteImageIcon('extraImage')
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterial(input);
+      await detectAndFillBrandAndMaterial(imageUrl);
     }
   }
 }
