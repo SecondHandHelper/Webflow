@@ -407,7 +407,7 @@ async function frontImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
     event.stopPropagation();
-    const imageUrl = uploadImageAndShowPreview(input, 'frontImage');
+    const imageUrl = await uploadImageAndShowPreview(input, 'frontImage');
     const promises = [];
     if (featureIsEnabled('colorCategory')) {
       promises.push(detectAndFillColor(imageUrl), detectAndFillBrandAndMaterial(imageUrl));
@@ -455,7 +455,7 @@ async function brandTagImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
     event.stopPropagation();
-    const imageUrl = uploadImageAndShowPreview(input, 'brandTagImage');
+    const imageUrl = await uploadImageAndShowPreview(input, 'brandTagImage');
     showDeleteImageIcon('brandTagImage')
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterial(imageUrl);
@@ -464,20 +464,24 @@ async function brandTagImageChangeHandler(event) {
 }
 
 function showLoadingIcon(imageName) {
-  document.getElementById(`loading${imageName}Icon`).style.display = 'inline-block';
-  document.getElementById(`delete${imageName}Icon`).style.display = 'none';
+  document.getElementById(`loading${capitalizeFirstLetter(imageName)}Icon`).style.display = 'inline-block';
+  document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
+}
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function showDeleteImageIcon(imageName) {
-  document.getElementById(`loading${imageName}Icon`).style.display = 'none';
-  document.getElementById(`delete${imageName}Icon`).style.display = 'inline-block';
+  document.getElementById(`loading${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
+  document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).style.display = 'inline-block';
 }
 
 async function productImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
     event.stopPropagation();
-    const imageUrl = uploadImageAndShowPreview(input, 'productImage');
+    const imageUrl = await uploadImageAndShowPreview(input, 'productImage');
     showDeleteImageIcon('productImage')
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterial(imageUrl);
@@ -489,7 +493,7 @@ async function defectImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
     event.stopPropagation();
-    const imageUrl = uploadImageAndShowPreview(input, 'defectImage');
+    const imageUrl = await uploadImageAndShowPreview(input, 'defectImage');
     showDeleteImageIcon('defectImage')
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterial(imageUrl);
@@ -501,7 +505,7 @@ async function materialTagImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
     event.stopPropagation();
-    const imageUrl = uploadImageAndShowPreview(input, 'materialImage');
+    const imageUrl = await uploadImageAndShowPreview(input, 'materialImage');
     showDeleteImageIcon('materialImage')
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterial(imageUrl);
@@ -513,7 +517,7 @@ async function extraImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
     event.stopPropagation();
-    const imageUrl = uploadImageAndShowPreview(input, 'extraImage');
+    const imageUrl = await uploadImageAndShowPreview(input, 'extraImage');
     showDeleteImageIcon('extraImage')
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterial(imageUrl);
