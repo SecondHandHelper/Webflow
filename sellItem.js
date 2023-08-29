@@ -304,10 +304,13 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
     });
     if (restoreSavedState) {
       if (document.getElementById('itemNoAnimals').checked !== data.noAnimals) {
-        document.getElementById('itemNoanimals').click();
+        document.getElementById('itemNoAnimals').click();
       }
-      if (document.getElementById('noSmoke').checked !== data.noSmoke) {
-        document.getElementById('noSmoke').click();
+      if (document.getElementById('itemNoSmoke').checked !== data.noSmoke) {
+        document.getElementById('itemNoSmoke').click();
+      }
+      if (document.getElementById('itemUserValuationApproval').checked !== data.userValuationApproval) {
+        document.getElementById('itemUserValuationApproval').click();
       }
     }
   } catch (error) {
