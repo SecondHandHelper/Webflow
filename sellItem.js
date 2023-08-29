@@ -226,7 +226,7 @@ function showImageState(imageName, state) {
   }
 }
 
-async function fillForm(itemId, savedItem) {
+async function fillForm(itemId, savedItem, restoreSavedState = false) {
   try {
     let item = { data: savedItem };
     if (!savedItem) {
@@ -269,8 +269,12 @@ async function fillForm(itemId, savedItem) {
     setFieldValue('itemMaterial', data.material);
     setFieldValue('itemModel', data.model);
     setFieldValue('itemOriginalPrice', originalPrice);
-    //itemUserComment.value = userComment; //Textarea
-    //itemDefectDescription.value = defectDescription; //Textarea
+
+    if (restoreSavedState) {
+      setFieldValue('itemUserComment', data.userComment);
+      setFieldValue('itemDefectDescription', data.defectDescription);
+      setFieldValue('itemAcceptPrice', data.acceptPrice);
+    }
 
     // Populate select fields
     selectFieldValue(itemAge, data.age);
@@ -296,6 +300,12 @@ async function fillForm(itemId, savedItem) {
         document.getElementById(key).checked = true;
       }
     });
+    if (itemNoAnimals.checked !== data.noAnimals) {
+      document.getElementById('itemNoanimals').click();
+    }
+    if (noSmoke.checked !== data.noSmoke) {
+      document.getElementById('noSmoke').click();
+    }
   } catch (error) {
     errorHandler.report(error);
     console.log("Error getting item document:", error);

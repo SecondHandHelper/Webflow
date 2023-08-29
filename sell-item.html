@@ -120,7 +120,7 @@
           const newItem = JSON.parse(sessionStorage.getItem('newItem'));
           const twoHours = 2*60*60*1000;
           if (Date.now() - newItem.updatedAt < twoHours) {
-            await fillForm('', newItem);
+            await fillForm(null, newItem, true);
           } else {
             sessionStorage.removeItem('newItem');
           }
