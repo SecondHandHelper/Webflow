@@ -1,5 +1,5 @@
 const defectsChoicesInSwedish = new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
-const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
+const imageElements = ["frontImage", "brandTagImage", "defectImage", "materialTagImage", "extraImage"];
 
 async function addItem(event) {
   const id = uuidv4();
