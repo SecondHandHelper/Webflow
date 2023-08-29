@@ -302,11 +302,13 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
         document.getElementById(key).checked = true;
       }
     });
-    if (itemNoAnimals.checked !== data.noAnimals) {
-      document.getElementById('itemNoanimals').click();
-    }
-    if (noSmoke.checked !== data.noSmoke) {
-      document.getElementById('noSmoke').click();
+    if (restoreSavedState) {
+      if (document.getElementById('itemNoAnimals').checked !== data.noAnimals) {
+        document.getElementById('itemNoanimals').click();
+      }
+      if (document.getElementById('noSmoke').checked !== data.noSmoke) {
+        document.getElementById('noSmoke').click();
+      }
     }
   } catch (error) {
     errorHandler.report(error);
