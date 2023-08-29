@@ -244,7 +244,7 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
     for (const imageName in images) {
       let urlSmall = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName] || images[`${imageName}Large`];
       let urlLarge = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
-      if (imageName === 'frontImage' && images.indexOf('enhancedFrontImage') > -1) {
+      if (imageName === 'frontImage' && images.enhancedFrontImage) {
         urlSmall = images['enhancedFrontImageSmall'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImage'] || images['enhancedFrontImageLarge'];
         urlLarge = images['enhancedFrontImage'] || images['enhancedFrontImageLarge'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImageSmall'];
       }
