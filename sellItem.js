@@ -658,14 +658,14 @@ async function initializeColorConfirm() {
 }
 
 function initializeDeleteImageListeners() {
-  document.getElementById('defectImage').addEventListener('click', () => {
-    removeSavedImage('defectImage');
+  document.getElementById('deleteDefectImageIcon').addEventListener('click', () => {
+    removeSavedImage('deleteDefectImageIcon');
   });
-  document.getElementById('materialTagImage').addEventListener('click', () => {
-    removeSavedImage('materialTagImage');
+  document.getElementById('deleteMaterialTagImageIcon').addEventListener('click', () => {
+    removeSavedImage('deleteMaterialTagImageIcon');
   });
-  document.getElementById('extraImage').addEventListener('click', () => {
-    removeSavedImage('extraImage');
+  document.getElementById('deleteExtraImageIcon').addEventListener('click', () => {
+    removeSavedImage('deleteExtraImageIcon');
   });
   document.getElementById("deleteFrontImageIcon").addEventListener('click', () => {
     document.getElementById("deleteFrontImageIcon").required = true;
