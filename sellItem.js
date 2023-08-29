@@ -233,17 +233,11 @@ async function fillForm(itemId, savedItem) {
       item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId });
     }
     const data = item.data;
-    const size = data.size;
-    const material = data.material;
-    const brand = data.brand;
-    const model = data.model;
+    const images = data.images || {};
     let originalPrice = data.originalPrice;
     if (originalPrice <= 0) {
       originalPrice = null;
     }
-    const age = data.age;
-    const condition = data.condition;
-    const images = data.images || {};
 
     // Populate images
     imageElements.map(img => sessionStorage.removeItem(`${img}PreviewUrl`));
@@ -268,38 +262,26 @@ async function fillForm(itemId, savedItem) {
     }
 
     // Populate text input fields
-    itemBrand.value = brand;
+    itemBrand.value = data.brand;
     // Don't use the setFieldValue for the brand since that triggers a dropdown to open
     document.getElementById('itemBrandLabel').style.display = 'inline-block'
-    setFieldValue('itemSize', size);
-    setFieldValue('itemMaterial', material);
-    setFieldValue('itemModel', model);
+    setFieldValue('itemSize', data.size);
+    setFieldValue('itemMaterial', data.material);
+    setFieldValue('itemModel', data.model);
     setFieldValue('itemOriginalPrice', originalPrice);
     //itemUserComment.value = userComment; //Textarea
     //itemDefectDescription.value = defectDescription; //Textarea
 
     // Populate select fields
-    let options = itemAge.options;
-    for (let i = 0; i < options.length; i++) {
-      if (age == options[i].attributes.value.value) {
-        itemAge.selectedIndex = i;
-        if (age != "") {
-          itemAge.style.color = "#333";
-          itemAge.dispatchEvent(new Event('input'));
-        }
-      }
+    selectFieldValue(itemAge, data.age);
+    selectFieldValue(itemColor, data.color);
+    selectFieldValue(itemCondition, data.condition);
+    if (itemCondition.options[itemCondition.selectedIndex].text === "Använd, tecken på slitage") {
+      defectInfoDiv.style.display = 'block';
     }
-    options = itemCondition.options;
-    for (let i = 0; i < options.length; i++) {
-      if (condition == options[i].innerText) {
-        itemCondition.selectedIndex = i;
-        itemCondition.style.color = "#333";
-        itemCondition.dispatchEvent(new Event('input'));
-        if (options[i].innerText == "Använd, tecken på slitage") {
-          defectInfoDiv.style.display = 'block';
-        }
-      }
-    }
+    const itemCategory = $('#itemCategory');
+    itemCategory.val(data.category);
+    itemCategory.trigger('change');
 
     // Populate radio-buttons
     document.getElementById('Woman').previousElementSibling.classList.remove("w--redirected-checked"); // Unselect radio button 'Woman'
@@ -319,6 +301,16 @@ async function fillForm(itemId, savedItem) {
     console.log("Error getting item document:", error);
   }
   document.getElementById('loadingDiv').style.display = 'none';
+}
+
+function selectFieldValue(field, value) {
+  field.selectedIndex = Array.from(field.options)
+    .map(elm => elm.attributes.value.value)
+    .indexOf(value);
+  if (value !== '') {
+    field.style.color = "#333";
+    field.dispatchEvent(new Event('input'));
+  }
 }
 
 function checkBrand(value) {
