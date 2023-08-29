@@ -303,15 +303,15 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
       }
     });
     if (restoreSavedState) {
-      if (document.getElementById('itemNoAnimals').checked !== data.noAnimals) {
+      if (!data.noAnimals) {
         document.getElementById('itemNoAnimals').click();
         document.getElementById('itemNoAnimals').previousElementSibling.classList.remove("w--redirected-checked");
       }
-      if (document.getElementById('itemNoSmoke').checked !== data.noSmoke) {
+      if (!data.noSmoke) {
         document.getElementById('itemNoSmoke').click();
         document.getElementById('itemNoSmoke').previousElementSibling.classList.remove("w--redirected-checked");
       }
-      if (document.getElementById('itemUserValuationApproval').checked !== data.userValuationApproval) {
+      if (!data.userValuationApproval) {
         document.getElementById('itemUserValuationApproval').click();
         document.getElementById('itemUserValuationApproval').previousElementSibling.classList.remove("w--redirected-checked");
       }
@@ -423,7 +423,7 @@ async function frontImageChangeHandler(event) {
     const imageUrl = await uploadImageAndShowPreview(input, 'frontImage');
     const promises = [];
     if (featureIsEnabled('colorCategory')) {
-      promises.push(detectAndFillColor(imageUrl), detectAndFillBrandAndMaterial(imageUrl));
+      promises.push(detectAndFillColor(imageUrl), detectAndFillBrandAndMaterialAndSize(imageUrl));
     }
     if (featureIsEnabled('enhanceImage')) {
       promises.push(enhanceFrontImage(imageUrl));
@@ -472,7 +472,7 @@ async function brandTagImageChangeHandler(event) {
     const imageUrl = await uploadImageAndShowPreview(input, 'brandTagImage');
     showDeleteImageIcon('brandTagImage')
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterial(imageUrl);
+      await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
   }
 }
@@ -498,7 +498,7 @@ async function productImageChangeHandler(event) {
     const imageUrl = await uploadImageAndShowPreview(input, 'productImage');
     showDeleteImageIcon('productImage')
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterial(imageUrl);
+      await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
   }
 }
@@ -510,7 +510,7 @@ async function defectImageChangeHandler(event) {
     const imageUrl = await uploadImageAndShowPreview(input, 'defectImage');
     showDeleteImageIcon('defectImage')
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterial(imageUrl);
+      await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
   }
 }
@@ -519,10 +519,10 @@ async function materialTagImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
     event.stopPropagation();
-    const imageUrl = await uploadImageAndShowPreview(input, 'materialImage');
-    showDeleteImageIcon('materialImage')
+    const imageUrl = await uploadImageAndShowPreview(input, 'materialTagImage');
+    showDeleteImageIcon('materialTagImage')
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterial(imageUrl);
+      await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
   }
 }
@@ -534,7 +534,7 @@ async function extraImageChangeHandler(event) {
     const imageUrl = await uploadImageAndShowPreview(input, 'extraImage');
     showDeleteImageIcon('extraImage')
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterial(imageUrl);
+      await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
   }
 }
@@ -544,7 +544,7 @@ function hideConfirmButtons(event, elementID) {
   event.currentTarget.closest('.text-input-container').querySelector('.suggest-buttons').style.display = 'none';
 }
 
-async function detectAndFillBrandAndMaterial(imageUrl) {
+async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
   try {
     if (document.querySelector('#itemBrand').value.length && document.querySelector('#itemMaterial').value.length
       && document.querySelector('#itemSize').value.length) {
