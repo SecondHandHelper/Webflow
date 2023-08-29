@@ -659,20 +659,20 @@ async function initializeColorConfirm() {
 
 function initializeDeleteImageListeners() {
   document.getElementById('deleteDefectImageIcon').addEventListener('click', () => {
-    removeSavedImage('deleteDefectImageIcon');
+    removeSavedImage('defectImage');
   });
   document.getElementById('deleteMaterialTagImageIcon').addEventListener('click', () => {
-    removeSavedImage('deleteMaterialTagImageIcon');
+    removeSavedImage('materialTagImage');
   });
   document.getElementById('deleteExtraImageIcon').addEventListener('click', () => {
-    removeSavedImage('deleteExtraImageIcon');
+    removeSavedImage('extraImage');
   });
   document.getElementById("deleteFrontImageIcon").addEventListener('click', () => {
-    document.getElementById("deleteFrontImageIcon").required = true;
+    document.getElementById("frontImage").required = true;
     removeSavedImage('frontImage');
   });
   document.getElementById("deleteBrandTagImageIcon").addEventListener('click', () => {
-    document.getElementById("deleteBrandTagImageIcon").required = true;
+    document.getElementById("brandTagImage").required = true;
     removeSavedImage('brandTagImage');
   });
 }
