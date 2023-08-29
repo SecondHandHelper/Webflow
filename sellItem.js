@@ -658,28 +658,22 @@ async function initializeColorConfirm() {
 }
 
 function initializeDeleteImageListeners() {
-  document.getElementById('deleteDefectImageIcon').addEventListener('click', () => {
-    removeSavedImage('defectImage');
-  });
-  document.getElementById('deleteMaterialTagImageIcon').addEventListener('click', () => {
-    removeSavedImage('materialTagImage');
-  });
-  document.getElementById('deleteExtraImageIcon').addEventListener('click', () => {
-    removeSavedImage('extraImage');
-  });
+  imageElements.forEach(imageName => {
+    document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).addEventListener('click', () => {
+      removeSavedImage(imageName);
+    });
+  })
   document.getElementById("deleteFrontImageIcon").addEventListener('click', () => {
     document.getElementById("frontImage").required = true;
-    removeSavedImage('frontImage');
   });
   document.getElementById("deleteBrandTagImageIcon").addEventListener('click', () => {
     document.getElementById("brandTagImage").required = true;
-    removeSavedImage('brandTagImage');
   });
 }
 
 function removeSavedImage(imageName) {
   const savedItem = JSON.parse(sessionStorage.getItem('newItem'));
-  savedItem['images'][imageName] = null;
+  delete savedItem.images[imageName];
   sessionStorage.setItem('newItem', JSON.stringify(savedItem));
 }
 
