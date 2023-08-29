@@ -658,17 +658,29 @@ async function initializeColorConfirm() {
 }
 
 function initializeDeleteImageListeners() {
-  imageElements.forEach(elmId => {
-    document.getElementById(elmId).addEventListener('click', () => {
-      const savedItem = JSON.parse(sessionStorage.getItem('newItem'));
-      savedItem['images'][elmId] = null;
-      sessionStorage.setItem('newItem', JSON.stringify(savedItem));
-    });
+  document.getElementById('defectImage').addEventListener('click', () => {
+    removeSavedImage('defectImage');
   });
-  document.getElementById("deleteFrontImageIcon").addEventListener('click', () =>
-    document.getElementById("deleteFrontImageIcon").required = true);
-  document.getElementById("deleteBrandTagImageIcon").addEventListener('click', () =>
-    document.getElementById("deleteBrandTagImageIcon").required = true);
+  document.getElementById('materialTagImage').addEventListener('click', () => {
+    removeSavedImage('materialTagImage');
+  });
+  document.getElementById('extraImage').addEventListener('click', () => {
+    removeSavedImage('extraImage');
+  });
+  document.getElementById("deleteFrontImageIcon").addEventListener('click', () => {
+    document.getElementById("deleteFrontImageIcon").required = true;
+    removeSavedImage('frontImage');
+  });
+  document.getElementById("deleteBrandTagImageIcon").addEventListener('click', () => {
+    document.getElementById("deleteBrandTagImageIcon").required = true;
+    removeSavedImage('brandTagImage');
+  });
+}
+
+function removeSavedImage(imageName) {
+  const savedItem = JSON.parse(sessionStorage.getItem('newItem'));
+  savedItem['images'][imageName] = null;
+  sessionStorage.setItem('newItem', JSON.stringify(savedItem));
 }
 
 async function initializeCategorySelect() {
