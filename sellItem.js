@@ -66,7 +66,7 @@ function collect() {
     }
   }
 
-  const images = JSON.parse(sessionStorage.getItem('newItem') || '{}').images
+  const images = JSON.parse(localStorage.getItem('newItem') || '{}').images
 
   return {
     user: authUser.current?.uid || null,
@@ -127,7 +127,7 @@ async function addItemInner(id) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
     await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
-    sessionStorage.removeItem('newItem');
+    localStorage.removeItem('newItem');
     sessionStorage.setItem('latestItemCreated', JSON.stringify(item));
   }
 
@@ -160,7 +160,7 @@ async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
   await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
-  sessionStorage.removeItem('newItem');
+  localStorage.removeItem('newItem');
   sessionStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
 }
 
@@ -176,7 +176,7 @@ async function rememberUnsavedChanges(event) {
       user, createdAt, status, shippingStatus, modelVariantFields, ...itemToSave
     } = collect();
     itemToSave.updatedAt = Date.now();
-    sessionStorage.setItem('newItem', JSON.stringify(itemToSave));
+    localStorage.setItem('newItem', JSON.stringify(itemToSave));
   }
 }
 
@@ -449,13 +449,13 @@ async function uploadImageAndShowPreview(input, imageName) {
 }
 
 function rememberNewItemImageField(filedName, value) {
-  let newItem = JSON.parse(sessionStorage.getItem('newItem') || JSON.stringify({ images: {} }));
+  let newItem = JSON.parse(localStorage.getItem('newItem') || JSON.stringify({ images: {} }));
   newItem.updatedAt = Date.now();
   if (!newItem.images) {
     newItem.images = {};
   }
   newItem['images'][filedName] = value;
-  sessionStorage.setItem('newItem', JSON.stringify(newItem));
+  localStorage.setItem('newItem', JSON.stringify(newItem));
 }
 
 async function uploadTempImage(input, filename) {
@@ -679,9 +679,9 @@ function initializeDeleteImageListeners() {
 }
 
 function removeSavedImage(imageName) {
-  const savedItem = JSON.parse(sessionStorage.getItem('newItem'));
+  const savedItem = JSON.parse(localStorage.getItem('newItem'));
   delete savedItem.images[imageName];
-  sessionStorage.setItem('newItem', JSON.stringify(savedItem));
+  localStorage.setItem('newItem', JSON.stringify(savedItem));
 }
 
 async function initializeCategorySelect() {

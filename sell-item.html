@@ -117,16 +117,11 @@
         }
         initializeDeleteImageListeners();
 
-        if (sessionStorage.getItem('newItem')) {
-          const newItem = JSON.parse(sessionStorage.getItem('newItem'));
-          const twoHours = 2*60*60*1000;
+        if (localStorage.getItem('newItem')) {
+          const newItem = JSON.parse(localStorage.getItem('newItem'));
           document.getElementById("frontImage").required = true;
           document.getElementById("brandTagImage").required = true;
-          if (Date.now() - newItem.updatedAt < twoHours) {
-            await fillForm(null, newItem, true);
-          } else {
-            sessionStorage.removeItem('newItem');
-          }
+          await fillForm(null, newItem, true);
           document.getElementById("triggerShowSellItemContent").click();
         } else if (params.id) {
             // Fill form if the user comes from a prefill link
