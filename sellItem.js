@@ -273,7 +273,9 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
     if (restoreSavedState) {
       setFieldValue('itemUserComment', data.userComment);
       setFieldValue('itemDefectDescription', data.defectDescription);
-      setFieldValue('itemAcceptPrice', data.acceptPrice);
+      setFieldValue('itemLowestAcceptPrice', data.acceptPrice);
+      setFieldValue('itemPhoneNumber', data.phoneNumber);
+      setFieldValue('itemPersonalId', data.personalId);
     }
 
     // Populate select fields
