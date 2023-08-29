@@ -116,13 +116,14 @@
             document.getElementById("itemPhoneNumber").required = true;
         }
 
-        // Fall 1. det finns en newItem sparad
-        // => 1.a params.id är också satt => använd newItem annars förlorar de vad de fyllt i
-        // När tar vi då bort newItem? efter
-
         if (sessionStorage.getItem('newItem')) {
-          await fillForm('', JSON.parse(sessionStorage.getItem('newItem')));
-          sessionStorage.removeItem('newItem');
+          const newItem = JSON.parse(sessionStorage.getItem('newItem'));
+          const twoHours = 2*60*60*1000;
+          if (Date.now() - newItem.updatedAt < twoHours) {
+            await fillForm('', newItem);
+          } else {
+            sessionStorage.removeItem('newItem');
+          }
           document.getElementById("frontImage").required = true;
           document.getElementById("brandTagImage").required = true;
           document.getElementById("triggerShowSellItemContent").click();

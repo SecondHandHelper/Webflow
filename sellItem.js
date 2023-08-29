@@ -434,9 +434,9 @@ async function uploadImageAndShowPreview(input, imageName) {
 function rememberNewItemImageField(filedName, value) {
   let newItem = JSON.parse(sessionStorage.getItem('newItem') ||
     JSON.stringify({ images: {} }));
-  const oneDay = 1000*60*60*24;
-  if (newItem.updatedAt && newItem.updatedAt - Date.now > oneDay) {
-    // Reset saved item if it's more than a day old
+  const twoHours = 2*60*60*1000;
+  if (newItem.updatedAt && Date.now() - newItem.updatedAt > twoHours) {
+    // Reset saved item if it's more than 2 hours old
     newItem = { images: {} };
   }
   newItem.updatedAt = Date.now();
