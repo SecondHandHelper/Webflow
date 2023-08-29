@@ -691,8 +691,10 @@ function clearFormFields() {
   itemCategory.trigger('change');
 
   // Populate radio-buttons
-  document.getElementById(data.sex).previousElementSibling.classList.remove("w--redirected-checked"); // Populate the right one
-  document.getElementById(data.sex).checked = false;
+  document.getElementById('Man').previousElementSibling.classList.remove("w--redirected-checked");
+  document.getElementById('Man').checked = false;
+  document.getElementById('Unisex').previousElementSibling.classList.remove("w--redirected-checked");
+  document.getElementById('Unisex').checked = false;
   document.getElementById('Woman').previousElementSibling.classList.add("w--redirected-checked"); // select radio button 'Woman'
   document.getElementById('Woman').checked = true;
 
