@@ -664,6 +664,57 @@ async function initializeColorConfirm() {
   })
 }
 
+function clearFormFields() {
+  localStorage.removeItem('newItem');
+  imageElements.forEach(imageName => {
+    document.getElementById(`${imageName}Preview`).style.backgroundImage = '';
+    showImageState(imageName, 'default-state');
+  });
+
+  setFieldValue('itemSize', null);
+  setFieldValue('itemMaterial', null);
+  setFieldValue('itemModel', null);
+  setFieldValue('itemOriginalPrice', null);
+
+  setFieldValue('itemUserComment', null);
+  setFieldValue('itemDefectDescription', null);
+  setFieldValue('itemLowestAcceptPrice', null);
+  setFieldValue('itemPhoneNumber', null);
+  setFieldValue('itemPersonalId', null);
+
+  selectFieldValue(itemAge, '');
+  selectFieldValue(itemColor, '');
+  selectFieldValue(itemCondition, '');
+  defectInfoDiv.style.display = 'none';
+  const itemCategory = $('#itemCategory');
+  itemCategory.val('');
+  itemCategory.trigger('change');
+
+  // Populate radio-buttons
+  document.getElementById(data.sex).previousElementSibling.classList.remove("w--redirected-checked"); // Populate the right one
+  document.getElementById(data.sex).checked = false;
+  document.getElementById('Woman').previousElementSibling.classList.add("w--redirected-checked"); // select radio button 'Woman'
+  document.getElementById('Woman').checked = true;
+
+  // Populate checkboxes
+  defectsChoicesInSwedish.forEach((value, key) => {
+    document.getElementById(key).previousElementSibling.classList.remove("w--redirected-checked");
+    document.getElementById(key).checked = false;
+  });
+  if (document.getElementById('itemNoAnimals').checked === false) {
+    document.getElementById('itemNoAnimals').click();
+    document.getElementById('itemNoAnimals').previousElementSibling.classList.add("w--redirected-checked");
+  }
+  if (document.getElementById('itemNoSmoke').checked === false) {
+    document.getElementById('itemNoSmoke').click();
+    document.getElementById('itemNoSmoke').previousElementSibling.classList.add("w--redirected-checked");
+  }
+  if (document.getElementById('itemUserValuationApproval').checked === false) {
+    document.getElementById('itemUserValuationApproval').click();
+    document.getElementById('itemUserValuationApproval').previousElementSibling.classList.add("w--redirected-checked");
+  }
+}
+
 function initializeDeleteImageListeners() {
   imageElements.forEach(imageName => {
     document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).addEventListener('click', () => {

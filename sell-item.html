@@ -122,6 +122,8 @@
           document.getElementById("frontImage").required = true;
           document.getElementById("brandTagImage").required = true;
           await fillForm(null, newItem, true);
+          document.getElementById('clearItemForm').style.display = 'block';
+          document.getElementById('clearItemForm').addEventListener('click', () => clearFormFields);
           document.getElementById("triggerShowSellItemContent").click();
         } else if (params.id) {
             // Fill form if the user comes from a prefill link
