@@ -447,6 +447,9 @@ async function uploadImageAndShowPreview(input, imageName) {
 function rememberNewItemImageField(filedName, value) {
   let newItem = JSON.parse(sessionStorage.getItem('newItem') || JSON.stringify({ images: {} }));
   newItem.updatedAt = Date.now();
+  if (!newItem.images) {
+    newItem.images = {};
+  }
   newItem['images'][filedName] = value;
   sessionStorage.setItem('newItem', JSON.stringify(newItem));
 }
