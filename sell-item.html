@@ -115,17 +115,20 @@
             phoneNumberDiv.style.display = "block";
             document.getElementById("itemPhoneNumber").required = true;
         }
-
-        if (sessionStorage.getItem('newItem')) {
+      document.getElementById("deleteFrontImageIcon").addEventListener('click', () =>
+        document.getElementById("deleteFrontImageIcon").required = true);
+      document.getElementById("deleteBrandTagImageIcon").addEventListener('click', () =>
+        document.getElementById("deleteBrandTagImageIcon").required = true);
+      if (sessionStorage.getItem('newItem')) {
           const newItem = JSON.parse(sessionStorage.getItem('newItem'));
           const twoHours = 2*60*60*1000;
+          document.getElementById("frontImage").required = true;
+          document.getElementById("brandTagImage").required = true;
           if (Date.now() - newItem.updatedAt < twoHours) {
             await fillForm(null, newItem, true);
           } else {
             sessionStorage.removeItem('newItem');
           }
-          document.getElementById("frontImage").required = true;
-          document.getElementById("brandTagImage").required = true;
           document.getElementById("triggerShowSellItemContent").click();
         } else if (params.id) {
             // Fill form if the user comes from a prefill link

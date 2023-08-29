@@ -247,6 +247,7 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
       if (imageElements.includes(imageName)) {
         showImagePreview(imageName, urlSmall);
         showImageState(imageName, 'success-state');
+        document.getElementById(imageName).required = false;
         sessionStorage.setItem(`${imageName}PreviewUrl`, urlLarge); // Store large preview url to create image from on submit
       }
     }
@@ -274,8 +275,8 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
       setFieldValue('itemUserComment', data.userComment);
       setFieldValue('itemDefectDescription', data.defectDescription);
       setFieldValue('itemLowestAcceptPrice', data.acceptPrice);
-      setFieldValue('itemPhoneNumber', data.phoneNumber);
-      setFieldValue('itemPersonalId', data.personalId);
+      data.phoneNumber ? setFieldValue('itemPhoneNumber', data.phoneNumber) : '';
+      data.personalId ? setFieldValue('itemPersonalId', data.personalId) : '';
     }
 
     // Populate select fields
