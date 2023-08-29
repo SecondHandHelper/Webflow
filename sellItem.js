@@ -445,13 +445,7 @@ async function uploadImageAndShowPreview(input, imageName) {
 }
 
 function rememberNewItemImageField(filedName, value) {
-  let newItem = JSON.parse(sessionStorage.getItem('newItem') ||
-    JSON.stringify({ images: {} }));
-  const twoHours = 2*60*60*1000;
-  if (newItem.updatedAt && Date.now() - newItem.updatedAt > twoHours) {
-    // Reset saved item if it's more than 2 hours old
-    newItem = { images: {} };
-  }
+  let newItem = JSON.parse(sessionStorage.getItem('newItem') || JSON.stringify({ images: {} }));
   newItem.updatedAt = Date.now();
   newItem['images'][filedName] = value;
   sessionStorage.setItem('newItem', JSON.stringify(newItem));
@@ -661,6 +655,20 @@ async function initializeColorConfirm() {
   document.getElementById('confirmColor').addEventListener('click', () => {
     document.querySelector('#itemColor').setCustomValidity('');
   })
+}
+
+function initializeDeleteImageListeners() {
+  imageElements.forEach(elmId => {
+    document.getElementById(elmId).addEventListener('click', () => {
+      const savedItem = JSON.parse(sessionStorage.getItem('newItem'));
+      savedItem['images'][elmId] = null;
+      sessionStorage.setItem('newItem', JSON.stringify(savedItem));
+    });
+  });
+  document.getElementById("deleteFrontImageIcon").addEventListener('click', () =>
+    document.getElementById("deleteFrontImageIcon").required = true);
+  document.getElementById("deleteBrandTagImageIcon").addEventListener('click', () =>
+    document.getElementById("deleteBrandTagImageIcon").required = true);
 }
 
 async function initializeCategorySelect() {

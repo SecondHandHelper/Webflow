@@ -115,11 +115,9 @@
             phoneNumberDiv.style.display = "block";
             document.getElementById("itemPhoneNumber").required = true;
         }
-      document.getElementById("deleteFrontImageIcon").addEventListener('click', () =>
-        document.getElementById("deleteFrontImageIcon").required = true);
-      document.getElementById("deleteBrandTagImageIcon").addEventListener('click', () =>
-        document.getElementById("deleteBrandTagImageIcon").required = true);
-      if (sessionStorage.getItem('newItem')) {
+        initializeDeleteImageListeners();
+
+        if (sessionStorage.getItem('newItem')) {
           const newItem = JSON.parse(sessionStorage.getItem('newItem'));
           const twoHours = 2*60*60*1000;
           document.getElementById("frontImage").required = true;
