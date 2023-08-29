@@ -175,7 +175,7 @@ async function rememberUnsavedChanges(event) {
     const {
       user, createdAt, status, shippingStatus, modelVariantFields, ...itemToSave
     } = collect();
-    itemToSave.updatedAt = Date.now;
+    itemToSave.updatedAt = Date.now();
     sessionStorage.setItem('newItem', JSON.stringify(itemToSave));
   }
 }
