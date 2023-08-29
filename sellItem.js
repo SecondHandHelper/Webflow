@@ -252,6 +252,7 @@ async function fillForm(itemId, savedItem) {
       const urlLarge = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
       if (imageElements.includes(imageName)) {
         showImagePreview(imageName, urlSmall);
+        showImageState(imageName, 'success-state');
         sessionStorage.setItem(`${imageName}PreviewUrl`, urlLarge); // Store large preview url to create image from on submit
       }
     }
