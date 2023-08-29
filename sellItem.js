@@ -278,7 +278,7 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
     if (restoreSavedState) {
       setFieldValue('itemUserComment', data.userComment);
       setFieldValue('itemDefectDescription', data.defectDescription);
-      setFieldValue('itemLowestAcceptPrice', data.acceptPrice);
+      setFieldValue('itemLowestAcceptPrice', data.acceptPrice <= 0 ? null : data.acceptPrice);
       data.phoneNumber ? setFieldValue('itemPhoneNumber', data.phoneNumber) : '';
       data.personalId ? setFieldValue('itemPersonalId', data.personalId) : '';
     }
@@ -335,6 +335,8 @@ function selectFieldValue(field, value) {
   if (value !== '') {
     field.style.color = "#333";
     field.dispatchEvent(new Event('input'));
+  } else {
+    field.style.color = '#929292';
   }
 }
 
@@ -671,6 +673,7 @@ function clearFormFields() {
     showImageState(imageName, 'default-state');
   });
 
+  setFieldValue('itemBrand', null);
   setFieldValue('itemSize', null);
   setFieldValue('itemMaterial', null);
   setFieldValue('itemModel', null);
