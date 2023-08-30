@@ -103,7 +103,12 @@
 
     async function sellItemMain() {
         sessionStorage.removeItem('latestItemCreated');
-        addEventListener('beforeunload', rememberUnsavedChanges);
+        document.getElementById('wf-form-Add-Item').querySelectorAll('input').forEach(elm => {
+          elm.addEventListener('blur', rememberUnsavedChanges);
+        });
+        document.getElementById('wf-form-Add-Item').querySelectorAll('textarea').forEach(elm => {
+          elm.addEventListener('blur', rememberUnsavedChanges);
+        });
         await initializeCategorySelect();
         await initializeColorConfirm();
         await initializeBrandConfirm();
