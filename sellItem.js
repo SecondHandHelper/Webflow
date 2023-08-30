@@ -679,9 +679,9 @@ async function detectAndFillColor(imageUrl) {
       return;
     }
     document.querySelector('#itemColor').setCustomValidity('Bekräfta eller ändra färgen');
-    document.querySelector('#colorSuggestButtons').style.display = 'block';
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
+    document.querySelector('#colorSuggestButtons').style.display = 'block';
     document.querySelector('#itemColor').dispatchEvent(new Event('blur'));
     analytics.track("Element Viewed", { elementID: "colorSuggestButtons" });
   } catch (e) {
