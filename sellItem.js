@@ -693,7 +693,7 @@ function initializeClearFormButton() {
   document.getElementById('wf-form-Add-Item').addEventListener('input', (event) => {
     let field = event.target;
     if (field instanceof Element) {
-      const defaultValue = defaultFormState()[field.id];
+      const defaultValue = defaultFormState()[field.name];
       if (defaultValue !== field.value && field.value !== '') {
         document.getElementById('clearItemForm').style.display = 'block';
       }
