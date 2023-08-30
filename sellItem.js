@@ -294,7 +294,7 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
     }
 
     // Populate text input fields
-    itemBrand.value = data.brand;
+    itemBrand.value = data.brand || '';
     // Don't use the setFieldValue for the brand since that triggers a dropdown to open
     document.getElementById('itemBrandLabel').style.display = 'inline-block'
     setFieldValue('itemSize', data.size);
@@ -322,11 +322,14 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
     itemCategory.trigger('change');
 
     // Populate radio-buttons
-    document.getElementById('Woman').previousElementSibling.classList.remove("w--redirected-checked"); // Unselect radio button 'Woman'
-    document.getElementById('Woman').checked = false;
     if (data.sex) {
+      document.getElementById('Woman').previousElementSibling.classList.remove("w--redirected-checked"); // Unselect radio button 'Woman'
+      document.getElementById('Woman').checked = false;
       document.getElementById(data.sex).previousElementSibling.classList.add("w--redirected-checked"); // Populate the right one
       document.getElementById(data.sex).checked = true;
+    } else {
+      document.getElementById('Woman').previousElementSibling.classList.add("w--redirected-checked"); // Unselect radio button 'Woman'
+      document.getElementById('Woman').checked = true;
     }
 
     // Populate checkboxes
@@ -337,7 +340,7 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
       }
     });
     if (restoreSavedState) {
-      if (!data.userValuationApproval) {
+      if ('userValuationApproval' in data && !data.userValuationApproval) {
         document.getElementById('itemUserValuationApproval').click();
         document.getElementById('itemUserValuationApproval').previousElementSibling.classList.remove("w--redirected-checked");
       }

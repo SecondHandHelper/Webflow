@@ -1,5 +1,5 @@
 const setFieldValue = (fieldId, value) => {
-  document.getElementById(fieldId).value = value;
+  document.getElementById(fieldId).value = value || '';
   document.getElementById(fieldId).dispatchEvent(new Event('input'));
 }
 
