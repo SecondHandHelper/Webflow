@@ -26,7 +26,7 @@ function defaultFormState() {
     category: null,
     color: null,
     condition: null,
-    defectDescription: "",
+    defectDescription: null,
     defects: [],
     images: {},
     material: null,
@@ -192,6 +192,7 @@ async function rememberUnsavedChanges(event) {
     const {
       user, createdAt, status, shippingStatus, modelVariantFields, ...itemToSave
     } = collect();
+    // Replace '' with null values
     const item = Object.keys(itemToSave).reduce((acc, key) => {
       acc[key] = itemToSave[key] === '' ? null : itemToSave[key];
       return acc;
