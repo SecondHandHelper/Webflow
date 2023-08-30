@@ -401,10 +401,11 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
 }
 
 function selectFieldValue(field, value) {
-  field.selectedIndex = Array.from(field.options)
+  const selectIndex = Array.from(field.options)
     .map(elm => elm.attributes.value.value)
     .indexOf(value);
-  if (value !== '') {
+  if (selectIndex >= 0) {
+    field.selectedIndex = selectIndex;
     field.style.color = "#333";
     field.dispatchEvent(new Event('input'));
   } else {
