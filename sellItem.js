@@ -199,6 +199,8 @@ async function rememberUnsavedChanges(event) {
     item.images = item.images ? item.images : {};
     item.userValuationApproval = item.preferences.userValuationApproval;
     delete item.preferences;
+    item.acceptPrice = item.acceptPrice && item.acceptPrice > 0 ? item.acceptPrice : null;
+    item.originalPrice = item.originalPrice && item.originalPrice > 0 ? item.originalPrice : null;
     if (!isDefaultFormState(item)) {
       localStorage.setItem('newItem', JSON.stringify(item));
     } else {
@@ -211,6 +213,7 @@ function isDefaultFormState(itemState) {
   const defaultState = defaultFormState();
   for (const field in defaultState) {
     if ((field in itemState) && itemState[field] !== defaultState[field]) {
+      console.log(`${field} differs`);
       return false;
     }
   }
