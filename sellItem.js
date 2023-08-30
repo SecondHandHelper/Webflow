@@ -188,31 +188,36 @@ async function enhanceFrontImage(imageUrl) {
 }
 
 async function rememberUnsavedChanges(event) {
-  if (!sessionStorage.getItem('latestItemCreated')) {
-    const {
-      user, createdAt, status, shippingStatus, modelVariantFields, ...itemToSave
-    } = collect();
-    // Replace '' with null values
-    const item = Object.keys(itemToSave).reduce((acc, key) => {
-      acc[key] = itemToSave[key] === '' ? null : itemToSave[key];
-      return acc;
-    }, {});
-    item.images = item.images ? item.images : {};
-    item.defects = item.defects ? item.defects : [];
-    item.userValuationApproval = item.preferences.userValuationApproval;
-    delete item.preferences;
-    item.acceptPrice = item.acceptPrice && item.acceptPrice > 0 ? item.acceptPrice : null;
-    item.originalPrice = item.originalPrice && item.originalPrice > 0 ? item.originalPrice : null;
-    [ 'itemBrand', 'itemSize', 'itemMaterial', 'itemColor' ].forEach(inputName => {
-      if (document.getElementById(inputName).parentNode.querySelector('.suggest-buttons').style.display === 'block') {
-        item[`${inputName}Confirm`] = true;
-      }
-    })
-    if (!isDefaultFormState(item)) {
-      localStorage.setItem('newItem', JSON.stringify(item));
-    } else {
-      localStorage.removeItem('newItem');
+  if (sessionStorage.getItem('latestItemCreated')) {
+    return;
+  }
+  const {
+    user, createdAt, status, shippingStatus, modelVariantFields, ...itemToSave
+  } = collect();
+  // Replace '' with null values
+  const item = Object.keys(itemToSave).reduce((acc, key) => {
+    acc[key] = itemToSave[key] === '' ? null : itemToSave[key];
+    return acc;
+  }, {});
+  item.images = item.images ? item.images : {};
+  item.defects = item.defects ? item.defects : [];
+  item.userValuationApproval = item.preferences.userValuationApproval;
+  delete item.preferences;
+  item.acceptPrice = item.acceptPrice && item.acceptPrice > 0 ? item.acceptPrice : null;
+  item.originalPrice = item.originalPrice && item.originalPrice > 0 ? item.originalPrice : null;
+  [ 'itemBrand', 'itemSize', 'itemMaterial', 'itemColor' ].forEach(inputName => {
+    const suggestButtons = document.getElementById(inputName).parentNode.querySelector('.suggest-buttons') ||
+      document.getElementById(inputName).parentNode.parentNode.querySelector('.suggest-buttons');
+    if (suggestButtons?.style?.display === 'block') {
+      item[`${inputName}Confirm`] = true;
     }
+  })
+  if (!isDefaultFormState(item)) {
+    console.log("Saving form state");
+    localStorage.setItem('newItem', JSON.stringify(item));
+  } else {
+    console.log('Removing saved item');
+    localStorage.removeItem('newItem');
   }
 }
 
@@ -517,7 +522,6 @@ async function uploadImageAndShowPreview(input, imageName) {
 
 function rememberNewItemImageField(filedName, value) {
   let newItem = JSON.parse(localStorage.getItem('newItem') || JSON.stringify({ images: {} }));
-  newItem.updatedAt = Date.now();
   if (!newItem.images) {
     newItem.images = {};
   }
