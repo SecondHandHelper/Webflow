@@ -109,7 +109,7 @@
         await initializeBrandConfirm();
         await initializeMaterialConfirm();
         await initializeSizeConfirm();
-
+        initializeClearFormButton();
         // Be om telefonnummer i formuläret
         if (!user.current?.phoneNumber) {
             phoneNumberDiv.style.display = "block";
@@ -117,7 +117,7 @@
         }
         initializeDeleteImageListeners();
 
-        if (localStorage.getItem('newItem')) {
+        if (localStorage.getItem('newItem') !== defaultFormState()) {
           const newItem = JSON.parse(localStorage.getItem('newItem'));
           document.getElementById("frontImage").required = true;
           document.getElementById("brandTagImage").required = true;

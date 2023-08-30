@@ -18,6 +18,29 @@ async function addItem(event) {
   }
 }
 
+function defaultFormState() {
+  return {
+    acceptPrice: null,
+    age: null,
+    brand: null,
+    category: null,
+    color: null,
+    condition: null,
+    defectDescription: "",
+    defects: [],
+    images: {},
+    material: null,
+    model: null,
+    noAnimals: true,
+    noSmoke: true,
+    originalPrice: null,
+    preferences: {userValuationApproval: false},
+    sex: "Woman",
+    size: null,
+    userComment: null,
+  }
+}
+
 function collect() {
   let sex = "";
   const now = new Date();
@@ -175,8 +198,16 @@ async function rememberUnsavedChanges(event) {
     const {
       user, createdAt, status, shippingStatus, modelVariantFields, ...itemToSave
     } = collect();
-    itemToSave.updatedAt = Date.now();
-    localStorage.setItem('newItem', JSON.stringify(itemToSave));
+    const item = Object.keys(itemToSave).reduce((acc, key) => {
+      acc[key] = itemToSave[key] === '' ? null : itemToSave[key];
+      return acc;
+    }, {});
+    item.images = item.images ? item.images : {};
+    if (JSON.stringify(item) !== JSON.stringify(defaultFormState())) {
+      localStorage.setItem('newItem', JSON.stringify(item));
+    } else {
+      localStorage.removeItem('newItem');
+    }
   }
 }
 
@@ -287,7 +318,7 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
     selectFieldValue(itemAge, data.age);
     selectFieldValue(itemColor, data.color);
     selectFieldValue(itemCondition, data.condition);
-    if (itemCondition.options[itemCondition.selectedIndex].text === "Använd, tecken på slitage") {
+    if (itemCondition.selectedIndex >= 0 && itemCondition.options[itemCondition.selectedIndex].text === "Använd, tecken på slitage") {
       defectInfoDiv.style.display = 'block';
     }
     const itemCategory = $('#itemCategory');
@@ -640,6 +671,19 @@ async function initializeBrandConfirm() {
   })
 }
 
+function initializeClearFormButton() {
+  document.getElementById('wf-form-Add-Item').addEventListener('input', (event) => {
+    let field = event.target;
+    if (field instanceof Element) {
+      const defaultValue = defaultFormState()[field.id];
+      if (defaultValue !== field.value && field.value !== '') {
+        document.getElementById('clearItemForm').style.display = 'block';
+      }
+    }
+  })
+
+}
+
 async function initializeSizeConfirm() {
   document.getElementById('rejectSize').addEventListener('click', () => {
     document.querySelector('#itemSize').value = '';
@@ -668,6 +712,7 @@ async function initializeColorConfirm() {
 
 function clearFormFields() {
   localStorage.removeItem('newItem');
+  document.getElementById('clearItemForm').style.display = 'none';
   imageElements.forEach(imageName => {
     document.getElementById(`${imageName}Preview`).style.backgroundImage = '';
     showImageState(imageName, 'default-state');
