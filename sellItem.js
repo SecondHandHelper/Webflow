@@ -198,6 +198,7 @@ async function rememberUnsavedChanges(event) {
       return acc;
     }, {});
     item.images = item.images ? item.images : {};
+    item.defects = item.defects ? item.defects : [];
     item.userValuationApproval = item.preferences.userValuationApproval;
     delete item.preferences;
     item.acceptPrice = item.acceptPrice && item.acceptPrice > 0 ? item.acceptPrice : null;
