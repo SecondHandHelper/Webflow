@@ -217,9 +217,12 @@ function isDefaultFormState(itemState) {
     if (!(field in itemState)) {
       continue;
     }
-    if (defaultState[field] instanceof Object && JSON.stringify(defaultState[field]) !== JSON.stringify(itemState[field])) {
-      console.log(`${field} differs`);
-      return false
+    if (defaultState[field] instanceof Object) {
+      if (JSON.stringify(defaultState[field]) !== JSON.stringify(itemState[field])) {
+        console.log(`${field} differs ${defaultState[field]} vs ${itemState[field]}`);
+        return false
+      }
+      continue;
     }
     if (itemState[field] !== defaultState[field]) {
       console.log(`${field} differs`);
