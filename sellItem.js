@@ -290,7 +290,9 @@ function showImageState(imageName, state) {
 
 function showSuggestButtons(fieldName, restoreSavedState, showConfirmation) {
   if (restoreSavedState && showConfirmation) {
-    document.getElementById(fieldName).parentNode.querySelector('.suggest-buttons').style.display = 'block';
+    const suggestButtons = document.getElementById(fieldName).parentNode.querySelector('.suggest-buttons') ||
+      document.getElementById(fieldName).parentNode.parentNode.querySelector('.suggest-buttons');
+    suggestButtons.style.display = 'block';
   }
 
 }
