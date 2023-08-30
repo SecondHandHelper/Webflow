@@ -331,7 +331,7 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
 
     // Populate checkboxes
     defectsChoicesInSwedish.forEach((value, key) => {
-      if (data.defects.includes(value)) {
+      if (data.defects && data.defects.includes(value)) {
         document.getElementById(key).previousElementSibling.classList.add("w--redirected-checked");
         document.getElementById(key).checked = true;
       }
@@ -343,8 +343,8 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
       }
     }
   } catch (error) {
+    console.error("Error getting item document:", error);
     errorHandler.report(error);
-    console.log("Error getting item document:", error);
   }
   document.getElementById('loadingDiv').style.display = 'none';
 }

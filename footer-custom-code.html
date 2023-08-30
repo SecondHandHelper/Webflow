@@ -10,6 +10,16 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
+  var errorHandler = new StackdriverErrorReporter();
+  const environment = location.href.includes('shh-test.page') ? 'web-test' : 'web-prod';
+  $(document).ready(function () {
+    errorHandler.start({
+      key: 'AIzaSyA1XebVWrZ_WlhKtlqqaRE8omzzn50zd-U',
+      projectId: 'second-hand-helper',
+      service: environment,
+    });
+  });
+
   // Firebase config
   var firebaseConfig = {
     apiKey: "AIzaSyCMWv3TzZuGPDg41K8wa_PY10rgtitoCnA",
@@ -233,19 +243,4 @@
       }
     });
   }
-</script>
-
-<script>
-  var errorHandler = new StackdriverErrorReporter();
-  const environment = location.href.includes('shh-test.page') ? 'web-test' : 'web-prod';
-  $(document).ready(function () {
-    errorHandler.start({
-      key: 'AIzaSyA1XebVWrZ_WlhKtlqqaRE8omzzn50zd-U',
-      projectId: 'second-hand-helper',
-      service: environment,
-    });
-  });
-  window.addEventListener('error', e => {
-    console.error(e); // Stackdriver stops reporting to console so we add it back here
-  });
 </script>
