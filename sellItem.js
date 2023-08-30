@@ -732,6 +732,12 @@ function initializeSaveStateListeners() {
   document.getElementById('wf-form-Add-Item').querySelectorAll('input').forEach(elm => {
     elm.addEventListener('blur', rememberUnsavedChanges);
   });
+  document.getElementById('wf-form-Add-Item').querySelectorAll('input[type="radio"]').forEach(elm => {
+    elm.addEventListener('change', rememberUnsavedChanges);
+  });
+  document.getElementById('wf-form-Add-Item').querySelectorAll('input[type="checkbox"]').forEach(elm => {
+    elm.addEventListener('change', rememberUnsavedChanges);
+  });
   document.getElementById('wf-form-Add-Item').querySelectorAll('select').forEach(elm => {
     elm.addEventListener('blur', rememberUnsavedChanges);
   });
