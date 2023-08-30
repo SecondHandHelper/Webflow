@@ -631,28 +631,28 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
     if (!document.querySelector('#itemBrand').value.length && response.data?.brand) {
       document.querySelector('#itemBrand').value = response.data.brand;
       document.querySelector('#itemBrand').setCustomValidity('Bekräfta eller ändra märket');
-      document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
-      document.querySelector('#itemBrand').dispatchEvent(new Event('blur'));
       document.getElementById('itemBrandLabel').style.display = 'inline-block';
       document.querySelector('#brandSuggestButtons').style.display = 'block';
+      document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
+      document.querySelector('#itemBrand').dispatchEvent(new Event('blur'));
       analytics.track("Element Viewed", { elementID: "brandSuggestButtons" });
     }
     if (!document.querySelector('#itemMaterial').value.length && response.data?.materials) {
       document.querySelector('#itemMaterial').value = response.data.materials;
       document.querySelector('#itemMaterial').setCustomValidity('Bekräfta eller ändra materialet');
-      document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
-      document.querySelector('#itemMaterial').dispatchEvent(new Event('blur'));
       document.getElementById('itemMaterialLabel').style.display = 'inline-block';
       document.querySelector('#materialSuggestButtons').style.display = 'block';
+      document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
+      document.querySelector('#itemMaterial').dispatchEvent(new Event('blur'));
       analytics.track("Element Viewed", { elementID: "materialSuggestButtons" });
     }
     if (!document.querySelector('#itemSize').value.length && response.data?.size) {
       document.querySelector('#itemSize').value = response.data.size;
       document.querySelector('#itemSize').setCustomValidity('Bekräfta eller ändra storlek');
-      document.querySelector('#itemSize').dispatchEvent(new Event('change'));
-      document.querySelector('#itemSize').dispatchEvent(new Event('blur'));
       document.getElementById('itemSizeLabel').style.display = 'inline-block';
       document.querySelector('#sizeSuggestButtons').style.display = 'block';
+      document.querySelector('#itemSize').dispatchEvent(new Event('change'));
+      document.querySelector('#itemSize').dispatchEvent(new Event('blur'));
       analytics.track("Element Viewed", { elementID: "sizeSuggestButtons" });
     }
   } catch (e) {
@@ -671,18 +671,17 @@ async function detectAndFillColor(imageUrl) {
     }
     if (response.data.colors.length > 2) {
       document.querySelector('#itemColor').value = 'Multicolour';
-      document.querySelector('#itemColor').dispatchEvent(new Event('blur'));
     } else if (apiColorMapping[response.data.colors?.[0]]) {
       document.querySelector('#itemColor').value = apiColorMapping[response.data.colors?.[0]];
-      document.querySelector('#itemColor').dispatchEvent(new Event('blur'));
     } else {
       console.log("Unable to set color from", response.data.colors?.[0]);
       return;
     }
     document.querySelector('#itemColor').setCustomValidity('Bekräfta eller ändra färgen');
+    document.querySelector('#colorSuggestButtons').style.display = 'block';
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
-    document.querySelector('#colorSuggestButtons').style.display = 'block';
+    document.querySelector('#itemColor').dispatchEvent(new Event('blur'));
     analytics.track("Element Viewed", { elementID: "colorSuggestButtons" });
   } catch (e) {
     errorHandler.report(e);
