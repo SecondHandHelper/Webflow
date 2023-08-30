@@ -632,6 +632,7 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
       document.querySelector('#itemBrand').value = response.data.brand;
       document.querySelector('#itemBrand').setCustomValidity('Bekräfta eller ändra märket');
       document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
+      document.querySelector('#itemBrand').dispatchEvent(new Event('blur'));
       document.getElementById('itemBrandLabel').style.display = 'inline-block';
       document.querySelector('#brandSuggestButtons').style.display = 'block';
       analytics.track("Element Viewed", { elementID: "brandSuggestButtons" });
@@ -640,6 +641,7 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
       document.querySelector('#itemMaterial').value = response.data.materials;
       document.querySelector('#itemMaterial').setCustomValidity('Bekräfta eller ändra materialet');
       document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
+      document.querySelector('#itemMaterial').dispatchEvent(new Event('blur'));
       document.getElementById('itemMaterialLabel').style.display = 'inline-block';
       document.querySelector('#materialSuggestButtons').style.display = 'block';
       analytics.track("Element Viewed", { elementID: "materialSuggestButtons" });
@@ -648,6 +650,7 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
       document.querySelector('#itemSize').value = response.data.size;
       document.querySelector('#itemSize').setCustomValidity('Bekräfta eller ändra storlek');
       document.querySelector('#itemSize').dispatchEvent(new Event('change'));
+      document.querySelector('#itemSize').dispatchEvent(new Event('blur'));
       document.getElementById('itemSizeLabel').style.display = 'inline-block';
       document.querySelector('#sizeSuggestButtons').style.display = 'block';
       analytics.track("Element Viewed", { elementID: "sizeSuggestButtons" });
@@ -668,8 +671,10 @@ async function detectAndFillColor(imageUrl) {
     }
     if (response.data.colors.length > 2) {
       document.querySelector('#itemColor').value = 'Multicolour';
+      document.querySelector('#itemColor').dispatchEvent(new Event('blur'));
     } else if (apiColorMapping[response.data.colors?.[0]]) {
       document.querySelector('#itemColor').value = apiColorMapping[response.data.colors?.[0]];
+      document.querySelector('#itemColor').dispatchEvent(new Event('blur'));
     } else {
       console.log("Unable to set color from", response.data.colors?.[0]);
       return;
