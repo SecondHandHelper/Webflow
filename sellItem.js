@@ -203,6 +203,11 @@ async function rememberUnsavedChanges(event) {
     delete item.preferences;
     item.acceptPrice = item.acceptPrice && item.acceptPrice > 0 ? item.acceptPrice : null;
     item.originalPrice = item.originalPrice && item.originalPrice > 0 ? item.originalPrice : null;
+    [ 'itemBrand', 'itemSize', 'itemMaterial', 'itemColor' ].forEach(inputName => {
+      if (document.getElementById(inputName).parentNode.querySelector('.suggest-buttons').style.display === 'block') {
+        item[`${inputName}Confirm`] = true;
+      }
+    })
     if (!isDefaultFormState(item)) {
       localStorage.setItem('newItem', JSON.stringify(item));
     } else {
@@ -278,6 +283,13 @@ function showImageState(imageName, state) {
   }
 }
 
+function showSuggestButtons(fieldName, restoreSavedState, showConfirmation) {
+  if (restoreSavedState && showConfirmation) {
+    document.getElementById(fieldName).parentNode.querySelector('.suggest-buttons').style.display = 'block';
+  }
+
+}
+
 async function fillForm(itemId, savedItem, restoreSavedState = false) {
   try {
     let item = { data: savedItem };
@@ -320,10 +332,13 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
 
     // Populate text input fields
     itemBrand.value = data.brand || '';
+    showSuggestButtons('itemBrand', restoreSavedState, data.itemBrandConfirm);
     // Don't use the setFieldValue for the brand since that triggers a dropdown to open
     document.getElementById('itemBrandLabel').style.display = 'inline-block'
     setFieldValue('itemSize', data.size);
+    showSuggestButtons('itemSize', restoreSavedState, data.itemSizeConfirm);
     setFieldValue('itemMaterial', data.material);
+    showSuggestButtons('itemMaterial', restoreSavedState, data.itemMaterialConfirm);
     setFieldValue('itemModel', data.model);
     setFieldValue('itemOriginalPrice', originalPrice);
 
@@ -338,6 +353,7 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
     // Populate select fields
     selectFieldValue(itemAge, data.age);
     selectFieldValue(itemColor, data.color);
+    showSuggestButtons('itemColor', restoreSavedState, data.itemColorConfirm);
     selectFieldValue(itemCondition, data.condition);
     if (itemCondition.selectedIndex >= 0 && itemCondition.options[itemCondition.selectedIndex].text === "Använd, tecken på slitage") {
       defectInfoDiv.style.display = 'block';
