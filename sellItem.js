@@ -293,8 +293,8 @@ function showSuggestButtons(fieldName, restoreSavedState, showConfirmation) {
     const suggestButtons = document.getElementById(fieldName).parentNode.querySelector('.suggest-buttons') ||
       document.getElementById(fieldName).parentNode.parentNode.querySelector('.suggest-buttons');
     suggestButtons.style.display = 'block';
+    document.getElementById(fieldName).setCustomValidity('Bekräfta eller ändra värdet');
   }
-
 }
 
 async function fillForm(itemId, savedItem, restoreSavedState = false) {
