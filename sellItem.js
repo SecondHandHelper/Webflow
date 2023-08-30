@@ -31,10 +31,8 @@ function defaultFormState() {
     images: {},
     material: null,
     model: null,
-    noAnimals: true,
-    noSmoke: true,
     originalPrice: null,
-    preferences: {userValuationApproval: false},
+    userValuationApproval: true,
     sex: "Woman",
     size: null,
     userComment: null,
@@ -54,8 +52,6 @@ function collect() {
   const age = itemAge.value;
   const condition = itemCondition.value;
   const defectDescription = itemDefectDescription.value ? itemDefectDescription.value.trim() : "";
-  const noAnimals = itemNoAnimals.checked;
-  const noSmoke = itemNoSmoke.checked;
   const userComment = itemUserComment.value ? itemUserComment.value.trim() : "";
   const acceptPrice = Number(itemLowestAcceptPrice.value);
   const userValuationApproval = itemUserValuationApproval.checked;
@@ -108,8 +104,6 @@ function collect() {
     condition,
     defects,
     defectDescription,
-    noAnimals,
-    noSmoke,
     userComment,
     acceptPrice,
     preferences: { userValuationApproval },
@@ -203,6 +197,8 @@ async function rememberUnsavedChanges(event) {
       return acc;
     }, {});
     item.images = item.images ? item.images : {};
+    item.userValuationApproval = item.preferences.userValuationApproval;
+    delete item.preferences;
     if (JSON.stringify(item) !== JSON.stringify(defaultFormState())) {
       localStorage.setItem('newItem', JSON.stringify(item));
     } else {
@@ -328,8 +324,10 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
     // Populate radio-buttons
     document.getElementById('Woman').previousElementSibling.classList.remove("w--redirected-checked"); // Unselect radio button 'Woman'
     document.getElementById('Woman').checked = false;
-    document.getElementById(data.sex).previousElementSibling.classList.add("w--redirected-checked"); // Populate the right one
-    document.getElementById(data.sex).checked = true;
+    if (data.sex) {
+      document.getElementById(data.sex).previousElementSibling.classList.add("w--redirected-checked"); // Populate the right one
+      document.getElementById(data.sex).checked = true;
+    }
 
     // Populate checkboxes
     defectsChoicesInSwedish.forEach((value, key) => {
@@ -339,14 +337,6 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
       }
     });
     if (restoreSavedState) {
-      if (!data.noAnimals) {
-        document.getElementById('itemNoAnimals').click();
-        document.getElementById('itemNoAnimals').previousElementSibling.classList.remove("w--redirected-checked");
-      }
-      if (!data.noSmoke) {
-        document.getElementById('itemNoSmoke').click();
-        document.getElementById('itemNoSmoke').previousElementSibling.classList.remove("w--redirected-checked");
-      }
       if (!data.userValuationApproval) {
         document.getElementById('itemUserValuationApproval').click();
         document.getElementById('itemUserValuationApproval').previousElementSibling.classList.remove("w--redirected-checked");
@@ -751,14 +741,6 @@ function clearFormFields() {
     document.getElementById(key).previousElementSibling.classList.remove("w--redirected-checked");
     document.getElementById(key).checked = false;
   });
-  if (document.getElementById('itemNoAnimals').checked === false) {
-    document.getElementById('itemNoAnimals').click();
-    document.getElementById('itemNoAnimals').previousElementSibling.classList.add("w--redirected-checked");
-  }
-  if (document.getElementById('itemNoSmoke').checked === false) {
-    document.getElementById('itemNoSmoke').click();
-    document.getElementById('itemNoSmoke').previousElementSibling.classList.add("w--redirected-checked");
-  }
   if (document.getElementById('itemUserValuationApproval').checked === false) {
     document.getElementById('itemUserValuationApproval').click();
     document.getElementById('itemUserValuationApproval').previousElementSibling.classList.add("w--redirected-checked");
