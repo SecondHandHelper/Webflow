@@ -726,7 +726,18 @@ function initializeClearFormButton() {
       }
     }
   })
+}
 
+function initializeSaveStateListeners() {
+  document.getElementById('wf-form-Add-Item').querySelectorAll('input').forEach(elm => {
+    elm.addEventListener('blur', rememberUnsavedChanges);
+  });
+  document.getElementById('wf-form-Add-Item').querySelectorAll('select').forEach(elm => {
+    elm.addEventListener('blur', rememberUnsavedChanges);
+  });
+  document.getElementById('wf-form-Add-Item').querySelectorAll('textarea').forEach(elm => {
+    elm.addEventListener('blur', rememberUnsavedChanges);
+  });
 }
 
 async function initializeSizeConfirm() {
