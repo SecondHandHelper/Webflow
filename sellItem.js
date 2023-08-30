@@ -1,5 +1,5 @@
 const defectsChoicesInSwedish = new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
-const imageElements = ["frontImage", "brandTagImage", "productImage", "defectImage", "materialTagImage", "extraImage"];
+const imageElements = ["frontImage", "brandTagImage", "defectImage", "materialTagImage", "extraImage"];
 
 async function addItem(event) {
   const id = uuidv4();
@@ -18,6 +18,27 @@ async function addItem(event) {
   }
 }
 
+function defaultFormState() {
+  return {
+    acceptPrice: null,
+    age: null,
+    brand: null,
+    category: null,
+    color: null,
+    condition: null,
+    defectDescription: null,
+    defects: [],
+    images: {},
+    material: null,
+    model: null,
+    originalPrice: null,
+    userValuationApproval: true,
+    sex: "Woman",
+    size: null,
+    userComment: null,
+  }
+}
+
 function collect() {
   let sex = "";
   const now = new Date();
@@ -31,8 +52,6 @@ function collect() {
   const age = itemAge.value;
   const condition = itemCondition.value;
   const defectDescription = itemDefectDescription.value ? itemDefectDescription.value.trim() : "";
-  const noAnimals = itemNoAnimals.checked;
-  const noSmoke = itemNoSmoke.checked;
   const userComment = itemUserComment.value ? itemUserComment.value.trim() : "";
   const acceptPrice = Number(itemLowestAcceptPrice.value);
   const userValuationApproval = itemUserValuationApproval.checked;
@@ -66,6 +85,8 @@ function collect() {
     }
   }
 
+  const images = JSON.parse(localStorage.getItem('newItem') || '{}').images
+
   return {
     user: authUser.current?.uid || null,
     createdAt: now.toISOString(),
@@ -83,12 +104,11 @@ function collect() {
     condition,
     defects,
     defectDescription,
-    noAnimals,
-    noSmoke,
     userComment,
     acceptPrice,
     preferences: { userValuationApproval },
     ...modelVariantFields,
+    images,
   };
 }
 
@@ -108,9 +128,8 @@ async function getShippingMethod() {
 }
 
 async function addItemInner(id) {
-  const { modelCoverImageUrl, ...pageData } = collect();
+  const { modelCoverImageUrl, images, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
-  const images = await uploadImagesFromForm(id);
   if (modelCoverImageUrl) {
     images['coverImage'] = modelCoverImageUrl;
     pageData['coverImageUpdatedAt'] = new Date().toISOString();
@@ -125,7 +144,7 @@ async function addItemInner(id) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
     await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
-    sessionStorage.removeItem('enhancedFrontImage');
+    localStorage.removeItem('newItem');
     sessionStorage.setItem('latestItemCreated', JSON.stringify(item));
   }
 
@@ -158,47 +177,69 @@ async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
   await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
-  sessionStorage.removeItem('enhancedFrontImage');
+  localStorage.removeItem('newItem');
   sessionStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
 }
 
-async function enhanceFrontImage(input) {
-  document.getElementById('loadingFrontImageIcon').style.display = 'inline-block';
-  document.getElementById('deleteFrontImageIcon').style.display = 'none';
-  showImageState('frontImage', 'uploading-state');
-
-  const base64Image = await createEnhancedImage(input);
-  showImagePreview('frontImage', base64Image);
-  await uploadEnhancedFrontImage(base64Image);
-  document.getElementById('loadingFrontImageIcon').style.display = 'none';
-  document.getElementById('deleteFrontImageIcon').style.display = 'inline-block';
+async function enhanceFrontImage(imageUrl) {
+  const enhancedImageUrl = await createEnhancedImage(imageUrl);
+  rememberNewItemImageField('enhancedFrontImage', enhancedImageUrl);
+  showImagePreview('frontImage', enhancedImageUrl);
 }
 
-async function uploadImagesFromForm(itemId) {
-  const imageData = imageElements.reduce((accumulator, current) => {
-    const file = document.getElementById(current).files[0] || sessionStorage.getItem(`${current}PreviewUrl`);
-    if (!file) return accumulator;
-    return { ...accumulator, [current]: file }
-  }, {}); // { frontImage: <file object>, ... }
-  const images = await uploadUserImages(itemId, imageData);
-  if (sessionStorage.getItem('enhancedFrontImage')) {
-    images['enhancedFrontImage'] = sessionStorage.getItem('enhancedFrontImage');
+async function rememberUnsavedChanges(event) {
+  if (sessionStorage.getItem('latestItemCreated')) {
+    return;
   }
-  return images;
+  const {
+    user, createdAt, status, shippingStatus, modelVariantFields, ...itemToSave
+  } = collect();
+  // Replace '' with null values
+  const item = Object.keys(itemToSave).reduce((acc, key) => {
+    acc[key] = itemToSave[key] === '' ? null : itemToSave[key];
+    return acc;
+  }, {});
+  item.images = item.images ? item.images : {};
+  item.defects = item.defects ? item.defects : [];
+  item.userValuationApproval = item.preferences.userValuationApproval;
+  delete item.preferences;
+  item.acceptPrice = item.acceptPrice && item.acceptPrice > 0 ? item.acceptPrice : null;
+  item.originalPrice = item.originalPrice && item.originalPrice > 0 ? item.originalPrice : null;
+  [ 'itemBrand', 'itemSize', 'itemMaterial', 'itemColor' ].forEach(inputName => {
+    const suggestButtons = document.getElementById(inputName).parentNode.querySelector('.suggest-buttons') ||
+      document.getElementById(inputName).parentNode.parentNode.querySelector('.suggest-buttons');
+    if (suggestButtons?.style?.display === 'block') {
+      item[`${inputName}Confirm`] = true;
+    }
+  })
+  if (!isDefaultFormState(item)) {
+    console.log("Saving form state");
+    localStorage.setItem('newItem', JSON.stringify(item));
+  } else {
+    console.log('Removing saved item');
+    localStorage.removeItem('newItem');
+  }
 }
 
-async function uploadUserImages(itemId, imageData) {
-  const promises = await Promise.all(Object.keys(imageData).map(async (fileName) => {
-    if (typeof imageData[fileName] === 'string') {
-      return { [fileName]: imageData[fileName] };
+function isDefaultFormState(itemState) {
+  const defaultState = defaultFormState();
+  for (const field in defaultState) {
+    if (!(field in itemState)) {
+      continue;
     }
-    const fileContent = await toBase64(imageData[fileName]);
-    console.log(`Uploading image request ${itemId}, ${fileName} ${fileContent.slice(0, 10)}`);
-    const response = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({ itemId, fileName, file: fileContent });
-    console.log(`upload image response ${JSON.stringify(response)}`)
-    return { [fileName]: response.data.url };
-  }));
-  return Object.assign(...promises);
+    if (defaultState[field] instanceof Object) {
+      if (JSON.stringify(defaultState[field]) !== JSON.stringify(itemState[field])) {
+        console.log(`${field} differs ${defaultState[field]} vs ${itemState[field]}`);
+        return false
+      }
+      continue;
+    }
+    if (itemState[field] !== defaultState[field]) {
+      console.log(`${field} differs`);
+      return false;
+    }
+  }
+  return true;
 }
 
 async function nextStep(options) {
@@ -232,7 +273,7 @@ function fieldLabelToggle(labelId) {
 
 function showImagePreview(imageName, url) {
   document.getElementById(`${imageName}Preview`).style.backgroundImage = `url('${url}')`;
-  showImageState(imageName, 'success-state');
+  showDeleteImageIcon(imageName);
 }
 
 function showImageState(imageName, state) {
@@ -247,32 +288,41 @@ function showImageState(imageName, state) {
   }
 }
 
-async function fillForm(itemId, savedItem) {
+function showSuggestButtons(fieldName, restoreSavedState, showConfirmation) {
+  if (restoreSavedState && showConfirmation) {
+    const suggestButtons = document.getElementById(fieldName).parentNode.querySelector('.suggest-buttons') ||
+      document.getElementById(fieldName).parentNode.parentNode.querySelector('.suggest-buttons');
+    suggestButtons.style.display = 'block';
+    document.getElementById(fieldName).setCustomValidity('Bekräfta eller ändra värdet');
+  }
+}
+
+async function fillForm(itemId, savedItem, restoreSavedState = false) {
   try {
     let item = { data: savedItem };
     if (!savedItem) {
       item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId });
     }
     const data = item.data;
-    const size = data.size;
-    const material = data.material;
-    const brand = data.brand;
-    const model = data.model;
+    const images = data.images || {};
     let originalPrice = data.originalPrice;
     if (originalPrice <= 0) {
       originalPrice = null;
     }
-    const age = data.age;
-    const condition = data.condition;
-    const images = data.images;
 
     // Populate images
     imageElements.map(img => sessionStorage.removeItem(`${img}PreviewUrl`));
     for (const imageName in images) {
-      const urlSmall = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName] || images[`${imageName}Large`];
-      const urlLarge = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
+      let urlSmall = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName] || images[`${imageName}Large`];
+      let urlLarge = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
+      if (imageName === 'frontImage' && images.enhancedFrontImage) {
+        urlSmall = images['enhancedFrontImageSmall'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImage'] || images['enhancedFrontImageLarge'];
+        urlLarge = images['enhancedFrontImage'] || images['enhancedFrontImageLarge'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImageSmall'];
+      }
       if (imageElements.includes(imageName)) {
         showImagePreview(imageName, urlSmall);
+        showImageState(imageName, 'success-state');
+        document.getElementById(imageName).required = false;
         sessionStorage.setItem(`${imageName}PreviewUrl`, urlLarge); // Store large preview url to create image from on submit
       }
     }
@@ -288,57 +338,79 @@ async function fillForm(itemId, savedItem) {
     }
 
     // Populate text input fields
-    itemBrand.value = brand;
+    itemBrand.value = data.brand || '';
+    showSuggestButtons('itemBrand', restoreSavedState, data.itemBrandConfirm);
     // Don't use the setFieldValue for the brand since that triggers a dropdown to open
     document.getElementById('itemBrandLabel').style.display = 'inline-block'
-    setFieldValue('itemSize', size);
-    setFieldValue('itemMaterial', material);
-    setFieldValue('itemModel', model);
+    setFieldValue('itemSize', data.size);
+    showSuggestButtons('itemSize', restoreSavedState, data.itemSizeConfirm);
+    setFieldValue('itemMaterial', data.material);
+    showSuggestButtons('itemMaterial', restoreSavedState, data.itemMaterialConfirm);
+    setFieldValue('itemModel', data.model);
     setFieldValue('itemOriginalPrice', originalPrice);
-    //itemUserComment.value = userComment; //Textarea
-    //itemDefectDescription.value = defectDescription; //Textarea
+
+    if (restoreSavedState) {
+      setFieldValue('itemUserComment', data.userComment);
+      setFieldValue('itemDefectDescription', data.defectDescription);
+      setFieldValue('itemLowestAcceptPrice', data.acceptPrice <= 0 ? null : data.acceptPrice);
+      data.phoneNumber ? setFieldValue('itemPhoneNumber', data.phoneNumber) : '';
+      data.personalId ? setFieldValue('itemPersonalId', data.personalId) : '';
+    }
 
     // Populate select fields
-    let options = itemAge.options;
-    for (let i = 0; i < options.length; i++) {
-      if (age == options[i].attributes.value.value) {
-        itemAge.selectedIndex = i;
-        if (age != "") {
-          itemAge.style.color = "#333";
-          itemAge.dispatchEvent(new Event('input'));
-        }
-      }
+    selectFieldValue(itemAge, data.age);
+    selectFieldValue(itemColor, data.color);
+    showSuggestButtons('itemColor', restoreSavedState, data.itemColorConfirm);
+    selectFieldValue(itemCondition, data.condition);
+    if (itemCondition.selectedIndex >= 0 && itemCondition.options[itemCondition.selectedIndex].text === "Använd, tecken på slitage") {
+      defectInfoDiv.style.display = 'block';
     }
-    options = itemCondition.options;
-    for (let i = 0; i < options.length; i++) {
-      if (condition == options[i].innerText) {
-        itemCondition.selectedIndex = i;
-        itemCondition.style.color = "#333";
-        itemCondition.dispatchEvent(new Event('input'));
-        if (options[i].innerText == "Använd, tecken på slitage") {
-          defectInfoDiv.style.display = 'block';
-        }
-      }
-    }
+    const itemCategory = $('#itemCategory');
+    itemCategory.val(data.category);
+    itemCategory.trigger('change');
 
     // Populate radio-buttons
-    document.getElementById('Woman').previousElementSibling.classList.remove("w--redirected-checked"); // Unselect radio button 'Woman'
-    document.getElementById('Woman').checked = false;
-    document.getElementById(data.sex).previousElementSibling.classList.add("w--redirected-checked"); // Populate the right one
-    document.getElementById(data.sex).checked = true;
+    if (data.sex) {
+      document.getElementById('Woman').previousElementSibling.classList.remove("w--redirected-checked"); // Unselect radio button 'Woman'
+      document.getElementById('Woman').checked = false;
+      document.getElementById(data.sex).previousElementSibling.classList.add("w--redirected-checked"); // Populate the right one
+      document.getElementById(data.sex).checked = true;
+    } else {
+      document.getElementById('Woman').previousElementSibling.classList.add("w--redirected-checked"); // Unselect radio button 'Woman'
+      document.getElementById('Woman').checked = true;
+    }
 
     // Populate checkboxes
     defectsChoicesInSwedish.forEach((value, key) => {
-      if (data.defects.includes(value)) {
+      if (data.defects && data.defects.includes(value)) {
         document.getElementById(key).previousElementSibling.classList.add("w--redirected-checked");
         document.getElementById(key).checked = true;
       }
     });
+    if (restoreSavedState) {
+      if ('userValuationApproval' in data && !data.userValuationApproval) {
+        document.getElementById('itemUserValuationApproval').click();
+        document.getElementById('itemUserValuationApproval').previousElementSibling.classList.remove("w--redirected-checked");
+      }
+    }
   } catch (error) {
+    console.error("Error getting item document:", error);
     errorHandler.report(error);
-    console.log("Error getting item document:", error);
   }
   document.getElementById('loadingDiv').style.display = 'none';
+}
+
+function selectFieldValue(field, value) {
+  const selectIndex = Array.from(field.options)
+    .map(elm => elm.attributes.value.value)
+    .indexOf(value);
+  if (selectIndex >= 0) {
+    field.selectedIndex = selectIndex;
+    field.style.color = "#333";
+    field.dispatchEvent(new Event('input'));
+  } else {
+    field.style.color = '#929292';
+  }
 }
 
 function checkBrand(value) {
@@ -424,80 +496,121 @@ const apiColorMapping = {
   "mustard": "Yellow"
 };
 
-async function frontImageUploadChangeHandler(event) {
+async function frontImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
     event.stopPropagation();
-    let src = URL.createObjectURL(input);
-    frontImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-    frontImagePreview.style.backgroundImage = `url('${src}')`;
+    const imageUrl = await uploadImageAndShowPreview(input, 'frontImage');
     const promises = [];
     if (featureIsEnabled('colorCategory')) {
-      promises.push(detectAndFillColor(input), detectAndFillBrandAndMaterial(input));
+      promises.push(detectAndFillColor(imageUrl), detectAndFillBrandAndMaterialAndSize(imageUrl));
     }
     if (featureIsEnabled('enhanceImage')) {
-      promises.push(enhanceFrontImage(input));
+      promises.push(enhanceFrontImage(imageUrl));
     }
     await Promise.all(promises);
   }
 }
 
-async function brandTagImageUploadChangeHandler() {
+async function uploadImageAndShowPreview(input, imageName) {
+  let src = URL.createObjectURL(input);
+  document.getElementById(`${imageName}PreviewUploading`).style.backgroundImage = `url('${src}')`;
+  document.getElementById(`${imageName}Preview`).style.backgroundImage = `url('${src}')`;
+  showLoadingIcon(imageName)
+  showImageState(imageName, 'success-state');
+  const imageUrl = await uploadTempImage(input, imageName);
+  rememberNewItemImageField(imageName, imageUrl);
+  return imageUrl;
+}
+
+function rememberNewItemImageField(filedName, value) {
+  let newItem = JSON.parse(localStorage.getItem('newItem') || JSON.stringify({ images: {} }));
+  if (!newItem.images) {
+    newItem.images = {};
+  }
+  newItem['images'][filedName] = value;
+  localStorage.setItem('newItem', JSON.stringify(newItem));
+}
+
+async function uploadTempImage(input, filename) {
+  const tempId = uuidv4();
+  const imageBase64 = await toBase64(input);
+  const response = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({
+    itemId: tempId, fileName: `${filename}`, file: imageBase64, temporary: true
+  });
+  return response.data.url;
+}
+
+async function brandTagImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
-    const src = URL.createObjectURL(input);
-    brandTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-    brandTagImagePreview.style.backgroundImage = `url('${src}')`;
+    event.stopPropagation();
+    const imageUrl = await uploadImageAndShowPreview(input, 'brandTagImage');
+    showDeleteImageIcon('brandTagImage')
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterial(input);
+      await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
   }
 }
 
-async function productImageUploadChangeHandler() {
+function showLoadingIcon(imageName) {
+  document.getElementById(`loading${capitalizeFirstLetter(imageName)}Icon`).style.display = 'inline-block';
+  document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
+}
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function showDeleteImageIcon(imageName) {
+  document.getElementById(`loading${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
+  document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).style.display = 'inline-block';
+}
+
+async function productImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
-    let src = URL.createObjectURL(input);
-    productImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-    productImagePreview.style.backgroundImage = `url('${src}')`;
+    event.stopPropagation();
+    const imageUrl = await uploadImageAndShowPreview(input, 'productImage');
+    showDeleteImageIcon('productImage')
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterial(input);
+      await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
   }
 }
 
-async function defectImageUploadChangeHandler() {
+async function defectImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
-    let src = URL.createObjectURL(input);
-    defectImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-    defectImagePreview.style.backgroundImage = `url('${src}')`;
+    event.stopPropagation();
+    const imageUrl = await uploadImageAndShowPreview(input, 'defectImage');
+    showDeleteImageIcon('defectImage')
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterial(input);
+      await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
   }
 }
 
-async function materialTagImageUploadChangeHandler() {
+async function materialTagImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
-    let src = URL.createObjectURL(input);
-    materialTagImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-    materialTagImagePreview.style.backgroundImage = `url('${src}')`;
+    event.stopPropagation();
+    const imageUrl = await uploadImageAndShowPreview(input, 'materialTagImage');
+    showDeleteImageIcon('materialTagImage')
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterial(input);
+      await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
   }
 }
 
-async function extraImageUploadChangeHandler() {
+async function extraImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
-    let src = URL.createObjectURL(input);
-    extraImagePreviewUploading.style.backgroundImage = `url('${src}')`;
-    extraImagePreview.style.backgroundImage = `url('${src}')`;
+    event.stopPropagation();
+    const imageUrl = await uploadImageAndShowPreview(input, 'extraImage');
+    showDeleteImageIcon('extraImage')
     if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterial(input);
+      await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
   }
 }
@@ -507,38 +620,40 @@ function hideConfirmButtons(event, elementID) {
   event.currentTarget.closest('.text-input-container').querySelector('.suggest-buttons').style.display = 'none';
 }
 
-async function detectAndFillBrandAndMaterial(input) {
+async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
   try {
-    const fileAsBase64 = await toBase64(input);
     if (document.querySelector('#itemBrand').value.length && document.querySelector('#itemMaterial').value.length
       && document.querySelector('#itemSize').value.length) {
-      // Don't do anything if brand, material and size already filled in
+      // Don't do anything if both brand and material already filled in
       return;
     }
-    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrandAndMaterialAndSize')({ base64Img: fileAsBase64 });
+    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrandAndMaterialAndSize')({ imageUrl });
     console.log(response);
     if (!document.querySelector('#itemBrand').value.length && response.data?.brand) {
       document.querySelector('#itemBrand').value = response.data.brand;
       document.querySelector('#itemBrand').setCustomValidity('Bekräfta eller ändra märket');
-      document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
       document.getElementById('itemBrandLabel').style.display = 'inline-block';
       document.querySelector('#brandSuggestButtons').style.display = 'block';
+      document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
+      document.querySelector('#itemBrand').dispatchEvent(new Event('blur'));
       analytics.track("Element Viewed", { elementID: "brandSuggestButtons" });
     }
     if (!document.querySelector('#itemMaterial').value.length && response.data?.materials) {
       document.querySelector('#itemMaterial').value = response.data.materials;
       document.querySelector('#itemMaterial').setCustomValidity('Bekräfta eller ändra materialet');
-      document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
       document.getElementById('itemMaterialLabel').style.display = 'inline-block';
       document.querySelector('#materialSuggestButtons').style.display = 'block';
+      document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
+      document.querySelector('#itemMaterial').dispatchEvent(new Event('blur'));
       analytics.track("Element Viewed", { elementID: "materialSuggestButtons" });
     }
     if (!document.querySelector('#itemSize').value.length && response.data?.size) {
       document.querySelector('#itemSize').value = response.data.size;
       document.querySelector('#itemSize').setCustomValidity('Bekräfta eller ändra storlek');
-      document.querySelector('#itemSize').dispatchEvent(new Event('change'));
       document.getElementById('itemSizeLabel').style.display = 'inline-block';
       document.querySelector('#sizeSuggestButtons').style.display = 'block';
+      document.querySelector('#itemSize').dispatchEvent(new Event('change'));
+      document.querySelector('#itemSize').dispatchEvent(new Event('blur'));
       analytics.track("Element Viewed", { elementID: "sizeSuggestButtons" });
     }
   } catch (e) {
@@ -547,10 +662,9 @@ async function detectAndFillBrandAndMaterial(input) {
   }
 }
 
-async function detectAndFillColor(input) {
+async function detectAndFillColor(imageUrl) {
   try {
-    const fileAsBase64 = await toBase64(input);
-    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ base64Img: fileAsBase64 });
+    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ imageUrl });
     console.log(response);
     if (!response.data?.colors || !response.data.colors.length) {
       console.log("Unable to detect product color");
@@ -568,6 +682,7 @@ async function detectAndFillColor(input) {
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
     document.querySelector('#colorSuggestButtons').style.display = 'block';
+    document.querySelector('#itemColor').dispatchEvent(new Event('blur'));
     analytics.track("Element Viewed", { elementID: "colorSuggestButtons" });
   } catch (e) {
     errorHandler.report(e);
@@ -601,6 +716,36 @@ async function initializeBrandConfirm() {
   })
 }
 
+function initializeClearFormButton() {
+  document.getElementById('wf-form-Add-Item').addEventListener('input', (event) => {
+    let field = event.target;
+    if (field instanceof Element) {
+      const defaultValue = defaultFormState()[field.name];
+      if (defaultValue !== field.value && field.value !== '') {
+        document.getElementById('clearItemForm').style.display = 'block';
+      }
+    }
+  })
+}
+
+function initializeSaveStateListeners() {
+  document.getElementById('wf-form-Add-Item').querySelectorAll('input').forEach(elm => {
+    elm.addEventListener('blur', rememberUnsavedChanges);
+  });
+  document.getElementById('wf-form-Add-Item').querySelectorAll('input[type="radio"]').forEach(elm => {
+    elm.addEventListener('change', rememberUnsavedChanges);
+  });
+  document.getElementById('wf-form-Add-Item').querySelectorAll('input[type="checkbox"]').forEach(elm => {
+    elm.addEventListener('change', rememberUnsavedChanges);
+  });
+  document.getElementById('wf-form-Add-Item').querySelectorAll('select').forEach(elm => {
+    elm.addEventListener('blur', rememberUnsavedChanges);
+  });
+  document.getElementById('wf-form-Add-Item').querySelectorAll('textarea').forEach(elm => {
+    elm.addEventListener('blur', rememberUnsavedChanges);
+  });
+}
+
 async function initializeSizeConfirm() {
   document.getElementById('rejectSize').addEventListener('click', () => {
     document.querySelector('#itemSize').value = '';
@@ -625,6 +770,73 @@ async function initializeColorConfirm() {
   document.getElementById('confirmColor').addEventListener('click', () => {
     document.querySelector('#itemColor').setCustomValidity('');
   })
+}
+
+function clearFormFields() {
+  localStorage.removeItem('newItem');
+  document.getElementById('clearItemForm').style.display = 'none';
+  imageElements.forEach(imageName => {
+    document.getElementById(`${imageName}Preview`).style.backgroundImage = '';
+    showImageState(imageName, 'default-state');
+  });
+
+  setFieldValue('itemBrand', null);
+  setFieldValue('itemSize', null);
+  setFieldValue('itemMaterial', null);
+  setFieldValue('itemModel', null);
+  setFieldValue('itemOriginalPrice', null);
+
+  setFieldValue('itemUserComment', null);
+  setFieldValue('itemDefectDescription', null);
+  setFieldValue('itemLowestAcceptPrice', null);
+  setFieldValue('itemPhoneNumber', null);
+  setFieldValue('itemPersonalId', null);
+
+  selectFieldValue(itemAge, '');
+  selectFieldValue(itemColor, '');
+  selectFieldValue(itemCondition, '');
+  defectInfoDiv.style.display = 'none';
+  const itemCategory = $('#itemCategory');
+  itemCategory.val('');
+  itemCategory.trigger('change');
+
+  // Populate radio-buttons
+  document.getElementById('Man').previousElementSibling.classList.remove("w--redirected-checked");
+  document.getElementById('Man').checked = false;
+  document.getElementById('Unisex').previousElementSibling.classList.remove("w--redirected-checked");
+  document.getElementById('Unisex').checked = false;
+  document.getElementById('Woman').previousElementSibling.classList.add("w--redirected-checked"); // select radio button 'Woman'
+  document.getElementById('Woman').checked = true;
+
+  // Populate checkboxes
+  defectsChoicesInSwedish.forEach((value, key) => {
+    document.getElementById(key).previousElementSibling.classList.remove("w--redirected-checked");
+    document.getElementById(key).checked = false;
+  });
+  if (document.getElementById('itemUserValuationApproval').checked === false) {
+    document.getElementById('itemUserValuationApproval').click();
+    document.getElementById('itemUserValuationApproval').previousElementSibling.classList.add("w--redirected-checked");
+  }
+}
+
+function initializeDeleteImageListeners() {
+  imageElements.forEach(imageName => {
+    document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).addEventListener('click', () => {
+      removeSavedImage(imageName);
+    });
+  })
+  document.getElementById("deleteFrontImageIcon").addEventListener('click', () => {
+    document.getElementById("frontImage").required = true;
+  });
+  document.getElementById("deleteBrandTagImageIcon").addEventListener('click', () => {
+    document.getElementById("brandTagImage").required = true;
+  });
+}
+
+function removeSavedImage(imageName) {
+  const savedItem = JSON.parse(localStorage.getItem('newItem'));
+  delete savedItem.images[imageName];
+  localStorage.setItem('newItem', JSON.stringify(savedItem));
 }
 
 async function initializeCategorySelect() {
