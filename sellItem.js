@@ -213,7 +213,14 @@ async function rememberUnsavedChanges(event) {
 function isDefaultFormState(itemState) {
   const defaultState = defaultFormState();
   for (const field in defaultState) {
-    if ((field in itemState) && itemState[field] !== defaultState[field]) {
+    if (!(field in itemState)) {
+      continue;
+    }
+    if (defaultState[field] instanceof Object && JSON.stringify(defaultState[field]) !== JSON.stringify(itemState[field])) {
+      console.log(`${field} differs`);
+      return false
+    }
+    if (itemState[field] !== defaultState[field]) {
       console.log(`${field} differs`);
       return false;
     }
