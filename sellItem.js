@@ -199,12 +199,22 @@ async function rememberUnsavedChanges(event) {
     item.images = item.images ? item.images : {};
     item.userValuationApproval = item.preferences.userValuationApproval;
     delete item.preferences;
-    if (JSON.stringify(item) !== JSON.stringify(defaultFormState())) {
+    if (!isDefaultFormState(item)) {
       localStorage.setItem('newItem', JSON.stringify(item));
     } else {
       localStorage.removeItem('newItem');
     }
   }
+}
+
+function isDefaultFormState(itemState) {
+  const defaultState = defaultFormState();
+  for (const field in defaultState) {
+    if ((field in itemState) && itemState[field] !== defaultState[field]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 async function nextStep(options) {
