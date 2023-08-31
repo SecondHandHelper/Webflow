@@ -841,10 +841,10 @@ async function initializeCategorySelect() {
   });
 
   let headerAdded = false;
-  $('#itemCategory').on('select2:select', () => {
-    analytics.track('Click', { elementID: 'itemCategoryValue' });
-    itemCategory.trigger('change');
-  });
+  $('#itemCategory').on( 'select2:select', () => analytics.track('Click', { elementID: 'itemCategoryValue' }) );
+  $('#itemCategory').on('change', () =>
+    document.querySelector('#itemCategory').dispatchEvent(new Event('change'))
+  );
   let searchClickTracked = false;
   $('#itemCategory').on('select2:open', () => {
     if (!searchClickTracked) {
