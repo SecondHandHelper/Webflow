@@ -188,7 +188,7 @@ async function enhanceFrontImage(imageUrl) {
 }
 
 async function rememberUnsavedChanges(event) {
-  if (sessionStorage.getItem('latestItemCreated')) {
+  if (sessionStorage.getItem('latestItemCreated') || localStorage.getItem('clearing')) {
     return;
   }
   const {
@@ -670,9 +670,9 @@ async function detectAndFillColor(imageUrl) {
       return;
     }
     document.querySelector('#itemColor').setCustomValidity('Bekräfta eller ändra färgen');
+    document.querySelector('#colorSuggestButtons').style.display = 'block';
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
-    document.querySelector('#colorSuggestButtons').style.display = 'block';
     analytics.track("Element Viewed", { elementID: "colorSuggestButtons" });
   } catch (e) {
     errorHandler.report(e);
@@ -764,49 +764,56 @@ async function initializeColorConfirm() {
 
 function clearFormFields() {
   localStorage.removeItem('newItem');
-  document.getElementById('clearItemForm').style.display = 'none';
-  imageElements.forEach(imageName => {
-    document.getElementById(`${imageName}Preview`).style.backgroundImage = '';
-    showImageState(imageName, 'default-state');
-  });
+  localStorage.setItem('clearing', 'true');
+  try {
+    document.getElementById('clearItemForm').style.display = 'none';
+    imageElements.forEach(imageName => {
+      document.getElementById(`${imageName}Preview`).style.backgroundImage = '';
+      showImageState(imageName, 'default-state');
+    });
 
-  setFieldValue('itemBrand', null);
-  setFieldValue('itemSize', null);
-  setFieldValue('itemMaterial', null);
-  setFieldValue('itemModel', null);
-  setFieldValue('itemOriginalPrice', null);
+    setFieldValue('itemBrand', null);
+    setFieldValue('itemSize', null);
+    setFieldValue('itemMaterial', null);
+    setFieldValue('itemModel', null);
+    setFieldValue('itemOriginalPrice', null);
 
-  setFieldValue('itemUserComment', null);
-  setFieldValue('itemDefectDescription', null);
-  setFieldValue('itemLowestAcceptPrice', null);
-  setFieldValue('itemPhoneNumber', null);
-  setFieldValue('itemPersonalId', null);
+    setFieldValue('itemUserComment', null);
+    setFieldValue('itemDefectDescription', null);
+    setFieldValue('itemLowestAcceptPrice', null);
+    setFieldValue('itemPhoneNumber', null);
+    setFieldValue('itemPersonalId', null);
 
-  selectFieldValue(itemAge, '');
-  selectFieldValue(itemColor, '');
-  selectFieldValue(itemCondition, '');
-  defectInfoDiv.style.display = 'none';
-  const itemCategory = $('#itemCategory');
-  itemCategory.val('');
-  itemCategory.trigger('change');
+    selectFieldValue(itemAge, '');
+    selectFieldValue(itemColor, '');
+    selectFieldValue(itemCondition, '');
+    defectInfoDiv.style.display = 'none';
+    const itemCategory = $('#itemCategory');
+    itemCategory.val('');
+    itemCategory.trigger('change');
 
-  // Populate radio-buttons
-  document.getElementById('Man').previousElementSibling.classList.remove("w--redirected-checked");
-  document.getElementById('Man').checked = false;
-  document.getElementById('Unisex').previousElementSibling.classList.remove("w--redirected-checked");
-  document.getElementById('Unisex').checked = false;
-  document.getElementById('Woman').previousElementSibling.classList.add("w--redirected-checked"); // select radio button 'Woman'
-  document.getElementById('Woman').checked = true;
+    // Populate radio-buttons
+    document.getElementById('Man').previousElementSibling.classList.remove("w--redirected-checked");
+    document.getElementById('Man').checked = false;
+    document.getElementById('Unisex').previousElementSibling.classList.remove("w--redirected-checked");
+    document.getElementById('Unisex').checked = false;
+    document.getElementById('Woman').previousElementSibling.classList.add("w--redirected-checked"); // select radio button 'Woman'
+    document.getElementById('Woman').checked = true;
 
-  // Populate checkboxes
-  defectsChoicesInSwedish.forEach((value, key) => {
-    document.getElementById(key).previousElementSibling.classList.remove("w--redirected-checked");
-    document.getElementById(key).checked = false;
-  });
-  if (document.getElementById('itemUserValuationApproval').checked === false) {
-    document.getElementById('itemUserValuationApproval').click();
-    document.getElementById('itemUserValuationApproval').previousElementSibling.classList.add("w--redirected-checked");
+    // Populate checkboxes
+    defectsChoicesInSwedish.forEach((value, key) => {
+      document.getElementById(key).previousElementSibling.classList.remove("w--redirected-checked");
+      document.getElementById(key).checked = false;
+    });
+    if (document.getElementById('itemUserValuationApproval').checked === false) {
+      document.getElementById('itemUserValuationApproval').click();
+      document.getElementById('itemUserValuationApproval').previousElementSibling.classList.add("w--redirected-checked");
+    }
+  } catch(e) {
+    console.log('Error clearing fields', e);
+    localStorage.removeItem('clearing');
   }
+
 }
 
 function initializeDeleteImageListeners() {
