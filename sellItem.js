@@ -726,7 +726,7 @@ function initializeClearFormButton() {
 
 function initializeSaveStateListeners() {
   document.getElementById('wf-form-Add-Item').querySelectorAll('input').forEach(elm => {
-    elm.addEventListener('blur', rememberUnsavedChanges);
+    elm.addEventListener('input', rememberUnsavedChanges);
   });
   document.getElementById('wf-form-Add-Item').querySelectorAll('input[type="radio"]').forEach(elm => {
     elm.addEventListener('change', rememberUnsavedChanges);
@@ -738,7 +738,7 @@ function initializeSaveStateListeners() {
     elm.addEventListener('change', rememberUnsavedChanges);
   });
   document.getElementById('wf-form-Add-Item').querySelectorAll('textarea').forEach(elm => {
-    elm.addEventListener('blur', rememberUnsavedChanges);
+    elm.addEventListener('input', rememberUnsavedChanges);
   });
 }
 
