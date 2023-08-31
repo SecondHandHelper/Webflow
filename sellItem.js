@@ -404,11 +404,12 @@ function selectFieldValue(field, value) {
   const selectIndex = Array.from(field.options)
     .map(elm => elm.attributes.value.value)
     .indexOf(value);
-  field.selectedIndex = selectIndex;
   field.dispatchEvent(new Event('input'));
   if (selectIndex > 0) {
+    field.selectedIndex = selectIndex;
     field.style.color = "#333";
   } else {
+    field.selectedIndex = 0;
     field.style.color = '#929292';
   }
 }
