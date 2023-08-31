@@ -813,9 +813,9 @@ function clearFormFields() {
     }
   } catch(e) {
     console.log('Error clearing fields', e);
+  } finally {
     localStorage.removeItem('clearing');
   }
-
 }
 
 function initializeDeleteImageListeners() {
