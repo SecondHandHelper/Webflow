@@ -635,7 +635,6 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
       document.getElementById('itemBrandLabel').style.display = 'inline-block';
       document.querySelector('#brandSuggestButtons').style.display = 'block';
       document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
-      document.querySelector('#itemBrand').dispatchEvent(new Event('blur'));
       analytics.track("Element Viewed", { elementID: "brandSuggestButtons" });
     }
     if (!document.querySelector('#itemMaterial').value.length && response.data?.materials) {
@@ -644,7 +643,6 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
       document.getElementById('itemMaterialLabel').style.display = 'inline-block';
       document.querySelector('#materialSuggestButtons').style.display = 'block';
       document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
-      document.querySelector('#itemMaterial').dispatchEvent(new Event('blur'));
       analytics.track("Element Viewed", { elementID: "materialSuggestButtons" });
     }
     if (!document.querySelector('#itemSize').value.length && response.data?.size) {
@@ -653,7 +651,6 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
       document.getElementById('itemSizeLabel').style.display = 'inline-block';
       document.querySelector('#sizeSuggestButtons').style.display = 'block';
       document.querySelector('#itemSize').dispatchEvent(new Event('change'));
-      document.querySelector('#itemSize').dispatchEvent(new Event('blur'));
       analytics.track("Element Viewed", { elementID: "sizeSuggestButtons" });
     }
   } catch (e) {
@@ -682,7 +679,6 @@ async function detectAndFillColor(imageUrl) {
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
     document.querySelector('#colorSuggestButtons').style.display = 'block';
-    document.querySelector('#itemColor').dispatchEvent(new Event('blur'));
     analytics.track("Element Viewed", { elementID: "colorSuggestButtons" });
   } catch (e) {
     errorHandler.report(e);
@@ -739,7 +735,7 @@ function initializeSaveStateListeners() {
     elm.addEventListener('change', rememberUnsavedChanges);
   });
   document.getElementById('wf-form-Add-Item').querySelectorAll('select').forEach(elm => {
-    elm.addEventListener('blur', rememberUnsavedChanges);
+    elm.addEventListener('change', rememberUnsavedChanges);
   });
   document.getElementById('wf-form-Add-Item').querySelectorAll('textarea').forEach(elm => {
     elm.addEventListener('blur', rememberUnsavedChanges);
