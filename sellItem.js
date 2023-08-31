@@ -146,7 +146,7 @@ async function addItemInner(id) {
     await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
     localStorage.removeItem('newItem');
     localStorage.removeItem('newItemImages');
-    sessionStorage.setItem('latestItemCreated', JSON.stringify(item));
+    localStorage.setItem('latestItemCreated', JSON.stringify(item));
   }
 
   // If first time: User submitted their phone number
@@ -180,7 +180,7 @@ async function createItemAfterSignIn() {
   await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
   localStorage.removeItem('newItem');
   localStorage.removeItem('newItemImages');
-  sessionStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
+  localStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
 }
 
 async function enhanceFrontImage(imageUrl) {
@@ -190,7 +190,7 @@ async function enhanceFrontImage(imageUrl) {
 }
 
 function rememberUnsavedChanges() {
-  if (sessionStorage.getItem('latestItemCreated')) {
+  if (localStorage.getItem('latestItemCreated')) {
     return;
   }
   const {
@@ -254,8 +254,8 @@ async function nextStep(options) {
 
 async function nextStepSignedIn(options) {
   // Show item confirmation screen
-  if (sessionStorage.getItem('latestItemCreated')) {
-    const enhancedFrontImageUrl = JSON.parse(sessionStorage.getItem('latestItemCreated'))?.images?.enhancedFrontImage;
+  if (localStorage.getItem('latestItemCreated')) {
+    const enhancedFrontImageUrl = JSON.parse(localStorage.getItem('latestItemCreated'))?.images?.enhancedFrontImage;
     if (enhancedFrontImageUrl) { itemConfirmationImage.style.backgroundImage = `url('${enhancedFrontImageUrl}')`; console.log("Found front image"); }
     else { console.log("Couldn't find front image"); }
   }
