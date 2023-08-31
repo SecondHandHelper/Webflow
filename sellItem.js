@@ -193,7 +193,6 @@ function rememberUnsavedChanges() {
   if (sessionStorage.getItem('latestItemCreated')) {
     return;
   }
-  console.log("saving unsaved changes");
   const {
     user, createdAt, status, shippingStatus, modelVariantFields, ...itemToSave
   } = collect();
@@ -726,8 +725,7 @@ function initializeClearFormButton() {
     }
   }
   document.getElementById('wf-form-Add-Item').addEventListener('input', showButtonIfFormChanged);
-  document.getElementById('wf-form-Add-Item').addEventListener('select', showButtonIfFormChanged);
-  document.getElementById('wf-form-Add-Item').addEventListener('textarea', showButtonIfFormChanged);
+  document.querySelector('#wf-form-Add-Item select').addEventListener('change', showButtonIfFormChanged);
 }
 
 function initializeSaveStateListeners() {
