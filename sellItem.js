@@ -213,10 +213,8 @@ async function rememberUnsavedChanges(event) {
     }
   })
   if (!isDefaultFormState(item)) {
-    console.log("Saving form state");
     localStorage.setItem('newItem', JSON.stringify(item));
   } else {
-    console.log('Removing saved item');
     localStorage.removeItem('newItem');
   }
 }
@@ -229,13 +227,11 @@ function isDefaultFormState(itemState) {
     }
     if (defaultState[field] instanceof Object) {
       if (JSON.stringify(defaultState[field]) !== JSON.stringify(itemState[field])) {
-        console.log(`${field} differs ${defaultState[field]} vs ${itemState[field]}`);
         return false
       }
       continue;
     }
     if (itemState[field] !== defaultState[field]) {
-      console.log(`${field} differs`);
       return false;
     }
   }
@@ -628,7 +624,6 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
       return;
     }
     const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrandAndMaterialAndSize')({ imageUrl });
-    console.log(response);
     if (!document.querySelector('#itemBrand').value.length && response.data?.brand) {
       document.querySelector('#itemBrand').value = response.data.brand;
       document.querySelector('#itemBrand').setCustomValidity('Bekräfta eller ändra märket');
@@ -662,7 +657,6 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
 async function detectAndFillColor(imageUrl) {
   try {
     const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ imageUrl });
-    console.log(response);
     if (!response.data?.colors || !response.data.colors.length) {
       console.log("Unable to detect product color");
       return;
@@ -849,7 +843,7 @@ async function initializeCategorySelect() {
   let headerAdded = false;
   $('#itemCategory').on('select2:select', () => {
     analytics.track('Click', { elementID: 'itemCategoryValue' });
-    console.log('Clicked itemCategoryValue');
+    itemCategory.trigger('change');
   });
   let searchClickTracked = false;
   $('#itemCategory').on('select2:open', () => {
@@ -857,7 +851,6 @@ async function initializeCategorySelect() {
       searchClickTracked = true;
       $('input.select2-search__field').on('click', () => {
         analytics.track('Click', { elementID: 'itemCategorySearch' });
-        console.log('Clicked itemCategorySearch');
       });
     }
   });
@@ -869,7 +862,6 @@ async function initializeCategorySelect() {
   });
   $('#itemCategory').on('select2:open', function () {
     analytics.track("Element Viewed", { elementID: "itemCategoryContainer" });
-    console.log('Viewed itemCategoryContainer');
     document.querySelector('body').style.overflow = 'hidden';
     document.querySelector('body').style.position = 'fixed';
     document.querySelector('html').style.overflow = 'fixed';
