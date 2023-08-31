@@ -187,7 +187,7 @@ async function enhanceFrontImage(imageUrl) {
   showImagePreview('frontImage', enhancedImageUrl);
 }
 
-async function rememberUnsavedChanges(event) {
+function rememberUnsavedChanges(event) {
   if (sessionStorage.getItem('latestItemCreated') || localStorage.getItem('clearing')) {
     return;
   }
@@ -630,6 +630,7 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
       document.getElementById('itemBrandLabel').style.display = 'inline-block';
       document.querySelector('#brandSuggestButtons').style.display = 'block';
       document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
+      rememberUnsavedChanges();
       analytics.track("Element Viewed", { elementID: "brandSuggestButtons" });
     }
     if (!document.querySelector('#itemMaterial').value.length && response.data?.materials) {
@@ -638,6 +639,7 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
       document.getElementById('itemMaterialLabel').style.display = 'inline-block';
       document.querySelector('#materialSuggestButtons').style.display = 'block';
       document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
+      rememberUnsavedChanges();
       analytics.track("Element Viewed", { elementID: "materialSuggestButtons" });
     }
     if (!document.querySelector('#itemSize').value.length && response.data?.size) {
@@ -646,6 +648,7 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
       document.getElementById('itemSizeLabel').style.display = 'inline-block';
       document.querySelector('#sizeSuggestButtons').style.display = 'block';
       document.querySelector('#itemSize').dispatchEvent(new Event('change'));
+      rememberUnsavedChanges();
       analytics.track("Element Viewed", { elementID: "sizeSuggestButtons" });
     }
   } catch (e) {
@@ -672,6 +675,7 @@ async function detectAndFillColor(imageUrl) {
     document.querySelector('#itemColor').setCustomValidity('Bekräfta eller ändra färgen');
     document.querySelector('#colorSuggestButtons').style.display = 'block';
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
+    rememberUnsavedChanges();
     analytics.track("Element Viewed", { elementID: "colorSuggestButtons" });
   } catch (e) {
     errorHandler.report(e);
