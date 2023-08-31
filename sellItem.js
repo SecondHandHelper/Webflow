@@ -341,7 +341,7 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
     itemBrand.value = data.brand || '';
     showSuggestButtons('itemBrand', restoreSavedState, data.itemBrandConfirm);
     // Don't use the setFieldValue for the brand since that triggers a dropdown to open
-    document.getElementById('itemBrandLabel').style.display = 'inline-block'
+    document.getElementById('itemBrandLabel').style.display = data.brand ? 'inline-block' : 'none';
     setFieldValue('itemSize', data.size);
     showSuggestButtons('itemSize', restoreSavedState, data.itemSizeConfirm);
     setFieldValue('itemMaterial', data.material);
@@ -716,7 +716,7 @@ async function initializeBrandConfirm() {
 }
 
 function initializeClearFormButton() {
-  document.getElementById('wf-form-Add-Item').addEventListener('input', (event) => {
+  function showButtonIfFormChanged(event) {
     let field = event.target;
     if (field instanceof Element) {
       const defaultValue = defaultFormState()[field.name];
@@ -724,7 +724,10 @@ function initializeClearFormButton() {
         document.getElementById('clearItemForm').style.display = 'block';
       }
     }
-  })
+  }
+  document.getElementById('wf-form-Add-Item').addEventListener('input', showButtonIfFormChanged);
+  document.getElementById('wf-form-Add-Item').addEventListener('select', showButtonIfFormChanged);
+  document.getElementById('wf-form-Add-Item').addEventListener('textarea', showButtonIfFormChanged);
 }
 
 function initializeSaveStateListeners() {
@@ -743,6 +746,17 @@ function initializeSaveStateListeners() {
   document.getElementById('wf-form-Add-Item').querySelectorAll('textarea').forEach(elm => {
     elm.addEventListener('input', rememberUnsavedChanges);
   });
+}
+
+function initializeRestoreOnNavigation() {
+  window.onpageshow = function(event) {
+    if (event.persisted && localStorage.getItem('newItem')) {
+      // Use setTimeout to make sure the document is loaded before we call fillForm()
+      setTimeout(() =>
+        fillForm(null, JSON.parse(localStorage.getItem('newItem')), true),
+        0);
+    }
+  };
 }
 
 async function initializeSizeConfirm() {
