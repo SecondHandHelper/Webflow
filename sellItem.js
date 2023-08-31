@@ -310,19 +310,19 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
     }
 
     // Populate images
-    imageElements.map(img => sessionStorage.removeItem(`${img}PreviewUrl`));
     for (const imageName in images) {
       let urlSmall = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName] || images[`${imageName}Large`];
       let urlLarge = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
+      rememberNewItemImageField(imageName, urlLarge);
       if (imageName === 'frontImage' && images.enhancedFrontImage) {
         urlSmall = images['enhancedFrontImageSmall'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImage'] || images['enhancedFrontImageLarge'];
         urlLarge = images['enhancedFrontImage'] || images['enhancedFrontImageLarge'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImageSmall'];
+        rememberNewItemImageField('enhancedFrontImage', urlLarge);
       }
       if (imageElements.includes(imageName)) {
         showImagePreview(imageName, urlSmall);
         showImageState(imageName, 'success-state');
         document.getElementById(imageName).required = false;
-        sessionStorage.setItem(`${imageName}PreviewUrl`, urlLarge); // Store large preview url to create image from on submit
       }
     }
 
