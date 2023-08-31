@@ -775,8 +775,6 @@ async function initializeColorConfirm() {
 }
 
 function clearFormFields() {
-  localStorage.removeItem('newItem');
-  localStorage.removeItem('newItemImages');
   document.getElementById('clearItemForm').style.display = 'none';
   imageElements.forEach(imageName => {
     document.getElementById(`${imageName}Preview`).style.backgroundImage = '';
@@ -820,6 +818,8 @@ function clearFormFields() {
     document.getElementById('itemUserValuationApproval').click();
     document.getElementById('itemUserValuationApproval').previousElementSibling.classList.add("w--redirected-checked");
   }
+  localStorage.removeItem('newItem');
+  localStorage.removeItem('newItemImages');
 }
 
 function initializeDeleteImageListeners() {
