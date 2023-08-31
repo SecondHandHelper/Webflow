@@ -768,6 +768,7 @@ async function initializeColorConfirm() {
     document.querySelector('#itemColor').setCustomValidity('');
   });
   document.getElementById('confirmColor').addEventListener('click', () => {
+    document.querySelector('#colorSuggestButtons').style.display = 'none';
     document.querySelector('#itemColor').setCustomValidity('');
     rememberUnsavedChanges();
   })
