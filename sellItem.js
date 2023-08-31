@@ -145,6 +145,7 @@ async function addItemInner(id) {
   } else {
     await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
     localStorage.removeItem('newItem');
+    localStorage.removeItem('newItemImages');
     sessionStorage.setItem('latestItemCreated', JSON.stringify(item));
   }
 
@@ -178,6 +179,7 @@ async function createItemAfterSignIn() {
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
   await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
   localStorage.removeItem('newItem');
+  localStorage.removeItem('newItemImages');
   sessionStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
 }
 
@@ -216,6 +218,7 @@ function rememberUnsavedChanges() {
     localStorage.setItem('newItem', JSON.stringify(item));
   } else {
     localStorage.removeItem('newItem');
+    localStorage.removeItem('newItemImages');
   }
 }
 
@@ -766,6 +769,7 @@ async function initializeColorConfirm() {
 
 function clearFormFields() {
   localStorage.removeItem('newItem');
+  localStorage.removeItem('newItemImages');
   localStorage.setItem('clearing', 'true');
   try {
     document.getElementById('clearItemForm').style.display = 'none';
