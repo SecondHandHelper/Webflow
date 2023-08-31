@@ -156,8 +156,10 @@
     itemMaterial.addEventListener('input', hideConfirmButtons);
     itemOriginalPrice.addEventListener('input', fieldLabelToggle('itemOriginalPriceLabel'));
     itemAge.addEventListener('input', fieldLabelToggle('itemAgeLabel'));
+    itemCondition.addEventListener('input', fieldLabelToggle('itemConditionLabel'));
     itemColor.addEventListener('input', fieldLabelToggle('itemColorLabel'));
     itemColor.addEventListener('input', hideConfirmButtons);
+    itemUserComment.addEventListener('input', fieldLabelToggle('userCommentLabel'));
 
     addItemForm.addEventListener("submit", addItem);
     userAddressForm.addEventListener("submit", addUserDetails);
