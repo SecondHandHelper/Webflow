@@ -103,7 +103,6 @@
 
     async function sellItemMain() {
         sessionStorage.removeItem('latestItemCreated');
-        initializeSaveStateListeners();
         await initializeCategorySelect();
         await initializeColorConfirm();
         await initializeBrandConfirm();
@@ -141,6 +140,7 @@
           document.getElementById("frontImage").required = true;
           document.getElementById("brandTagImage").required = true;
         }
+        initializeSaveStateListeners();
     }
 
     // Initial state
