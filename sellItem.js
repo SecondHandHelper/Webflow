@@ -747,14 +747,15 @@ function initializeSaveStateListeners() {
 }
 
 function initializeRestoreOnNavigation() {
-  window.onpageshow = function(event) {
+  window.addEventListener('pageshow', (event) => {
     if (event.persisted && localStorage.getItem('newItem')) {
       // Use setTimeout to make sure the document is loaded before we call fillForm()
-      setTimeout(() =>
-        fillForm(null, JSON.parse(localStorage.getItem('newItem')), true),
-        0);
+      setTimeout(async () => {
+          await fillForm(null, JSON.parse(localStorage.getItem('newItem')), true);
+        },
+        10);
     }
-  };
+  });
 }
 
 async function initializeSizeConfirm() {
