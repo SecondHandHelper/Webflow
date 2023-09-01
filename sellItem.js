@@ -502,6 +502,11 @@ async function frontImageChangeHandler(event) {
   if (input) {
     event.stopPropagation();
     const imageUrl = await uploadImageAndShowPreview(input, 'frontImage');
+    if (!imageUrl || Object.keys(imageUrl).length === 0) {
+      document.getElementById('frontImagePreview').style.backgroundImage = '';
+      showImageState('frontImage', 'default-state');
+      return;
+    }
     const promises = [];
     if (featureIsEnabled('colorCategory')) {
       promises.push(detectAndFillColor(imageUrl), detectAndFillBrandAndMaterialAndSize(imageUrl));
@@ -533,15 +538,20 @@ function rememberNewItemImageField(fieldName, value) {
 
 async function uploadTempImage(input, filename) {
   const tempId = uuidv4();
-  const scaledInput = await scaleImageToMaxSize(input);
-  //const imageBase64 = await toBase64(scaledInput);
+  let imageBase64 = await scaleImageToMaxSize(input);
+  if (!imageBase64) {
+    imageBase64 = await toBase64(input);
+  }
   const response = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({
-    itemId: tempId, fileName: `${filename}`, file: scaledInput, temporary: true
+    itemId: tempId, fileName: `${filename}`, file: imageBase64, temporary: true
   });
   return response.data.url;
 }
 
 async function scaleImageToMaxSize(input) {
+  if (input.size < 3 * 1024 * 1024) {
+    return toBase64(input);
+  }
   return new Promise((resolve, reject) => {
     const MAX_WIDTH = 1512;
     const MAX_HEIGHT = 2016;
