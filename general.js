@@ -819,8 +819,12 @@ async function createEnhancedImage(imageUrl) {
     sessionStorage.setItem('enhancedFrontImage', enhancedFileUrl)
     return enhancedFileUrl;
   } catch (ex) {
-    errorHandler.report(ex);
-    console.error(ex);
+    try {
+      errorHandler.report(ex);
+      console.error(ex);
+    } catch (ex) {
+      console.log('Failed to report error');
+    }
     return '';
   }
 }
