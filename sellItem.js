@@ -533,11 +533,48 @@ function rememberNewItemImageField(fieldName, value) {
 
 async function uploadTempImage(input, filename) {
   const tempId = uuidv4();
-  const imageBase64 = await toBase64(input);
+  const scaledInput = await scaleImageToMaxSize(input);
+  //const imageBase64 = await toBase64(scaledInput);
   const response = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({
-    itemId: tempId, fileName: `${filename}`, file: imageBase64, temporary: true
+    itemId: tempId, fileName: `${filename}`, file: scaledInput, temporary: true
   });
   return response.data.url;
+}
+
+async function scaleImageToMaxSize(input) {
+  return new Promise((resolve, reject) => {
+    const MAX_WIDTH = 1512;
+    const MAX_HEIGHT = 2016;
+    const reader = new FileReader();
+    reader.readAsDataURL(input);
+    reader.onload = () => {
+      const img = document.createElement("img");
+      img.src = reader.result;
+      img.onload = () => {
+
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = height * (MAX_WIDTH / width);
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = width * (MAX_HEIGHT / height);
+            height = MAX_HEIGHT;
+          }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL(input.type));
+      }
+      reader.onerror = reject;
+    }
+  });
 }
 
 async function brandTagImageChangeHandler(event) {
