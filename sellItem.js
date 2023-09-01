@@ -255,8 +255,9 @@ async function nextStep(options) {
 async function nextStepSignedIn(options) {
   // Show item confirmation screen
   if (localStorage.getItem('latestItemCreated')) {
-    const enhancedFrontImageUrl = JSON.parse(localStorage.getItem('latestItemCreated'))?.images?.enhancedFrontImage;
-    if (enhancedFrontImageUrl) { itemConfirmationImage.style.backgroundImage = `url('${enhancedFrontImageUrl}')`; console.log("Found front image"); }
+    const frontImage = JSON.parse(localStorage.getItem('latestItemCreated'))?.images?.enhancedFrontImage ||
+      JSON.parse(localStorage.getItem('latestItemCreated'))?.images?.frontImage;
+    if (frontImage) { itemConfirmationImage.style.backgroundImage = `url('${frontImage}')`; console.log("Found front image"); }
     else { console.log("Couldn't find front image"); }
   }
   triggerShowItemConfirmation.click();
