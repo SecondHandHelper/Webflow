@@ -404,7 +404,6 @@ function selectFieldValue(field, value) {
   const selectIndex = Array.from(field.options)
     .map(elm => elm.attributes.value.value)
     .indexOf(value);
-  field.dispatchEvent(new Event('input'));
   if (selectIndex > 0) {
     field.selectedIndex = selectIndex;
     field.style.color = "#333";
@@ -412,6 +411,7 @@ function selectFieldValue(field, value) {
     field.selectedIndex = 0;
     field.style.color = '#929292';
   }
+  field.dispatchEvent(new Event('input'));
 }
 
 function checkBrand(value) {
