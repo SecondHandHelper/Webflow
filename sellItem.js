@@ -185,8 +185,10 @@ async function createItemAfterSignIn() {
 
 async function enhanceFrontImage(imageUrl) {
   const enhancedImageUrl = await createEnhancedImage(imageUrl);
-  rememberNewItemImageField('enhancedFrontImage', enhancedImageUrl);
-  showImagePreview('frontImage', enhancedImageUrl);
+  if (enhancedImageUrl) {
+    rememberNewItemImageField('enhancedFrontImage', enhancedImageUrl);
+    showImagePreview('frontImage', enhancedImageUrl);
+  }
 }
 
 function rememberUnsavedChanges() {
