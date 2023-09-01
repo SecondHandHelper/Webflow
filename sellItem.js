@@ -189,6 +189,7 @@ async function enhanceFrontImage(imageUrl) {
     rememberNewItemImageField('enhancedFrontImage', enhancedImageUrl);
     showImagePreview('frontImage', enhancedImageUrl);
   }
+  showDeleteImageIcon('frontImage');
 }
 
 function rememberUnsavedChanges() {
