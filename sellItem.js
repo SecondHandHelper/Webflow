@@ -542,13 +542,13 @@ async function uploadImageAndShowPreview(input, imageName) {
 
 function showImageError(imageName, error) {
   const parentNode = document.getElementById(imageName).parentNode.parentNode;
-  parentNode.querySelector('.error-state').style.display = 'block';
-  parentNode.querySelector('.error-message').innerText = error;
+  parentNode.querySelector('.w-file-upload-error').style.display = 'block';
+  parentNode.querySelector('.w-file-upload-error-msg').innerText = error;
 }
 
 function hideImageError(imageName) {
   const parentNode = document.getElementById(imageName).parentNode.parentNode;
-  parentNode.querySelector('.error-state').style.display = 'none';
+  parentNode.querySelector('.w-file-upload-error').style.display = 'none';
 }
 
 function rememberNewItemImageField(fieldName, value) {
