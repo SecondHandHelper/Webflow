@@ -539,6 +539,7 @@ async function uploadImageAndShowPreview(input, imageName) {
     document.getElementById(`${imageName}PreviewUploading`).style.backgroundImage = '';
     document.getElementById(`${imageName}Preview`).style.backgroundImage = '';
     document.getElementById(`loading${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
+    document.getElementById(imageName).value = '';
     if (input.size > 10 * 1024 * 1024) {
       showImageError(imageName, 'Error: Bilden är för stor. Max 10 MB.');
     } else {
@@ -579,7 +580,8 @@ async function uploadTempImage(input, fileName) {
     method: 'POST',
     body: form
   });
-  return response.data.url;
+  const jsonResponse = await response.json();
+  return jsonResponse.url;
 }
 
 async function scaleImageToMaxSize(input) {
