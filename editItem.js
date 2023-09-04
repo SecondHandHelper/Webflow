@@ -62,11 +62,16 @@ async function updateItem(itemId, changedImages) {
         }));
         if (changedImages.indexOf('frontImage') > -1) {
           // Front image was changed, also save the enhancedFrontImage
-          await firebase.app().functions("europe-west1").httpsCallable('saveItemImage')({ itemId, fileName: 'enhancedFrontImage',
+          const response = await firebase.app().functions("europe-west1").httpsCallable('saveItemImage')({ itemId, fileName: 'enhancedFrontImage',
             url: sessionStorage.getItem('enhancedFrontImage') });
+          changes['images.enhancedFrontImage'] = response.data.url;
+          changes['images.enhancedFrontImageSmall'] = ''
+          changes['images.enhancedFrontImageMedium'] = ''
+          changes['images.enhancedFrontImageLarge'] = ''
         }
       }
       await updateItemDoc(itemId, changes);
+      sessionStorage.removeItem('enhancedFrontImage');
     }
   
     async function updateItemDoc(itemId, changes) {
