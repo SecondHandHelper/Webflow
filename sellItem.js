@@ -467,13 +467,6 @@ function initializeSelectColor() {
   };
 }
 
-const toBase64 = file => new Promise((resolve, reject) => {
-  const reader = new FileReader();
-  reader.readAsDataURL(file);
-  reader.onload = () => resolve(reader.result);
-  reader.onerror = reject;
-});
-
 const apiColorMapping = {
   "black": "Black",
   "white": "White",
@@ -506,8 +499,6 @@ async function frontImageChangeHandler(event) {
     event.stopPropagation();
     const imageUrl = await uploadImageAndShowPreview(input, 'frontImage');
     if (!imageUrl || Object.keys(imageUrl).length === 0) {
-      document.getElementById('frontImagePreview').style.backgroundImage = '';
-      showImageState('frontImage', 'default-state');
       return;
     }
     const promises = [];
@@ -539,6 +530,7 @@ async function uploadImageAndShowPreview(input, imageName) {
     document.getElementById(`${imageName}PreviewUploading`).style.backgroundImage = '';
     document.getElementById(`${imageName}Preview`).style.backgroundImage = '';
     document.getElementById(`loading${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
+    showImageState(imageName, 'default-state');
     if (input.size > 10 * 1024 * 1024) {
       showImageError(imageName, 'Error: Bilden är för stor. Max 10 MB.');
     } else {
