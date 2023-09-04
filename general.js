@@ -824,12 +824,3 @@ async function createEnhancedImage(imageUrl) {
     return '';
   }
 }
-
-async function uploadEnhancedFrontImage(base64Image) {
-  const tempId = uuidv4();
-  const enhancedFileResponse = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({
-    itemId: 'tempFrontImages', fileName: `${tempId}-frontImage`, file: base64Image
-  });
-  sessionStorage.setItem('enhancedFrontImage', enhancedFileResponse.data.url)
-  return enhancedFileResponse.data.url;
-}

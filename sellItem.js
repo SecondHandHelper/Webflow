@@ -523,14 +523,39 @@ async function frontImageChangeHandler(event) {
 }
 
 async function uploadImageAndShowPreview(input, imageName) {
-  let src = URL.createObjectURL(input);
-  document.getElementById(`${imageName}PreviewUploading`).style.backgroundImage = `url('${src}')`;
-  document.getElementById(`${imageName}Preview`).style.backgroundImage = `url('${src}')`;
-  showLoadingIcon(imageName)
-  showImageState(imageName, 'success-state');
-  const imageUrl = await uploadTempImage(input, imageName);
-  rememberNewItemImageField(imageName, imageUrl);
-  return imageUrl;
+  try {
+    hideImageError(imageName);
+    let src = URL.createObjectURL(input);
+    document.getElementById(`${imageName}PreviewUploading`).style.backgroundImage = `url('${src}')`;
+    document.getElementById(`${imageName}Preview`).style.backgroundImage = `url('${src}')`;
+    showLoadingIcon(imageName)
+    showImageState(imageName, 'success-state');
+    const imageUrl = await uploadTempImage(input, imageName);
+    rememberNewItemImageField(imageName, imageUrl);
+    return imageUrl;
+  } catch (ex) {
+    console.error('Failed to upload image', ex);
+    errorHandler.report(e);
+    document.getElementById(`${imageName}PreviewUploading`).style.backgroundImage = '';
+    document.getElementById(`${imageName}Preview`).style.backgroundImage = '';
+    document.getElementById(`loading${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
+    if (input.size > 10 * 1024 * 1024) {
+      showImageError(imageName, 'Error: Bilden är för stor. Max 10 MB.');
+    } else {
+      showImageError(imageName, 'Error: Något gick fel vid uppladdning, försök igen eller kontakt oss om felet kvarstår.');
+    }
+  }
+}
+
+function showImageError(imageName, error) {
+  const parentNode = document.getElementById(imageName).parentNode.parentNode;
+  parentNode.querySelector('.error-state').style.display = 'block';
+  parentNode.querySelector('.error-message').innerText = error;
+}
+
+function hideImageError(imageName) {
+  const parentNode = document.getElementById(imageName).parentNode.parentNode;
+  parentNode.querySelector('.error-state').style.display = 'none';
 }
 
 function rememberNewItemImageField(fieldName, value) {
@@ -539,32 +564,35 @@ function rememberNewItemImageField(fieldName, value) {
   localStorage.setItem('newItemImages', JSON.stringify(newItemImages));
 }
 
-async function uploadTempImage(input, filename) {
+async function uploadTempImage(input, fileName) {
   const tempId = uuidv4();
-  let imageBase64 = await scaleImageToMaxSize(input);
-  if (!imageBase64) {
-    imageBase64 = await toBase64(input);
+  let image = await scaleImageToMaxSize(input);
+  if (!image) {
+    throw 'Fel vid bearbetning av vald bild.';
   }
-  const response = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({
-    itemId: tempId, fileName: `${filename}`, file: imageBase64, temporary: true
+  const form = new FormData();
+  form.append('itemId', tempId);
+  form.append('fileName', fileName);
+  form.append('file', image);
+  form.append('temporary', 'true');
+  const response = await fetch('https://europe-west3-second-hand-helper.cloudfunctions.net/uploadItemImageBinary', {
+    method: 'POST',
+    body: form
   });
   return response.data.url;
 }
 
 async function scaleImageToMaxSize(input) {
   if (input.size < 3 * 1024 * 1024) {
-    return toBase64(input);
+    return Promise.resolve(input);
   }
   return new Promise((resolve, reject) => {
     const MAX_WIDTH = 1512;
     const MAX_HEIGHT = 2016;
     const reader = new FileReader();
-    reader.readAsDataURL(input);
     reader.onload = () => {
       const img = document.createElement("img");
-      img.src = reader.result;
       img.onload = () => {
-
         let width = img.width;
         let height = img.height;
         if (width > height) {
@@ -583,10 +611,12 @@ async function scaleImageToMaxSize(input) {
         canvas.height = height;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL(input.type));
+        canvas.toBlob(resolve, 'image/jpeg')
       }
+      img.src = reader.result;
       reader.onerror = reject;
     }
+    reader.readAsDataURL(input);
   });
 }
 
