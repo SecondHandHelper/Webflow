@@ -134,10 +134,14 @@
       if (input) {
         document.getElementById('loadingFrontImageIcon').style.display = 'inline-block';
         document.getElementById('deleteFrontImageIcon').style.display = 'none';
-        const base64Image = await createEnhancedImage(input);
-        const enhancedImage = await uploadEnhancedFrontImage(base64Image);
-        document.getElementById('frontImagePreviewUploading').style.backgroundImage = `url('${enhancedImage}')`;
-        document.getElementById('frontImagePreview').style.backgroundImage = `url('${enhancedImage}')`;
+        const imageUrl = await uploadImageAndShowPreview(input, 'frontImage');
+        if (!imageUrl || Object.keys(imageUrl).length === 0) {
+            return;
+        }
+        const enhancedImageUrl = await createEnhancedImage(imageUrl);
+        sessionStorage.setItem('enhancedFrontImage', enhancedImageUrl)
+        document.getElementById('frontImagePreviewUploading').style.backgroundImage = `url('${enhancedImageUrl}')`;
+        document.getElementById('frontImagePreview').style.backgroundImage = `url('${enhancedImageUrl}')`;
         document.getElementById('loadingFrontImageIcon').style.display = 'none';
         document.getElementById('deleteFrontImageIcon').style.display = 'inline-block';
       }

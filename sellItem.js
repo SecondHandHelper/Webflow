@@ -185,8 +185,11 @@ async function createItemAfterSignIn() {
 
 async function enhanceFrontImage(imageUrl) {
   const enhancedImageUrl = await createEnhancedImage(imageUrl);
-  rememberNewItemImageField('enhancedFrontImage', enhancedImageUrl);
-  showImagePreview('frontImage', enhancedImageUrl);
+  if (enhancedImageUrl) {
+    rememberNewItemImageField('enhancedFrontImage', enhancedImageUrl);
+    showImagePreview('frontImage', enhancedImageUrl);
+  }
+  showDeleteImageIcon('frontImage');
 }
 
 function rememberUnsavedChanges() {
@@ -464,13 +467,6 @@ function initializeSelectColor() {
   };
 }
 
-const toBase64 = file => new Promise((resolve, reject) => {
-  const reader = new FileReader();
-  reader.readAsDataURL(file);
-  reader.onload = () => resolve(reader.result);
-  reader.onerror = reject;
-});
-
 const apiColorMapping = {
   "black": "Black",
   "white": "White",
@@ -502,6 +498,9 @@ async function frontImageChangeHandler(event) {
   if (input) {
     event.stopPropagation();
     const imageUrl = await uploadImageAndShowPreview(input, 'frontImage');
+    if (!imageUrl || Object.keys(imageUrl).length === 0) {
+      return;
+    }
     const promises = [];
     if (featureIsEnabled('colorCategory')) {
       promises.push(detectAndFillColor(imageUrl), detectAndFillBrandAndMaterialAndSize(imageUrl));
@@ -515,14 +514,41 @@ async function frontImageChangeHandler(event) {
 }
 
 async function uploadImageAndShowPreview(input, imageName) {
-  let src = URL.createObjectURL(input);
-  document.getElementById(`${imageName}PreviewUploading`).style.backgroundImage = `url('${src}')`;
-  document.getElementById(`${imageName}Preview`).style.backgroundImage = `url('${src}')`;
-  showLoadingIcon(imageName)
-  showImageState(imageName, 'success-state');
-  const imageUrl = await uploadTempImage(input, imageName);
-  rememberNewItemImageField(imageName, imageUrl);
-  return imageUrl;
+  try {
+    hideImageError(imageName);
+    let src = URL.createObjectURL(input);
+    document.getElementById(`${imageName}PreviewUploading`).style.backgroundImage = `url('${src}')`;
+    document.getElementById(`${imageName}Preview`).style.backgroundImage = `url('${src}')`;
+    showLoadingIcon(imageName)
+    showImageState(imageName, 'success-state');
+    const imageUrl = await uploadTempImage(input, imageName);
+    rememberNewItemImageField(imageName, imageUrl);
+    return imageUrl;
+  } catch (ex) {
+    console.error('Failed to upload image', ex);
+    errorHandler.report(ex);
+    document.getElementById(`${imageName}PreviewUploading`).style.backgroundImage = '';
+    document.getElementById(`${imageName}Preview`).style.backgroundImage = '';
+    document.getElementById(`loading${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
+    showImageState(imageName, 'default-state');
+    if (input.size > 10 * 1024 * 1024) {
+      showImageError(imageName, 'Error: Bilden är för stor. Max 10 MB.');
+    } else {
+      showImageError(imageName, 'Error: Något gick fel vid uppladdning, försök igen eller kontakt oss om felet kvarstår.');
+    }
+    document.getElementById(imageName).value = '';
+  }
+}
+
+function showImageError(imageName, error) {
+  const parentNode = document.getElementById(imageName).parentNode.parentNode;
+  parentNode.querySelector('.w-file-upload-error').style.display = 'block';
+  parentNode.querySelector('.w-file-upload-error-msg').innerText = error;
+}
+
+function hideImageError(imageName) {
+  const parentNode = document.getElementById(imageName).parentNode.parentNode;
+  parentNode.querySelector('.w-file-upload-error').style.display = 'none';
 }
 
 function rememberNewItemImageField(fieldName, value) {
@@ -531,27 +557,36 @@ function rememberNewItemImageField(fieldName, value) {
   localStorage.setItem('newItemImages', JSON.stringify(newItemImages));
 }
 
-async function uploadTempImage(input, filename) {
+async function uploadTempImage(input, fileName) {
   const tempId = uuidv4();
-  const scaledInput = await scaleImageToMaxSize(input);
-  //const imageBase64 = await toBase64(scaledInput);
-  const response = await firebase.app().functions("europe-west1").httpsCallable('uploadItemImage')({
-    itemId: tempId, fileName: `${filename}`, file: scaledInput, temporary: true
+  let image = await scaleImageToMaxSize(input);
+  if (!image) {
+    throw 'Fel vid bearbetning av vald bild.';
+  }
+  const form = new FormData();
+  form.append('itemId', tempId);
+  form.append('fileName', fileName);
+  form.append('file', image);
+  form.append('temporary', 'true');
+  const response = await fetch('https://uploaditemimagebinary-heypmjzjfq-ew.a.run.app', {
+    method: 'POST',
+    body: form
   });
-  return response.data.url;
+  const jsonResponse = await response.json();
+  return jsonResponse.url;
 }
 
 async function scaleImageToMaxSize(input) {
+  if (input.size < 3 * 1024 * 1024) {
+    return Promise.resolve(input);
+  }
   return new Promise((resolve, reject) => {
     const MAX_WIDTH = 1512;
     const MAX_HEIGHT = 2016;
     const reader = new FileReader();
-    reader.readAsDataURL(input);
     reader.onload = () => {
       const img = document.createElement("img");
-      img.src = reader.result;
       img.onload = () => {
-
         let width = img.width;
         let height = img.height;
         if (width > height) {
@@ -570,10 +605,12 @@ async function scaleImageToMaxSize(input) {
         canvas.height = height;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL(input.type));
+        canvas.toBlob(resolve, 'image/jpeg')
       }
+      img.src = reader.result;
       reader.onerror = reject;
     }
+    reader.readAsDataURL(input);
   });
 }
 
