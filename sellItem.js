@@ -575,7 +575,7 @@ async function uploadTempImage(input, fileName) {
   form.append('fileName', fileName);
   form.append('file', image);
   form.append('temporary', 'true');
-  const response = await fetch('https://europe-west3-second-hand-helper.cloudfunctions.net/uploadItemImageBinary', {
+  const response = await fetch('https://uploaditemimagebinary-heypmjzjfq-ew.a.run.app', {
     method: 'POST',
     body: form
   });
