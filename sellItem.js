@@ -193,7 +193,10 @@ function initializeInputEventListeners() {
     const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
     document.getElementById('wf-form-Add-Item').reportValidity();
     if (invalidElements.length > 0) {
-      invalidElements[0].scrollIntoView();
+      const element = invalidElements[0];
+      const y = element.getBoundingClientRect().top + window.scrollY - 40;
+      window.scrollTo({ top: y, behavior: 'smooth'});
+      document.getElementById('wf-form-Add-Item').reportValidity();
     }
   });
   addItemForm.addEventListener("submit", addItem);
