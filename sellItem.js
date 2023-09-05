@@ -506,6 +506,7 @@ async function frontImageChangeHandler(event) {
       promises.push(detectAndFillColor(imageUrl), detectAndFillBrandAndMaterialAndSize(imageUrl));
     }
     if (featureIsEnabled('enhanceImage')) {
+      triggerEnhancingAnimation.click();
       promises.push(enhanceFrontImage(imageUrl));
     }
     await Promise.all(promises);
