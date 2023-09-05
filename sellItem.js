@@ -191,8 +191,9 @@ function initializeInputEventListeners() {
 
   document.getElementById('addItemButton').addEventListener('click', () => {
     const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
+    document.getElementById('wf-form-Add-Item').reportValidity();
     if (invalidElements.length > 0) {
-      invalidElements[0].scrollIntoViewIfNeeded();
+      invalidElements[0].scrollIntoView();
     }
   });
   addItemForm.addEventListener("submit", addItem);
