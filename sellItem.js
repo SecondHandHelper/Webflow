@@ -174,6 +174,52 @@ async function addItemInner(id) {
   }
 }
 
+function initializeInputEventListeners() {
+  itemBrand.addEventListener('input', fieldLabelToggle('itemBrandLabel'));
+  itemBrand.addEventListener('input', hideConfirmButtons);
+  itemModel.addEventListener('input', fieldLabelToggle('itemModelLabel'));
+  itemSize.addEventListener('input', fieldLabelToggle('itemSizeLabel'));
+  itemSize.addEventListener('input', hideConfirmButtons);
+  itemMaterial.addEventListener('input', fieldLabelToggle('itemMaterialLabel'));
+  itemMaterial.addEventListener('input', hideConfirmButtons);
+  itemOriginalPrice.addEventListener('input', fieldLabelToggle('itemOriginalPriceLabel'));
+  itemAge.addEventListener('input', fieldLabelToggle('itemAgeLabel'));
+  itemCondition.addEventListener('input', fieldLabelToggle('itemConditionLabel'));
+  itemColor.addEventListener('input', fieldLabelToggle('itemColorLabel'));
+  itemColor.addEventListener('input', hideConfirmButtons);
+  itemUserComment.addEventListener('input', fieldLabelToggle('userCommentLabel'));
+
+  document.getElementById('addItemButton').addEventListener('click', () => {
+    const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
+    document.getElementById('wf-form-Add-Item').reportValidity();
+    if (invalidElements.length > 0) {
+      const element = invalidElements[0];
+      const y = element.getBoundingClientRect().top + window.scrollY - 40;
+      window.scrollTo({ top: y, behavior: 'smooth'});
+      document.getElementById('wf-form-Add-Item').reportValidity();
+    }
+  });
+  addItemForm.addEventListener("submit", addItem);
+  userAddressForm.addEventListener("submit", addUserDetails);
+  document.getElementById('itemPhoneNumber').addEventListener("input", () => {
+    const pn = formatPhoneNumber(itemPhoneNumber.value);
+    const error = pn.length >= 12 && pn.includes('+') ? '' : 'Ogiltigt mobilnummer';
+    itemPhoneNumber.setCustomValidity(error);
+  });
+  itemPersonalId.addEventListener("input", () => {
+    const pid = itemPersonalId.value;
+    formattedPid = formatPersonalId(pid) || '' ;
+    const error = isValidSwedishSsn(formattedPid) ? '' : 'Ogiltigt personnummer';
+    itemPersonalId.setCustomValidity(error);
+    if (pid){
+      itemPersonalId.required = true;
+    } else {
+      itemPersonalId.required = false; // This row doesn't seem to work, therefor the safe guard below.
+      itemPersonalId.setCustomValidity('');
+    }
+  });
+}
+
 async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
@@ -506,6 +552,7 @@ async function frontImageChangeHandler(event) {
       promises.push(detectAndFillColor(imageUrl), detectAndFillBrandAndMaterialAndSize(imageUrl));
     }
     if (featureIsEnabled('enhanceImage')) {
+      document.getElementById(`loadingFrontImageIcon`).style.display = 'none';
       triggerEnhancingAnimation.click();
       promises.push(enhanceFrontImage(imageUrl));
     }
