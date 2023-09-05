@@ -235,6 +235,7 @@ async function enhanceFrontImage(imageUrl) {
     rememberNewItemImageField('enhancedFrontImage', enhancedImageUrl);
     showImagePreview('frontImage', enhancedImageUrl);
   }
+  document.getElementById('enhancedAnimationDiv').style.display = 'none'
   showDeleteImageIcon('frontImage');
 }
 
@@ -552,6 +553,7 @@ async function frontImageChangeHandler(event) {
       promises.push(detectAndFillColor(imageUrl), detectAndFillBrandAndMaterialAndSize(imageUrl));
     }
     if (featureIsEnabled('enhanceImage')) {
+      document.getElementById(`loadingFrontImageIcon`).style.display = 'none';
       triggerEnhancingAnimation.click();
       promises.push(enhanceFrontImage(imageUrl));
     }
