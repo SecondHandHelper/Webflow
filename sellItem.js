@@ -690,7 +690,7 @@ function showDeleteImageIcon(imageName) {
   document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).style.display = 'inline-block';
   if (imageName === 'frontImage'){
     document.getElementById('enhancedAnimationDiv').style.display = 'none';
-    triggerStopEnhancingAnimation
+    triggerStopEnhancingAnimation.click();
   }
 }
 
