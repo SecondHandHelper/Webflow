@@ -189,8 +189,12 @@ function initializeInputEventListeners() {
   itemColor.addEventListener('input', hideConfirmButtons);
   itemUserComment.addEventListener('input', fieldLabelToggle('userCommentLabel'));
 
-  document.getElementById('addItemButton').addEventListener('click', () =>
-      document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid')[0].scrollIntoViewIfNeeded());
+  document.getElementById('addItemButton').addEventListener('click', () => {
+    const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
+    if (invalidElements.length > 0) {
+      invalidElements[0].scrollIntoViewIfNeeded();
+    }
+  });
   addItemForm.addEventListener("submit", addItem);
   userAddressForm.addEventListener("submit", addUserDetails);
   document.getElementById('itemPhoneNumber').addEventListener("input", () => {
