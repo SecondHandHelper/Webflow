@@ -675,6 +675,7 @@ async function brandTagImageChangeHandler(event) {
 
 function showLoadingIcon(imageName) {
   if (imageName == 'frontImage'){ 
+    document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
     document.getElementById('enhancedAnimationDiv').style.display = 'block';
     triggerEnhancingAnimation.click(); 
     return
