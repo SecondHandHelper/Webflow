@@ -552,9 +552,6 @@ async function frontImageChangeHandler(event) {
       promises.push(detectAndFillColor(imageUrl), detectAndFillBrandAndMaterialAndSize(imageUrl));
     }
     if (featureIsEnabled('enhanceImage')) {
-      document.getElementById(`loadingFrontImageIcon`).style.display = 'none';
-      document.getElementById('enhancedAnimationDiv').style.display = 'block';
-      triggerEnhancingAnimation.click();
       promises.push(enhanceFrontImage(imageUrl));
     }
     await Promise.all(promises);
@@ -677,6 +674,11 @@ async function brandTagImageChangeHandler(event) {
 }
 
 function showLoadingIcon(imageName) {
+  if (imageName == 'frontImage'){ 
+    document.getElementById('enhancedAnimationDiv').style.display = 'block';
+    triggerEnhancingAnimation.click(); 
+    return
+  }
   document.getElementById(`loading${capitalizeFirstLetter(imageName)}Icon`).style.display = 'inline-block';
   document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
 }
