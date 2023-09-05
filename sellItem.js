@@ -689,8 +689,8 @@ function showDeleteImageIcon(imageName) {
   document.getElementById(`loading${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
   document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).style.display = 'inline-block';
   if (imageName === 'frontImage'){
-    console.log('Tobias was here');
     document.getElementById('enhancedAnimationDiv').style.display = 'none';
+    triggerStopEnhancingAnimation
   }
 }
 
