@@ -553,6 +553,7 @@ async function frontImageChangeHandler(event) {
     }
     if (featureIsEnabled('enhanceImage')) {
       document.getElementById(`loadingFrontImageIcon`).style.display = 'none';
+      document.getElementById('enhancedAnimationDiv').style.display = 'block';
       triggerEnhancingAnimation.click();
       promises.push(enhanceFrontImage(imageUrl));
     }
@@ -687,6 +688,10 @@ function capitalizeFirstLetter(string) {
 function showDeleteImageIcon(imageName) {
   document.getElementById(`loading${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
   document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).style.display = 'inline-block';
+  if (imageName === 'frontImage'){
+    console.log('Tobias was here');
+    document.getElementById('enhancedAnimationDiv').style.display = 'none';
+  }
 }
 
 async function productImageChangeHandler(event) {
