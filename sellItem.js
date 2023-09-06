@@ -578,6 +578,7 @@ async function frontImageChangeHandler(event) {
       promises.push(enhanceFrontImage(imageUrl));
     }
     await Promise.all(promises);
+    rememberUnsavedChanges();
   }
 }
 
@@ -691,6 +692,7 @@ async function brandTagImageChangeHandler(event) {
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
+    rememberUnsavedChanges();
   }
 }
 
@@ -726,6 +728,7 @@ async function productImageChangeHandler(event) {
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
+    rememberUnsavedChanges();
   }
 }
 
@@ -738,6 +741,7 @@ async function defectImageChangeHandler(event) {
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
+    rememberUnsavedChanges();
   }
 }
 
@@ -750,6 +754,7 @@ async function materialTagImageChangeHandler(event) {
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
+    rememberUnsavedChanges();
   }
 }
 
@@ -762,6 +767,7 @@ async function extraImageChangeHandler(event) {
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
+    rememberUnsavedChanges();
   }
 }
 
