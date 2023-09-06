@@ -1018,8 +1018,11 @@ function initializeDeleteImageListeners() {
 
 function removeSavedImage(imageName) {
   const newItemImages = JSON.parse(localStorage.getItem('newItemImages'));
+  const newItem = JSON.parse(localStorage.getItem('newItem'));
   delete newItemImages[imageName];
+  delete newItem?.images?.[imageName];
   localStorage.setItem('newItemImages', JSON.stringify(newItemImages));
+  localStorage.setItem('newItem', JSON.stringify(newItem));
 }
 
 async function initializeCategorySelect() {
