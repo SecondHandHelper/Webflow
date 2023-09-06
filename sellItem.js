@@ -250,10 +250,10 @@ async function createItemAfterSignIn() {
 }
 
 async function enhanceFrontImage(imageUrl) {
-  const enhancedImageUrl = await createEnhancedImage(imageUrl);
-  if (enhancedImageUrl) {
-    rememberNewItemImageField('enhancedFrontImage', enhancedImageUrl);
-    showImagePreview('frontImage', enhancedImageUrl);
+  const enhancedImageUrls = await createEnhancedImage(imageUrl);
+  if (enhancedImageUrls?.url) {
+    rememberNewItemImageField('enhancedFrontImage', enhancedImageUrls.url);
+    showImagePreview('frontImage', enhancedImageUrls.urlSmall);
   }
   showDeleteImageIcon('frontImage');
 }

@@ -138,10 +138,10 @@
         if (!imageUrl || Object.keys(imageUrl).length === 0) {
             return;
         }
-        const enhancedImageUrl = await createEnhancedImage(imageUrl);
-        sessionStorage.setItem('enhancedFrontImage', enhancedImageUrl)
-        document.getElementById('frontImagePreviewUploading').style.backgroundImage = `url('${enhancedImageUrl}')`;
-        document.getElementById('frontImagePreview').style.backgroundImage = `url('${enhancedImageUrl}')`;
+        const enhancedImageUrls = await createEnhancedImage(imageUrl);
+        sessionStorage.setItem('enhancedFrontImage', enhancedImageUrls.url)
+        document.getElementById('frontImagePreviewUploading').style.backgroundImage = `url('${enhancedImageUrls.urlSmall}')`;
+        document.getElementById('frontImagePreview').style.backgroundImage = `url('${enhancedImageUrls.urlSmall}')`;
         document.getElementById('loadingFrontImageIcon').style.display = 'none';
         document.getElementById('deleteFrontImageIcon').style.display = 'inline-block';
       }
