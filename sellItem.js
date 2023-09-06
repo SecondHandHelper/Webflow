@@ -577,7 +577,6 @@ async function frontImageChangeHandler(event) {
       promises.push(enhanceFrontImage(imageUrl));
     }
     await Promise.all(promises);
-    rememberUnsavedChanges();
   }
 }
 
@@ -691,7 +690,6 @@ async function brandTagImageChangeHandler(event) {
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
-    rememberUnsavedChanges();
   }
 }
 
@@ -727,7 +725,6 @@ async function productImageChangeHandler(event) {
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
-    rememberUnsavedChanges();
   }
 }
 
@@ -740,7 +737,6 @@ async function defectImageChangeHandler(event) {
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
-    rememberUnsavedChanges();
   }
 }
 
@@ -753,7 +749,6 @@ async function materialTagImageChangeHandler(event) {
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
-    rememberUnsavedChanges();
   }
 }
 
@@ -766,7 +761,6 @@ async function extraImageChangeHandler(event) {
     if (featureIsEnabled('colorCategory')) {
       await detectAndFillBrandAndMaterialAndSize(imageUrl);
     }
-    rememberUnsavedChanges();
   }
 }
 
@@ -880,8 +874,9 @@ function initializeClearFormButton() {
 }
 
 function initializeSaveStateListeners() {
+  // We delay the rememberUnsavedChanges call to allow any confirm/reject animations to finish
   document.getElementById('wf-form-Add-Item').querySelectorAll('input').forEach(elm => {
-    elm.addEventListener('input', rememberUnsavedChanges);
+    elm.addEventListener('input', () => setTimeout(rememberUnsavedChanges, 150));
   });
   document.getElementById('wf-form-Add-Item').querySelectorAll('input[type="radio"]').forEach(elm => {
     elm.addEventListener('change', rememberUnsavedChanges);
@@ -889,8 +884,9 @@ function initializeSaveStateListeners() {
   document.getElementById('wf-form-Add-Item').querySelectorAll('input[type="checkbox"]').forEach(elm => {
     elm.addEventListener('change', rememberUnsavedChanges);
   });
+  // We delay the rememberUnsavedChanges call to allow any confirm/reject animations to finish
   document.getElementById('wf-form-Add-Item').querySelectorAll('select').forEach(elm => {
-    elm.addEventListener('change', rememberUnsavedChanges);
+    elm.addEventListener('change', () => setTimeout(rememberUnsavedChanges, 150));
   });
   document.getElementById('wf-form-Add-Item').querySelectorAll('textarea').forEach(elm => {
     elm.addEventListener('input', rememberUnsavedChanges);
@@ -929,13 +925,11 @@ async function initializeColorConfirm() {
     document.querySelector('#colorSuggestButtons').style.display = 'none';
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
-    rememberUnsavedChanges();
     document.querySelector('#itemColor').setCustomValidity('');
   });
   document.getElementById('confirmColor').addEventListener('click', () => {
     document.querySelector('#colorSuggestButtons').style.display = 'none';
     document.querySelector('#itemColor').setCustomValidity('');
-    rememberUnsavedChanges();
   })
 }
 
