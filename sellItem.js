@@ -483,6 +483,7 @@ function selectFieldValue(field, value) {
     field.style.color = '#929292';
   }
   field.dispatchEvent(new Event('input'));
+  field.dispatchEvent(new Event('change'));
 }
 
 function checkBrand(value) {
@@ -926,7 +927,7 @@ function initializeSuggestButtonsSaveState() {
       rememberUnsavedChanges();
     }
   });
-  Array.from(document.querySelectorAll('.confirm-buttons')).forEach(elm =>
+  Array.from(document.querySelectorAll('.suggest-buttons')).forEach(elm =>
     observer.observe(elm, { attributes: true})
   )
 }
