@@ -190,14 +190,18 @@ function initializeInputEventListeners() {
   itemUserComment.addEventListener('input', fieldLabelToggle('userCommentLabel'));
 
   document.getElementById('addItemButton').addEventListener('click', () => {
-    const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
     document.getElementById('wf-form-Add-Item').reportValidity();
-    if (invalidElements.length > 0) {
-      const element = invalidElements[0];
-      const y = element.getBoundingClientRect().top + window.scrollY - 40;
-      window.scrollTo({ top: y, behavior: 'smooth'});
-      document.getElementById('wf-form-Add-Item').reportValidity();
-    }
+    setTimeout(() => {
+      const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
+      if (invalidElements.length > 0) {
+        const element = invalidElements[0];
+        if (!isElementInView(element)) {
+          const y = element.getBoundingClientRect().top + window.scrollY - 40;
+          window.scrollTo({ top: y, behavior: 'smooth'});
+        }
+        document.getElementById('wf-form-Add-Item').reportValidity();
+      }
+    }, 300);
   });
   addItemForm.addEventListener("submit", addItem);
   userAddressForm.addEventListener("submit", addUserDetails);
@@ -218,6 +222,19 @@ function initializeInputEventListeners() {
       itemPersonalId.setCustomValidity('');
     }
   });
+}
+
+function isElementInView (el) {
+  if (typeof jQuery === "function" && el instanceof jQuery) {
+    el = el[0];
+  }
+  const rect = el.getBoundingClientRect();
+  return (
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <= (window.innerHeight/2 || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+  );
 }
 
 async function createItemAfterSignIn() {
