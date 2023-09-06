@@ -876,7 +876,7 @@ function initializeClearFormButton() {
 function initializeSaveStateListeners() {
   // We delay the rememberUnsavedChanges call to allow any confirm/reject animations to finish
   document.getElementById('wf-form-Add-Item').querySelectorAll('input').forEach(elm => {
-    elm.addEventListener('input', () => setTimeout(rememberUnsavedChanges, 500));
+    elm.addEventListener('input', rememberUnsavedChanges);
   });
   document.getElementById('wf-form-Add-Item').querySelectorAll('input[type="radio"]').forEach(elm => {
     elm.addEventListener('change', rememberUnsavedChanges);
@@ -886,7 +886,7 @@ function initializeSaveStateListeners() {
   });
   // We delay the rememberUnsavedChanges call to allow any confirm/reject animations to finish
   document.getElementById('wf-form-Add-Item').querySelectorAll('select').forEach(elm => {
-    elm.addEventListener('change', () => setTimeout(rememberUnsavedChanges, 500));
+    elm.addEventListener('change', rememberUnsavedChanges);
   });
   document.getElementById('wf-form-Add-Item').querySelectorAll('textarea').forEach(elm => {
     elm.addEventListener('input', rememberUnsavedChanges);
@@ -917,6 +917,18 @@ async function initializeSizeConfirm() {
     document.querySelector('#itemSize').setCustomValidity('');
     document.querySelector('#itemSize').dispatchEvent(new Event('input'));
   })
+}
+
+function initializeSuggestButtonsSaveState() {
+  const observer = new MutationObserver((mutationsList, observer) => {
+    const mutatedElement = mutationsList.find(elm => elm.attributeName === 'style');
+    if (mutatedElement && mutatedElement.target.style.display === 'none') {
+      rememberUnsavedChanges();
+    }
+  });
+  Array.from(document.querySelectorAll('.confirm-buttons')).forEach(elm =>
+    observer.observe(elm, { attributes: true})
+  )
 }
 
 async function initializeColorConfirm() {
