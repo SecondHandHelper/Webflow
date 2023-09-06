@@ -108,6 +108,7 @@
         await initializeBrandConfirm();
         await initializeMaterialConfirm();
         await initializeSizeConfirm();
+        initializeSuggestButtonsSaveState();
         initializeClearFormButton();
         // Be om telefonnummer i formuläret
         if (!user.current?.phoneNumber) {

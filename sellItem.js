@@ -176,25 +176,28 @@ async function addItemInner(id) {
 
 function initializeInputEventListeners() {
   itemBrand.addEventListener('input', fieldLabelToggle('itemBrandLabel'));
-  itemBrand.addEventListener('input', hideConfirmButtons);
+  itemBrand.addEventListener('input', clearConfirmButtonValidity);
   itemModel.addEventListener('input', fieldLabelToggle('itemModelLabel'));
   itemSize.addEventListener('input', fieldLabelToggle('itemSizeLabel'));
-  itemSize.addEventListener('input', hideConfirmButtons);
+  itemSize.addEventListener('input', clearConfirmButtonValidity);
   itemMaterial.addEventListener('input', fieldLabelToggle('itemMaterialLabel'));
-  itemMaterial.addEventListener('input', hideConfirmButtons);
+  itemMaterial.addEventListener('input', clearConfirmButtonValidity);
   itemOriginalPrice.addEventListener('input', fieldLabelToggle('itemOriginalPriceLabel'));
   itemAge.addEventListener('input', fieldLabelToggle('itemAgeLabel'));
   itemCondition.addEventListener('input', fieldLabelToggle('itemConditionLabel'));
-  itemColor.addEventListener('input', fieldLabelToggle('itemColorLabel'));
-  itemColor.addEventListener('input', hideConfirmButtons);
+  itemColor.addEventListener('change', fieldLabelToggle('itemColorLabel'));
+  itemColor.addEventListener('input', clearConfirmButtonValidity);
   itemUserComment.addEventListener('input', fieldLabelToggle('userCommentLabel'));
 
   document.getElementById('addItemButton').addEventListener('click', () => {
     document.getElementById('wf-form-Add-Item').reportValidity();
+    const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
+    const element = invalidElements?.[0];
+    if (element && element.getBoundingClientRect().height <= 1) {
+      element.style.cssText = 'width:100% !important;height:100% !important;'
+    }
     setTimeout(() => {
-      const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
       if (invalidElements.length > 0) {
-        const element = invalidElements[0];
         if (!isElementInView(element)) {
           const y = element.getBoundingClientRect().top + window.scrollY - 40;
           window.scrollTo({ top: y, behavior: 'smooth'});
@@ -478,6 +481,7 @@ function selectFieldValue(field, value) {
     field.style.color = '#929292';
   }
   field.dispatchEvent(new Event('input'));
+  field.dispatchEvent(new Event('change'));
 }
 
 function checkBrand(value) {
@@ -765,9 +769,8 @@ async function extraImageChangeHandler(event) {
   }
 }
 
-function hideConfirmButtons(event, elementID) {
+function clearConfirmButtonValidity(event) {
   event.currentTarget.setCustomValidity('');
-  event.currentTarget.closest('.text-input-container').querySelector('.suggest-buttons').style.display = 'none';
 }
 
 async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
@@ -876,6 +879,7 @@ function initializeClearFormButton() {
 }
 
 function initializeSaveStateListeners() {
+  // We delay the rememberUnsavedChanges call to allow any confirm/reject animations to finish
   document.getElementById('wf-form-Add-Item').querySelectorAll('input').forEach(elm => {
     elm.addEventListener('input', rememberUnsavedChanges);
   });
@@ -885,6 +889,7 @@ function initializeSaveStateListeners() {
   document.getElementById('wf-form-Add-Item').querySelectorAll('input[type="checkbox"]').forEach(elm => {
     elm.addEventListener('change', rememberUnsavedChanges);
   });
+  // We delay the rememberUnsavedChanges call to allow any confirm/reject animations to finish
   document.getElementById('wf-form-Add-Item').querySelectorAll('select').forEach(elm => {
     elm.addEventListener('change', rememberUnsavedChanges);
   });
@@ -919,19 +924,28 @@ async function initializeSizeConfirm() {
   })
 }
 
+function initializeSuggestButtonsSaveState() {
+  const observer = new MutationObserver((mutationsList, observer) => {
+    const mutatedElement = mutationsList.find(elm => elm.attributeName === 'style');
+    if (mutatedElement && mutatedElement.target.style.display === 'none') {
+      rememberUnsavedChanges();
+    }
+  });
+  Array.from(document.querySelectorAll('.suggest-buttons')).forEach(elm =>
+    observer.observe(elm, { attributes: true})
+  )
+}
+
 async function initializeColorConfirm() {
   document.getElementById('rejectColor').addEventListener('click', () => {
     document.querySelector('#itemColor').value = '';
     document.querySelector('#colorSuggestButtons').style.display = 'none';
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
-    rememberUnsavedChanges();
     document.querySelector('#itemColor').setCustomValidity('');
   });
   document.getElementById('confirmColor').addEventListener('click', () => {
-    document.querySelector('#colorSuggestButtons').style.display = 'none';
     document.querySelector('#itemColor').setCustomValidity('');
-    rememberUnsavedChanges();
   })
 }
 
@@ -943,6 +957,7 @@ function clearFormFields() {
   });
 
   setFieldValue('itemBrand', null);
+  Array.from(document.querySelectorAll('.suggest-buttons')).forEach(el => el.style.display = 'none');
   setFieldValue('itemSize', null);
   setFieldValue('itemMaterial', null);
   setFieldValue('itemModel', null);
@@ -991,6 +1006,7 @@ function initializeDeleteImageListeners() {
   })
   document.getElementById("deleteFrontImageIcon").addEventListener('click', () => {
     document.getElementById("frontImage").required = true;
+    removeSavedImage('enhancedFrontImage');
   });
   document.getElementById("deleteBrandTagImageIcon").addEventListener('click', () => {
     document.getElementById("brandTagImage").required = true;
@@ -999,8 +1015,11 @@ function initializeDeleteImageListeners() {
 
 function removeSavedImage(imageName) {
   const newItemImages = JSON.parse(localStorage.getItem('newItemImages'));
+  const newItem = JSON.parse(localStorage.getItem('newItem'));
   delete newItemImages[imageName];
+  delete newItem?.images?.[imageName];
   localStorage.setItem('newItemImages', JSON.stringify(newItemImages));
+  localStorage.setItem('newItem', JSON.stringify(newItem));
 }
 
 async function initializeCategorySelect() {
