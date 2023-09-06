@@ -185,7 +185,7 @@ function initializeInputEventListeners() {
   itemOriginalPrice.addEventListener('input', fieldLabelToggle('itemOriginalPriceLabel'));
   itemAge.addEventListener('input', fieldLabelToggle('itemAgeLabel'));
   itemCondition.addEventListener('input', fieldLabelToggle('itemConditionLabel'));
-  itemColor.addEventListener('input', fieldLabelToggle('itemColorLabel'));
+  itemColor.addEventListener('change', fieldLabelToggle('itemColorLabel'));
   itemColor.addEventListener('input', clearConfirmButtonValidity);
   itemUserComment.addEventListener('input', fieldLabelToggle('userCommentLabel'));
 
@@ -996,6 +996,7 @@ function initializeDeleteImageListeners() {
   })
   document.getElementById("deleteFrontImageIcon").addEventListener('click', () => {
     document.getElementById("frontImage").required = true;
+    removeSavedImage('enhancedFrontImage');
   });
   document.getElementById("deleteBrandTagImageIcon").addEventListener('click', () => {
     document.getElementById("brandTagImage").required = true;
