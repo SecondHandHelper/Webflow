@@ -176,17 +176,17 @@ async function addItemInner(id) {
 
 function initializeInputEventListeners() {
   itemBrand.addEventListener('input', fieldLabelToggle('itemBrandLabel'));
-  itemBrand.addEventListener('input', hideConfirmButtons);
+  itemBrand.addEventListener('input', clearConfirmButtonError);
   itemModel.addEventListener('input', fieldLabelToggle('itemModelLabel'));
   itemSize.addEventListener('input', fieldLabelToggle('itemSizeLabel'));
-  itemSize.addEventListener('input', hideConfirmButtons);
+  itemSize.addEventListener('input', clearConfirmButtonError);
   itemMaterial.addEventListener('input', fieldLabelToggle('itemMaterialLabel'));
-  itemMaterial.addEventListener('input', hideConfirmButtons);
+  itemMaterial.addEventListener('input', clearConfirmButtonError);
   itemOriginalPrice.addEventListener('input', fieldLabelToggle('itemOriginalPriceLabel'));
   itemAge.addEventListener('input', fieldLabelToggle('itemAgeLabel'));
   itemCondition.addEventListener('input', fieldLabelToggle('itemConditionLabel'));
   itemColor.addEventListener('input', fieldLabelToggle('itemColorLabel'));
-  itemColor.addEventListener('input', hideConfirmButtons);
+  itemColor.addEventListener('input', clearConfirmButtonError);
   itemUserComment.addEventListener('input', fieldLabelToggle('userCommentLabel'));
 
   document.getElementById('addItemButton').addEventListener('click', () => {
@@ -195,8 +195,8 @@ function initializeInputEventListeners() {
     const element = invalidElements?.[0];
     setTimeout(() => {
       if (element) {
-        element.style.width = '100%';
-        element.style.heigth = '100%';
+        element.style.width = '100% !important';
+        element.style.height = '100% !important';
       }
     }, 0);
     setTimeout(() => {
@@ -771,12 +771,8 @@ async function extraImageChangeHandler(event) {
   }
 }
 
-function hideConfirmButtons(event, elementID) {
+function clearConfirmButtonError(event, elementID) {
   event.currentTarget.setCustomValidity('');
-  setTimeout(() => {
-    // Allow the animation to finish before hiding the buttons.
-    event.currentTarget.closest('.text-input-container').querySelector('.suggest-buttons').style.display = 'none';
-  }, 100);
 }
 
 async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
