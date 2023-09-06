@@ -876,7 +876,7 @@ function initializeClearFormButton() {
 function initializeSaveStateListeners() {
   // We delay the rememberUnsavedChanges call to allow any confirm/reject animations to finish
   document.getElementById('wf-form-Add-Item').querySelectorAll('input').forEach(elm => {
-    elm.addEventListener('input', () => setTimeout(rememberUnsavedChanges, 150));
+    elm.addEventListener('input', () => setTimeout(rememberUnsavedChanges, 250));
   });
   document.getElementById('wf-form-Add-Item').querySelectorAll('input[type="radio"]').forEach(elm => {
     elm.addEventListener('change', rememberUnsavedChanges);
@@ -886,7 +886,7 @@ function initializeSaveStateListeners() {
   });
   // We delay the rememberUnsavedChanges call to allow any confirm/reject animations to finish
   document.getElementById('wf-form-Add-Item').querySelectorAll('select').forEach(elm => {
-    elm.addEventListener('change', () => setTimeout(rememberUnsavedChanges, 150));
+    elm.addEventListener('change', () => setTimeout(rememberUnsavedChanges, 250));
   });
   document.getElementById('wf-form-Add-Item').querySelectorAll('textarea').forEach(elm => {
     elm.addEventListener('input', rememberUnsavedChanges);
