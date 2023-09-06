@@ -193,10 +193,12 @@ function initializeInputEventListeners() {
     document.getElementById('wf-form-Add-Item').reportValidity();
     const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
     const element = invalidElements?.[0];
-    if (element) {
-      element.style.width = '100%';
-      element.style.heigth = '100%';
-    }
+    setTimeout(() => {
+      if (element) {
+        element.style.width = '100%';
+        element.style.heigth = '100%';
+      }
+    }, 0);
     setTimeout(() => {
       if (invalidElements.length > 0) {
         if (!isElementInView(element)) {
