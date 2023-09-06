@@ -196,7 +196,7 @@ function initializeInputEventListeners() {
     setTimeout(() => {
       if (element) {
         element.style.width = '100%';
-        element.style.heigth = '100%';
+        element.style.height = '100%';
       }
     }, 0);
     setTimeout(() => {
