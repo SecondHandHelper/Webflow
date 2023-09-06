@@ -201,7 +201,7 @@ function initializeInputEventListeners() {
           document.getElementById('wf-form-Add-Item').reportValidity();
         }
       }
-    }, 50);
+    }, 300);
   });
   addItemForm.addEventListener("submit", addItem);
   userAddressForm.addEventListener("submit", addUserDetails);
