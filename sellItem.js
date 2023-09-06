@@ -198,8 +198,8 @@ function initializeInputEventListeners() {
         if (!isElementInView(element)) {
           const y = element.getBoundingClientRect().top + window.scrollY - 40;
           window.scrollTo({ top: y, behavior: 'smooth'});
-          document.getElementById('wf-form-Add-Item').reportValidity();
         }
+        document.getElementById('wf-form-Add-Item').reportValidity();
       }
     }, 300);
   });
