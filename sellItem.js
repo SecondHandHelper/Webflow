@@ -193,7 +193,7 @@ function initializeInputEventListeners() {
     document.getElementById('wf-form-Add-Item').reportValidity();
     const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
     const element = invalidElements?.[0];
-    if (element) {
+    if (element && element.getBoundingClientRect().height <= 1) {
       element.style.cssText = 'width:100% !important;height:100% !important;'
     }
     setTimeout(() => {
@@ -839,7 +839,6 @@ async function detectAndFillColor(imageUrl) {
 async function initializeMaterialConfirm() {
   document.getElementById('rejectMaterial').addEventListener('click', () => {
     document.querySelector('#itemMaterial').value = '';
-    document.querySelector('#materialSuggestButtons').style.display = 'none';
     document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
     document.querySelector('#itemMaterial').dispatchEvent(new Event('input'));
     document.querySelector('#itemMaterial').setCustomValidity('');
@@ -853,7 +852,6 @@ async function initializeMaterialConfirm() {
 async function initializeBrandConfirm() {
   document.getElementById('rejectBrand').addEventListener('click', () => {
     document.querySelector('#itemBrand').value = '';
-    document.querySelector('#brandSuggestButtons').style.display = 'none';
     document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
     document.querySelector('#itemBrand').dispatchEvent(new Event('input'));
     document.querySelector('#itemBrand').setCustomValidity('');
@@ -913,7 +911,6 @@ function initializeRestoreOnNavigation() {
 async function initializeSizeConfirm() {
   document.getElementById('rejectSize').addEventListener('click', () => {
     document.querySelector('#itemSize').value = '';
-    document.querySelector('#sizeSuggestButtons').style.display = 'none';
     document.querySelector('#itemSize').dispatchEvent(new Event('change'));
     document.querySelector('#itemSize').dispatchEvent(new Event('input'));
     document.querySelector('#itemSize').setCustomValidity('');
@@ -939,13 +936,11 @@ function initializeSuggestButtonsSaveState() {
 async function initializeColorConfirm() {
   document.getElementById('rejectColor').addEventListener('click', () => {
     document.querySelector('#itemColor').value = '';
-    document.querySelector('#colorSuggestButtons').style.display = 'none';
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
     document.querySelector('#itemColor').dispatchEvent(new Event('input'));
     document.querySelector('#itemColor').setCustomValidity('');
   });
   document.getElementById('confirmColor').addEventListener('click', () => {
-    document.querySelector('#colorSuggestButtons').style.display = 'none';
     document.querySelector('#itemColor').setCustomValidity('');
   })
 }
