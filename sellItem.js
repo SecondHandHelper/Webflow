@@ -193,11 +193,9 @@ function initializeInputEventListeners() {
     document.getElementById('wf-form-Add-Item').reportValidity();
     const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
     const element = invalidElements?.[0];
-    setTimeout(() => {
-      if (element) {
-        element.style.cssText = 'width:100% !important;height:100% !important;'
-      }
-    }, 0);
+    if (element) {
+      element.style.cssText = 'width:100% !important;height:100% !important;'
+    }
     setTimeout(() => {
       if (invalidElements.length > 0) {
         if (!isElementInView(element)) {
