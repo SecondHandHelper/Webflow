@@ -195,8 +195,7 @@ function initializeInputEventListeners() {
     const element = invalidElements?.[0];
     setTimeout(() => {
       if (element) {
-        element.style.width = '100% !important';
-        element.style.height = '100% !important';
+        element.style.cssText = 'width:100% !important;height:100% !important;'
       }
     }, 0);
     setTimeout(() => {
