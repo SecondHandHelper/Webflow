@@ -191,10 +191,14 @@ function initializeInputEventListeners() {
 
   document.getElementById('addItemButton').addEventListener('click', () => {
     document.getElementById('wf-form-Add-Item').reportValidity();
+    const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
+    const element = invalidElements?.[0];
+    if (element) {
+      element.style.width = '100%';
+      element.style.heigth = '100%';
+    }
     setTimeout(() => {
-      const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
       if (invalidElements.length > 0) {
-        const element = invalidElements[0];
         if (!isElementInView(element)) {
           const y = element.getBoundingClientRect().top + window.scrollY - 40;
           window.scrollTo({ top: y, behavior: 'smooth'});
@@ -767,7 +771,10 @@ async function extraImageChangeHandler(event) {
 
 function hideConfirmButtons(event, elementID) {
   event.currentTarget.setCustomValidity('');
-  event.currentTarget.closest('.text-input-container').querySelector('.suggest-buttons').style.display = 'none';
+  setTimeout(() => {
+    // Allow the animation to finish before hiding the buttons.
+    event.currentTarget.closest('.text-input-container').querySelector('.suggest-buttons').style.display = 'none';
+  }, 100);
 }
 
 async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
