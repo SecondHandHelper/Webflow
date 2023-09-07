@@ -24,7 +24,7 @@ async function updateItem(itemId, changedImages) {
       userComment: userComment
     }
   
-    async function uploadImages(itemId) {
+    async function uploadImages(itemId, item) {
       console.log("uploadImages()");
       if (changedImages.length > 0) {
         // START - Mark imageRequest as Resolved
@@ -59,15 +59,26 @@ async function updateItem(itemId, changedImages) {
           changes[`images.${key}Small`] = "";
           changes[`images.${key}Medium`] = "";
           changes[`images.${key}Large`] = "";
+          changes[`images.versionsStatus.${key}`] = '';
         }));
         if (changedImages.indexOf('frontImage') > -1) {
-          // Front image was changed, also save the enhancedFrontImage
+          // Front image was changed, also save the enhancedFrontImage in the right place
           const response = await firebase.app().functions("europe-west1").httpsCallable('saveItemImage')({ itemId, fileName: 'enhancedFrontImage',
             url: sessionStorage.getItem('enhancedFrontImage') });
           changes['images.enhancedFrontImage'] = response.data.url;
-          changes['images.enhancedFrontImageSmall'] = ''
-          changes['images.enhancedFrontImageMedium'] = ''
-          changes['images.enhancedFrontImageLarge'] = ''
+          changes['images.enhancedFrontImageSmall'] = '';
+          changes['images.enhancedFrontImageMedium'] = '';
+          changes['images.enhancedFrontImageLarge'] = '';
+          changes[`images.versionsStatus.enhancedFrontImage`] = '';
+          const item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId})
+          const itemData = item.data;
+          if (itemData.images.coverImage === itemData.images.enhancedFrontImage) {
+              changes['images.coverImage'] = '';
+              changes['images.coverImageSmall'] = '';
+              changes['images.coverImageMedium'] = '';
+              changes['images.coverImageLarge'] = '';
+              changes[`images.versionsStatus.coverImage`] = '';
+          }
         }
       }
       await updateItemDoc(itemId, changes);
