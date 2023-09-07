@@ -256,6 +256,7 @@ async function enhanceFrontImage(imageUrl) {
     showImagePreview('frontImage', enhancedImageUrls.urlSmall);
   }
   showDeleteImageIcon('frontImage');
+  return enhancedImageUrls;
 }
 
 function rememberUnsavedChanges() {

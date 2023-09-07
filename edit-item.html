@@ -139,8 +139,6 @@
         }
         const enhancedImageUrls = await enhanceFrontImage(imageUrl);
         sessionStorage.setItem('enhancedFrontImage', enhancedImageUrls.url)
-        document.getElementById('frontImagePreviewUploading').style.backgroundImage = `url('${enhancedImageUrls.urlSmall}')`;
-        document.getElementById('frontImagePreview').style.backgroundImage = `url('${enhancedImageUrls.urlSmall}')`;
       }
     });
 
