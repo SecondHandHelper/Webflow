@@ -63,15 +63,11 @@ async function updateItem(itemId, changedImages) {
         }));
         if (changedImages.indexOf('frontImage') > -1) {
           // Front image was changed, also save the enhancedFrontImage in the right place
-          const response = await firebase.app().functions("europe-west1").httpsCallable('saveItemImage')({ itemId, fileName: 'enhancedFrontImage',
-            url: sessionStorage.getItem('enhancedFrontImage') });
-          changes['images.enhancedFrontImage'] = response.data.url;
-          changes['images.enhancedFrontImageSmall'] = '';
-          changes['images.enhancedFrontImageMedium'] = '';
-          changes['images.enhancedFrontImageLarge'] = '';
-          changes[`images.versionsStatus.enhancedFrontImage`] = '';
           const item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId})
           const itemData = item.data;
+          await firebase.app().functions("europe-west1").httpsCallable('saveItemImage')({ itemId, fileName: `enhancedFrontImage`,
+            url: `${sessionStorage.getItem('enhancedFrontImage')}?v=${uuidv4().split('-')[0]}` });
+          changes[`images.versionsStatus.enhancedFrontImage`] = '';
           if (itemData.images.coverImage === itemData.images.enhancedFrontImage) {
               changes['images.coverImage'] = '';
               changes['images.coverImageSmall'] = '';

@@ -32,7 +32,7 @@
 
           // Populate images
           function showImageAndHideSiblings(x, url) {
-            document.getElementById(`${x}Preview`).style.backgroundImage = `url('${url}?v=${Math.floor(Math.random() * 10)}')`;
+            document.getElementById(`${x}Preview`).style.backgroundImage = `url('${url}')`;
             siblings = document.getElementById(x).parentNode.parentNode.childNodes;
             for (var i = 0; i < siblings.length; i++) {
               if (siblings[i].className.includes("success-state")) {
