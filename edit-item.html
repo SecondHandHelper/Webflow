@@ -137,8 +137,7 @@
         if (!imageUrl || Object.keys(imageUrl).length === 0) {
             return;
         }
-        const enhancedImageUrls = await enhanceFrontImage(imageUrl);
-        sessionStorage.setItem('enhancedFrontImage', enhancedImageUrls.url)
+        await enhanceFrontImage(imageUrl);
       }
     });
 

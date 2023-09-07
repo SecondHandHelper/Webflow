@@ -24,8 +24,7 @@ async function updateItem(itemId, changedImages) {
       userComment: userComment
     }
   
-    async function uploadImages(itemId, item) {
-      console.log("uploadImages()");
+    async function uploadImages(itemId) {
       if (changedImages.length > 0) {
         // START - Mark imageRequest as Resolved
         await db.collection("items").doc(itemId).get().then((doc) => {
@@ -44,22 +43,22 @@ async function updateItem(itemId, changedImages) {
         });
         // Uploads files and add the new imageUrls to the changes object
         const storageRef = storage.ref();
-        await Promise.all(Array.from(images).map(async ([key, value]) => {
-          console.log(`${key}: ${value}`);
+        await Promise.all(Array.from(images).map(async ([imageName, value]) => {
+          console.log(`${imageName}: ${value}`);
           // If images was changed, set photo directions to default, since an 'info request' of images could have been shown
           photoDirectionsText.style.display = 'block';
           infoRequestImagesDiv.style.display = 'none';
 
-          let imagePathReference = `images/${itemId}/${key}`;
+          let imagePathReference = `images/${itemId}/${imageName}`;
           let fileRef = storageRef.child(imagePathReference);
           await fileRef.put(value);
           const imageDownloadUrl = await fileRef.getDownloadURL();
-          let k = "images." + key;
+          let k = "images." + imageName;
           changes[k] = imageDownloadUrl;
-          changes[`images.${key}Small`] = "";
-          changes[`images.${key}Medium`] = "";
-          changes[`images.${key}Large`] = "";
-          changes[`images.versionsStatus.${key}`] = '';
+          changes[`images.${imageName}Small`] = "";
+          changes[`images.${imageName}Medium`] = "";
+          changes[`images.${imageName}Large`] = "";
+          changes[`images.versionsStatus.${imageName}`] = '';
         }));
         if (changedImages.indexOf('frontImage') > -1) {
           // Front image was changed, also save the enhancedFrontImage in the right place
