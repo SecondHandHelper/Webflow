@@ -31,8 +31,8 @@
           }
 
           // Populate images
-          function hideSiblings(x, url) {
-            document.getElementById(`${x}Preview`).style.backgroundImage = `url('${url}')`;
+          function showImageAndHideSiblings(x, url) {
+            document.getElementById(`${x}Preview`).style.backgroundImage = `url('${url}?v=${Math.floor(Math.random() * 10)}')`;
             siblings = document.getElementById(x).parentNode.parentNode.childNodes;
             for (var i = 0; i < siblings.length; i++) {
               if (siblings[i].className.includes("success-state")) {
@@ -47,13 +47,14 @@
             const possibleElmts = ["brandTagImage", "materialTagImage", "defectImage", "productImage", "extraImage"];
             const url = images[`${x}Small`] || images[`${x}Medium`] || images[`${x}Large`] || images[x];
             if (possibleElmts.includes(x)) {
-              hideSiblings(x, url);
+              showImageAndHideSiblings(x, url);
             }
           }
           // Special case for frontImage where we want to show the enhancedFrontImage
-          const frontImageUrl = images[`enhancedFrontImageSmall`] || images[`enhancedFrontImageMedium`] || images[`enhancedFrontImageLarge`] || images['enhancedFrontImage'];
+          const frontImageUrl = images[`enhancedFrontImageSmall`] || images[`enhancedFrontImageMedium`] || images[`enhancedFrontImageLarge`] || images['enhancedFrontImage'] ||
+              images[`frontImageSmall`] || images[`frontImageMedium`] || images[`frontImageLarge`] || images['frontImage'];
           if (frontImageUrl) {
-            hideSiblings('frontImage', frontImageUrl);
+            showImageAndHideSiblings('frontImage', frontImageUrl);
           }
 
           // Populate text input fields
@@ -132,18 +133,14 @@
     document.getElementById('frontImage').addEventListener('change', async function () {
       let input = this.files[0];
       if (input) {
-        document.getElementById('loadingFrontImageIcon').style.display = 'inline-block';
-        document.getElementById('deleteFrontImageIcon').style.display = 'none';
         const imageUrl = await uploadImageAndShowPreview(input, 'frontImage');
         if (!imageUrl || Object.keys(imageUrl).length === 0) {
             return;
         }
-        const enhancedImageUrls = await createEnhancedImage(imageUrl);
+        const enhancedImageUrls = await enhanceFrontImage(imageUrl);
         sessionStorage.setItem('enhancedFrontImage', enhancedImageUrls.url)
         document.getElementById('frontImagePreviewUploading').style.backgroundImage = `url('${enhancedImageUrls.urlSmall}')`;
         document.getElementById('frontImagePreview').style.backgroundImage = `url('${enhancedImageUrls.urlSmall}')`;
-        document.getElementById('loadingFrontImageIcon').style.display = 'none';
-        document.getElementById('deleteFrontImageIcon').style.display = 'inline-block';
       }
     });
 
