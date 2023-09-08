@@ -79,7 +79,7 @@
     }
     const initialPageSetup = async () => {
         document.getElementById('itemImage').src = await getFrontImage();
-        document.getElementById('chatLink').onclick = () => Intercom('showNewMessage', `Värdering av item ${itemId || item.id}`);
+        document.getElementById('chatLink').onclick = () => Intercom('showNewMessage', `Värdering av item ${params.id || item.id}`);
     }
 
     initialPageSetup();
