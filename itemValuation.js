@@ -7,7 +7,7 @@ const getMlValuation = async () => {
     // const res = { data: { mlDsValuationLog: 'Success', newMaxPriceEstimate: 600, newMinPriceEstimate: 390 }};
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({ itemId, item });
     const { minPrice, maxPrice, decline, humanCheckNeeded, willNotSell } = res.data;
-    if (willNotSell || humanCheckNeeded) {
+    if (humanCheckNeeded) {
         return window.location.replace('/item-confirmation');
     }
     document.getElementById('loadingDiv').style.display = 'none';
@@ -28,21 +28,31 @@ const getMlValuation = async () => {
             }
             return window.location.href = '/sell-item';
         });
+    } else {
+        document.getElementById('confirmButton').addEventListener('click', async () => {
+            await firebase.app().functions("europe-west1").httpsCallable('saveAcceptedValuation')({
+                itemId,
+                minPrice,
+                maxPrice
+            });
+            return window.location.href = '/item-confirmation';
+        });
+        document.getElementById('rejectButton').addEventListener('click', async () => {
+            if (itemId) {
+                await firebase.app().functions("europe-west1").httpsCallable('markItemRejected')({
+                    itemId,
+                    minPrice,
+                    maxPrice,
+                    userDecline: true
+                });
+            }
+            if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+                sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
+                localStorage.removeItem('newItem');
+            }
+            return window.location.href = '/sell-item';
+        });
     }
-    document.getElementById('confirmButton').addEventListener('click', async () => {
-        await firebase.app().functions("europe-west1").httpsCallable('saveAcceptedValuation')({ itemId, minPrice, maxPrice });
-        return window.location.href = '/item-confirmation';
-    });
-    document.getElementById('rejectButton').addEventListener('click', async () => {
-        if (itemId) {
-            await firebase.app().functions("europe-west1").httpsCallable('markItemRejected')({ itemId, minPrice, maxPrice, userDecline: true });
-        }
-        if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-            sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
-            localStorage.removeItem('newItem');
-        }
-        return window.location.href = '/sell-item';
-    });
 }
 
 // uncomment when running locally
