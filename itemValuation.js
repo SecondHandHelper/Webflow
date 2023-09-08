@@ -47,5 +47,6 @@ const getMlValuation = async () => {
 
 // uncomment when running locally
 // const parceled = true
+getMlValuation();
 
 
