@@ -29,8 +29,8 @@ const getMlValuation = async () => {
             return window.location.href = '/sell-item';
         });
     }
-    document.getElementById('confirmButton').addEventListener('click', () => {
-        // await firebase.app().functions("europe-west1").httpsCallable('deleteItem')({ itemId });
+    document.getElementById('confirmButton').addEventListener('click', async () => {
+        await firebase.app().functions("europe-west1").httpsCallable('saveAcceptedValuation')({ itemId, minPrice, maxPrice });
         return window.location.href = '/item-confirmation';
     });
     document.getElementById('rejectButton').addEventListener('click', async () => {
