@@ -1,9 +1,9 @@
 const getMlValuation = async () => {
-    if (!itemId) {
-        return window.location.href = '/private';
-    }
     const item = sessionStorage.getItem('itemToBeCreatedAfterSignIn');
     const itemId = params.id;
+    if (!itemId && !item) {
+        return window.location.href = '/private';
+    }
     // const res = { data: { mlDsValuationLog: 'Success', newMaxPriceEstimate: 600, newMinPriceEstimate: 390 }};
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({ itemId, item });
     const { newMinPriceEstimate: minPrice, newMaxPriceEstimate: maxPrice, mlDsValuationLog: valuationResult } = res.data;
@@ -47,5 +47,5 @@ const getMlValuation = async () => {
 
 // uncomment when running locally
 // const parceled = true
-getMlValuation();
+
 
