@@ -6,14 +6,14 @@ const getMlValuation = async () => {
     }
     // const res = { data: { mlDsValuationLog: 'Success', newMaxPriceEstimate: 600, newMinPriceEstimate: 390 }};
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({ itemId, item });
-    const { newMinPriceEstimate: minPrice, newMaxPriceEstimate: maxPrice, mlDsValuationLog: valuationResult } = res.data;
-    if (valuationResult === 'Manual') {
+    const { minPrice, maxPrice, decline, humanCheckNeeded, willNotSell } = res.data;
+    if (willNotSell || humanCheckNeeded) {
         return window.location.replace('/item-confirmation');
     }
     document.getElementById('loadingDiv').style.display = 'none';
     document.getElementById('valuationResultDiv').style.display = 'block';
     document.getElementById('valuationText').innerText = `${minPrice} - ${maxPrice} kr`;
-    if (valuationResult === 'Decline') {
+    if (decline) {
         document.getElementById('deniedText').style.display = 'block';
         document.getElementById('rejectButton').style.display = 'none';
         document.getElementById('confirmButton').innerText = 'Okej'
