@@ -1,11 +1,87 @@
-<script src="http://localhost:1234/itemValuation.js"></script>
 <script>
-    //checks if the parceled variable from itemValuation.js is undefined
-    //  - meaning local host isn't up and running
-    // if not, loads from the githack pages
-    if (typeof parceled === 'undefined') {
-        let script = document.createElement('script')
-        script.src = 'https://rawcdn.githack.com/SecondHandHelper/Webflow/test529/itemValuation.js';
-        document.head.appendChild(script)
+    let fetchedItem = null;
+    const getItem = async (itemId) => {
+        if (!fetchedItem) {
+            const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId });
+            if (res.data) {
+                fetchedItem = res.data;
+            }
+        }
+        return fetchedItem;
     }
+
+    const getFrontImage = async () => {
+        const item = sessionStorage.getItem('itemToBeCreatedAfterSignIn');
+        const itemId = params.id;
+        return sessionStorage.getItem('enhancedFrontImageSmall') || item?.images?.enhancedFrontImage ||
+            (await getItem(itemId)).images.enhancedFrontImageSmall || (await getItem(itemId)).images.enhancedFrontImage;
+    }
+
+    const getMlValuation = async () => {
+        const itemId = params.id;
+        const item = sessionStorage.getItem('itemToBeCreatedAfterSignIn');
+        if (!itemId && !item) {
+            return window.location.href = '/private';
+        }
+        // const res = { data: { mlDsValuationLog: 'Success', newMaxPriceEstimate: 600, newMinPriceEstimate: 390 }};
+        const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({ itemId, item });
+        const { minPrice, maxPrice, decline, humanCheckNeeded, willNotSell } = res.data;
+        if (humanCheckNeeded) {
+            return window.location.replace('/item-confirmation');
+        }
+        document.getElementById('loadingDiv').style.display = 'none';
+        document.getElementById('valuationResultDiv').style.display = 'block';
+        document.getElementById('valuationText').innerText = `${minPrice} - ${maxPrice} kr`;
+        if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+            // Hide chat div for non-signed in users
+            document.getElementById('chatDiv').style.display = 'none';
+        }
+        if (decline) {
+            document.getElementById('chatDivHeader').innerText = 'Ser vår värderingen konstig ut?';
+            document.getElementById('deniedText').style.display = 'block';
+            document.getElementById('rejectButton').style.display = 'none';
+            document.getElementById('confirmButton').innerText = 'Okej'
+            document.getElementById('declineExplanation').style.display = 'block';
+            document.getElementById('valuationExplanation').style.display = 'none';
+            document.getElementById('confirmButton').addEventListener('click', async () => {
+                if (itemId) {
+                    await firebase.app().functions("europe-west1").httpsCallable('markItemRejected')({ itemId, minPrice, maxPrice, userDecline: false });
+                }
+                sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
+                localStorage.removeItem('newItem');
+                sessionStorage.removeItem('enhancedFrontImageSmall');
+                return window.location.href = '/private';
+            });
+        } else {
+            document.getElementById('confirmButton').addEventListener('click', async () => {
+                await firebase.app().functions("europe-west1").httpsCallable('saveAcceptedValuation')({
+                    itemId,
+                    minPrice,
+                    maxPrice
+                });
+                return window.location.href = '/item-confirmation';
+            });
+            document.getElementById('rejectButton').addEventListener('click', async () => {
+                if (itemId) {
+                    await firebase.app().functions("europe-west1").httpsCallable('markItemRejected')({
+                        itemId,
+                        minPrice,
+                        maxPrice,
+                        userDecline: true
+                    });
+                }
+                sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
+                localStorage.removeItem('newItem');
+                sessionStorage.removeItem('enhancedFrontImageSmall');
+                return window.location.href = '/private';
+            });
+        }
+    }
+    const initialPageSetup = async () => {
+        document.getElementById('itemImage').src = await getFrontImage();
+        document.getElementById('chatLink').onclick = () => Intercom('showNewMessage', `Värdering av item ${itemId || item.id}`);
+    }
+
+    initialPageSetup();
+    getMlValuation();
 </script>
