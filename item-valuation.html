@@ -1,0 +1,11 @@
+<script src="http://localhost:1234/itemValuation.js"></script>
+<script>
+    //checks if the parceled variable from itemValuation.js is undefined
+    //  - meaning local host isn't up and running
+    // if not, loads from the githack pages
+    if (typeof parceled === 'undefined') {
+        let script = document.createElement('script')
+        script.src = 'https://rawcdn.githack.com/SecondHandHelper/Webflow/test528/itemValuation.js';
+        document.head.appendChild(script)
+    }
+</script>
