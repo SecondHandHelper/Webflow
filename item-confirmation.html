@@ -1,0 +1,32 @@
+<script>
+
+    if (localStorage.getItem('latestItemCreated')) {
+        //IMAGES
+        const images = JSON.parse(localStorage.getItem('latestItemCreated'))?.images;
+        if (images) {
+            const imageUrl = images?.enhancedFrontImage || images?.frontImage;
+            // Add slide
+
+            console.log('images', images);
+            const slide = document.getElementById('frontImageSlide');
+            const cloneSlide = slide.cloneNode(true);
+            sliderMask.innerHTML = '';
+            for (const imageName in images) {
+                const newSlide = cloneSlide;
+                newSlide.id = imageName;
+                newSlide.firstChild.src = images[imageName];
+                sliderMask.appendChild(newSlide);
+            }
+        }
+        else { console.log('No images found from latest item'); }
+
+
+        //TEXT
+
+
+        //PLATFORMS
+
+    } else {
+        console.log('No latest item found');
+    }
+</script>
