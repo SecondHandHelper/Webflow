@@ -27,7 +27,11 @@
         const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({ itemId, item });
         const { minPrice, maxPrice, decline, humanCheckNeeded, willNotSell } = res.data;
         if (!minPrice || humanCheckNeeded) {
-            return window.location.replace('/item-confirmation');
+            if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+                return window.location.replace('/sign-in');
+            } else {
+                return window.location.replace('/item-confirmation');
+            }
         }
         document.getElementById('loadingDiv').style.display = 'none';
         document.getElementById('valuationResultDiv').style.display = 'flex';
@@ -54,12 +58,26 @@
             });
         } else {
             document.getElementById('confirmButton').addEventListener('click', async () => {
-                await firebase.app().functions("europe-west1").httpsCallable('saveAcceptedValuation')({
-                    itemId,
-                    minPrice,
-                    maxPrice
-                });
-                return window.location.href = '/item-confirmation';
+                if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+                    const savedItem = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
+                    savedItem.infoRequests = {
+                        'price.response': 'Accepted',
+                        'price.status': 'Resolved',
+                        'price.minPrice': minPrice,
+                        'price.maxPrice': maxPrice,
+                    };
+                    savedItem.minPriceEstimate = minPrice;
+                    savedItem.maxPriceEstimate = maxPrice;
+                    sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify(savedItem));
+                    return window.location.href = '/sign-in';
+                } else {
+                    await firebase.app().functions("europe-west1").httpsCallable('saveAcceptedValuation')({
+                        itemId,
+                        minPrice,
+                        maxPrice
+                    });
+                    return window.location.href = '/item-confirmation';
+                }
             });
             document.getElementById('rejectButton').addEventListener('click', async () => {
                 if (itemId) {

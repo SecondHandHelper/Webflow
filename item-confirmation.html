@@ -1,32 +1,102 @@
 <script>
 
-    if (localStorage.getItem('latestItemCreated')) {
-        //IMAGES
-        const images = JSON.parse(localStorage.getItem('latestItemCreated'))?.images;
-        if (images) {
-            const imageUrl = images?.enhancedFrontImage || images?.frontImage;
-            // Add slide
-
-            console.log('images', images);
-            const slide = document.getElementById('frontImageSlide');
-            const cloneSlide = slide.cloneNode(true);
-            sliderMask.innerHTML = '';
-            for (const imageName in images) {
-                const newSlide = cloneSlide;
+    function initializeSlider(item) {
+        const images = item?.images;
+        document.getElementById('loadingDiv').style.display = 'none';
+        document.getElementById('slider').style.display = 'block';
+        document.getElementById('frontImageSlide').firstChild.src = sessionStorage.getItem('enhancedFrontImageSmall') ||
+            images.enhancedFrontImageSmall || images.enhancedFrontImageMedium || images.enhancedFrontImage ||
+            images.frontImageSmall || images.frontImage;
+        document.getElementById('brandTagSlide').firstChild.src = images.brandTagImage;
+        // Add slides for non-mandatory images
+        let addedImages = false;
+        for (const imageName of ['materialTagImage', 'defectImage', 'extraImage']) {
+            if (images[imageName]) {
+                const newSlide = document.getElementById('frontImageSlide').cloneNode(true);
                 newSlide.id = imageName;
-                newSlide.firstChild.src = images[imageName];
-                sliderMask.appendChild(newSlide);
+                newSlide.firstChild.src = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName];
+                document.getElementById('sliderMask').insertBefore(newSlide, document.getElementById('sliderMask').lastChild);
+                const newDot = document.getElementById('sliderDots').lastChild.cloneNode(true)
+                document.getElementById('sliderDots').appendChild(newDot);
+                addedImages = true;
             }
         }
-        else { console.log('No images found from latest item'); }
+        document.querySelector('#slider .left-arrow').addEventListener('click', () => {
+            if ()
+        });
+        document.querySelector('#slider .right-arrow').addEventListener('click', () => {
 
+        });
+        document.addEventListener('touchstart', e => {
+            touchstartX = e.changedTouches[0].screenX
+        });
 
-        //TEXT
+        document.addEventListener('touchend', e => {
+            touchendX = e.changedTouches[0].screenX
+            if (checkDirection() === 'left') {
 
+            }
+            if (checkDirection() === 'right') {
 
-        //PLATFORMS
+            }
+        });
+    }
 
+    let touchstartX = 0
+    let touchendX = 0
+
+    function checkDirection() {
+        if (touchendX < touchstartX) return 'left';
+        if (touchendX > touchstartX) return 'right';
+    }
+
+    function initializeTextFields(item) {
+        if (item.cleanedBrand) {
+            document.getElementById('itemTitle').innerText = item.cleanedBrand.trim() + "-" + item.category.toLowerCase();
+        } else {
+            document.getElementById('itemTitle').innerText = item.cleanedBrand.trim() + "-" + item.category.toLowerCase();
+        }
+        document.getElementById('itemPrice').innerText = item.minPriceEstimate ? `${item.minPriceEstimate - item.maxPriceEstimate} kr` : '';
+        document.getElementById('itemColor').innerText = item.color;
+        document.getElementById('itemSize').innerText = item.size;
+        document.getElementById('itemMaterial').innerText = item.material;
+        document.getElementById('itemCondition').innerText = item.condition = itemConditionText(item);
+        if (item.userComment) {
+            document.getElementById('itemCommentDiv').style.display = 'block';
+            document.getElementById('itemComment').innerText = item.userComment;
+        }
+        (item.platformsToBePublishedOn || []).forEach(platform => {
+            console.log(platform);
+            document.getElementById(`platform${platform}`).style.display = 'block';
+        });
+    }
+
+    function itemConditionText(item) {
+        if (item.condition === 'Använd, tecken på slitage' && (item.defects.length || item.defectDescription)) {
+            return `Anmärkning: ${item.defects ? item.defects + '.' : ''} ${item.defectDescription ? item.defectDescription + '.' : ''}`;
+        }
+        return item.condition;
+    }
+
+    function initializeButtons(item) {
+        document.getElementById('newItemButton').addEventListener('click', () => location.href = '/sell-item');
+        document.getElementById('editItemButton').addEventListener('click', () => location.href = `/sell-item?id=${item.id}`);
+    }
+
+    if (localStorage.getItem('latestItemCreated') || params.id) {
+        const item = JSON.parse(localStorage.getItem('latestItemCreated'));
+        // Show images from latestItemCreated to make it quick then fill in the rest from saved item since it contains
+        // more info
+        item && initializeSlider(item);
+        firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: item?.id || params.id })
+            .then(response => {
+                item || initializeSlider(response.data); // Only set slider images if it is not already set from latestItemCreated
+                initializeTextFields(response.data);
+                initializeButtons(response.data);
+            })
+            .catch(e => console.error(e));
     } else {
         console.log('No latest item found');
+        locaction.href = '/private';
     }
 </script>

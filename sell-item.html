@@ -89,7 +89,7 @@
                 if (shippingMethod) {
                     await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
                 }
-                return await nextStep({ itemCreatedFromPrefill: true });
+                return await nextStep();
             } else {
                 // otherwise make sure to remove any previously saved item as a precaution
                 sessionStorage.removeItem('itemToBeCreatedAfterSignIn');

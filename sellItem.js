@@ -146,6 +146,7 @@ async function addItemInner(id) {
     await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
     localStorage.removeItem('newItem');
     localStorage.removeItem('newItemImages');
+    item.id = id;
     localStorage.setItem('latestItemCreated', JSON.stringify(item));
   }
 
@@ -312,28 +313,8 @@ function isDefaultFormState(itemState) {
   return true;
 }
 
-async function nextStep(options) {
-  if (!authUser.current) {
-    // If user isn't logged in they will be taken through these steps:
-    // 1. Logg in or create account on the /sign-in page
-    // 2. Get back to /sell-item and continue normal flow (show address if no address, show confirmation div)
-    location.href = "/sign-in";
-    return
-  }
-  await nextStepSignedIn(options);
-}
-
-async function nextStepSignedIn(options) {
-  // Show item confirmation screen
-  if (localStorage.getItem('latestItemCreated')) {
-    const frontImage = JSON.parse(localStorage.getItem('latestItemCreated'))?.images?.enhancedFrontImage ||
-      JSON.parse(localStorage.getItem('latestItemCreated'))?.images?.frontImage;
-    if (frontImage) { itemConfirmationImage.style.backgroundImage = `url('${frontImage}')`; console.log("Found front image"); }
-    else { console.log("Couldn't find front image"); }
-  }
-  triggerShowItemConfirmation.click();
-  // Track with segment
-  analytics.track("Element Viewed", { elementID: "itemConfirmationScreen" });
+async function nextStep() {
+  location.href = '/item-valuation';
 }
 
 function fieldLabelToggle(labelId) {
