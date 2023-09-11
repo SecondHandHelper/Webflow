@@ -254,6 +254,7 @@ async function enhanceFrontImage(imageUrl) {
   if (enhancedImageUrls?.url) {
     rememberNewItemImageField('enhancedFrontImage', enhancedImageUrls.url);
     showImagePreview('frontImage', enhancedImageUrls.urlSmall);
+    sessionStorage.setItem('enhancedFrontImageSmall', enhancedImageUrls.urlSmall);
   }
   showDeleteImageIcon('frontImage');
   return enhancedImageUrls;
