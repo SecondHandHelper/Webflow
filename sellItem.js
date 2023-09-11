@@ -4,18 +4,40 @@ const imageElements = ["frontImage", "brandTagImage", "defectImage", "materialTa
 async function addItem(event) {
   const id = uuidv4();
   try {
+    document.getElementById('addItemFormDiv').style.display = 'none';
+    document.getElementById('loadingDiv').style.display = 'flex';
+    document.getElementById('creatingItemText').style.display = 'block';
     await addItemInner(id);
-
+    const nextStep = await getMlValuation(id);
     // Track with segment 'User Activated'
     if (userItemsCount === 0) {
       analytics.track('User Activated');
     }
-
-    await nextStep();
+    location.href = nextStep;
   } catch (e) {
     errorHandler.report(e);
     console.error('addItem failed', e);
   }
+}
+
+const getMlValuation = async (itemId) => {
+  const item = sessionStorage.getItem('itemToBeCreatedAfterSignIn');
+  if (!itemId && !item) {
+    console.error('No item and no itemId, unexpected!!');
+    return '/item-confirmation';
+  }
+  // const res = { data: { mlDsValuationLog: 'Success', newMaxPriceEstimate: 600, newMinPriceEstimate: 390 }};
+  const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});
+  const {minPrice, maxPrice, decline, humanCheckNeeded, willNotSell} = res.data;
+  if (!minPrice || humanCheckNeeded) {
+    if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+      return '/sign-in';
+    } else {
+      return '/item-confirmation';
+    }
+  }
+  sessionStorage.setItem('itemValuation', JSON.stringify({ minPrice, maxPrice, decline, humanCheckNeeded, willNotSell }));
+  return '/item-confirmation'
 }
 
 function defaultFormState() {
@@ -311,10 +333,6 @@ function isDefaultFormState(itemState) {
     }
   }
   return true;
-}
-
-async function nextStep() {
-  location.href = '/item-valuation';
 }
 
 function fieldLabelToggle(labelId) {
