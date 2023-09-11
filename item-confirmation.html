@@ -4,50 +4,27 @@
         const images = item?.images;
         document.getElementById('loadingDiv').style.display = 'none';
         document.getElementById('slider').style.display = 'block';
-        document.getElementById('frontImageSlide').firstChild.src = sessionStorage.getItem('enhancedFrontImageSmall') ||
+
+        const slide = document.getElementById('frontImageSlide');
+        const cloneSlide = slide.cloneNode(true);
+        const sliderMask = document.getElementById('sliderMask');
+        sliderMask.innerHTML = '';
+
+        const frontImageSlide = cloneSlide.cloneNode(true);
+        frontImageSlide.firstChild.src = sessionStorage.getItem('enhancedFrontImageSmall') ||
             images.enhancedFrontImageSmall || images.enhancedFrontImageMedium || images.enhancedFrontImage ||
             images.frontImageSmall || images.frontImage;
-        document.getElementById('brandTagSlide').firstChild.src = images.brandTagImage;
-        // Add slides for non-mandatory images
-        let addedImages = false;
-        for (const imageName of ['materialTagImage', 'defectImage', 'extraImage']) {
+        frontImageSlide.id = 'frontImage';
+        sliderMask.appendChild(frontImageSlide);
+        // Add slides for all other images
+        for (const imageName of ['brandTagImage', 'materialTagImage', 'defectImage', 'extraImage']) {
             if (images[imageName]) {
-                const newSlide = document.getElementById('frontImageSlide').cloneNode(true);
+                const newSlide = cloneSlide.cloneNode(true);
                 newSlide.id = imageName;
                 newSlide.firstChild.src = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName];
-                document.getElementById('sliderMask').insertBefore(newSlide, document.getElementById('sliderMask').lastChild);
-                const newDot = document.getElementById('sliderDots').lastChild.cloneNode(true)
-                document.getElementById('sliderDots').appendChild(newDot);
-                addedImages = true;
+                sliderMask.appendChild(newSlide);
             }
         }
-        document.querySelector('#slider .left-arrow').addEventListener('click', () => {
-            if ()
-        });
-        document.querySelector('#slider .right-arrow').addEventListener('click', () => {
-
-        });
-        document.addEventListener('touchstart', e => {
-            touchstartX = e.changedTouches[0].screenX
-        });
-
-        document.addEventListener('touchend', e => {
-            touchendX = e.changedTouches[0].screenX
-            if (checkDirection() === 'left') {
-
-            }
-            if (checkDirection() === 'right') {
-
-            }
-        });
-    }
-
-    let touchstartX = 0
-    let touchendX = 0
-
-    function checkDirection() {
-        if (touchendX < touchstartX) return 'left';
-        if (touchendX > touchstartX) return 'right';
     }
 
     function initializeTextFields(item) {
