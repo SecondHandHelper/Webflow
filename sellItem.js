@@ -308,6 +308,7 @@ async function createItemAfterSignIn() {
   await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
   localStorage.removeItem('newItem');
   localStorage.removeItem('newItemImages');
+  itemFromStorage.item.id = itemFromStorage.id;
   localStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
 }
 

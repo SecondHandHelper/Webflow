@@ -43,7 +43,12 @@
             document.getElementById('itemComment').innerText = item.userComment;
         }
         (item.platformsToBePublishedOn || []).forEach(platform => {
-            document.getElementById(`platform${platform}`).style.display = 'block';
+            if (!platform.match(/Mai|Tradera/)) {
+                const newNode = document.getElementById('platformMai').cloneNode(true);
+                newNode.id = platform;
+                newNode.innerText = platform;
+                document.getElementById('platformMai').parentNode.appendChild(newNode);
+            }
         });
     }
 
