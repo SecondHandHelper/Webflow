@@ -61,7 +61,6 @@
 
     function initializeButtons(item) {
         document.getElementById('newItemButton').addEventListener('click', () => location.href = '/sell-item');
-        document.getElementById('editItemButton').addEventListener('click', () => location.href = `/sell-item?id=${item.id}`);
     }
 
     if (localStorage.getItem('latestItemCreated') || params.id) {

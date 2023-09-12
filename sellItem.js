@@ -50,7 +50,7 @@ const getMlValuation = async (itemId) => {
           item: { ...item, ...valuationData } })
         );
       } else {
-        await firebase.app().functions("europe-west1").httpsCallable('saveItemValuation')({ itemId, ...valuationData });
+        await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
       }
       return nextStepAfterMlValuation();
     }
