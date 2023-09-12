@@ -43,7 +43,6 @@
             document.getElementById('itemComment').innerText = item.userComment;
         }
         (item.platformsToBePublishedOn || []).forEach(platform => {
-            console.log(platform);
             document.getElementById(`platform${platform}`).style.display = 'block';
         });
     }
