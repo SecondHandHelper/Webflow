@@ -11,7 +11,7 @@
     }
 
     const getFrontImage = async () => {
-        const item = sessionStorage.getItem('itemToBeCreatedAfterSignIn');
+        const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')).item;
         const itemId = params.id;
         return sessionStorage.getItem('enhancedFrontImageSmall') || item?.images?.enhancedFrontImage ||
             (await getItem(itemId)).images.enhancedFrontImageSmall || (await getItem(itemId)).images.enhancedFrontImage;
@@ -53,14 +53,14 @@
             document.getElementById('confirmButton').addEventListener('click', async () => {
                 if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
                     const savedItem = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
-                    savedItem.infoRequests = {
+                    savedItem.item.infoRequests = {
                         'price.response': 'Accepted',
                         'price.status': 'Resolved',
                         'price.minPrice': minPrice,
                         'price.maxPrice': maxPrice,
                     };
-                    savedItem.minPriceEstimate = minPrice;
-                    savedItem.maxPriceEstimate = maxPrice;
+                    savedItem.item.minPriceEstimate = minPrice;
+                    savedItem.item.maxPriceEstimate = maxPrice;
                     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify(savedItem));
                     return window.location.href = '/sign-in';
                 } else {
@@ -91,7 +91,7 @@
 
     const getMlValuation = async () => {
         const itemId = params.id;
-        const item = sessionStorage.getItem('itemToBeCreatedAfterSignIn');
+        const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')).item;
         if (!itemId && !item) {
             return window.location.href = '/private';
         }

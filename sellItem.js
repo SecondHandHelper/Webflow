@@ -47,7 +47,10 @@ const getMlValuation = async (itemId) => {
         'mlDsModelVersion': version.toString()
       }
       if (item) {
-        sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ ...item, ...valuationData }));
+        sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
+          itemId: JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')).itemId,
+          item: { ...item, ...valuationData } })
+        );
       } else {
         await firebase.app().functions("europe-west1").httpsCallable('saveItemValuation')({ itemId, ...valuationData });
       }
