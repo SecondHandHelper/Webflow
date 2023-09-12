@@ -1142,7 +1142,7 @@ const partsMatch = (s0, s1) => {
 };
 
 function getMaiMaterial(item) {
-  const materials = item.material?.toLowerCase()?.trim().split(/\s+/);
+  const materials = item.material?.toLowerCase()?.trim().split(/\s*,?\s+/);
   if (!materials?.length) return null;
   const match = materials.find(material => {
     if (!material || material.length <= 1) return false;
