@@ -32,9 +32,23 @@ const getMlValuation = async (itemId) => {
   }
   try {
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});
-    const {minPrice, maxPrice, decline, humanCheckNeeded, willNotSell} = res.data;
+    const { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version } = res.data;
     if (!minPrice || humanCheckNeeded) {
-      // TODO: Var ska vi spara ml värderingen om vi har en men humanCheckNeeded är satt?
+      const valuationData = {
+        'mlDsDecline': decline,
+        'mlDsHumanCheckNeeded': humanCheckNeeded,
+        'mlDsHumanCheckExplanation': humanCheckExplanation ? humanCheckExplanation.join(', ') : null,
+        'mlDsMinPriceEstimate': minPrice,
+        'mlDsMaxPriceEstimate': maxPrice,
+        'mlDsWillNotSellPrediction': willNotSell,
+        'mlDsSoldPriceEstimate': soldPrice,
+        'mlDsModelVersion': version.toString()
+      }
+      if (item) {
+        sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ ...item, ...valuationData }));
+      } else {
+        await firebase.app().functions("europe-west1").httpsCallable('saveItemValuation')({ itemId, ...valuationData });
+      }
       return nextStepAfterMlValuation();
     }
     sessionStorage.setItem('itemValuation', JSON.stringify({
