@@ -27,6 +27,9 @@ const getMlValuation = async (itemId) => {
     return '/item-confirmation';
   }
   // const res = { data: { mlDsValuationLog: 'Success', newMaxPriceEstimate: 600, newMinPriceEstimate: 390 }};
+  if (item && !item.maiMaterial) {
+    item.maiMaterial = getMaiMaterial(item);
+  }
   const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});
   const {minPrice, maxPrice, decline, humanCheckNeeded, willNotSell} = res.data;
   if (!minPrice || humanCheckNeeded) {
@@ -1091,6 +1094,197 @@ async function initializeCategorySelect() {
     }, 50);
   });
 }
+
+const BLACK_LIST = ['se', 'bild', 'vet', 'ej', 'flätad', 'klack', 'överdel', 'grovt', 'hälrem', 'vind', 'och', 'vattentålig', 'utsida', 'tillverkad', 'av', 'woolrichs', 'signatur', 'blandning', 'avslutad', 'med', 'en', 'speciell', 'teflonbeläggning', 'för', 'extra', 'skydd', 'ankdun', 'vadderingen', 'avtagbar', 'tvättbjörnspäls', 'på', 'luvan'];
+
+const blackListSet = new Set(BLACK_LIST);
+
+const blackListed = (s) => blackListSet.has(s?.toLowerCase());
+
+const partsMatch = (s0, s1) => {
+  return !blackListed(s0) && !blackListed(s1) && (s0.indexOf(s1) > -1 || s1.indexOf(s0) > -1);
+};
+
+function getMaiMaterial(item) {
+  const material = item.material?.toLowerCase()?.trim();
+  if (!material || material.length <= 1) return null;
+  const match = maiMaterials.find(({ name, words }) => {
+    if (material === 'ull' && name === 'Cotton') return null; // Special case!
+    return [name, ...words].find((word) => {
+      const w = word?.toLowerCase() || '';
+      return (partsMatch(w, partLowercase)) ? name : '';
+    });
+  });
+  return match || null;
+}
+
+const maiMaterials = [
+  {
+    "id": "selgdlc4B1zgu9mlA",
+    "name": "Cashmere",
+    "words": ["kashmir", "kaschmir"]
+  },
+  {
+    "id": "selt2pAmVBnZ39qM2",
+    "name": "Cotton",
+    "words": ["bomull"]
+  },
+  {
+    "id": "selKuQUkJMxcjMUqt",
+    "name": "Leather",
+    "words": ["läder", "skinn"]
+  },
+  {
+    "id": "sel23NBtqvBHJk78G",
+    "name": "Exotic leathers",
+    "words": ["exotiskt läder", "exotiskt skinn"]
+  },
+  {
+    "id": "selFcI7M3LJgLAjox",
+    "name": "Denim - Jeans",
+    "words": ["twill", "jeans"]
+  },
+  {
+    "id": "selIhCRlvkNKKMUUr",
+    "name": "Spandex",
+    "words": []
+  },
+  {
+    "id": "selxhEtnyAXM4ACsq",
+    "name": "Wool",
+    "words": ["ull", "ylle", "alpaca", "merino"]
+  },
+  {
+    "id": "selKSXPlNux42EfA9",
+    "name": "Linen",
+    "words": ["linne"]
+  },
+  {
+    "id": "sel67FYak6CsTk4jr",
+    "name": "Patent leather",
+    "words": ["lackat läder", "konstläder", "lackläder", "lackat skinn"]
+  },
+  {
+    "id": "selnsZKTprFfdpbpL",
+    "name": "Plastic",
+    "words": ["plast", "av plast"]
+  },
+  {
+    "id": "sel8yyj30LsADDnFx",
+    "name": "Polyester",
+    "words": ["ployester", "polyster", "polyamid", "polamid"]
+  },
+  {
+    "id": "selBcoAapTVv0zATJ",
+    "name": "Rubber",
+    "words": ["gummi", "av gummi", "gummiband"]
+  },
+  {
+    "id": "seliYLcDX1mwC8LV1",
+    "name": "Silk",
+    "words": ["siden", "silke"]
+  },
+  {
+    "id": "sel12c4p1edN9vlJS",
+    "name": "Suede",
+    "words": ["mocka", "mocca"]
+  },
+  {
+    "id": "selE8vZST4IiS6GQW",
+    "name": "Synthetic",
+    "words": ["syntetisk", "syntetiska", "syntetiskt", "acryl", "akryl", "lyocell", "nylon", "elestan", "rayon", "acetat", "gore"]
+  },
+  {
+    "id": "selvDLHRONrlhlt5R",
+    "name": "Cloth",
+    "words": []
+  },
+  {
+    "id": "seleLvSJq0ZKuQlKV",
+    "name": "Velvet",
+    "words": ["sammet", "sammetsväv"]
+  },
+  {
+    "id": "selgREajUjUk3flrO",
+    "name": "Viscose",
+    "words": ["viskos"]
+  },
+  {
+    "id": "selJgx9Y5xvyeeUAJ",
+    "name": "Tweed",
+    "words": []
+  },
+  {
+    "id": "selHldRLi8o3USJ80",
+    "name": "Faux fur",
+    "words": ["fuskpäls", "imitationspäls"]
+  },
+  {
+    "id": "selOl9VjI6qQBBzB9",
+    "name": "Fur",
+    "words": ["päls"]
+  },
+  {
+    "id": "selsHi8HpO2EMmGlC",
+    "name": "Glitter",
+    "words": []
+  },
+  {
+    "id": "selfN2I0IR0LPoX26",
+    "name": "Sponge",
+    "words": ["svamp"]
+  },
+  {
+    "id": "seld9hDGKjA7JNje7",
+    "name": "White gold",
+    "words": ["vitt guld"]
+  },
+  {
+    "id": "selsGCyjVIcgNpNm3",
+    "name": "Yellow gold",
+    "words": ["gult guld"]
+  },
+  {
+    "id": "selQWYSJF3XR3wGAC",
+    "name": "Pink gold",
+    "words": ["rosa guld", "roséguld"]
+  },
+  {
+    "id": "selN5o1szUKuAk47p",
+    "name": "Gold plated",
+    "words": ["guldpläterad", "förgylld"]
+  },
+  {
+    "id": "sel1V9oOI0UrPI8um",
+    "name": "Silver",
+    "words": []
+  },
+  {
+    "id": "selAwYRPXIBUfseOT",
+    "name": "Silver Plated",
+    "words": ["silverpläterad", "silverpläterat"]
+  },
+  {
+    "id": "seljnrN35XuczyPMV",
+    "name": "Metal",
+    "words": ["metall"]
+  },
+  {
+    "id": "selIfTH2wkuWLXvKw",
+    "name": "Steel",
+    "words": ["stål"]
+  },
+  {
+    "id": "selVbpscPPj0e6RSP",
+    "name": "Wood",
+    "words": ["trä"]
+  },
+  {
+    "id": "sel47FuFUekEVcyzW",
+    "name": "Other",
+    "words": ["annat"]
+  }
+]
 
 const itemCategories = [
   {
