@@ -1144,17 +1144,20 @@ const partsMatch = (s0, s1) => {
 function getMaiMaterial(item) {
   const materials = item.material?.toLowerCase()?.trim().split(/\s*,?\s+/);
   if (!materials?.length) return null;
-  const match = materials.find(material => {
-    if (!material || material.length <= 1) return false;
-    return maiMaterials.find(({ name, words }) => {
-      if (material === 'ull' && name === 'Cotton') return null; // Special case!
+  for (const material of materials) {
+    if (material?.length <= 1) return false;
+    const match = maiMaterials.find(({ name, words }) => {
+      if (material === 'ull' && name === 'Cotton') return false; // Special case!
       return [name, ...words].find((word) => {
         const w = word?.toLowerCase() || '';
-        return (partsMatch(w, material)) ? name : '';
+        return partsMatch(w, material);
       });
     });
-  });
-  return match?.name;
+    if (match?.name) {
+      return match?.name;
+    }
+  }
+  return null;
 }
 
 const maiMaterials = [
