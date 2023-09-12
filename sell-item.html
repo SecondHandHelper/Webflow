@@ -103,7 +103,8 @@
     }
 
     async function sellItemMain() {
-      localStorage.removeItem('latestItemCreated');
+        localStorage.removeItem('latestItemCreated');
+        sessionStorage.removeItem('itemValuation');
         await initializeCategorySelect();
         await initializeColorConfirm();
         await initializeBrandConfirm();

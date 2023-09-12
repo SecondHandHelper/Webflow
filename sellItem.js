@@ -6,9 +6,7 @@ async function addItem(event) {
   try {
     document.getElementById('addItemFormDiv').style.display = 'none';
     document.getElementById('loadingDiv').style.display = 'flex';
-    document.getElementById('creatingItemText').style.display = 'block';
     document.getElementById('clearItemForm').style.display = 'none';
-    document.getElementById('goBack').style.display = 'none';
     await addItemInner(id);
     const nextStep = await getMlValuation(id);
     // Track with segment 'User Activated'
