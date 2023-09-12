@@ -30,17 +30,34 @@ const getMlValuation = async (itemId) => {
   if (item && !item.maiMaterial) {
     item.maiMaterial = getMaiMaterial(item);
   }
-  const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});
-  const {minPrice, maxPrice, decline, humanCheckNeeded, willNotSell} = res.data;
-  if (!minPrice || humanCheckNeeded) {
-    if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-      return '/sign-in';
-    } else {
-      return '/item-confirmation';
+  try {
+    const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});
+    const {minPrice, maxPrice, decline, humanCheckNeeded, willNotSell} = res.data;
+    if (!minPrice || humanCheckNeeded) {
+      // TODO: Var ska vi spara ml värderingen om vi har en men humanCheckNeeded är satt?
+      return nextStepAfterMlValuation();
     }
+    sessionStorage.setItem('itemValuation', JSON.stringify({
+      minPrice,
+      maxPrice,
+      decline,
+      humanCheckNeeded,
+      willNotSell
+    }));
+  } catch (e) {
+    console.error('Failed to get ml valuation', e);
   }
-  sessionStorage.setItem('itemValuation', JSON.stringify({ minPrice, maxPrice, decline, humanCheckNeeded, willNotSell }));
-  return '/item-confirmation'
+  return nextStepAfterMlValuation();
+}
+
+function nextStepAfterMlValuation() {
+  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+    return '/sign-in';
+  }
+  if (sessionStorage.getItem('itemValuation')) {
+    return '/item-valuation';
+  }
+  return '/item-confirmation';
 }
 
 function defaultFormState() {
