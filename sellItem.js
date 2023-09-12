@@ -1139,16 +1139,19 @@ const partsMatch = (s0, s1) => {
 };
 
 function getMaiMaterial(item) {
-  const material = item.material?.toLowerCase()?.trim();
-  if (!material || material.length <= 1) return null;
-  const match = maiMaterials.find(({ name, words }) => {
-    if (material === 'ull' && name === 'Cotton') return null; // Special case!
-    return [name, ...words].find((word) => {
-      const w = word?.toLowerCase() || '';
-      return (partsMatch(w, material)) ? name : '';
+  const materials = item.material?.toLowerCase()?.trim().split(/\s+/);
+  if (!materials?.length) return null;
+  const match = materials.find(material => {
+    if (!material || material.length <= 1) return false;
+    return maiMaterials.find(({ name, words }) => {
+      if (material === 'ull' && name === 'Cotton') return null; // Special case!
+      return [name, ...words].find((word) => {
+        const w = word?.toLowerCase() || '';
+        return (partsMatch(w, material)) ? name : '';
+      });
     });
   });
-  return match || null;
+  return match?.name;
 }
 
 const maiMaterials = [
