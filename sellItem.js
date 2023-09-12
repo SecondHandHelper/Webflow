@@ -48,7 +48,7 @@ const getMlValuation = async (itemId) => {
       }
       if (item) {
         sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
-          itemId: JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')).itemId,
+          id: JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')).id,
           item: { ...item, ...valuationData } })
         );
       } else {
