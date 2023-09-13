@@ -814,6 +814,9 @@ async function extraImageChangeHandler(event) {
 
 function clearConfirmButtonValidity(event) {
   event.currentTarget.setCustomValidity('');
+  const suggestButtons = event.currentTarget.parentNode.querySelector('.suggest-buttons') ||
+      event.currentTarget.parentNode.parentNode.querySelector('.suggest-buttons');
+  suggestButtons.style.display = 'none';
 }
 
 async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
