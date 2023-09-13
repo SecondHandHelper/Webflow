@@ -20,7 +20,7 @@ async function addItem(event) {
   }
 }
 
-async function saveItemValuation({ minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version }) {
+async function saveItemValuation(itemId, { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version }) {
   const valuationData = {
     'mlDsDecline': decline,
     'mlDsHumanCheckNeeded': humanCheckNeeded,
@@ -55,7 +55,7 @@ const getMlValuation = async (itemId) => {
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});
     const { minPrice, maxPrice, decline, humanCheckNeeded, willNotSell } = res.data;
     if (!minPrice || humanCheckNeeded) {
-      saveItemValuation(res.data);
+      await saveItemValuation(itemId, res.data);
       return nextStepAfterMlValuation();
     }
     sessionStorage.setItem('itemValuation', JSON.stringify({

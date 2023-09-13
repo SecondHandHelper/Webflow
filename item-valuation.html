@@ -97,7 +97,7 @@
         const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({ itemId });
         const { minPrice, humanCheckNeeded } = res.data;
         if (!minPrice || humanCheckNeeded) {
-            saveItemValuation(res.data);
+            await saveItemValuation(itemId, res.data);
         }
         showMlValuation(res.data);
     }
