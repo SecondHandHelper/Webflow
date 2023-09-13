@@ -22,14 +22,22 @@ async function addItem(event) {
 
 async function saveItemValuation(itemId, { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version }) {
   const valuationData = {
-    'mlDsDecline': decline,
-    'mlDsHumanCheckNeeded': humanCheckNeeded,
-    'mlDsHumanCheckExplanation': humanCheckExplanation ? humanCheckExplanation.join(', ') : null,
-    'mlDsMinPriceEstimate': minPrice,
-    'mlDsMaxPriceEstimate': maxPrice,
-    'mlDsWillNotSellPrediction': willNotSell,
-    'mlDsSoldPriceEstimate': soldPrice,
-    'mlDsModelVersion': version?.toString()
+    mlDsDecline: decline,
+    mlDsHumanCheckNeeded: humanCheckNeeded,
+    mlDsHumanCheckExplanation: humanCheckExplanation ? humanCheckExplanation.join(', ') : null,
+    mlDsMinPriceEstimate: minPrice,
+    mlDsMaxPriceEstimate: maxPrice,
+    mlDsWillNotSellPrediction: willNotSell,
+    mlDsSoldPriceEstimate: soldPrice,
+    mlDsModelVersion: version?.toString(),
+    newMinPriceEstimate: minPrice,
+    newMaxPriceEstimate: maxPrice,
+    ...(decline ? {} : {
+      'infoRequests.price.status': 'Active',
+      'infoRequests.price.description': 'Värderingen utgår från vad liknande plagg sålts för nyligen. Vi börjar alltid i den övre delen av spannet och sänker successivt inom intervallet under säljperioden på 30 dagar.',
+      'infoRequests.price.minPrice': minPrice,
+      'infoRequests.price.maxPrice': maxPrice,
+    })
   }
   if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({

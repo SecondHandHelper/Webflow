@@ -66,11 +66,12 @@
         return item.condition;
     }
 
-    function initializeButtons(item) {
+    function initializeButtons() {
         document.getElementById('newItemButton').addEventListener('click', () => location.href = '/sell-item');
     }
 
     if (localStorage.getItem('latestItemCreated') || params.id) {
+        document.getElementById('closeIcon').addEventListener('click', () => location.href = '/private');
         const item = JSON.parse(localStorage.getItem('latestItemCreated'));
         // Show images from latestItemCreated to make it quick then fill in the rest from saved item since it contains
         // more info
@@ -79,7 +80,7 @@
             .then(response => {
                 item || initializeSlider(response.data); // Only set slider images if it is not already set from latestItemCreated
                 initializeTextFields(response.data);
-                initializeButtons(response.data);
+                initializeButtons();
             })
             .catch(e => console.error(e));
     } else {

@@ -20,12 +20,10 @@
     const acceptValuation = async (itemId, minPrice, maxPrice) => {
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
             const savedItem = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
-            savedItem.item.infoRequests = {
-                'price.response': 'Accepted',
-                'price.status': 'Resolved',
-                'price.minPrice': minPrice,
-                'price.maxPrice': maxPrice,
-            };
+            savedItem.item['infoRequests.price.response'] = 'Accepted';
+            savedItem.item['infoRequests.price.status'] = 'Resolved';
+            savedItem.item['infoRequests.price.minPrice'] = minPrice;
+            savedItem.item['infoRequests.price.maxPrice'] = maxPrice;
             savedItem.item.minPriceEstimate = minPrice;
             savedItem.item.maxPriceEstimate = maxPrice;
             sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify(savedItem));
@@ -63,8 +61,16 @@
             document.getElementById('deniedText').style.display = 'block';
             document.getElementById('rejectButton').style.display = 'none';
             document.getElementById('confirmButton').innerText = 'Okej'
+            document.getElementById('newItemButton').style.display = 'block';
             document.getElementById('declineExplanation').style.display = 'block';
             document.getElementById('valuationExplanation').style.display = 'none';
+            document.getElementById('newItemButton').addEventListener('click', async () => {
+                sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
+                localStorage.removeItem('newItem');
+                sessionStorage.removeItem('enhancedFrontImageSmall');
+                sessionStorage.removeItem('itemValuation');
+                window.location.href = '/sell-item';
+            });
             document.getElementById('confirmButton').addEventListener('click', async () => {
                 if (itemId) {
                     await firebase.app().functions("europe-west1").httpsCallable('markItemRejected')({ itemId, minPrice, maxPrice, userDecline: false });
@@ -72,7 +78,8 @@
                 sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
                 localStorage.removeItem('newItem');
                 sessionStorage.removeItem('enhancedFrontImageSmall');
-                return window.location.href = '/private';
+                sessionStorage.removeItem('itemValuation');
+                window.location.href = '/private';
             });
         } else {
             document.getElementById('confirmButton').addEventListener('click', () => acceptValuation(itemId, minPrice, maxPrice));
