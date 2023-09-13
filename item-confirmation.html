@@ -73,6 +73,9 @@
     if (localStorage.getItem('latestItemCreated') || params.id) {
         document.getElementById('closeIcon').addEventListener('click', () => location.href = '/private');
         const item = JSON.parse(localStorage.getItem('latestItemCreated'));
+        if (item.mlDsHumanCheckNeeded || !item.mlDsMinPriceEstimate) {
+            document.getElementById('nextStepText').innerText = 'Du kommer få ett SMS när vi värderat plagget som du får ta ställning till.';
+        }
         // Show images from latestItemCreated to make it quick then fill in the rest from saved item since it contains
         // more info
         item && initializeSlider(item);
