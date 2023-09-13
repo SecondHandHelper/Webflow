@@ -706,7 +706,6 @@ function formatPersonalId(personalIdInput) {
             personalId = "20" + personalId;
         }
     }
-    console.log(personalId);
     if (personalId.length === 12) {
         return personalId;
     }

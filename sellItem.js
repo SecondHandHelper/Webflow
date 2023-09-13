@@ -29,7 +29,7 @@ async function saveItemValuation(itemId, { minPrice, maxPrice, decline, humanChe
     'mlDsMaxPriceEstimate': maxPrice,
     'mlDsWillNotSellPrediction': willNotSell,
     'mlDsSoldPriceEstimate': soldPrice,
-    'mlDsModelVersion': version.toString()
+    'mlDsModelVersion': version?.toString()
   }
   if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
@@ -54,8 +54,8 @@ const getMlValuation = async (itemId) => {
   try {
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});
     const { minPrice, maxPrice, decline, humanCheckNeeded, willNotSell } = res.data;
+    await saveItemValuation(itemId, res.data);
     if (!minPrice || humanCheckNeeded) {
-      await saveItemValuation(itemId, res.data);
       return nextStepAfterMlValuation();
     }
     sessionStorage.setItem('itemValuation', JSON.stringify({
