@@ -37,9 +37,10 @@
         if (item.cleanedBrand) {
             document.getElementById('itemTitle').innerText = item.cleanedBrand.trim() + "-" + item.category.toLowerCase();
         } else {
-            document.getElementById('itemTitle').innerText = item.cleanedBrand.trim() + "-" + item.category.toLowerCase();
+            document.getElementById('itemTitle').innerText = item.brand.trim() + "-" + item.category.toLowerCase();
         }
-        document.getElementById('itemPrice').innerText = item.minPriceEstimate ? `${item.minPriceEstimate - item.maxPriceEstimate} kr` : '';
+        document.getElementById('itemPrice').innerText = item.maxPriceEstimate ? `${item.maxPriceEstimate} kr` : '';
+        document.getElementById('itemPrice').style.display = 'block';
         document.getElementById('itemColor').innerText = colorName(item.color);
         document.getElementById('itemSize').innerText = item.size;
         document.getElementById('itemMaterial').innerText = item.material;

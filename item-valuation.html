@@ -123,7 +123,7 @@
     const itemValuation = JSON.parse(sessionStorage.getItem('itemValuation'));
     if (itemValuation && !item?.preferences?.userValuationApproval) { // TODO: Funkar inte - har vi inget item?
         acceptValuation(item.id, itemValuation.minPrice, itemValuation.maxPrice)
-            .then(() => location.href = '/item-confirmatione')
+            .then(() => location.href = '/item-confirmation')
             .catch(() => location.href = '/item-confirmation');
     } else {
         initialPageSetup();
