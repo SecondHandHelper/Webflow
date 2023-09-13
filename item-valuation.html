@@ -11,27 +11,49 @@
     }
 
     const getFrontImage = async () => {
-        const item = sessionStorage.getItem('itemToBeCreatedAfterSignIn');
+        const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}')?.item;
         const itemId = params.id;
         return sessionStorage.getItem('enhancedFrontImageSmall') || item?.images?.enhancedFrontImage ||
             (await getItem(itemId)).images.enhancedFrontImageSmall || (await getItem(itemId)).images.enhancedFrontImage;
     }
 
-    const getMlValuation = async () => {
-        const itemId = params.id;
-        const item = sessionStorage.getItem('itemToBeCreatedAfterSignIn');
-        if (!itemId && !item) {
-            return window.location.href = '/private';
+    const acceptValuation = async (itemId, minPrice, maxPrice) => {
+        if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+            const savedItem = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
+            savedItem.item.infoRequests = {
+                'price.response': 'Accepted',
+                'price.status': 'Resolved',
+                'price.minPrice': minPrice,
+                'price.maxPrice': maxPrice,
+            };
+            savedItem.item.minPriceEstimate = minPrice;
+            savedItem.item.maxPriceEstimate = maxPrice;
+            sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify(savedItem));
+            return window.location.href = '/sign-in';
+        } else {
+            await firebase.app().functions("europe-west1").httpsCallable('saveAcceptedValuation')({
+                itemId,
+                minPrice,
+                maxPrice
+            });
+            return window.location.href = '/item-confirmation';
         }
-        // const res = { data: { mlDsValuationLog: 'Success', newMaxPriceEstimate: 600, newMinPriceEstimate: 390 }};
-        const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({ itemId, item });
-        const { minPrice, maxPrice, decline, humanCheckNeeded, willNotSell } = res.data;
+    }
+
+    const showMlValuation = (itemValuation) => {
+        const { minPrice, maxPrice, decline, humanCheckNeeded } = itemValuation;
+        const itemId = JSON.parse(localStorage.getItem('latestItemCreated') || '{}')?.id;
         if (!minPrice || humanCheckNeeded) {
-            return window.location.replace('/item-confirmation');
+            if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+                return window.location.replace('/sign-in');
+            } else {
+                return window.location.replace('/item-confirmation');
+            }
         }
         document.getElementById('loadingDiv').style.display = 'none';
         document.getElementById('valuationResultDiv').style.display = 'flex';
-        document.getElementById('valuationText').innerText = `${minPrice} - ${maxPrice} kr`;
+        document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
+        document.getElementById('valuationText').style.display = 'block';
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
             // Hide chat div for non-signed in users
             document.getElementById('chatDiv').style.display = 'none';
@@ -53,14 +75,7 @@
                 return window.location.href = '/private';
             });
         } else {
-            document.getElementById('confirmButton').addEventListener('click', async () => {
-                await firebase.app().functions("europe-west1").httpsCallable('saveAcceptedValuation')({
-                    itemId,
-                    minPrice,
-                    maxPrice
-                });
-                return window.location.href = '/item-confirmation';
-            });
+            document.getElementById('confirmButton').addEventListener('click', () => acceptValuation(itemId, minPrice, maxPrice));
             document.getElementById('rejectButton').addEventListener('click', async () => {
                 if (itemId) {
                     await firebase.app().functions("europe-west1").httpsCallable('markItemRejected')({
@@ -77,15 +92,46 @@
             });
         }
     }
+
+    const getMachineValuation = async (itemId) => {
+        const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({ itemId });
+        const { minPrice, humanCheckNeeded } = res.data;
+        if (!minPrice || humanCheckNeeded) {
+            await saveItemValuation(itemId, res.data);
+        }
+        showMlValuation(res.data);
+    }
+
     const initialPageSetup = async () => {
         document.getElementById('itemImage').src = await getFrontImage();
         document.getElementById('chatLink').onclick = () => Intercom('showNewMessage');
+        document.getElementById('valuationClose').addEventListener('click', () => {
+            sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
+            localStorage.removeItem('newItem');
+            sessionStorage.removeItem('enhancedFrontImageSmall');
+            return window.location.href = '/private';
+        })
     }
     window.intercomSettings = {
         app_id: "klyy0le5"
     };
     (function () { var w = window; var ic = w.Intercom; if (typeof ic === "function") { ic('reattach_activator'); ic('update', w.intercomSettings); } else { var d = document; var i = function () { i.c(arguments); }; i.q = []; i.c = function (args) { i.q.push(args); }; w.Intercom = i; var l = function () { var s = d.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = 'https://widget.intercom.io/widget/klyy0le5'; var x = d.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x); }; if (w.attachEvent) { w.attachEvent('onload', l); } else { w.addEventListener('load', l, false); } } })();
     Intercom('update', { 'hide_default_launcher': true });
-    initialPageSetup();
-    getMlValuation();
+
+    const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}')?.item ||
+        JSON.parse(localStorage.getItem('latestItemCreated') || '{}');
+    const itemValuation = JSON.parse(sessionStorage.getItem('itemValuation'));
+    if (itemValuation && !item?.preferences?.userValuationApproval) { // TODO: Funkar inte - har vi inget item?
+        acceptValuation(item.id, itemValuation.minPrice, itemValuation.maxPrice)
+            .then(() => location.href = '/item-confirmation')
+            .catch(() => location.href = '/item-confirmation');
+    } else {
+        initialPageSetup();
+        if (params.id) {
+            getMachineValuation(params.id);
+        }
+        if (sessionStorage.getItem('itemValuation')) {
+            showMlValuation(JSON.parse(sessionStorage.getItem('itemValuation')));
+        }
+    }
 </script>

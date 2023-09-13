@@ -4,18 +4,81 @@ const imageElements = ["frontImage", "brandTagImage", "defectImage", "materialTa
 async function addItem(event) {
   const id = uuidv4();
   try {
+    document.getElementById('addItemFormDiv').style.display = 'none';
+    document.getElementById('loadingDiv').style.display = 'flex';
+    document.getElementById('clearItemForm').style.display = 'none';
     await addItemInner(id);
-
+    const nextStep = await getMlValuation(id);
     // Track with segment 'User Activated'
     if (userItemsCount === 0) {
       analytics.track('User Activated');
     }
-
-    await nextStep();
+    location.href = nextStep;
   } catch (e) {
     errorHandler.report(e);
     console.error('addItem failed', e);
   }
+}
+
+async function saveItemValuation(itemId, { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version }) {
+  const valuationData = {
+    'mlDsDecline': decline,
+    'mlDsHumanCheckNeeded': humanCheckNeeded,
+    'mlDsHumanCheckExplanation': humanCheckExplanation ? humanCheckExplanation.join(', ') : null,
+    'mlDsMinPriceEstimate': minPrice,
+    'mlDsMaxPriceEstimate': maxPrice,
+    'mlDsWillNotSellPrediction': willNotSell,
+    'mlDsSoldPriceEstimate': soldPrice,
+    'mlDsModelVersion': version.toString()
+  }
+  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+    sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
+      id: JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')).id,
+      item: { ...item, ...valuationData } })
+    );
+  } else {
+    await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
+  }
+}
+
+const getMlValuation = async (itemId) => {
+  const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}')?.item;
+  if (!itemId && !item) {
+    console.error('No item and no itemId, unexpected!!');
+    return '/item-confirmation';
+  }
+  // const res = { data: { mlDsValuationLog: 'Success', newMaxPriceEstimate: 600, newMinPriceEstimate: 390 }};
+  if (item && !item.maiMaterial) {
+    item.maiMaterial = getMaiMaterial(item);
+  }
+  try {
+    const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});
+    const { minPrice, maxPrice, decline, humanCheckNeeded, willNotSell } = res.data;
+    if (!minPrice || humanCheckNeeded) {
+      await saveItemValuation(itemId, res.data);
+      return nextStepAfterMlValuation();
+    }
+    sessionStorage.setItem('itemValuation', JSON.stringify({
+      minPrice,
+      maxPrice,
+      decline,
+      humanCheckNeeded,
+      willNotSell
+    }));
+  } catch (e) {
+    console.error('Failed to get ml valuation', e);
+  }
+  return nextStepAfterMlValuation();
+}
+
+function nextStepAfterMlValuation() {
+  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+    return '/sign-in';
+  }
+  if (sessionStorage.getItem('itemValuation')) {
+    return '/item-valuation';
+  }
+  return '/item-confirmation';
 }
 
 function defaultFormState() {
@@ -146,6 +209,7 @@ async function addItemInner(id) {
     await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
     localStorage.removeItem('newItem');
     localStorage.removeItem('newItemImages');
+    item.id = id;
     localStorage.setItem('latestItemCreated', JSON.stringify(item));
   }
 
@@ -246,6 +310,7 @@ async function createItemAfterSignIn() {
   await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
   localStorage.removeItem('newItem');
   localStorage.removeItem('newItemImages');
+  itemFromStorage.item.id = itemFromStorage.id;
   localStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
 }
 
@@ -310,30 +375,6 @@ function isDefaultFormState(itemState) {
     }
   }
   return true;
-}
-
-async function nextStep(options) {
-  if (!authUser.current) {
-    // If user isn't logged in they will be taken through these steps:
-    // 1. Logg in or create account on the /sign-in page
-    // 2. Get back to /sell-item and continue normal flow (show address if no address, show confirmation div)
-    location.href = "/sign-in";
-    return
-  }
-  await nextStepSignedIn(options);
-}
-
-async function nextStepSignedIn(options) {
-  // Show item confirmation screen
-  if (localStorage.getItem('latestItemCreated')) {
-    const frontImage = JSON.parse(localStorage.getItem('latestItemCreated'))?.images?.enhancedFrontImage ||
-      JSON.parse(localStorage.getItem('latestItemCreated'))?.images?.frontImage;
-    if (frontImage) { itemConfirmationImage.style.backgroundImage = `url('${frontImage}')`; console.log("Found front image"); }
-    else { console.log("Couldn't find front image"); }
-  }
-  triggerShowItemConfirmation.click();
-  // Track with segment
-  analytics.track("Element Viewed", { elementID: "itemConfirmationScreen" });
 }
 
 function fieldLabelToggle(labelId) {
@@ -773,6 +814,9 @@ async function extraImageChangeHandler(event) {
 
 function clearConfirmButtonValidity(event) {
   event.currentTarget.setCustomValidity('');
+  const suggestButtons = event.currentTarget.parentNode.querySelector('.suggest-buttons') ||
+      event.currentTarget.parentNode.parentNode.querySelector('.suggest-buttons');
+  suggestButtons.style.display = 'none';
 }
 
 async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
@@ -1092,6 +1136,203 @@ async function initializeCategorySelect() {
     }, 50);
   });
 }
+
+const BLACK_LIST = ['se', 'bild', 'vet', 'ej', 'flätad', 'klack', 'överdel', 'grovt', 'hälrem', 'vind', 'och', 'vattentålig', 'utsida', 'tillverkad', 'av', 'woolrichs', 'signatur', 'blandning', 'avslutad', 'med', 'en', 'speciell', 'teflonbeläggning', 'för', 'extra', 'skydd', 'ankdun', 'vadderingen', 'avtagbar', 'tvättbjörnspäls', 'på', 'luvan'];
+
+const blackListSet = new Set(BLACK_LIST);
+
+const blackListed = (s) => blackListSet.has(s?.toLowerCase());
+
+const partsMatch = (s0, s1) => {
+  return !blackListed(s0) && !blackListed(s1) && (s0.indexOf(s1) > -1 || s1.indexOf(s0) > -1);
+};
+
+function getMaiMaterial(item) {
+  const materials = item.material?.toLowerCase()?.trim().split(/\s*,?\s+/);
+  if (!materials?.length) return null;
+  for (const material of materials) {
+    if (material?.length <= 1) return false;
+    const match = maiMaterials.find(({ name, words }) => {
+      if (material === 'ull' && name === 'Cotton') return false; // Special case!
+      return [name, ...words].find((word) => {
+        const w = word?.toLowerCase() || '';
+        return partsMatch(w, material);
+      });
+    });
+    if (match?.name) {
+      return match?.name;
+    }
+  }
+  return null;
+}
+
+const maiMaterials = [
+  {
+    "id": "selgdlc4B1zgu9mlA",
+    "name": "Cashmere",
+    "words": ["kashmir", "kaschmir"]
+  },
+  {
+    "id": "selt2pAmVBnZ39qM2",
+    "name": "Cotton",
+    "words": ["bomull"]
+  },
+  {
+    "id": "selKuQUkJMxcjMUqt",
+    "name": "Leather",
+    "words": ["läder", "skinn"]
+  },
+  {
+    "id": "sel23NBtqvBHJk78G",
+    "name": "Exotic leathers",
+    "words": ["exotiskt läder", "exotiskt skinn"]
+  },
+  {
+    "id": "selFcI7M3LJgLAjox",
+    "name": "Denim - Jeans",
+    "words": ["twill", "jeans"]
+  },
+  {
+    "id": "selIhCRlvkNKKMUUr",
+    "name": "Spandex",
+    "words": []
+  },
+  {
+    "id": "selxhEtnyAXM4ACsq",
+    "name": "Wool",
+    "words": ["ull", "ylle", "alpaca", "merino"]
+  },
+  {
+    "id": "selKSXPlNux42EfA9",
+    "name": "Linen",
+    "words": ["linne"]
+  },
+  {
+    "id": "sel67FYak6CsTk4jr",
+    "name": "Patent leather",
+    "words": ["lackat läder", "konstläder", "lackläder", "lackat skinn"]
+  },
+  {
+    "id": "selnsZKTprFfdpbpL",
+    "name": "Plastic",
+    "words": ["plast", "av plast"]
+  },
+  {
+    "id": "sel8yyj30LsADDnFx",
+    "name": "Polyester",
+    "words": ["ployester", "polyster", "polyamid", "polamid"]
+  },
+  {
+    "id": "selBcoAapTVv0zATJ",
+    "name": "Rubber",
+    "words": ["gummi", "av gummi", "gummiband"]
+  },
+  {
+    "id": "seliYLcDX1mwC8LV1",
+    "name": "Silk",
+    "words": ["siden", "silke"]
+  },
+  {
+    "id": "sel12c4p1edN9vlJS",
+    "name": "Suede",
+    "words": ["mocka", "mocca"]
+  },
+  {
+    "id": "selE8vZST4IiS6GQW",
+    "name": "Synthetic",
+    "words": ["syntetisk", "syntetiska", "syntetiskt", "acryl", "akryl", "lyocell", "nylon", "elestan", "rayon", "acetat", "gore"]
+  },
+  {
+    "id": "selvDLHRONrlhlt5R",
+    "name": "Cloth",
+    "words": []
+  },
+  {
+    "id": "seleLvSJq0ZKuQlKV",
+    "name": "Velvet",
+    "words": ["sammet", "sammetsväv"]
+  },
+  {
+    "id": "selgREajUjUk3flrO",
+    "name": "Viscose",
+    "words": ["viskos"]
+  },
+  {
+    "id": "selJgx9Y5xvyeeUAJ",
+    "name": "Tweed",
+    "words": []
+  },
+  {
+    "id": "selHldRLi8o3USJ80",
+    "name": "Faux fur",
+    "words": ["fuskpäls", "imitationspäls"]
+  },
+  {
+    "id": "selOl9VjI6qQBBzB9",
+    "name": "Fur",
+    "words": ["päls"]
+  },
+  {
+    "id": "selsHi8HpO2EMmGlC",
+    "name": "Glitter",
+    "words": []
+  },
+  {
+    "id": "selfN2I0IR0LPoX26",
+    "name": "Sponge",
+    "words": ["svamp"]
+  },
+  {
+    "id": "seld9hDGKjA7JNje7",
+    "name": "White gold",
+    "words": ["vitt guld"]
+  },
+  {
+    "id": "selsGCyjVIcgNpNm3",
+    "name": "Yellow gold",
+    "words": ["gult guld"]
+  },
+  {
+    "id": "selQWYSJF3XR3wGAC",
+    "name": "Pink gold",
+    "words": ["rosa guld", "roséguld"]
+  },
+  {
+    "id": "selN5o1szUKuAk47p",
+    "name": "Gold plated",
+    "words": ["guldpläterad", "förgylld"]
+  },
+  {
+    "id": "sel1V9oOI0UrPI8um",
+    "name": "Silver",
+    "words": []
+  },
+  {
+    "id": "selAwYRPXIBUfseOT",
+    "name": "Silver Plated",
+    "words": ["silverpläterad", "silverpläterat"]
+  },
+  {
+    "id": "seljnrN35XuczyPMV",
+    "name": "Metal",
+    "words": ["metall"]
+  },
+  {
+    "id": "selIfTH2wkuWLXvKw",
+    "name": "Steel",
+    "words": ["stål"]
+  },
+  {
+    "id": "selVbpscPPj0e6RSP",
+    "name": "Wood",
+    "words": ["trä"]
+  },
+  {
+    "id": "sel47FuFUekEVcyzW",
+    "name": "Other",
+    "words": ["annat"]
+  }
+]
 
 const itemCategories = [
   {

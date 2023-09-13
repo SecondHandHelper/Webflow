@@ -1,32 +1,89 @@
 <script>
+    function initializeSlider(item) {
+        const images = item?.images;
+        document.getElementById('loadingDiv').style.display = 'none';
+        document.getElementById('slider').style.display = 'block';
 
-    if (localStorage.getItem('latestItemCreated')) {
-        //IMAGES
-        const images = JSON.parse(localStorage.getItem('latestItemCreated'))?.images;
-        if (images) {
-            const imageUrl = images?.enhancedFrontImage || images?.frontImage;
-            // Add slide
+        const slide = document.getElementById('frontImageSlide');
+        const cloneSlide = slide.cloneNode(true);
+        const sliderMask = document.getElementById('sliderMask');
+        sliderMask.innerHTML = '';
 
-            console.log('images', images);
-            const slide = document.getElementById('frontImageSlide');
-            const cloneSlide = slide.cloneNode(true);
-            sliderMask.innerHTML = '';
-            for (const imageName in images) {
-                const newSlide = cloneSlide;
+        const frontImageSlide = cloneSlide.cloneNode(true);
+        frontImageSlide.firstChild.src = sessionStorage.getItem('enhancedFrontImageSmall') ||
+            images.enhancedFrontImageSmall || images.enhancedFrontImageMedium || images.enhancedFrontImage ||
+            images.frontImageSmall || images.frontImage;
+        frontImageSlide.id = 'frontImage';
+        sliderMask.appendChild(frontImageSlide);
+        // Add slides for all other images
+        for (const imageName of ['brandTagImage', 'materialTagImage', 'defectImage', 'extraImage']) {
+            if (images[imageName]) {
+                const newSlide = cloneSlide.cloneNode(true);
                 newSlide.id = imageName;
-                newSlide.firstChild.src = images[imageName];
+                newSlide.firstChild.src = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName];
                 sliderMask.appendChild(newSlide);
             }
         }
-        else { console.log('No images found from latest item'); }
+    }
 
+    function colorName(color) {
+        const mapping = { Beige: 'Beige', Blue: 'Blå', Brown: 'Brun', Green: 'Grön', Grey: 'Grå', Yellow: 'Gul', Gold: 'Guld',
+            Purple: 'Lila', Navy: 'Navy', Orange: 'Orange', Pink: 'Rosa', Red: 'Röd', Silver: 'Silver', Black: 'Svart',
+            Turquoise: 'Turkos', Burgundy: 'Vinröd', White: 'Vit', Multicolour: 'Flerfärgad' };
+        return mapping[color] || color;
+    }
+    
+    function initializeTextFields(item) {
+        if (item.cleanedBrand) {
+            document.getElementById('itemTitle').innerText = item.cleanedBrand.trim() + "-" + item.category.toLowerCase();
+        } else {
+            document.getElementById('itemTitle').innerText = item.brand.trim() + "-" + item.category.toLowerCase();
+        }
+        document.getElementById('itemPrice').innerText = item.maxPriceEstimate ? `${item.maxPriceEstimate} kr` : '';
+        document.getElementById('itemPrice').style.display = 'block';
+        document.getElementById('itemColor').innerText = colorName(item.color);
+        document.getElementById('itemSize').innerText = item.size;
+        document.getElementById('itemMaterial').innerText = item.material;
+        document.getElementById('itemCondition').innerText = item.condition = itemConditionText(item);
+        if (item.userComment) {
+            document.getElementById('itemCommentDiv').style.display = 'block';
+            document.getElementById('itemComment').innerText = item.userComment;
+        }
+        (item.platformsToBePublishedOn || []).forEach(platform => {
+            if (!platform.match(/Mai|Tradera/)) {
+                const newNode = document.getElementById('platformMai').cloneNode(true);
+                newNode.id = platform;
+                newNode.innerText = platform;
+                document.getElementById('platformMai').parentNode.appendChild(newNode);
+            }
+        });
+    }
 
-        //TEXT
+    function itemConditionText(item) {
+        if (item.condition === 'Använd, tecken på slitage' && (item.defects.length || item.defectDescription)) {
+            return `Anmärkning: ${item.defects ? item.defects + '.' : ''} ${item.defectDescription ? item.defectDescription + '.' : ''}`;
+        }
+        return item.condition;
+    }
 
+    function initializeButtons(item) {
+        document.getElementById('newItemButton').addEventListener('click', () => location.href = '/sell-item');
+    }
 
-        //PLATFORMS
-
+    if (localStorage.getItem('latestItemCreated') || params.id) {
+        const item = JSON.parse(localStorage.getItem('latestItemCreated'));
+        // Show images from latestItemCreated to make it quick then fill in the rest from saved item since it contains
+        // more info
+        item && initializeSlider(item);
+        firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: item?.id || params.id })
+            .then(response => {
+                item || initializeSlider(response.data); // Only set slider images if it is not already set from latestItemCreated
+                initializeTextFields(response.data);
+                initializeButtons(response.data);
+            })
+            .catch(e => console.error(e));
     } else {
         console.log('No latest item found');
+        location.href = '/private';
     }
 </script>
