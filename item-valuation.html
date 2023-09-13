@@ -41,7 +41,7 @@
     }
 
     const showMlValuation = (itemValuation) => {
-        const { minPrice, maxPrice, decline, humanCheckNeeded, willNotSell } = itemValuation;
+        const { minPrice, maxPrice, decline, humanCheckNeeded } = itemValuation;
         const itemId = JSON.parse(localStorage.getItem('latestItemCreated') || '{}')?.id;
         if (!minPrice || humanCheckNeeded) {
             if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
@@ -53,6 +53,7 @@
         document.getElementById('loadingDiv').style.display = 'none';
         document.getElementById('valuationResultDiv').style.display = 'flex';
         document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
+        document.getElementById('valuationText').style.display = 'block';
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
             // Hide chat div for non-signed in users
             document.getElementById('chatDiv').style.display = 'none';
@@ -92,13 +93,12 @@
         }
     }
 
-    const getMachineValuation = async () => {
-        const itemId = params.id;
-        const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')).item;
-        if (!itemId && !item) {
-            return window.location.href = '/private';
+    const getMachineValuation = async (itemId) => {
+        const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({ itemId });
+        const { minPrice, humanCheckNeeded } = res.data;
+        if (!minPrice || humanCheckNeeded) {
+            saveItemValuation(res.data);
         }
-        const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({ itemId, item });
         showMlValuation(res.data);
     }
 
@@ -121,13 +121,14 @@
     const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}')?.item ||
         JSON.parse(localStorage.getItem('latestItemCreated') || '{}');
     const itemValuation = JSON.parse(sessionStorage.getItem('itemValuation'));
-    if (itemValuation && !item?.preferences?.userValuationApproval) {
-        await acceptValuation(item.id, itemValuation.minPrice, itemValuation.maxPrice);
-        location.href = '/item-confirmatione';
+    if (itemValuation && !item?.preferences?.userValuationApproval) { // TODO: Funkar inte - har vi inget item?
+        acceptValuation(item.id, itemValuation.minPrice, itemValuation.maxPrice)
+            .then(() => location.href = '/item-confirmatione')
+            .catch(() => location.href = '/item-confirmation');
     } else {
         initialPageSetup();
         if (params.id) {
-            getMachineValuation();
+            getMachineValuation(params.id);
         }
         if (sessionStorage.getItem('itemValuation')) {
             showMlValuation(JSON.parse(sessionStorage.getItem('itemValuation')));

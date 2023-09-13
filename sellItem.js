@@ -20,6 +20,27 @@ async function addItem(event) {
   }
 }
 
+async function saveItemValuation({ minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version }) {
+  const valuationData = {
+    'mlDsDecline': decline,
+    'mlDsHumanCheckNeeded': humanCheckNeeded,
+    'mlDsHumanCheckExplanation': humanCheckExplanation ? humanCheckExplanation.join(', ') : null,
+    'mlDsMinPriceEstimate': minPrice,
+    'mlDsMaxPriceEstimate': maxPrice,
+    'mlDsWillNotSellPrediction': willNotSell,
+    'mlDsSoldPriceEstimate': soldPrice,
+    'mlDsModelVersion': version.toString()
+  }
+  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+    sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
+      id: JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')).id,
+      item: { ...item, ...valuationData } })
+    );
+  } else {
+    await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
+  }
+}
+
 const getMlValuation = async (itemId) => {
   const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}')?.item;
   if (!itemId && !item) {
@@ -32,26 +53,9 @@ const getMlValuation = async (itemId) => {
   }
   try {
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});
-    const { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version } = res.data;
+    const { minPrice, maxPrice, decline, humanCheckNeeded, willNotSell } = res.data;
     if (!minPrice || humanCheckNeeded) {
-      const valuationData = {
-        'mlDsDecline': decline,
-        'mlDsHumanCheckNeeded': humanCheckNeeded,
-        'mlDsHumanCheckExplanation': humanCheckExplanation ? humanCheckExplanation.join(', ') : null,
-        'mlDsMinPriceEstimate': minPrice,
-        'mlDsMaxPriceEstimate': maxPrice,
-        'mlDsWillNotSellPrediction': willNotSell,
-        'mlDsSoldPriceEstimate': soldPrice,
-        'mlDsModelVersion': version.toString()
-      }
-      if (item) {
-        sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
-          id: JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')).id,
-          item: { ...item, ...valuationData } })
-        );
-      } else {
-        await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
-      }
+      saveItemValuation(res.data);
       return nextStepAfterMlValuation();
     }
     sessionStorage.setItem('itemValuation', JSON.stringify({

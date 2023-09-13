@@ -1,5 +1,4 @@
 <script>
-
     function initializeSlider(item) {
         const images = item?.images;
         document.getElementById('loadingDiv').style.display = 'none';
@@ -27,6 +26,13 @@
         }
     }
 
+    function colorName(color) {
+        const mapping = { Beige: 'Beige', Blue: 'Blå', Brown: 'Brun', Green: 'Grön', Grey: 'Grå', Yellow: 'Gul', Gold: 'Guld',
+            Purple: 'Lila', Navy: 'Navy', Orange: 'Orange', Pink: 'Rosa', Red: 'Röd', Silver: 'Silver', Black: 'Svart',
+            Turquoise: 'Turkos', Burgundy: 'Vinröd', White: 'Vit', Multicolour: 'Flerfärgad' };
+        return mapping[color] || color;
+    }
+    
     function initializeTextFields(item) {
         if (item.cleanedBrand) {
             document.getElementById('itemTitle').innerText = item.cleanedBrand.trim() + "-" + item.category.toLowerCase();
@@ -34,7 +40,7 @@
             document.getElementById('itemTitle').innerText = item.cleanedBrand.trim() + "-" + item.category.toLowerCase();
         }
         document.getElementById('itemPrice').innerText = item.minPriceEstimate ? `${item.minPriceEstimate - item.maxPriceEstimate} kr` : '';
-        document.getElementById('itemColor').innerText = item.color;
+        document.getElementById('itemColor').innerText = colorName(item.color);
         document.getElementById('itemSize').innerText = item.size;
         document.getElementById('itemMaterial').innerText = item.material;
         document.getElementById('itemCondition').innerText = item.condition = itemConditionText(item);
