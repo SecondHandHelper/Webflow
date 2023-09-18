@@ -1,20 +1,7 @@
 <script>
-    let fetchedItem = null;
-    const getItem = async (itemId) => {
-        if (!fetchedItem) {
-            const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId });
-            if (res.data) {
-                fetchedItem = res.data;
-            }
-        }
-        return fetchedItem;
-    }
-
     const getFrontImage = async () => {
         const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}')?.item;
-        const itemId = params.id;
-        return sessionStorage.getItem('enhancedFrontImageSmall') || item?.images?.enhancedFrontImage ||
-            (await getItem(itemId)).images.enhancedFrontImageSmall || (await getItem(itemId)).images.enhancedFrontImage;
+        return sessionStorage.getItem('enhancedFrontImageSmall') || item?.images?.enhancedFrontImage;
     }
 
     const acceptValuation = async (itemId, minPrice, maxPrice) => {
@@ -100,18 +87,10 @@
         }
     }
 
-    const getMachineValuation = async (itemId) => {
-        const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({ itemId });
-        const { minPrice, humanCheckNeeded } = res.data;
-        if (!minPrice || humanCheckNeeded) {
-            await saveItemValuation(itemId, res.data);
-        }
-        showMlValuation(res.data);
-    }
-
-    const initialPageSetup = async () => {
+    const initialPageSetup = async (item) => {
         document.getElementById('itemImage').src = await getFrontImage();
-        document.getElementById('chatLink').onclick = () => Intercom('showNewMessage');
+        document.getElementById('chatLink').onclick = () => Intercom('showNewMessage',
+            `Gällande värdering för ${item.brand.trim()}-${item.category} (${item.id})\n`);
         document.getElementById('valuationClose').addEventListener('click', () => {
             sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
             localStorage.removeItem('newItem');
@@ -133,10 +112,7 @@
             .then(() => location.href = '/item-confirmation')
             .catch(() => location.href = '/item-confirmation');
     } else {
-        initialPageSetup();
-        if (params.id) {
-            getMachineValuation(params.id);
-        }
+        initialPageSetup(item);
         if (sessionStorage.getItem('itemValuation')) {
             showMlValuation(JSON.parse(sessionStorage.getItem('itemValuation')));
         }
