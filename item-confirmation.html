@@ -33,11 +33,14 @@
         return mapping[color] || color;
     }
     
-    function initializeTextFields(item) {
-        if (item.cleanedBrand) {
-            document.getElementById('itemTitle').innerText = item.cleanedBrand.trim() + "-" + item.category.toLowerCase();
-        } else {
-            document.getElementById('itemTitle').innerText = item.brand.trim() + "-" + item.category.toLowerCase();
+    function initializeFields(item) {
+        initializeSlider(item);
+        document.getElementById('itemTitle').innerText = (item.cleanedBrand || item.brand).trim() + "-" + item.category.toLowerCase();
+        if (!item.preferences.userValuationApproval) {
+            document.getElementById('nextStepText').innerText = 'Vi hör av oss när plagget är sålt och ska skickas.'
+        } else if (item.humanCheckNeeded || !item.minPriceEstimate) {
+            document.getElementById('nextStepHeader').style.display = 'block';
+            document.getElementById('nextStepText').innerText = 'Du kommer få ett SMS när vi värderat plagget som du får ta ställning till.';
         }
         document.getElementById('itemPrice').innerText = item.maxPriceEstimate ? `${item.maxPriceEstimate} kr` : '';
         document.getElementById('itemPrice').style.display = 'block';
@@ -49,6 +52,9 @@
             document.getElementById('itemCommentDiv').style.display = 'block';
             document.getElementById('itemComment').innerText = item.userComment;
         }
+    }
+
+    function initializePlatforms(item) {
         (item.platformsToBePublishedOn || []).forEach(platform => {
             if (!platform.match(/Mai|Tradera/)) {
                 const newNode = document.getElementById('platformMai').cloneNode(true);
@@ -68,23 +74,16 @@
 
     function initializeButtons() {
         document.getElementById('newItemButton').addEventListener('click', () => location.href = '/sell-item');
+        document.getElementById('closeIcon').addEventListener('click', () => location.href = '/private');
     }
 
-    if (localStorage.getItem('latestItemCreated') || params.id) {
-        document.getElementById('closeIcon').addEventListener('click', () => location.href = '/private');
-        const item = JSON.parse(localStorage.getItem('latestItemCreated'));
-        if (item.mlDsHumanCheckNeeded || !item.mlDsMinPriceEstimate) {
-            document.getElementById('nextStepText').innerText = 'Du kommer få ett SMS när vi värderat plagget som du får ta ställning till.';
-        }
-        // Show images from latestItemCreated to make it quick then fill in the rest from saved item since it contains
-        // more info
-        item && initializeSlider(item);
-        firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: item?.id || params.id })
-            .then(response => {
-                item || initializeSlider(response.data); // Only set slider images if it is not already set from latestItemCreated
-                initializeTextFields(response.data);
-                initializeButtons();
-            })
+    const item = JSON.parse(localStorage.getItem('latestItemCreated'));
+    if (item) {
+        initializeFields(item);
+        initializeButtons();
+        // Show all fields except platformsToBePublishedOn, that is set in the backend so fetch the item before showing it
+        firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: item?.id  })
+            .then(response => { initializePlatforms(response.data) })
             .catch(e => console.error(e));
     } else {
         console.log('No latest item found');

@@ -173,7 +173,11 @@
         return;
       }
       if (document.referrer.includes(window.location.origin)) {
-        window.history.back();
+        if (document.referrer.includes('/item-confirmation')) {
+          location.href = '/private';
+        } else {
+          window.history.back();
+        }
       } else {
         if (user) {
           location.href = "/private";

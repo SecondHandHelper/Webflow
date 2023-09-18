@@ -7,8 +7,8 @@ async function addItem(event) {
     document.getElementById('addItemFormDiv').style.display = 'none';
     document.getElementById('loadingDiv').style.display = 'flex';
     document.getElementById('clearItemForm').style.display = 'none';
-    await addItemInner(id);
-    const nextStep = await getMlValuation(id);
+    const item = await addItemInner(id);
+    const nextStep = await getAndSaveMlValuation(id, item.preferences.userValuationApproval);
     // Track with segment 'User Activated'
     if (userItemsCount === 0) {
       analytics.track('User Activated');
@@ -22,14 +22,13 @@ async function addItem(event) {
 
 async function saveItemValuation(itemId, { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version }) {
   const valuationData = {
-    mlDsDecline: decline,
-    mlDsHumanCheckNeeded: humanCheckNeeded,
-    mlDsHumanCheckExplanation: humanCheckExplanation ? humanCheckExplanation.join(', ') : null,
-    mlDsMinPriceEstimate: minPrice,
-    mlDsMaxPriceEstimate: maxPrice,
-    mlDsWillNotSellPrediction: willNotSell,
-    mlDsSoldPriceEstimate: soldPrice,
-    mlDsModelVersion: version?.toString(),
+    decline, humanCheckNeeded,
+    humanCheckExplanation: humanCheckExplanation ? humanCheckExplanation.join(', ') : null,
+    minPriceEstimate: minPrice,
+    maxPriceEstimate: maxPrice,
+    willNotSellPrediction: willNotSell,
+    soldPriceEstimate: soldPrice,
+    modelVersion: version?.toString(),
     newMinPriceEstimate: minPrice,
     newMaxPriceEstimate: maxPrice,
     ...(decline ? {} : {
@@ -46,47 +45,42 @@ async function saveItemValuation(itemId, { minPrice, maxPrice, decline, humanChe
     );
   } else {
     await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
+    const latestItemCreated = localStorage.getItem('latestItemCreated');
+    localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData }));
   }
 }
 
-const getMlValuation = async (itemId) => {
+const getAndSaveMlValuation = async (itemId, userValuationApproval) => {
   const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}')?.item;
   if (!itemId && !item) {
     console.error('No item and no itemId, unexpected!!');
     return '/item-confirmation';
   }
-  // const res = { data: { mlDsValuationLog: 'Success', newMaxPriceEstimate: 600, newMinPriceEstimate: 390 }};
-  if (item && !item.maiMaterial) {
-    item.maiMaterial = getMaiMaterial(item);
-  }
   try {
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});
     const { minPrice, maxPrice, decline, humanCheckNeeded, willNotSell } = res.data;
     await saveItemValuation(itemId, res.data);
-    if (!minPrice || humanCheckNeeded) {
-      return nextStepAfterMlValuation();
-    }
-    sessionStorage.setItem('itemValuation', JSON.stringify({
-      minPrice,
-      maxPrice,
-      decline,
-      humanCheckNeeded,
-      willNotSell
-    }));
+    return nextStepAfterMlValuation(minPrice && maxPrice, decline, willNotSell, humanCheckNeeded, userValuationApproval);
   } catch (e) {
     console.error('Failed to get ml valuation', e);
   }
   return nextStepAfterMlValuation();
 }
 
-function nextStepAfterMlValuation() {
-  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-    return '/sign-in';
+function nextStepAfterMlValuation(mlValuationPresent, decline, willNotSell, humanCheckNeeded, userValuationApproval) {
+  if (!mlValuationPresent) {
+    if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+      return '/sign-in';
+    }
+    return '/item-confirmation';
   }
-  if (sessionStorage.getItem('itemValuation')) {
+  if (decline || willNotSell) {
     return '/item-valuation';
   }
-  return '/item-confirmation';
+  if (humanCheckNeeded || !userValuationApproval) {
+    return '/item-confirmation';
+  }
+  return '/item-valuation';
 }
 
 function defaultFormState() {
@@ -210,6 +204,7 @@ async function addItemInner(id) {
   }
   const createdFromItem = params.id ? { createdFromItem: params.id } : {};
   const item = { ...pageData, shippingMethod, images, ...createdFromItem, version: "2" };
+  item.maiMaterial = getMaiMaterial(item);
 
   if (!authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
@@ -244,6 +239,7 @@ async function addItemInner(id) {
       sessionStorage.setItem('personalId', personalId);
     }
   }
+  return item;
 }
 
 function initializeInputEventListeners() {
