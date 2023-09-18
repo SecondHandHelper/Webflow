@@ -51,7 +51,7 @@ async function saveItemValuation(itemId, { minPrice, maxPrice, decline, humanChe
 }
 
 const getAndSaveMlValuation = async (itemId, userValuationApproval) => {
-  const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}')?.item;
+  const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}').item;
   if (!itemId && !item) {
     console.error('No item and no itemId, unexpected!!');
     return '/item-confirmation';
