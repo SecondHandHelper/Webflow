@@ -7,8 +7,12 @@
     const acceptValuation = async (itemId, minPrice, maxPrice) => {
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
             const savedItem = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
-            savedItem.item.infoRequests.price.response = 'Accepted';
-            savedItem.item.infoRequests.price.status = 'Resolved';
+            savedItem.item.infoRequests = {
+                price: {
+                    response: 'Accepted',
+                    status: 'Resolved',
+                }
+            }
             savedItem.item.minPriceEstimate = minPrice;
             savedItem.item.maxPriceEstimate = maxPrice;
             sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify(savedItem));
@@ -37,9 +41,9 @@
         document.getElementById('valuationResultDiv').style.display = 'flex';
         document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
         document.getElementById('valuationText').style.display = 'block';
-        if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+        if (!sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
             // Hide chat div for non-signed in users
-            document.getElementById('chatDiv').style.display = 'none';
+            document.getElementById('chatDiv').style.display = 'block';
         }
         if (decline) {
             document.getElementById('chatDivHeader').innerText = 'Ser vår värderingen konstig ut?';

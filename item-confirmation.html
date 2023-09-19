@@ -39,8 +39,6 @@
         if (!item.preferences.userValuationApproval) {
             document.getElementById('nextStepText').innerText = 'Vi hör av oss när plagget är sålt och ska skickas.'
         } else if (item.humanCheckNeeded || !item.minPriceEstimate) {
-            document.getElementById('nextStepHeader').style.display = 'block';
-            document.getElementById('nextStepText').style.color = '#000';
             document.getElementById('nextStepText').innerText = 'Du kommer få ett SMS när vi värderat plagget som du får ta ställning till.';
         }
         document.getElementById('itemPrice').innerText = item.maxPriceEstimate ? `${item.maxPriceEstimate} kr` : '';
