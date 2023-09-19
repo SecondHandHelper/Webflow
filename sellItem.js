@@ -39,9 +39,10 @@ async function saveItemValuation(itemId, { minPrice, maxPrice, decline, humanChe
     })
   }
   if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+    const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
-      id: JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')).id,
-      item: { ...item, ...valuationData } })
+      id: item.id,
+      item: { ...item.item, ...valuationData } })
     );
   } else {
     await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
