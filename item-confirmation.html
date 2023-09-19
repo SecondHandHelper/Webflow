@@ -1,7 +1,6 @@
 <script>
     function initializeSlider(item) {
         const images = item?.images;
-        document.getElementById('loadingDiv').style.display = 'none';
         document.getElementById('slider').style.display = 'block';
 
         const slide = document.getElementById('frontImageSlide');
@@ -9,18 +8,14 @@
         const sliderMask = document.getElementById('sliderMask');
         sliderMask.innerHTML = '';
 
-        const frontImageSlide = cloneSlide.cloneNode(true);
-        frontImageSlide.firstChild.src = sessionStorage.getItem('enhancedFrontImageSmall') ||
-            images.enhancedFrontImageSmall || images.enhancedFrontImageMedium || images.enhancedFrontImage ||
-            images.frontImageSmall || images.frontImage;
-        frontImageSlide.id = 'frontImage';
-        sliderMask.appendChild(frontImageSlide);
-        // Add slides for all other images
-        for (const imageName of ['brandTagImage', 'materialTagImage', 'defectImage', 'extraImage']) {
+        for (const imageName of ['frontImage', 'enhancedFrontImage', 'brandTagImage', 'materialTagImage', 'extraImage', 'defectImage']) {
             if (images[imageName]) {
+                if (imageName === 'frontImage' && images['enhancedFrontImage']) {
+                    continue;
+                }
                 const newSlide = cloneSlide.cloneNode(true);
                 newSlide.id = imageName;
-                newSlide.firstChild.src = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName];
+                newSlide.firstChild.src = images[imageName];
                 sliderMask.appendChild(newSlide);
             }
         }
@@ -72,19 +67,22 @@
     }
 
     function initializeButtons() {
-        document.getElementById('newItemButton').addEventListener('click', () => location.href = '/sell-item');
         document.getElementById('closeIcon').addEventListener('click', () => location.href = '/private');
     }
 
     const item = JSON.parse(localStorage.getItem('latestItemCreated'));
     if (item) {
-        $(document).ready(() => {
-            initializeFields(item);
-            initializeButtons();
-        });
+        initializeFields(item);
+        document.getElementById('loadingDiv').style.display = 'none';
+        document.getElementById('contentDiv').style.display = 'block';
+        $(document).ready(initializeButtons);
         // Show all fields except platformsToBePublishedOn, that is set in the backend so fetch the item before showing it
         firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: item?.id  })
-            .then(response => { initializePlatforms(response.data) })
+            .then(response => {
+                initializePlatforms(response.data);
+                document.getElementById('platformsLoadingDiv').style.display = 'none';
+                document.getElementById('platformsDiv').style.display = 'block';
+            })
             .catch(e => console.error(e));
     } else {
         console.log('No latest item found');

@@ -46,19 +46,19 @@ async function saveItemValuation(itemId, { minPrice, maxPrice, decline, humanChe
     }
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
       id: item.id,
-      item: { ...item.item, ...valuationData,
-        ...(decline ? {} : {
-          'infoRequests.price.status': 'Active',
-          'infoRequests.price.description': 'Värderingen utgår från vad liknande plagg sålts för nyligen. Vi börjar alltid i den övre delen av spannet och sänker successivt inom intervallet under säljperioden på 30 dagar.',
-          'infoRequests.price.minPrice': minPrice,
-          'infoRequests.price.maxPrice': maxPrice,
-        })
-      }
+      item: { ...item.item, ...valuationData }
     }));
   } else {
     await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
     const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
-    localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData }));
+    localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData,
+      ...(decline ? {} : {
+        'infoRequests.price.status': 'Active',
+        'infoRequests.price.description': 'Värderingen utgår från vad liknande plagg sålts för nyligen. Vi börjar alltid i den övre delen av spannet och sänker successivt inom intervallet under säljperioden på 30 dagar.',
+        'infoRequests.price.minPrice': minPrice,
+        'infoRequests.price.maxPrice': maxPrice,
+      })
+    }));
   }
 }
 
