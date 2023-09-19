@@ -29,7 +29,7 @@ async function saveItemValuation(itemId, { minPrice, maxPrice, decline, humanChe
       soldPriceEstimate: soldPrice,
       modelVersion: version?.toString(),
     },
-    ...(decline ? {} : { infoRequests: {
+    ...(decline || humanCheckNeeded ? {} : { infoRequests: {
       price: {
         status: 'Active',
         description: 'Värderingen utgår från vad liknande plagg sålts för nyligen. Vi börjar alltid i den övre delen av spannet och sänker successivt inom intervallet under säljperioden på 30 dagar.',
