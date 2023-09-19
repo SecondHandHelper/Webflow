@@ -22,11 +22,13 @@ async function addItem(event) {
 
 async function saveItemValuation(itemId, { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version }) {
   const valuationData = {
-    decline, humanCheckNeeded,
-    humanCheckExplanation: humanCheckExplanation ? humanCheckExplanation.join(', ') : null,
-    willNotSellPrediction: willNotSell,
-    soldPriceEstimate: soldPrice,
-    modelVersion: version?.toString(),
+    mlValuation: {
+      decline, humanCheckNeeded, minPriceEstimate: minPrice, maxPriceEstimate: maxPrice,
+      humanCheckExplanation: humanCheckExplanation ? humanCheckExplanation.join(', ') : null,
+      willNotSellPrediction: willNotSell,
+      soldPriceEstimate: soldPrice,
+      modelVersion: version?.toString(),
+    },
     ...(decline ? {} : { infoRequests: {
       price: {
         status: 'Active',

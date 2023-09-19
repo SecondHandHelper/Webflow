@@ -33,7 +33,7 @@
         document.getElementById('itemTitle').innerText = (item.cleanedBrand || item.brand).trim() + "-" + item.category.toLowerCase();
         if (!item.preferences.userValuationApproval) {
             document.getElementById('nextStepText').innerText = 'Vi hör av oss när plagget är sålt och ska skickas.'
-        } else if (item.humanCheckNeeded || !item.minPriceEstimate) {
+        } else if (item.humanCheckNeeded || !item.mlValuation?.minPriceEstimate) {
             document.getElementById('nextStepText').innerText = 'Du kommer få ett SMS när vi värderat plagget som du får ta ställning till.';
         }
         document.getElementById('itemPrice').innerText = item.maxPriceEstimate ? `${item.maxPriceEstimate} kr` : '';

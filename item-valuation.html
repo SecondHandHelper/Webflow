@@ -11,8 +11,6 @@
             savedItem.item.infoRequests.price.status = 'Resolved';
             savedItem.item.minPriceEstimate = minPrice;
             savedItem.item.maxPriceEstimate = maxPrice;
-            savedItem.minPriceEstimate = minPrice;
-            savedItem.maxPriceEstimate = maxPrice;
             sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify(savedItem));
             return window.location.href = '/sign-in';
         } else {
