@@ -86,7 +86,8 @@ async function loginWithCookieToken() {
 loginWithCookieToken();
 
 function userIsSellingNewItem() {
-  return sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sell-item')
+  return sessionStorage.getItem('itemToBeCreatedAfterSignIn') &&
+      (document.referrer.includes('/sell-item') || document.referrer.includes('/item-valuation'));
 }
 
 async function signedInNextStep(fallbackRedirect) {
