@@ -45,7 +45,7 @@ async function saveItemValuation(itemId, { minPrice, maxPrice, decline, humanChe
     );
   } else {
     await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
-    const latestItemCreated = localStorage.getItem('latestItemCreated');
+    const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
     localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData }));
   }
 }
