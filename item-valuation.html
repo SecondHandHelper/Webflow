@@ -7,12 +7,8 @@
     const acceptValuation = async (itemId, minPrice, maxPrice) => {
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
             const savedItem = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
-            savedItem.item.infoRequests = {
-                price: {
-                    response: 'Accepted',
-                    status: 'Resolved',
-                }
-            }
+            savedItem.item.infoRequests.price.response = 'Accepted';
+            savedItem.item.infoRequests.price.status = 'Resolved';
             savedItem.item.minPriceEstimate = minPrice;
             savedItem.item.maxPriceEstimate = maxPrice;
             sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify(savedItem));
