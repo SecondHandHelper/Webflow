@@ -24,7 +24,7 @@
     }
 
     const showMlValuation = (item) => {
-        const { minPriceEstimate: minPrice, maxPriceEstimate: maxPrice, decline, humanCheckNeeded } = item;
+        const { minPriceEstimate: minPrice, maxPriceEstimate: maxPrice, decline, humanCheckNeeded } = item.mlValuation;
         const itemId = JSON.parse(localStorage.getItem('latestItemCreated') || '{}')?.id;
         if (!minPrice || humanCheckNeeded) {
             if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
@@ -38,7 +38,6 @@
         document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
         document.getElementById('valuationText').style.display = 'block';
         if (!sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-            // Hide chat div for non-signed in users
             document.getElementById('chatDiv').style.display = 'block';
         }
         if (decline) {
@@ -88,7 +87,7 @@
     const initialPageSetup = async (item) => {
         document.getElementById('itemImage').src = await getFrontImage();
         document.getElementById('chatLink').onclick = () => Intercom('showNewMessage',
-            `Gällande värdering för ${item.brand.trim()}-${item.category} (${item.id})\n`);
+            `ID: ${item.id}\n\nGällande värderingen på ${item.mlValuation.minPriceEstimate}-${item.mlValuation.maxPriceEstimate} för ${item.brand.trim()}-${item.category.toLowerCase()}. Vad skulle du vilja ändra värderingen till och varför?\n\n`);
         document.getElementById('valuationClose').addEventListener('click', () => {
             sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
             localStorage.removeItem('newItem');
