@@ -24,37 +24,26 @@ async function saveItemValuation(itemId, { minPrice, maxPrice, decline, humanChe
   const valuationData = {
     decline, humanCheckNeeded,
     humanCheckExplanation: humanCheckExplanation ? humanCheckExplanation.join(', ') : null,
-    minPriceEstimate: minPrice,
-    maxPriceEstimate: maxPrice,
     willNotSellPrediction: willNotSell,
     soldPriceEstimate: soldPrice,
     modelVersion: version?.toString(),
+    ...(decline ? {} : { infoRequests: {
+      price: {
+        status: 'Active',
+        description: 'Värderingen utgår från vad liknande plagg sålts för nyligen. Vi börjar alltid i den övre delen av spannet och sänker successivt inom intervallet under säljperioden på 30 dagar.',
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+      }
+    }})
   }
   if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
     const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
-    if (!decline) {
-      valuationData.infoRequests = {
-        price: {
-          status: 'Active',
-          description: 'Värderingen utgår från vad liknande plagg sålts för nyligen. Vi börjar alltid i den övre delen av spannet och sänker successivt inom intervallet under säljperioden på 30 dagar.',
-          minPrice: minPrice,
-          maxPrice: maxPrice,
-        }
-      }
-    }
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
       id: item.id,
       item: { ...item.item, ...valuationData }
     }));
   } else {
-    await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData,
-      ...(decline ? {} : {
-        'infoRequests.price.status': 'Active',
-        'infoRequests.price.description': 'Värderingen utgår från vad liknande plagg sålts för nyligen. Vi börjar alltid i den övre delen av spannet och sänker successivt inom intervallet under säljperioden på 30 dagar.',
-        'infoRequests.price.minPrice': minPrice,
-        'infoRequests.price.maxPrice': maxPrice,
-      })
-    });
+    await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
     const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
     localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData }));
   }
