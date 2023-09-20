@@ -893,7 +893,7 @@ async function detectAndFillColor(imageUrl) {
 async function initializeMaterialConfirm() {
   document.getElementById('rejectMaterial').addEventListener('click', () => {
     document.querySelector('#itemMaterial').value = '';
-    document.querySelector('#itemMaterial').setCustomValidity('');
+    document.querySelector('#materialSuggestButtons').style.display = 'none';
     fieldLabelToggle('itemMaterialLabel');
     document.querySelector('#itemMaterial').setCustomValidity('')
   });
@@ -905,6 +905,7 @@ async function initializeMaterialConfirm() {
 async function initializeBrandConfirm() {
   document.getElementById('rejectBrand').addEventListener('click', () => {
     document.querySelector('#itemBrand').value = '';
+    document.querySelector('#brandSuggestButtons').style.display = 'none';
     document.querySelector('#itemBrand').setCustomValidity('');
     fieldLabelToggle('itemBrandLabel');
   });
@@ -963,6 +964,7 @@ function initializeRestoreOnNavigation() {
 async function initializeSizeConfirm() {
   document.getElementById('rejectSize').addEventListener('click', () => {
     document.querySelector('#itemSize').value = '';
+    document.querySelector('#sizeSuggestButtons').style.display = 'none';
     fieldLabelToggle('itemBrandLabel');
     document.querySelector('#itemSize').setCustomValidity('');
   });
@@ -986,6 +988,8 @@ function initializeSuggestButtonsSaveState() {
 async function initializeColorConfirm() {
   document.getElementById('rejectColor').addEventListener('click', () => {
     document.querySelector('#itemColor').value = '';
+    document.querySelector('#colorSuggestButtons').style.display = 'none';
+    fieldLabelToggle('itemColorLabel');
     document.querySelector('#itemColor').setCustomValidity('');
   });
   document.getElementById('confirmColor').addEventListener('click', () => {
