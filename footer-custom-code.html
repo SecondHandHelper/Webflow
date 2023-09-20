@@ -125,16 +125,16 @@
   }
 </script>
 
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test528/general.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test555/general.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.48/cookieManagement.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.48/signIn.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.48/infoRequestsFunctions.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.48/referralFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test443/autocomplete-brands.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test555/autocomplete-brands.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.48/loadItemCards.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test528/sellItem.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test433/sellItemModelSearch.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test528/editItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test558/sellItem.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test555/sellItemModelSearch.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test555/editItem.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.48/private.js"></script>
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.48/settings.js"></script>
 
@@ -173,7 +173,11 @@
         return;
       }
       if (document.referrer.includes(window.location.origin)) {
-        window.history.back();
+        if (document.referrer.includes('/item-confirmation')) {
+          location.href = '/private';
+        } else {
+          window.history.back();
+        }
       } else {
         if (user) {
           location.href = "/private";

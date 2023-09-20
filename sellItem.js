@@ -7,8 +7,8 @@ async function addItem(event) {
     document.getElementById('addItemFormDiv').style.display = 'none';
     document.getElementById('loadingDiv').style.display = 'flex';
     document.getElementById('clearItemForm').style.display = 'none';
-    await addItemInner(id);
-    const nextStep = await getMlValuation(id);
+    const item = await addItemInner(id);
+    const nextStep = await getAndSaveMlValuation(id, item.preferences.userValuationApproval);
     // Track with segment 'User Activated'
     if (userItemsCount === 0) {
       analytics.track('User Activated');
@@ -22,71 +22,66 @@ async function addItem(event) {
 
 async function saveItemValuation(itemId, { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version }) {
   const valuationData = {
-    mlDsDecline: decline,
-    mlDsHumanCheckNeeded: humanCheckNeeded,
-    mlDsHumanCheckExplanation: humanCheckExplanation ? humanCheckExplanation.join(', ') : null,
-    mlDsMinPriceEstimate: minPrice,
-    mlDsMaxPriceEstimate: maxPrice,
-    mlDsWillNotSellPrediction: willNotSell,
-    mlDsSoldPriceEstimate: soldPrice,
-    mlDsModelVersion: version?.toString(),
-    newMinPriceEstimate: minPrice,
-    newMaxPriceEstimate: maxPrice,
-    ...(decline ? {} : {
-      'infoRequests.price.status': 'Active',
-      'infoRequests.price.description': 'Värderingen utgår från vad liknande plagg sålts för nyligen. Vi börjar alltid i den övre delen av spannet och sänker successivt inom intervallet under säljperioden på 30 dagar.',
-      'infoRequests.price.minPrice': minPrice,
-      'infoRequests.price.maxPrice': maxPrice,
-    })
+    mlValuation: {
+      decline, humanCheckNeeded, minPriceEstimate: minPrice, maxPriceEstimate: maxPrice,
+      humanCheckExplanation: humanCheckExplanation ? humanCheckExplanation.join(', ') : null,
+      willNotSellPrediction: willNotSell,
+      soldPriceEstimate: soldPrice,
+      modelVersion: version?.toString(),
+    },
+    ...(decline || humanCheckNeeded ? {} : { infoRequests: {
+      price: {
+        status: 'Active',
+        description: 'Värderingen utgår från vad liknande plagg sålts för nyligen. Vi börjar alltid i den övre delen av spannet och sänker successivt inom intervallet under säljperioden på 30 dagar.',
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+      }
+    }})
   }
   if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+    const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
-      id: JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')).id,
-      item: { ...item, ...valuationData } })
-    );
+      id: item.id,
+      item: { ...item.item, ...valuationData }
+    }));
   } else {
     await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
+    const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
+    localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData }));
   }
 }
 
-const getMlValuation = async (itemId) => {
-  const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}')?.item;
+const getAndSaveMlValuation = async (itemId, userValuationApproval) => {
+  const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}').item;
   if (!itemId && !item) {
     console.error('No item and no itemId, unexpected!!');
     return '/item-confirmation';
   }
-  // const res = { data: { mlDsValuationLog: 'Success', newMaxPriceEstimate: 600, newMinPriceEstimate: 390 }};
-  if (item && !item.maiMaterial) {
-    item.maiMaterial = getMaiMaterial(item);
-  }
   try {
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});
-    const { minPrice, maxPrice, decline, humanCheckNeeded, willNotSell } = res.data;
+    const { minPrice, maxPrice, decline, humanCheckNeeded } = res.data;
     await saveItemValuation(itemId, res.data);
-    if (!minPrice || humanCheckNeeded) {
-      return nextStepAfterMlValuation();
-    }
-    sessionStorage.setItem('itemValuation', JSON.stringify({
-      minPrice,
-      maxPrice,
-      decline,
-      humanCheckNeeded,
-      willNotSell
-    }));
+    return nextStepAfterMlValuation(minPrice && maxPrice, decline, humanCheckNeeded, userValuationApproval);
   } catch (e) {
     console.error('Failed to get ml valuation', e);
   }
   return nextStepAfterMlValuation();
 }
 
-function nextStepAfterMlValuation() {
-  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-    return '/sign-in';
+function nextStepAfterMlValuation(mlValuationPresent, decline, humanCheckNeeded, userValuationApproval) {
+  if (!mlValuationPresent) {
+    if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+      return '/sign-in';
+    }
+    return '/item-confirmation';
   }
-  if (sessionStorage.getItem('itemValuation')) {
+  if (decline) {
     return '/item-valuation';
   }
-  return '/item-confirmation';
+  if (humanCheckNeeded || !userValuationApproval) {
+    return '/item-confirmation';
+  }
+  return '/item-valuation';
 }
 
 function defaultFormState() {
@@ -210,6 +205,7 @@ async function addItemInner(id) {
   }
   const createdFromItem = params.id ? { createdFromItem: params.id } : {};
   const item = { ...pageData, shippingMethod, images, ...createdFromItem, version: "2" };
+  item.maiMaterial = getMaiMaterial(item);
 
   if (!authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
@@ -244,6 +240,7 @@ async function addItemInner(id) {
       sessionStorage.setItem('personalId', personalId);
     }
   }
+  return item;
 }
 
 function initializeInputEventListeners() {

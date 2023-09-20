@@ -32,8 +32,7 @@
         initializeSlider(item);
         document.getElementById('itemTitle').innerText = (item.cleanedBrand || item.brand).trim() + "-" + item.category.toLowerCase();
         if (item.mlValuation?.humanCheckNeeded || !item.mlValuation?.minPriceEstimate) {
-            document.getElementById('nextStepTitle').style.display = 'block';
-            document.getElementById('nextStepText').innerText = 'Du kommer få ett SMS när vi värderat plagget som du kan ta ställning till';
+            document.getElementById('nextStepText').innerText = 'Du kommer få ett SMS när vi värderat plagget som du kan ta ställning till.';
         }
         document.getElementById('itemPrice').innerText = item.maxPriceEstimate ? `${item.maxPriceEstimate} kr` : '';
         document.getElementById('itemPrice').style.display = 'block';
@@ -65,16 +64,11 @@
         return item.condition;
     }
 
-    function initializeButtons() {
-        document.getElementById('closeIcon').addEventListener('click', () => location.href = '/private');
-    }
-
     const item = JSON.parse(localStorage.getItem('latestItemCreated'));
     if (item) {
         initializeFields(item);
         document.getElementById('loadingDiv').style.display = 'none';
         document.getElementById('contentDiv').style.display = 'block';
-        $(document).ready(initializeButtons);
         // Show all fields except platformsToBePublishedOn, that is set in the backend so fetch the item before showing it
         firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: item?.id  })
             .then(response => {
