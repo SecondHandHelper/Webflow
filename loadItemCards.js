@@ -12,7 +12,7 @@ async function loadItemCards(items) {
     var shippingStatus = doc.data().shippingStatus;
     var brand = doc.data().brand;
     var soldPrice = doc.data().soldPrice;
-    var sellerGets = doc.data().sellerGets;
+    var sellerGets = doc.data().sellerGets ? Math.ceil(doc.data().sellerGets) : doc.data().sellerGets ;
     var buyerFirstName = doc.data().buyer?.FirstName || doc.data().buyerFirstName;
     var buyerAddressCity = doc.data().buyer?.City || doc.data().buyerAddressCity;
     var minPriceEstimate = doc.data().minPriceEstimate;
