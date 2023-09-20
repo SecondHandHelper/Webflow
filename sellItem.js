@@ -20,14 +20,17 @@ async function addItem(event) {
   }
 }
 
-async function saveItemValuation(itemId, { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version }) {
+async function saveItemValuation(itemId, mlValuationData) {
+  const { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version,
+    newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog } = mlValuationData;
   const valuationData = {
     mlValuation: {
       decline, humanCheckNeeded, minPriceEstimate: minPrice, maxPriceEstimate: maxPrice,
-      humanCheckExplanation: humanCheckExplanation ? humanCheckExplanation.join(', ') : null,
+      humanCheckExplanation: humanCheckExplanation,
       willNotSellPrediction: willNotSell,
       soldPriceEstimate: soldPrice,
       modelVersion: version?.toString(),
+      newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog
     },
     ...(decline || humanCheckNeeded ? {} : { infoRequests: {
       price: {
