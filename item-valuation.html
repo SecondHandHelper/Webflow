@@ -1,9 +1,4 @@
 <script>
-    const getFrontImage = async () => {
-        const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}')?.item;
-        return sessionStorage.getItem('enhancedFrontImageSmall') || item?.images?.enhancedFrontImage;
-    }
-
     const acceptValuation = async (itemId, minPrice, maxPrice) => {
         if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
             const savedItem = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
@@ -26,13 +21,6 @@
     const showMlValuation = (item) => {
         const { minPriceEstimate: minPrice, maxPriceEstimate: maxPrice, decline, humanCheckNeeded } = item.mlValuation;
         const itemId = JSON.parse(localStorage.getItem('latestItemCreated') || '{}')?.id;
-        if (!minPrice || humanCheckNeeded) {
-            if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-                return window.location.replace('/sign-in');
-            } else {
-                return window.location.replace('/item-confirmation');
-            }
-        }
         document.getElementById('loadingDiv').style.display = 'none';
         document.getElementById('valuationResultDiv').style.display = 'flex';
         document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
@@ -84,8 +72,8 @@
         }
     }
 
-    const initialPageSetup = async (item) => {
-        document.getElementById('itemImage').src = await getFrontImage();
+    const initialPageSetup = (item) => {
+        document.getElementById('itemImage').src = sessionStorage.getItem('enhancedFrontImageSmall') || item?.images?.enhancedFrontImage;
         document.getElementById('chatLink').onclick = () => Intercom('showNewMessage',
             `ID: ${item.id}\n\nGällande värderingen på ${item.mlValuation.minPriceEstimate}-${item.mlValuation.maxPriceEstimate} för ${item.brand.trim()}-${item.category.toLowerCase()}. Vad skulle du vilja ändra värderingen till och varför?\n\n`);
         document.getElementById('valuationClose').addEventListener('click', () => {

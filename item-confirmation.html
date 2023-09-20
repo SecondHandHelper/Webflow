@@ -64,16 +64,11 @@
         return item.condition;
     }
 
-    function initializeButtons() {
-        document.getElementById('closeIcon').addEventListener('click', () => location.href = '/private');
-    }
-
     const item = JSON.parse(localStorage.getItem('latestItemCreated'));
     if (item) {
         initializeFields(item);
         document.getElementById('loadingDiv').style.display = 'none';
         document.getElementById('contentDiv').style.display = 'block';
-        $(document).ready(initializeButtons);
         // Show all fields except platformsToBePublishedOn, that is set in the backend so fetch the item before showing it
         firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: item?.id  })
             .then(response => {
