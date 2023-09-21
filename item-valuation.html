@@ -84,15 +84,27 @@
         })
     }
 
-    window.intercomSettings = {
-        app_id: "klyy0le5"
-    };
-    (function () { var w = window; var ic = w.Intercom; if (typeof ic === "function") { ic('reattach_activator'); ic('update', w.intercomSettings); } else { var d = document; var i = function () { i.c(arguments); }; i.q = []; i.c = function (args) { i.q.push(args); }; w.Intercom = i; var l = function () { var s = d.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = 'https://widget.intercom.io/widget/klyy0le5'; var x = d.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x); }; if (w.attachEvent) { w.attachEvent('onload', l); } else { w.addEventListener('load', l, false); } } })();
-    Intercom('update', { 'hide_default_launcher': true });
+    const getItem = async (itemId) => {
+        const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: itemId  })
+        return res?.data;
+    }
 
-    const item = params.id ? (await getItem(params.id)) :
-        (JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}')?.item || JSON.parse(localStorage.getItem('latestItemCreated') || '{}'));
+    const main = async () => {
+        window.intercomSettings = {
+            app_id: "klyy0le5"
+        };
+        (function () { var w = window; var ic = w.Intercom; if (typeof ic === "function") { ic('reattach_activator'); ic('update', w.intercomSettings); } else { var d = document; var i = function () { i.c(arguments); }; i.q = []; i.c = function (args) { i.q.push(args); }; w.Intercom = i; var l = function () { var s = d.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = 'https://widget.intercom.io/widget/klyy0le5'; var x = d.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x); }; if (w.attachEvent) { w.attachEvent('onload', l); } else { w.addEventListener('load', l, false); } } })();
+        Intercom('update', { 'hide_default_launcher': true });
 
-    initialPageSetup(item);
-    showMlValuation(item);
+        const item = params.id ? (await getItem(params.id)) :
+            (JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}')?.item || JSON.parse(localStorage.getItem('latestItemCreated') || '{}'));
+        if (!item) {
+            console.error('Invalid item id or no saved item to show valuation for');
+            return location.href = '/private';
+        }
+        initialPageSetup(item);
+        showMlValuation(item);
+    }
+
+    main();
 </script>
