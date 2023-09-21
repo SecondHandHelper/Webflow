@@ -64,7 +64,7 @@ const getAndSaveMlValuation = async (itemId, userValuationApproval) => {
   }
   try {
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});
-    const { minPrice, maxPrice, decline, humanCheckNeeded } = res.data;
+    const { minPrice, maxPrice, decline, humanCheckNeeded } = res.data || {};
     await saveItemValuation(itemId, res.data);
     return nextStepAfterMlValuation(minPrice && maxPrice, decline, humanCheckNeeded, userValuationApproval);
   } catch (e) {
