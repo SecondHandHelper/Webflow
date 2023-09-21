@@ -34,7 +34,7 @@
         if (item.mlValuation?.humanCheckNeeded || !item.mlValuation?.minPriceEstimate) {
             document.getElementById('nextStepText').innerText = 'Du kommer få ett SMS när vi värderat plagget som du kan ta ställning till.';
         }
-        document.getElementById('itemPrice').innerText = item.mlValuation.maxPriceEstimate ? `${item.mlValuation.maxPriceEstimate} kr` : '';
+        document.getElementById('itemPrice').innerText = item.mlValuation?.maxPriceEstimate ? `${item.mlValuation.maxPriceEstimate} kr` : '';
         document.getElementById('itemPrice').style.display = 'block';
         document.getElementById('itemColor').innerText = colorName(item.color);
         document.getElementById('itemSize').innerText = item.size;
@@ -72,11 +72,13 @@
         // Show all fields except platformsToBePublishedOn, that is set in the backend so fetch the item before showing it
         firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: item?.id  })
             .then(response => {
-                if (response.data?.platformsToBePublishedOn?.length > 2) {
+                if (response.data?.platformsToBePublishedOn?.length >= 2) {
                     initializePlatforms(response.data);
+                    document.getElementById('platformsLoadingDiv').style.display = 'none';
+                    document.getElementById('platformsDiv').style.display = 'block';
+                } else {
+                    document.getElementById('platformsSection').style.display = 'none';
                 }
-                document.getElementById('platformsLoadingDiv').style.display = 'none';
-                document.getElementById('platformsDiv').style.display = 'block';
             })
             .catch(e => console.error(e));
     } else {
