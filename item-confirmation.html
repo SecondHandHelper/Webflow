@@ -71,7 +71,7 @@
 
     const getItem = async (itemId) => {
         const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: itemId  });
-        return res?.data;
+        return { ...(res?.data || {}), id: itemId };
     }
 
     const main = async () => {

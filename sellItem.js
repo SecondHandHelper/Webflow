@@ -700,7 +700,8 @@ async function uploadTempImage(input, fileName) {
 }
 
 async function scaleImageToMaxSize(input) {
-  if (input.size < 3 * 1024 * 1024) {
+  if (input.size < 1024 * 1024) {
+    // Don't compress images < 1MB in size
     return Promise.resolve(input);
   }
   return new Promise((resolve, reject) => {

@@ -19,11 +19,12 @@
     }
 
     const showMlValuation = (item) => {
-        const { minPriceEstimate: minPrice, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate: maxPrice, decline, humanCheckNeeded } = item.mlValuation;
-        const itemId = JSON.parse(localStorage.getItem('latestItemCreated') || '{}')?.id;
+        const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline } = item.mlValuation || {};
+        const minPrice = newMinPriceEstimate || minPriceEstimate || item.infoRequests?.price?.minPrice;
+        const maxPrice = newMaxPriceEstimate || maxPriceEstimate || item.infoRequests?.price?.maxPrice
         document.getElementById('loadingDiv').style.display = 'none';
         document.getElementById('valuationResultDiv').style.display = 'flex';
-        document.getElementById('valuationText').innerText = `${newMinPriceEstimate || minPrice}-${newMaxPriceEstimate || maxPrice} kr`;
+        document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
         document.getElementById('valuationText').style.display = 'block';
         if (!sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
             document.getElementById('chatDiv').style.display = 'block';
@@ -44,8 +45,10 @@
                 window.location.href = '/sell-item';
             });
             document.getElementById('confirmButton').addEventListener('click', async () => {
-                if (itemId) {
-                    await firebase.app().functions("europe-west1").httpsCallable('markItemRejected')({ itemId, minPrice, maxPrice, userDecline: false });
+                if (item.id) {
+                    await firebase.app().functions("europe-west1").httpsCallable('markItemRejected')({
+                        itemId: item.id, userDecline: false
+                    });
                 }
                 sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
                 localStorage.removeItem('newItem');
@@ -54,14 +57,11 @@
                 window.location.href = '/private';
             });
         } else {
-            document.getElementById('confirmButton').addEventListener('click', () => acceptValuation(itemId, minPrice, maxPrice));
+            document.getElementById('confirmButton').addEventListener('click', () => acceptValuation(item.id, minPrice, maxPrice));
             document.getElementById('rejectButton').addEventListener('click', async () => {
-                if (itemId) {
+                if (item.id) {
                     await firebase.app().functions("europe-west1").httpsCallable('markItemRejected')({
-                        itemId,
-                        minPrice,
-                        maxPrice,
-                        userDecline: true
+                        itemId: item.id, userDecline: true
                     });
                 }
                 sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
@@ -87,8 +87,8 @@
     }
 
     const getItem = async (itemId) => {
-        const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: itemId  })
-        return res?.data;
+        const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId })
+        return { ...(res?.data || {}), id: itemId };
     }
 
     const main = async () => {
