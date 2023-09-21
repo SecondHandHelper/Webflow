@@ -34,7 +34,8 @@
         if (item.mlValuation?.humanCheckNeeded || !item.mlValuation?.minPriceEstimate) {
             document.getElementById('nextStepText').innerText = 'Du kommer få ett SMS när vi värderat plagget som du kan ta ställning till.';
         }
-        document.getElementById('itemPrice').innerText = item.mlValuation?.maxPriceEstimate ? `${item.mlValuation.maxPriceEstimate} kr` : '';
+        document.getElementById('itemPrice').innerText = item.mlValuation?.maxPriceEstimate && !item.mlValuation?.humanCheckNeeded ?
+            `${item.mlValuation.maxPriceEstimate} kr` : '';
         document.getElementById('itemPrice').style.display = 'block';
         document.getElementById('itemColor').innerText = colorName(item.color);
         document.getElementById('itemSize').innerText = item.size;
