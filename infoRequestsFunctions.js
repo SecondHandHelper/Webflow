@@ -171,14 +171,15 @@ function loadInfoRequests(userId) {
                             subText = "Vill du sänka priset och få det sålt?";
                             const max = infoRequests[req].maxPrice;
                             const min = infoRequests[req].minPrice;
+                            href = `javascript:openNewPriceToast('${itemId}', '${status}', ${max}, ${min}, '${brand}', '${description}', '${category}');`;
                             if (status === "New") {
                                 title = "Värdering";
                                 buttonClass = "acceptnewpricebutton";
                                 buttonTextClass = "text-block-69-copy-copy";
                                 buttonText = "Se värdering";
                                 subText = "Vill du sälja till vår värdering?";
+                                href = `/item-valuation?id=${itemId}`;
                             }
-                            href = `javascript:openNewPriceToast('${itemId}', '${status}', ${max}, ${min}, '${brand}', '${description}', '${category}');`;
                         }
                         // MEASUREMENTS REQUEST
                         if (req === "measurements") {

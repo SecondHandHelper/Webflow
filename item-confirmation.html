@@ -48,7 +48,7 @@
     }
 
     function initializePlatforms(item) {
-        (item.platformsToBePublishedOn || []).forEach(platform => {
+        (item.platformsToBePublishedOn).forEach(platform => {
             if (!platform.match(/Mai|Tradera/)) {
                 const newNode = document.getElementById('platformMai').cloneNode(true);
                 newNode.id = platform;
@@ -56,6 +56,8 @@
                 document.getElementById('platformMai').parentNode.appendChild(newNode);
             }
         });
+        document.getElementById('platformsLoadingDiv').style.display = 'none';
+        document.getElementById('platformsDiv').style.display = 'block';
     }
 
     function itemConditionText(item) {
@@ -65,25 +67,35 @@
         return item.condition;
     }
 
-    const item = JSON.parse(localStorage.getItem('latestItemCreated'));
-    if (item) {
+
+    const getItem = async (itemId) => {
+        return await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: itemId  })
+    }
+
+    const main = async () => {
+        const item = params.id ? await getItem(params.id) : JSON.parse(localStorage.getItem('latestItemCreated'));
+        if (!item) {
+            console.error("Invalid item id param or no recently created item");
+            return location.href = '/private';
+        }
         initializeFields(item);
         document.getElementById('loadingDiv').style.display = 'none';
         document.getElementById('contentDiv').style.display = 'block';
         // Show all fields except platformsToBePublishedOn, that is set in the backend so fetch the item before showing it
-        firebase.app().functions("europe-west1").httpsCallable('getPlatformsToBePublishedOn')({ itemId: item?.id  })
-            .then(response => {
-                if (response.data?.platformsToBePublishedOn?.length >= 2) {
-                    initializePlatforms(response.data);
-                    document.getElementById('platformsLoadingDiv').style.display = 'none';
-                    document.getElementById('platformsDiv').style.display = 'block';
-                } else {
-                    document.getElementById('platformsSection').style.display = 'none';
-                }
-            })
-            .catch(e => console.error(e));
-    } else {
-        console.log('No latest item found');
-        location.href = '/private';
+        if (item.platformsToBePublishedOn?.length) {
+            initializePlatforms(item);
+        } else {
+            firebase.app().functions("europe-west1").httpsCallable('getPlatformsToBePublishedOn')({ itemId: item?.id  })
+                .then(response => {
+                    if (response.data?.platformsToBePublishedOn?.length >= 2) {
+                        initializePlatforms(response.data);
+                    } else {
+                        document.getElementById('platformsSection').style.display = 'none';
+                    }
+                })
+                .catch(e => console.error(e));
+        }
     }
+
+    main();
 </script>
