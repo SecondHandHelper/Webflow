@@ -14,7 +14,11 @@
                 minPrice,
                 maxPrice
             });
-            return window.location.href = `/item-confirmation${params.id ? '?id=' + params.id : ''}`;
+            if (!document.referrer.includes('/private')) {
+                return window.location.href = `/item-confirmation${params.id ? '?id=' + params.id : ''}`;
+            } else {
+                return window.location.href = `/private`;
+            }
         }
     }
 
