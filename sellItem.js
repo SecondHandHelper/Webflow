@@ -32,13 +32,15 @@ async function saveItemValuation(itemId, mlValuationData) {
       modelVersion: version?.toString(),
       newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog
     },
-    ...(decline || humanCheckNeeded ? {} : { infoRequests: {
-      price: {
-        status: 'Active',
-        description: 'Värderingen utgår från vad liknande plagg sålts för nyligen. Vi börjar alltid i den övre delen av spannet och sänker successivt inom intervallet under säljperioden på 30 dagar.',
-        minPrice: minPrice,
-        maxPrice: maxPrice,
-      }
+    ...(decline || humanCheckNeeded ? {} : {
+      valuationStatus: 'Completed',
+      infoRequests: {
+        price: {
+          status: 'Active',
+          description: 'Värderingen utgår från vad liknande plagg sålts för nyligen. Vi börjar alltid i den övre delen av spannet och sänker successivt inom intervallet under säljperioden på 30 dagar.',
+          minPrice: minPrice,
+          maxPrice: maxPrice,
+        }
     }})
   }
   if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
