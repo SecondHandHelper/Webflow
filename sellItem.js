@@ -22,7 +22,10 @@ async function addItem(event) {
 
 async function saveItemValuation(itemId, mlValuationData) {
   const { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version,
-    newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog } = mlValuationData;
+    newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog } = mlValuationData || {};
+  if (!minPrice && !decline) {
+    return;
+  }
   const valuationData = {
     mlValuation: {
       decline, humanCheckNeeded, minPriceEstimate: minPrice, maxPriceEstimate: maxPrice,
