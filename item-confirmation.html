@@ -32,7 +32,8 @@
         initializeSlider(item);
         document.getElementById('itemTitle').innerText = (item.cleanedBrand || item.brand).trim() + "-" + item.category.toLowerCase();
         if (item.mlValuation?.humanCheckNeeded || !item.mlValuation?.minPriceEstimate) {
-            document.getElementById('nextStepText').innerText = 'Du kommer få ett SMS när vi värderat plagget som du kan ta ställning till.';
+            document.getElementById('nextStepTitle').style.display = 'block';
+            document.getElementById('nextStepText').innerText = 'Du kommer få ett SMS när vi värderat plagget som du kan ta ställning till';
         }
         document.getElementById('itemPrice').innerText = item.mlValuation?.maxPriceEstimate && !item.mlValuation?.humanCheckNeeded ?
             `${item.mlValuation.maxPriceEstimate} kr` : '';
