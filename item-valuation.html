@@ -22,7 +22,7 @@
         }
     }
 
-    const showMlValuation = (item) => {
+    const showMlValuation = async (item) => {
         const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline } = item.mlValuation || {};
         const minPrice = newMinPriceEstimate || minPriceEstimate || item.infoRequests?.price?.minPrice;
         const maxPrice = newMaxPriceEstimate || maxPriceEstimate || item.infoRequests?.price?.maxPrice
@@ -41,25 +41,25 @@
             document.getElementById('newItemButton').style.display = 'flex';
             document.getElementById('declineExplanation').style.display = 'block';
             document.getElementById('valuationExplanation').style.display = 'none';
-            document.getElementById('newItemButton').addEventListener('click', async () => {
+            document.getElementById('newItemButton').addEventListener('click', () => {
                 sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
                 localStorage.removeItem('newItem');
                 sessionStorage.removeItem('enhancedFrontImageSmall');
                 sessionStorage.removeItem('itemValuation');
                 window.location.href = '/sell-item';
             });
-            document.getElementById('confirmButton').addEventListener('click', async () => {
-                if (item.id) {
-                    await firebase.app().functions("europe-west1").httpsCallable('markItemRejected')({
-                        itemId: item.id, userDecline: false
-                    });
-                }
+            document.getElementById('confirmButton').addEventListener('click', () => {
                 sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
                 localStorage.removeItem('newItem');
                 sessionStorage.removeItem('enhancedFrontImageSmall');
                 sessionStorage.removeItem('itemValuation');
                 window.location.href = '/private';
             });
+            if (item.id) {
+                await firebase.app().functions("europe-west1").httpsCallable('markItemRejected')({
+                    itemId: item.id, userDecline: false
+                });
+            }
         } else {
             document.getElementById('confirmButton').addEventListener('click', () => acceptValuation(item.id, minPrice, maxPrice));
             document.getElementById('rejectButton').addEventListener('click', async () => {
