@@ -135,12 +135,15 @@ function collect() {
   // Get defects list
   let defectElements = new Map().set("hole", hole.checked).set("stain", stain.checked).set("lostFit", lostFit.checked).set("nopprig", nopprig.checked).set("threadUp", threadUp.checked).set("colorChange", colorChange.checked).set("otherDefect", otherDefect.checked);
   let defects = [];
-  defectElements.forEach((value, key) => {
-    if (value) {
-      let string = defectsChoicesInSwedish.get(key);
-      defects.push(string);
-    }
-  });
+  if (condition === 'Använd, tecken på slitage') {
+    defectElements.forEach((value, key) => {
+      if (value) {
+        let string = defectsChoicesInSwedish.get(key);
+        defects.push(string);
+      }
+    });
+  }
+
 
   // Get radio buttons
   var sexRadioButtons = document.getElementsByName("Sex");
