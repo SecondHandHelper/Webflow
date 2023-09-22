@@ -35,7 +35,7 @@ async function saveItemValuation(itemId, mlValuationData) {
       modelVersion: version?.toString(),
       newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog
     },
-    ...(decline || humanCheckNeeded ? {} : {
+    ...(decline || humanCheckNeeded || newMinMaxLog?.length ? {} : {
       valuationStatus: 'Completed',
       infoRequests: {
         price: {
@@ -67,16 +67,17 @@ const getAndSaveMlValuation = async (itemId, userValuationApproval) => {
   }
   try {
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});
-    const { minPrice, maxPrice, decline, humanCheckNeeded } = res.data || {};
+    const { minPrice, maxPrice, decline, humanCheckNeeded, newMinMaxLog } = res.data || {};
     await saveItemValuation(itemId, res.data);
-    return nextStepAfterMlValuation(minPrice && maxPrice, decline, humanCheckNeeded, userValuationApproval);
+    return nextStepAfterMlValuation(minPrice && maxPrice, decline,
+        humanCheckNeeded || newMinMaxLog?.length, userValuationApproval);
   } catch (e) {
     console.error('Failed to get ml valuation', e);
   }
   return nextStepAfterMlValuation();
 }
 
-function nextStepAfterMlValuation(mlValuationPresent, decline, humanCheckNeeded, userValuationApproval) {
+function nextStepAfterMlValuation(mlValuationPresent, decline, valuationNeedsChecking, userValuationApproval) {
   if (!mlValuationPresent) {
     if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
       return '/sign-in';
@@ -86,7 +87,7 @@ function nextStepAfterMlValuation(mlValuationPresent, decline, humanCheckNeeded,
   if (decline) {
     return '/item-valuation';
   }
-  if (humanCheckNeeded || !userValuationApproval) {
+  if (valuationNeedsChecking || !userValuationApproval) {
     return '/item-confirmation';
   }
   return '/item-valuation';

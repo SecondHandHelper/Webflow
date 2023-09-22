@@ -31,12 +31,12 @@
     function initializeFields(item) {
         initializeSlider(item);
         document.getElementById('itemTitle').innerText = (item.cleanedBrand || item.brand).trim() + "-" + item.category.toLowerCase();
-        if (item.mlValuation?.humanCheckNeeded || !item.mlValuation?.minPriceEstimate) {
+        const { humanCheckNeeded, minPriceEstimate, maxPriceEstimate, newMinMaxLog } = item.mlValuation || {};
+        if (humanCheckNeeded || !minPriceEstimate || newMinMaxLog) {
             document.getElementById('nextStepTitle').style.display = 'block';
             document.getElementById('nextStepText').innerText = 'Du kommer få ett SMS när vi värderat plagget som du kan ta ställning till';
         }
-        document.getElementById('itemPrice').innerText = item.mlValuation?.maxPriceEstimate && !item.mlValuation?.humanCheckNeeded ?
-            `${item.mlValuation.maxPriceEstimate} kr` : '';
+        document.getElementById('itemPrice').innerText = maxPriceEstimate && !humanCheckNeeded && !newMinMaxLog ? `${maxPriceEstimate} kr` : '';
         document.getElementById('itemPrice').style.display = 'block';
         document.getElementById('itemColor').innerText = colorName(item.color);
         document.getElementById('itemSize').innerText = item.size;
