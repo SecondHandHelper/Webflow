@@ -37,6 +37,7 @@ async function saveItemValuation(itemId, mlValuationData) {
     },
     ...(decline || humanCheckNeeded || newMinMaxLog?.length ? {} : {
       valuationStatus: 'Completed',
+      valuationDate: new Date().toISOString(),
       infoRequests: {
         price: {
           status: 'Active',
