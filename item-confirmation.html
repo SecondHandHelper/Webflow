@@ -22,29 +22,35 @@
     }
 
     function colorName(color) {
-        const mapping = { Beige: 'Beige', Blue: 'Blå', Brown: 'Brun', Green: 'Grön', Grey: 'Grå', Yellow: 'Gul', Gold: 'Guld',
+        const mapping = {
+            Beige: 'Beige', Blue: 'Blå', Brown: 'Brun', Green: 'Grön', Grey: 'Grå', Yellow: 'Gul', Gold: 'Guld',
             Purple: 'Lila', Navy: 'Navy', Orange: 'Orange', Pink: 'Rosa', Red: 'Röd', Silver: 'Silver', Black: 'Svart',
-            Turquoise: 'Turkos', Burgundy: 'Vinröd', White: 'Vit', Multicolour: 'Flerfärgad' };
+            Turquoise: 'Turkos', Burgundy: 'Vinröd', White: 'Vit', Multicolour: 'Flerfärgad'
+        };
         return mapping[color] || color;
     }
-    
+
     function initializeFields(item) {
         initializeSlider(item);
-        document.getElementById('itemTitle').innerText = (item.cleanedBrand || item.brand).trim() + "-" + item.category.toLowerCase();
         const { humanCheckNeeded, minPriceEstimate, maxPriceEstimate, newMinMaxLog } = item.mlValuation || {};
         if (humanCheckNeeded || !minPriceEstimate || newMinMaxLog) {
             document.getElementById('nextStepTitle').style.display = 'block';
             document.getElementById('nextStepText').innerText = 'Du kommer få ett SMS när vi värderat plagget som du kan ta ställning till';
         }
-        document.getElementById('itemPrice').innerText = maxPriceEstimate && !humanCheckNeeded && !newMinMaxLog ? `${maxPriceEstimate} kr` : '';
+        document.getElementById('itemTitle').innerText = (item.cleanedBrand || item.brand).trim() + "-" + item.category.toLowerCase();
+        document.getElementById('itemPrice').innerText = maxPriceEstimate && !humanCheckNeeded && !newMinMaxLog ? `${maxPriceEstimate} SEK` : '';
         document.getElementById('itemPrice').style.display = 'block';
-        document.getElementById('itemColor').innerText = colorName(item.color);
+        document.getElementById('itemSubtitle').innerText = item.model ? `${item.model}, ${colorName(item.color)}` : colorName(item.color);
         document.getElementById('itemSize').innerText = item.size;
         document.getElementById('itemMaterial').innerText = item.material;
         document.getElementById('itemCondition').innerText = item.condition = itemConditionText(item);
+        if (item.originalPrice) {
+            itemOriginalPrice.innerText = item.originalPrice + ' SEK';
+            originalPriceDiv.style.display = 'flex';
+        }
         if (item.userComment) {
-            document.getElementById('itemCommentDiv').style.display = 'block';
             document.getElementById('itemComment').innerText = item.userComment;
+            document.getElementById('itemCommentDiv').style.display = 'block';
         }
     }
 
@@ -62,15 +68,29 @@
     }
 
     function itemConditionText(item) {
+        let conditionText = '';
         if (item.condition === 'Använd, tecken på slitage' && (item.defects.length || item.defectDescription)) {
-            return `Anmärkning: ${item.defects ? item.defects + '.' : ''} ${item.defectDescription ? item.defectDescription + '.' : ''}`;
+            let defects = [];
+            if (item.defectDescription){
+                conditionText = item.defectDescription;
+            }
+            else if (item.defects && item.defects.length > 0) {
+                defects = item.defects.filter((defect) => { return defect !== 'Annat'; });
+                conditionText = 'Anmärkning: ' + defects.join(', ');
+            } else {
+                conditionText = item.condition;
+            }
+        } else {
+            conditionText = item.condition;
         }
-        return item.condition;
+        conditionText = (conditionText + '.').replace('..', '.');
+
+        return conditionText;
     }
 
 
     const getItem = async (itemId) => {
-        const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: itemId  });
+        const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: itemId });
         return { ...(res?.data || {}), id: itemId };
     }
 
@@ -81,13 +101,12 @@
             return location.href = '/private';
         }
         initializeFields(item);
-        document.getElementById('loadingDiv').style.display = 'none';
-        document.getElementById('contentDiv').style.display = 'block';
+        triggerShowContent.click();
         // Show all fields except platformsToBePublishedOn, that is set in the backend so fetch the item before showing it
         if (item.platformsToBePublishedOn?.length) {
             initializePlatforms(item);
         } else {
-            firebase.app().functions("europe-west1").httpsCallable('getPlatformsToBePublishedOn')({ itemId: item?.id  })
+            firebase.app().functions("europe-west1").httpsCallable('getPlatformsToBePublishedOn')({ itemId: item?.id })
                 .then(response => {
                     if (response.data?.platformsToBePublishedOn?.length >= 2) {
                         initializePlatforms(response.data);

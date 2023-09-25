@@ -26,8 +26,8 @@
         const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline } = item.mlValuation || {};
         const minPrice = newMinPriceEstimate || minPriceEstimate || item.infoRequests?.price?.minPrice;
         const maxPrice = newMaxPriceEstimate || maxPriceEstimate || item.infoRequests?.price?.maxPrice
-        document.getElementById('loadingDiv').style.display = 'none';
         document.getElementById('valuationResultDiv').style.display = 'flex';
+        triggerShowContent.click();
         document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
         document.getElementById('valuationText').style.display = 'block';
         if (!sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
