@@ -30,6 +30,10 @@
 
         showNpsSurvey(items);
         showInviteToast(items);
+        if(user.current?.referralData?.referralCode){
+            referralCodeText.innerHTML = user.current.referralData.referralCode;
+            headerInviteButton.style.display = 'flex';
+        }
         loadItemCards(items);
         loadInfoRequests(userId);
         showOrderBagsSection();
