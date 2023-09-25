@@ -789,7 +789,7 @@ function shareCode() {
     const code = user.current.referralData.referralCode;
     const text = `Hej, jag vill tipsa om Mai för att rensa ur garderoben. Mai är en tjänst som hjälper dig att sälja dina kläder på ett enkelt sätt. Man tar bilder på sina plagg, sedan sköter Mai resten, såsom värdering, publicering på plattformar, kontakt med köpare och frakt när det blir sålt. Man får själv behålla 80% av vinsten, och blir det inte sålt kostar det ingenting.
 
-Som en uppmuntran till att komma igång ger Mai dig 100kr i välkomstgåva, när du registrerar dig med min kod ${code}.
+Om du lägger upp ett plagg inom 7 dagar får du sälja det kommissionsfritt när du använder min kod: ${code}
 
 Läs mer och registrera dig här:`
     if (navigator.share) {
