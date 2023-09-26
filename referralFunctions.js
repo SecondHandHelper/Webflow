@@ -48,9 +48,19 @@ async function createReferralCode() {
 }
 
 async function connectReferralUsers(inputCode) {
+  inputCode = inputCode.trim().toUpperCase();
+  if (inputCode === user.current?.referralData?.referralCode) {
+    // Show message they can't add their own code
+    errorMessageBanner.click();
+    setTimeout(function () {
+      errorMessageBanner.click();
+    }, 1000);
+    return
+  }
+
   // Find user with matching referral code and connect users
   try {
-    inputCode = inputCode.trim().toUpperCase();
+    
     const referrerUser = await firebase.app().functions("europe-west3").httpsCallable('connectReferralUser')({ code: inputCode })
     if (referrerUser?.data?.name) {
       document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + referrerUser?.data?.name;
