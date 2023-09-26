@@ -23,7 +23,7 @@ async function requestUniqueId() {
 }
 
 async function addItem(event) {
-  const { id } = await requestUniqueId();
+  const id = await requestUniqueId();
   try {
     document.getElementById('addItemFormDiv').style.display = 'none';
     document.getElementById('loadingDiv').style.display = 'flex';
@@ -710,7 +710,7 @@ function rememberNewItemImageField(fieldName, value) {
 }
 
 async function uploadTempImage(input, fileName) {
-  const { id: tempId } = await requestUniqueId();
+  const tempId = await requestUniqueId();
   let image = await scaleImageToMaxSize(input);
   if (!image) {
     throw 'Fel vid bearbetning av vald bild.';
