@@ -24,8 +24,8 @@
 
     const showMlValuation = async (item) => {
         const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline } = item.mlValuation || {};
-        const minPrice = newMinPriceEstimate || minPriceEstimate || item.infoRequests?.price?.minPrice;
-        const maxPrice = newMaxPriceEstimate || maxPriceEstimate || item.infoRequests?.price?.maxPrice
+        const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
+        const maxPrice =  item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
         document.getElementById('valuationResultDiv').style.display = 'flex';
         triggerShowContent.click();
         document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
