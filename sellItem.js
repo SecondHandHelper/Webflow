@@ -247,7 +247,7 @@ async function addItemInner(id) {
   if (!authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
-    await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
+    await firebase.app().functions("europe-west1").httpsCallable('createItem2')({ id, item });
     localStorage.removeItem('newItem');
     localStorage.removeItem('newItemImages');
     item.id = id;
