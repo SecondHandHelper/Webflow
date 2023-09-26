@@ -55,7 +55,7 @@ async function connectReferralUsers(inputCode) {
     saveRefCodeLoadingDiv.style.display = 'none';
     saveReferralCodeButton.style.display = 'inline-block';
     setTimeout(function () {
-      errorMessageBanner.click();
+      errorMessageBanner.style.display = 'none';
     }, 2000);
     return
   }
