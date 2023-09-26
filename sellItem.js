@@ -20,6 +20,10 @@ async function addItem(event) {
   }
 }
 
+function needsHumanCheck({ humanCheckNeeded, newMinMaxLog }) {
+  return humanCheckNeeded || newMinMaxLog.match(/accept price above max/i)
+}
+
 async function saveItemValuation(itemId, mlValuationData) {
   const { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version,
     newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog } = mlValuationData || {};
@@ -35,7 +39,7 @@ async function saveItemValuation(itemId, mlValuationData) {
       modelVersion: version?.toString(),
       newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog
     },
-    ...(decline || humanCheckNeeded || newMinMaxLog?.length ? {} : {
+    ...(decline || needsHumanCheck(mlValuationData) ? {} : {
       valuationStatus: 'Completed',
       valuationDate: new Date().toISOString(),
       infoRequests: {
@@ -68,10 +72,9 @@ const getAndSaveMlValuation = async (itemId, userValuationApproval) => {
   }
   try {
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});
-    const { minPrice, maxPrice, decline, humanCheckNeeded, newMinMaxLog } = res.data || {};
+    const { minPrice, maxPrice, decline } = res.data || {};
     await saveItemValuation(itemId, res.data);
-    return nextStepAfterMlValuation(minPrice && maxPrice, decline,
-        humanCheckNeeded || newMinMaxLog?.length, userValuationApproval);
+    return nextStepAfterMlValuation(minPrice && maxPrice, decline, needsHumanCheck(res.data), userValuationApproval);
   } catch (e) {
     console.error('Failed to get ml valuation', e);
   }
@@ -705,8 +708,8 @@ async function uploadTempImage(input, fileName) {
 }
 
 async function scaleImageToMaxSize(input) {
-  if (input.size < 1024 * 1024) {
-    // Don't compress images < 1MB in size
+  if (input.size < 3 * 1024 * 1024) {
+    // Don't compress images < 3MB in size
     return Promise.resolve(input);
   }
   return new Promise((resolve, reject) => {
