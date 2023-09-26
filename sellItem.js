@@ -1,8 +1,29 @@
 const defectsChoicesInSwedish = new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
 const imageElements = ["frontImage", "brandTagImage", "defectImage", "materialTagImage", "extraImage"];
 
+async function requestUniqueId() {
+  const endpointUrl = 'https://generateuniqueid-heypmjzjfq-ew.a.run.app';
+  try {
+    const response = await fetch(endpointUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      console.error(`Error: ${response.statusText}`);
+      return null;
+    }
+    const data = await response.json();
+    return data.id;
+  } catch (error) {
+    console.error(`Failed to fetch unique ID: ${error.message}`);
+    return null;
+  }
+}
+
 async function addItem(event) {
-  const id = uuidv4();
+  const { id } = await requestUniqueId();
   try {
     document.getElementById('addItemFormDiv').style.display = 'none';
     document.getElementById('loadingDiv').style.display = 'flex';
@@ -689,7 +710,7 @@ function rememberNewItemImageField(fieldName, value) {
 }
 
 async function uploadTempImage(input, fileName) {
-  const tempId = uuidv4();
+  const { id: tempId } = await requestUniqueId();
   let image = await scaleImageToMaxSize(input);
   if (!image) {
     throw 'Fel vid bearbetning av vald bild.';
@@ -760,10 +781,10 @@ async function brandTagImageChangeHandler(event) {
 }
 
 function showLoadingIcon(imageName) {
-  if (imageName == 'frontImage'){ 
+  if (imageName == 'frontImage'){
     document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
     document.getElementById('enhancedAnimationDiv').style.display = 'block';
-    triggerEnhancingAnimation.click(); 
+    triggerEnhancingAnimation.click();
     return
   }
   document.getElementById(`loading${capitalizeFirstLetter(imageName)}Icon`).style.display = 'inline-block';
