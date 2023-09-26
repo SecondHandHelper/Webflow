@@ -21,7 +21,7 @@ async function addItem(event) {
 }
 
 function needsHumanCheck({ humanCheckNeeded, newMinMaxLog }) {
-  return humanCheckNeeded || newMinMaxLog.match(/accept price above max/i)
+  return humanCheckNeeded || newMinMaxLog.match(/accept price is above max/i)
 }
 
 async function saveItemValuation(itemId, mlValuationData) {
