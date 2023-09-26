@@ -52,6 +52,8 @@ async function connectReferralUsers(inputCode) {
   if (inputCode === user.current?.referralData?.referralCode) {
     // Show message they can't add their own code
     errorMessageBanner.style.display = 'flex';
+    saveRefCodeLoadingDiv.style.display = 'none';
+    saveReferralCodeButton.style.display = 'inline-block';
     setTimeout(function () {
       errorMessageBanner.click();
     }, 2000);
