@@ -51,9 +51,9 @@ async function connectReferralUsers(inputCode) {
   inputCode = inputCode.trim().toUpperCase();
   if (inputCode === user.current?.referralData?.referralCode) {
     // Show message they can't add their own code
-    errorMessageBanner.click();
+    errorMessageBanner.style.display = 'flex';
     setTimeout(function () {
-      errorMessageBanner.click();
+      errorMessageBanner.style.display = 'none';
     }, 1000);
     return
   }
