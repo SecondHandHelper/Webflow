@@ -247,7 +247,8 @@ async function addItemInner(id) {
   if (!authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
-    const newItem = await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
+    const response = await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
+    const newItem = response.data;
     localStorage.removeItem('newItem');
     localStorage.removeItem('newItemImages');
     newItem.id = id;
@@ -349,7 +350,8 @@ function isElementInView (el) {
 async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
-  const newItem = await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
+  const response = await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
+  const newItem = response.data;
   localStorage.removeItem('newItem');
   localStorage.removeItem('newItemImages');
   newItem.id = itemFromStorage.id;
