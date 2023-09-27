@@ -468,11 +468,11 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
       let urlSmall = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName] || images[`${imageName}Large`];
       let urlLarge = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
       if (imageElements.includes(imageName)) {
-        rememberNewItemImageField(imageName, urlLarge);
+        rememberNewItemImageField(imageName, urlLarge, urlSmall);
         if (imageName === 'frontImage' && images.enhancedFrontImage) {
           urlSmall = images['enhancedFrontImageSmall'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImage'] || images['enhancedFrontImageLarge'];
           urlLarge = images['enhancedFrontImage'] || images['enhancedFrontImageLarge'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImageSmall'];
-          rememberNewItemImageField('enhancedFrontImage', urlLarge);
+          rememberNewItemImageField('enhancedFrontImage', urlLarge, urlSmall);
         }
         showImagePreview(imageName, urlSmall);
         showImageState(imageName, 'success-state');
