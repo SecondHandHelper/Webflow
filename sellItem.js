@@ -247,12 +247,11 @@ async function addItemInner(id) {
   if (!authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
-    const response = await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
-    const newItem = response.data;
+    await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
     localStorage.removeItem('newItem');
     localStorage.removeItem('newItemImages');
-    newItem.id = id;
-    localStorage.setItem('latestItemCreated', JSON.stringify(newItem));
+    item.id = id;
+    localStorage.setItem('latestItemCreated', JSON.stringify(item));
   }
 
   // If first time: User submitted their phone number
@@ -350,12 +349,11 @@ function isElementInView (el) {
 async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
-  const response = await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
-  const newItem = response.data;
+  await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
   localStorage.removeItem('newItem');
   localStorage.removeItem('newItemImages');
-  newItem.id = itemFromStorage.id;
-  localStorage.setItem('latestItemCreated', JSON.stringify(newItem));
+  itemFromStorage.item.id = itemFromStorage.id;
+  localStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
 }
 
 async function enhanceFrontImage(imageUrl) {
