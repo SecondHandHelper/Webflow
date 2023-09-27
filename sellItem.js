@@ -730,8 +730,8 @@ async function uploadTempImage(input, fileName) {
 }
 
 async function scaleImageToMaxSize(input) {
-  if (input.size < 3 * 1024 * 1024) {
-    // Don't compress images < 3MB in size
+  if (input.size < 9 * 1024 * 1024) {
+    // Don't compress images < 9MB in size
     return Promise.resolve(input);
   }
   return new Promise((resolve, reject) => {
@@ -758,6 +758,7 @@ async function scaleImageToMaxSize(input) {
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext("2d");
+        ctx.imageSmoothingQuality = "high";
         ctx.drawImage(img, 0, 0, width, height);
         canvas.toBlob(resolve, 'image/jpeg')
       }
