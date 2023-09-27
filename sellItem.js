@@ -359,9 +359,8 @@ async function createItemAfterSignIn() {
 async function enhanceFrontImage(imageUrl) {
   const enhancedImageUrls = await createEnhancedImage(imageUrl);
   if (enhancedImageUrls?.url) {
-    rememberNewItemImageField('enhancedFrontImage', enhancedImageUrls.url);
-    showImagePreview('frontImage', enhancedImageUrls.urlSmall);
-    sessionStorage.setItem('enhancedFrontImageSmall', enhancedImageUrls.urlSmall);
+    rememberNewItemImageField('enhancedFrontImage', enhancedImageUrls.url, enhancedImageUrls.urlSmall);
+    showImagePreview('frontImage', window.innerWidth <= 400 ? enhancedImageUrls.urlSmall : enhancedImageUrls.url);
   }
   showDeleteImageIcon('frontImage');
   return enhancedImageUrls;
@@ -673,8 +672,8 @@ async function uploadImageAndShowPreview(input, imageName) {
     document.getElementById(`${imageName}Preview`).style.backgroundImage = `url('${src}')`;
     showLoadingIcon(imageName)
     showImageState(imageName, 'success-state');
-    const imageUrl = await uploadTempImage(input, imageName);
-    rememberNewItemImageField(imageName, imageUrl);
+    const { url: imageUrl, urlSmall: imageUrlSmall } = await uploadTempImage(input, imageName);
+    rememberNewItemImageField(imageName, imageUrl, imageUrlSmall);
     return imageUrl;
   } catch (ex) {
     console.error('Failed to upload image', ex);
@@ -703,9 +702,10 @@ function hideImageError(imageName) {
   parentNode.querySelector('.w-file-upload-error').style.display = 'none';
 }
 
-function rememberNewItemImageField(fieldName, value) {
+function rememberNewItemImageField(imageName, imageUrl, imageUrlSmall) {
   let newItemImages = JSON.parse(localStorage.getItem('newItemImages') || JSON.stringify({}));
-  newItemImages[fieldName] = value;
+  newItemImages[imageName] = imageUrl;
+  newItemImages[`${imageName}Small`] = imageUrlSmall;
   localStorage.setItem('newItemImages', JSON.stringify(newItemImages));
 }
 
@@ -720,12 +720,13 @@ async function uploadTempImage(input, fileName) {
   form.append('fileName', fileName);
   form.append('file', image);
   form.append('temporary', 'true');
+  form.append('generateSmallImage', 'true');
   const response = await fetch('https://uploaditemimagebinary-heypmjzjfq-ew.a.run.app', {
     method: 'POST',
     body: form
   });
   const jsonResponse = await response.json();
-  return jsonResponse.url;
+  return jsonResponse;
 }
 
 async function scaleImageToMaxSize(input) {
@@ -1100,6 +1101,7 @@ function removeSavedImage(imageName) {
   const newItemImages = JSON.parse(localStorage.getItem('newItemImages'));
   const newItem = JSON.parse(localStorage.getItem('newItem'));
   delete newItemImages[imageName];
+  delete newItemImages[`${imageName}Small`];
   delete newItem?.images?.[imageName];
   localStorage.setItem('newItemImages', JSON.stringify(newItemImages));
   localStorage.setItem('newItem', JSON.stringify(newItem));

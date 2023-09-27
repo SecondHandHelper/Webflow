@@ -15,7 +15,7 @@
                 }
                 const newSlide = cloneSlide.cloneNode(true);
                 newSlide.id = imageName;
-                newSlide.firstChild.src = images[imageName];
+                newSlide.firstChild.src = window.innerWidth <= 400 ? images[`${imageName}Small`] : images[imageName];
                 sliderMask.appendChild(newSlide);
             }
         }

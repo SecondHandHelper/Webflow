@@ -44,14 +44,12 @@
             document.getElementById('newItemButton').addEventListener('click', () => {
                 sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
                 localStorage.removeItem('newItem');
-                sessionStorage.removeItem('enhancedFrontImageSmall');
                 sessionStorage.removeItem('itemValuation');
                 window.location.href = '/sell-item';
             });
             document.getElementById('confirmButton').addEventListener('click', () => {
                 sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
                 localStorage.removeItem('newItem');
-                sessionStorage.removeItem('enhancedFrontImageSmall');
                 sessionStorage.removeItem('itemValuation');
                 window.location.href = '/private';
             });
@@ -70,14 +68,13 @@
                 }
                 sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
                 localStorage.removeItem('newItem');
-                sessionStorage.removeItem('enhancedFrontImageSmall');
                 return window.location.href = '/private';
             });
         }
     }
 
     const initialPageSetup = (item) => {
-        document.getElementById('itemImage').src = sessionStorage.getItem('enhancedFrontImageSmall') || item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage;
+        document.getElementById('itemImage').src = window.innerWidth <= 400 ? item?.images?.enhancedFrontImageSmall : item?.images?.enhancedFrontImage;
         document.getElementById('chatLink').onclick = () => Intercom('showNewMessage',
             item.mlValuation?.decline ?
                 `ID: ${item.id}\n\nGällande att ni tackade nej till ${item.brand.trim()}-${item.category.toLowerCase()}:\n\n` :
@@ -85,7 +82,6 @@
         document.getElementById('valuationClose').addEventListener('click', () => {
             sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
             localStorage.removeItem('newItem');
-            sessionStorage.removeItem('enhancedFrontImageSmall');
             return window.location.href = '/private';
         })
     }
