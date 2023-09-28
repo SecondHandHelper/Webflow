@@ -21,6 +21,11 @@
 
   // Set invite code cookie
   checkCookie("invite");
+
+  if (params.invite){
+    referralCodeText.innerHTML = params.invite;
+    activeCode.style.display = 'flex';
+  }
 </script>
 <script>
   // Intercom stuff
