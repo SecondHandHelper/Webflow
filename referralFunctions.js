@@ -1,42 +1,52 @@
 // REFERRAL PROGRAM FUNCTIONS
 async function showReferralSection() {
-  const userCreatedDate = new Date(authUser.current.metadata.creationTime);
-  const now = new Date();
-  let daysDiff = (now.getTime() - userCreatedDate.getTime()) / (1000 * 3600 * 24);
-  console.log("Days since user registered", daysDiff);
-  let soldItemExist = false;
-
-  // Check if an item is sold
-  await db.collection("items").where("user", "==", userId).where("status", "==", "Sold").get().then((querySnapshot) => {
-    if (querySnapshot.size > 0) {
-      soldItemExist = true;
-    }
-  });
-
-  if (user.current?.referralData?.referralCode && soldItemExist) {
+  if (user.current?.referralData?.referralCode) {
     document.getElementById("myReferralCodeText").innerHTML = user.current.referralData.referralCode;
-    
     if (user.current?.referralData?.activatedReferredUsersCount > 0) {
-      // shareCodeState 'block', but should also show the bonus received... TODO"
+      // shareCodeState 'block', but should also show the bonus received... TODO"... Eller förresten, detta ska nog ligga på en referral sida + SMS
       shareCodeState.style.display = 'block';
     } else {
       shareCodeState.style.display = 'block';
     }
-  } else if (user.current?.referralData?.referredBy && !user.current?.referralData?.referredByBonusPaid) {
-    // Get inviters first name
-    const inviter = user.current?.referralData?.referredBy;
-
-    const inviterName = await firebase.app().functions("europe-west3").httpsCallable('referrerName')({ referrerId: inviter });
-    if (inviterName?.data?.name) {
-      document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + inviterName.data.name;
-    }
-    referredByBonusState.style.display = 'block';
-  } else if ((user.current?.referralData?.referredBy ? false : true) && daysDiff < 100) {
-    enterCodeState.style.display = 'block';
   }
-
   referralSection.style.display = 'block';
 }
+
+async function checkSoldItemExists (){
+  // Check if an item is sold
+  await db.collection("items").where("user", "==", userId).where("status", "==", "Sold").get().then((querySnapshot) => {
+    if (querySnapshot.size > 0) {
+      return true;
+    }
+  });
+  return false
+}
+
+async function showBonusSection() {
+  const userCreatedDate = new Date(authUser.current.metadata.creationTime);
+  const now = new Date();
+  let daysDiff = (now.getTime() - userCreatedDate.getTime()) / (1000 * 3600 * 24);
+  console.log("Days since user registered", daysDiff);
+  const referralData = user.current?.referralData;
+
+  if (referralData && referralData?.referredBy && (!referralData?.referredByBonusPaid || !referralData?.referredByDiscountUsed)) { //TODO: Behöver 'referredByDiscountUsed' till FS för att kunna se om de redan löst in 1 kommissionsfri försäljning
+    // Get inviters first name
+    const inviter = referralData?.referredBy;
+    const inviterName = await firebase.app().functions("europe-west3").httpsCallable('referrerName')({ referrerId: inviter });
+    if (inviterName?.data?.name && inviterName?.data?.name !== 'Mai') {
+      document.getElementById('bonusName').innerHTML = `BONUS - INBJUDEN AV " + ${inviterName.data.name}`;
+    }
+    bonusActivatedState.style.display = 'block';
+    bonusSection.style.display = 'block';
+    return;
+  }
+  
+  if ((user.current?.referralData?.referredBy ? false : true) && daysDiff <= 10) {
+    enterCodeState.style.display = 'block';
+    bonusSection.style.display = 'block';
+  }
+}
+
 
 async function createReferralCode() {
   if (!user.current?.referralData?.referralCode) {
@@ -65,7 +75,7 @@ async function connectReferralUsers(inputCode) {
     const referrerUser = await firebase.app().functions("europe-west3").httpsCallable('connectReferralUser')({ code: inputCode })
     if (referrerUser?.data?.name) {
       document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + referrerUser?.data?.name;
-      referredByBonusState.style.display = 'block';
+      bonusActivatedState.style.display = 'block';
       enterCodeState.style.display = 'none';
       console.log("Referral connection successfully stored");
     } else {
