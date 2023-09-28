@@ -55,7 +55,7 @@ async function showReferralErrorMessage (msg){
   saveReferralCodeButton.click(); //To trigger animation
   setTimeout(function () {
     errorMessageBanner.style.display = 'none';
-  }, 2000);
+  }, 2500);
 }
 
 async function connectReferralUsers(inputCode) {
@@ -68,14 +68,14 @@ async function connectReferralUsers(inputCode) {
   // Find user with matching referral code and connect users
   try {
     const referrerUser = await firebase.app().functions("europe-west3").httpsCallable('connectReferralUser')({ code: inputCode })
-    if (referrerUser?.data?.name) {
-      document.getElementById("bonusName").innerHTML = "BONUS - INBJUDEN AV " + referrerUser?.data?.name;
+    if (referrerUser?.data?.name && referrerUser?.data?.name !== 'Mai') {
+      document.getElementById("bonusName").innerHTML = "BONUS - INBJUDEN AV " + referrerUser?.data?.name.toUpperCase();
       bonusActivatedState.style.display = 'block';
       enterCodeState.style.display = 'none';
       console.log("Referral connection successfully stored");
     } else {
       console.log("Failed to use referral code", referrerUser?.data);
-      await showReferralErrorMessage('Koden finns inte');
+      await showReferralErrorMessage('Koden hittades inte');
       return
     }
   } catch (e) {
