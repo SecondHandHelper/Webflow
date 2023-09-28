@@ -57,16 +57,21 @@ async function createReferralCode() {
   }
 }
 
+async function showReferralErrorMessage (msg){
+  // Show message they can't add their own code
+  errorBannerMessage.innerHTML = msg ? msg : errorBannerMessage.innerHTML;
+  errorMessageBanner.style.display = 'flex';
+  saveRefCodeLoadingDiv.style.display = 'none';
+  saveReferralCodeButton.style.display = 'inline-block';
+  setTimeout(function () {
+    errorMessageBanner.style.display = 'none';
+  }, 2000);
+}
+
 async function connectReferralUsers(inputCode) {
   inputCode = inputCode.trim().toUpperCase();
   if (inputCode === user.current?.referralData?.referralCode) {
-    // Show message they can't add their own code
-    errorMessageBanner.style.display = 'flex';
-    saveRefCodeLoadingDiv.style.display = 'none';
-    saveReferralCodeButton.style.display = 'inline-block';
-    setTimeout(function () {
-      errorMessageBanner.style.display = 'none';
-    }, 2000);
+    await showReferralErrorMessage('Du kan inte aktivera din egen kod');
     return
   }
 
@@ -74,12 +79,14 @@ async function connectReferralUsers(inputCode) {
   try {
     const referrerUser = await firebase.app().functions("europe-west3").httpsCallable('connectReferralUser')({ code: inputCode })
     if (referrerUser?.data?.name) {
-      document.getElementById("referredByBonusTitle").innerHTML = "Välkomstgåva från " + referrerUser?.data?.name;
+      document.getElementById("bonusName").innerHTML = "BONUS - INBJUDEN AV " + referrerUser?.data?.name;
       bonusActivatedState.style.display = 'block';
       enterCodeState.style.display = 'none';
       console.log("Referral connection successfully stored");
     } else {
       console.log("Failed to use referral code", referrerUser?.data);
+      await showReferralErrorMessage('Koden finns inte');
+      return
     }
   } catch (e) {
     errorHandler.report(e);
