@@ -12,16 +12,6 @@ async function showReferralSection() {
   referralSection.style.display = 'block';
 }
 
-async function checkSoldItemExists (){
-  // Check if an item is sold
-  await db.collection("items").where("user", "==", userId).where("status", "==", "Sold").get().then((querySnapshot) => {
-    if (querySnapshot.size > 0) {
-      return true;
-    }
-  });
-  return false
-}
-
 async function showBonusSection() {
   const userCreatedDate = new Date(authUser.current.metadata.creationTime);
   const now = new Date();
@@ -47,7 +37,6 @@ async function showBonusSection() {
   }
 }
 
-
 async function createReferralCode() {
   if (!user.current?.referralData?.referralCode) {
     const referralCode = await firebase.app().functions("europe-west3").httpsCallable('setUserReferralCode')();
@@ -63,6 +52,7 @@ async function showReferralErrorMessage (msg){
   errorMessageBanner.style.display = 'flex';
   saveRefCodeLoadingDiv.style.display = 'none';
   saveReferralCodeButton.style.display = 'inline-block';
+  saveReferralCodeButton.click(); //To trigger animation
   setTimeout(function () {
     errorMessageBanner.style.display = 'none';
   }, 2000);
@@ -92,4 +82,14 @@ async function connectReferralUsers(inputCode) {
     errorHandler.report(e);
     console.log("Failed to use referral code", e);
   }
+}
+
+async function checkSoldItemExists (){
+  // Check if an item is sold
+  await db.collection("items").where("user", "==", userId).where("status", "==", "Sold").get().then((querySnapshot) => {
+    if (querySnapshot.size > 0) {
+      return true;
+    }
+  });
+  return false
 }
