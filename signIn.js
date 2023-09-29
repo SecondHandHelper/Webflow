@@ -1,6 +1,6 @@
 console.log('Check onAuthStateChanged: ', new Date());
 firebase.auth().onAuthStateChanged(async (result) => {
-  console.log("onAuthStateChanged callback");
+  console.log("onAuthStateChanged callback: ", new Date());
   const now = new Date().toISOString();
   if (result) {
     // Get and set current user
