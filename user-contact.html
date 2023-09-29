@@ -1,11 +1,16 @@
 <script>
     const pageSetUp = async () => {
+        const item = params.id ?
+            await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId}) :
+            JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
+        introText.innerText = `För att fullfölja försäljningen av ditt ${item.brand}-plagg behöver vi dina uppgifter. Anges bara en gång.`
+
         mobilePhone.addEventListener('input', fieldLabelToggle('mobilePhoneLabel'));
         personalId.addEventListener('input', fieldLabelToggle('personalIdLabel'));
 
         userDetailsClose.addEventListener('click', () => {
             location.href = '/private';
-        })
+        });
 
         saveUserDetailsButton.addEventListener('click', async () => {
           const mobilePhoneError = mobilePhone.value?.length < 9 ? 'Ange ditt mobilnummer' : '';
