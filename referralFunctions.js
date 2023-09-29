@@ -22,8 +22,8 @@ async function showBonusSection() {
   if (referralData && referralData?.referredBy && (!referralData?.referredByBonusPaid || !referralData?.referredByDiscountUsed)) { //TODO: Behöver 'referredByDiscountUsed' till FS för att kunna se om de redan löst in 1 kommissionsfri försäljning
     // Get inviters first name
     const inviter = referralData?.referredBy;
-    const inviterName = await firebase.app().functions("europe-west3").httpsCallable('referrerName')({ referrerId: inviter });
-    await showActivatedBonus(inviterName?.data?.name);
+    const res = await firebase.app().functions("europe-west3").httpsCallable('referrerName')({ referrerId: inviter });
+    await showActivatedBonus(res?.data?.name, res?.data?.code);
     bonusSection.style.display = 'block';
     return;
   }
@@ -34,12 +34,13 @@ async function showBonusSection() {
   }
 }
 
-async function showActivatedBonus( referrerName ) {
+async function showActivatedBonus( referrerName, referrerCode ) {
+  console.log();
   let bonusNameText = 'BONUS';
   if (referrerName && referrerName !== 'Mai') {
     bonusNameText = "BONUS - INBJUDEN AV " + referrerName.toUpperCase();
   } else {
-    bonusNameText = "BONUS - " + inputCode.toUpperCase();
+    bonusNameText = "BONUS - " + referrerCode.toUpperCase();
   }
   document.getElementById("bonusName").innerHTML = bonusNameText;
   bonusActivatedState.style.display = 'block';
@@ -79,7 +80,7 @@ async function connectReferralUsers(inputCode) {
     const referrerUser = await firebase.app().functions("europe-west3").httpsCallable('connectReferralUser')({ code: inputCode })
     console.log('referrerUser', referrerUser);
     if (referrerUser) {
-      await showActivatedBonus(referrerUser?.data?.addressFirstName);
+      await showActivatedBonus(referrerUser?.data?.addressFirstName, inputCode);
       console.log("Referral connection successfully stored");
       return { referrerName, inputCode }
     } else {
