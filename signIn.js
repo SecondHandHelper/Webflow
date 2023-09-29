@@ -1,3 +1,4 @@
+console.log('Check onAuthStateChanged: ', new Date());
 firebase.auth().onAuthStateChanged(async (result) => {
   console.log("onAuthStateChanged callback");
   const now = new Date().toISOString();

@@ -20,10 +20,9 @@
   checkCookie("utm_content");
 
   // Set invite code cookie
-  checkCookie("invite");
-
-  if (params.invite){
-    referralCodeText.innerHTML = params.invite;
+  const inviteCode = checkCookie("invite");
+  if (inviteCode){
+    referralCodeText.innerHTML = inviteCode;
     activeCode.style.display = 'flex';
   }
 </script>

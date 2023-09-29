@@ -4,6 +4,7 @@
     var phone;
 </script>
 <script>
+    checkCookie("invite");
     sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
     user.whenSet(privateMain);
     async function privateMain() {
@@ -30,9 +31,13 @@
 
         showNpsSurvey(items);
         showInviteToast(items);
-        if(user.current?.referralData?.referralCode){
+        if (user.current?.referralData?.referralCode) {
             referralCodeText.innerHTML = user.current.referralData.referralCode;
             headerInviteButton.style.display = 'flex';
+        }
+        const inviteCode = checkCookie("invite");
+        if (inviteCode) {
+            await connectReferralUsers(inviteCode);
         }
         showBonusSection();
         loadItemCards(items);
@@ -62,7 +67,7 @@
                         publishedDate = new Date(publishedDate);
                         let nowDate = new Date();
                         const daysDiff = Math.floor((nowDate.getTime() - publishedDate.getTime()) / (1000 * 3600 * 24));
-                        if (daysDiff <= 45) { 
+                        if (daysDiff <= 45) {
                             document.getElementById('holidayModeDiv').style.display = 'block';
                         }
                     }
