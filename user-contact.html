@@ -3,6 +3,10 @@
         mobilePhone.addEventListener('input', fieldLabelToggle('mobilePhoneLabel'));
         personalId.addEventListener('input', fieldLabelToggle('personalIdLabel'));
 
+        userDetailsClose.addEventListener('click', () => {
+            location.href = '/private';
+        })
+
         saveUserDetailsButton.addEventListener('click', async () => {
           const mobilePhoneError = mobilePhone.value?.length < 9 ? 'Ange ditt mobilnummer' : '';
           mobilePhone.setCustomValidity(mobilePhoneError);
