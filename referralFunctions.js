@@ -23,18 +23,27 @@ async function showBonusSection() {
     // Get inviters first name
     const inviter = referralData?.referredBy;
     const inviterName = await firebase.app().functions("europe-west3").httpsCallable('referrerName')({ referrerId: inviter });
-    if (inviterName?.data?.name && inviterName?.data?.name !== 'Mai') {
-      document.getElementById('bonusName').innerHTML = `BONUS - INBJUDEN AV " + ${inviterName.data.name}`;
-    }
-    bonusActivatedState.style.display = 'block';
+    await showActivatedBonus(inviterName?.data?.name);
     bonusSection.style.display = 'block';
     return;
   }
-  
+
   if ((user.current?.referralData?.referredBy ? false : true) && daysDiff <= 30) {
     enterCodeState.style.display = 'block';
     bonusSection.style.display = 'block';
   }
+}
+
+async function showActivatedBonus( referrerName ) {
+  let bonusNameText = 'BONUS';
+  if (referrerName && referrerName !== 'Mai') {
+    bonusNameText = "BONUS - INBJUDEN AV " + referrerName.toUpperCase();
+  } else {
+    bonusNameText = "BONUS - " + inputCode.toUpperCase();
+  }
+  document.getElementById("bonusName").innerHTML = bonusNameText;
+  bonusActivatedState.style.display = 'block';
+  enterCodeState.style.display = 'none';
 }
 
 async function createReferralCode() {
@@ -46,7 +55,7 @@ async function createReferralCode() {
   }
 }
 
-async function showReferralErrorMessage (msg){
+async function showReferralErrorMessage(msg) {
   // Show message they can't add their own code
   errorBannerMessage.innerHTML = msg ? msg : errorBannerMessage.innerHTML;
   errorMessageBanner.style.display = 'flex';
@@ -68,18 +77,11 @@ async function connectReferralUsers(inputCode) {
   // Find user with matching referral code and connect users
   try {
     const referrerUser = await firebase.app().functions("europe-west3").httpsCallable('connectReferralUser')({ code: inputCode })
+    console.log('referrerUser', referrerUser);
     if (referrerUser) {
-      let bonusNameText = '';
-      if(referrerUser?.data?.name && referrerUser?.data?.name !== 'Mai'){
-        bonusNameText = "BONUS - INBJUDEN AV " + referrerUser?.data?.name.toUpperCase();
-      } else {
-        bonusNameText = "BONUS - " + inputCode.toUpperCase();
-      }
-      document.getElementById("bonusName").innerHTML = bonusNameText;
-      bonusActivatedState.style.display = 'block';
-      enterCodeState.style.display = 'none';
+      await showActivatedBonus(referrerUser?.data?.addressFirstName);
       console.log("Referral connection successfully stored");
-      return true
+      return { referrerName, inputCode }
     } else {
       console.log("Failed to use referral code", referrerUser?.data);
       await showReferralErrorMessage(`Koden ${inputCode} finns inte`);
@@ -91,7 +93,7 @@ async function connectReferralUsers(inputCode) {
   }
 }
 
-async function checkSoldItemExists (){
+async function checkSoldItemExists() {
   // Check if an item is sold
   await db.collection("items").where("user", "==", userId).where("status", "==", "Sold").get().then((querySnapshot) => {
     if (querySnapshot.size > 0) {
