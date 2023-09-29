@@ -90,7 +90,8 @@
                 if (shippingMethod) {
                     await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
                 }
-                return location.href = '/item-confirmation';
+                const userPhoneSet = user.current?.phoneNumber?.length;
+                return location.href = userPhoneSet ? '/item-confirmation' : '/user-contact';
             } else {
                 // otherwise make sure to remove any previously saved item as a precaution
                 sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
