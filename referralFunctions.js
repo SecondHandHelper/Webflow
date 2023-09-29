@@ -81,6 +81,7 @@ async function connectReferralUsers(inputCode) {
   // Find user with matching referral code and connect users
   try {
     const referrerUser = await firebase.app().functions("europe-west3").httpsCallable('connectReferralUser')({ code: inputCode })
+    console.log('referrerUser', referrerUser);
     if (referrerUser) {
       await showActivatedBonus(referrerUser?.data?.addressFirstName, inputCode);
       console.log("Referral connection successfully stored");
