@@ -68,8 +68,14 @@ async function connectReferralUsers(inputCode) {
   // Find user with matching referral code and connect users
   try {
     const referrerUser = await firebase.app().functions("europe-west3").httpsCallable('connectReferralUser')({ code: inputCode })
-    if (referrerUser?.data?.name && referrerUser?.data?.name !== 'Mai') {
-      document.getElementById("bonusName").innerHTML = "BONUS - INBJUDEN AV " + referrerUser?.data?.name.toUpperCase();
+    if (referrerUser) {
+      let bonusNameText = '';
+      if(referrerUser?.data?.name && referrerUser?.data?.name !== 'Mai'){
+        bonusNameText = "BONUS - INBJUDEN AV " + referrerUser?.data?.name.toUpperCase();
+      } else {
+        bonusNameText = "BONUS - " + inputCode.toUpperCase();
+      }
+      document.getElementById("bonusName").innerHTML = bonusNameText;
       bonusActivatedState.style.display = 'block';
       enterCodeState.style.display = 'none';
       console.log("Referral connection successfully stored");
