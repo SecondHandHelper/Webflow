@@ -81,7 +81,7 @@ async function connectReferralUsers(inputCode) {
   // Find user with matching referral code and connect users
   try {
     const res = await firebase.app().functions("europe-west3").httpsCallable('connectReferralUser')({ code: inputCode })
-    console.log('referrerUser', referrerUser);
+    console.log('connecReferralUser response: ', res);
     if (res?.data?.code !== '200') { //User already used a referral
       return 
     }
@@ -89,7 +89,7 @@ async function connectReferralUsers(inputCode) {
       await showActivatedBonus(res?.data?.name, inputCode);
       console.log("Referral connection successfully stored");
     } else {
-      console.log("Failed to use referral code", referrerUser?.data);
+      console.log("Failed to use referral code", res?.data);
       await showReferralErrorMessage(`Koden ${inputCode} finns inte`);
     }
   } catch (e) {
