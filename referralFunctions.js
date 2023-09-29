@@ -31,7 +31,7 @@ async function showBonusSection() {
     return;
   }
   
-  if ((user.current?.referralData?.referredBy ? false : true) && daysDiff <= 10) {
+  if ((user.current?.referralData?.referredBy ? false : true) && daysDiff <= 30) {
     enterCodeState.style.display = 'block';
     bonusSection.style.display = 'block';
   }
