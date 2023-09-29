@@ -45,8 +45,8 @@ async function showActivatedBonus(referrerName, referrerCode) {
   }
   if (document.getElementById("bonusSection")) {
     document.getElementById("bonusName").innerHTML = bonusNameText;
-    bonusActivatedState.style.display = 'block';
-    enterCodeState.style.display = 'none';
+    document.getElementById("bonusActivatedState").style.display = 'block';
+    document.getElementById("enterCodeState").style.display = 'none';
   }
 }
 
