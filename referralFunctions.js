@@ -23,6 +23,7 @@ async function showBonusSection() {
     // Get inviters first name
     const inviter = referralData?.referredBy;
     const res = await firebase.app().functions("europe-west3").httpsCallable('referrerName')({ referrerId: inviter });
+    console.log('referrerName result', res);
     await showActivatedBonus(res?.data?.name, res?.data?.code);
     bonusSection.style.display = 'block';
     return;
@@ -39,7 +40,7 @@ async function showActivatedBonus( referrerName, referrerCode ) {
   let bonusNameText = 'BONUS';
   if (referrerName && referrerName !== 'Mai') {
     bonusNameText = "BONUS - INBJUDEN AV " + referrerName.toUpperCase();
-  } else {
+  } else if (referrerCode) {
     bonusNameText = "BONUS - " + referrerCode.toUpperCase();
   }
   document.getElementById("bonusName").innerHTML = bonusNameText;
