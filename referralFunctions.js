@@ -43,9 +43,11 @@ async function showActivatedBonus( referrerName, referrerCode ) {
   } else if (referrerCode) {
     bonusNameText = "BONUS - " + referrerCode.toUpperCase();
   }
-  document.getElementById("bonusName").innerHTML = bonusNameText;
-  bonusActivatedState.style.display = 'block';
-  enterCodeState.style.display = 'none';
+  if (document.getElementById("bonusSection")){
+    document.getElementById("bonusName").innerHTML = bonusNameText;
+    bonusActivatedState.style.display = 'block';
+    enterCodeState.style.display = 'none';
+  }
 }
 
 async function createReferralCode() {
