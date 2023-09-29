@@ -35,7 +35,7 @@ async function showBonusSection() {
   }
 }
 
-async function showActivatedBonus( referrerName, referrerCode ) {
+async function showActivatedBonus(referrerName, referrerCode) {
   console.log();
   let bonusNameText = 'BONUS';
   if (referrerName && referrerName !== 'Mai') {
@@ -43,7 +43,7 @@ async function showActivatedBonus( referrerName, referrerCode ) {
   } else if (referrerCode) {
     bonusNameText = "BONUS - " + referrerCode.toUpperCase();
   }
-  if (document.getElementById("bonusSection")){
+  if (document.getElementById("bonusSection")) {
     document.getElementById("bonusName").innerHTML = bonusNameText;
     bonusActivatedState.style.display = 'block';
     enterCodeState.style.display = 'none';
@@ -80,10 +80,13 @@ async function connectReferralUsers(inputCode) {
 
   // Find user with matching referral code and connect users
   try {
-    const referrerUser = await firebase.app().functions("europe-west3").httpsCallable('connectReferralUser')({ code: inputCode })
+    const res = await firebase.app().functions("europe-west3").httpsCallable('connectReferralUser')({ code: inputCode })
     console.log('referrerUser', referrerUser);
-    if (referrerUser) {
-      await showActivatedBonus(referrerUser?.data?.addressFirstName, inputCode);
+    if (res?.data?.code !== '200') { //User already used a referral
+      return 
+    }
+    if (res?.data?.name) {
+      await showActivatedBonus(res?.data?.name, inputCode);
       console.log("Referral connection successfully stored");
     } else {
       console.log("Failed to use referral code", referrerUser?.data);
