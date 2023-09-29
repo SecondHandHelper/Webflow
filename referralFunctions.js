@@ -52,7 +52,7 @@ async function showReferralErrorMessage (msg){
   errorMessageBanner.style.display = 'flex';
   saveRefCodeLoadingDiv.style.display = 'none';
   saveReferralCodeButton.style.display = 'inline-block';
-  saveReferralCodeButton.click(); //To trigger animation
+  //saveReferralCodeButton.click(); //To trigger animation
   setTimeout(function () {
     errorMessageBanner.style.display = 'none';
   }, 2500);
@@ -73,10 +73,11 @@ async function connectReferralUsers(inputCode) {
       bonusActivatedState.style.display = 'block';
       enterCodeState.style.display = 'none';
       console.log("Referral connection successfully stored");
+      return true
     } else {
       console.log("Failed to use referral code", referrerUser?.data);
-      await showReferralErrorMessage('Koden hittades inte');
-      return
+      await showReferralErrorMessage(`Koden ${inputCode} finns inte`);
+      return false
     }
   } catch (e) {
     errorHandler.report(e);
