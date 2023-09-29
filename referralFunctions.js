@@ -82,7 +82,7 @@ async function connectReferralUsers(inputCode) {
   try {
     const res = await firebase.app().functions("europe-west3").httpsCallable('connectReferralUser')({ code: inputCode })
     console.log('connecReferralUser response: ', res);
-    if (res?.data?.code === '400') { //User already used a referral
+    if (res?.data?.code === 400) { //User already used a referral
       return 
     }
     if (res?.data?.name) {
