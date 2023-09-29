@@ -21,7 +21,7 @@
           if (reportValidity()) {
               try {
                   await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')(
-                      { phoneNumber: mobilePhone.value, personalId: personalId.value }
+                      { phoneNumber: formatPhoneNumber(mobilePhone.value), personalId: formatPersonalId(personalId.value) }
                   );
               } catch (e) {
                   console.error('Failed saving user contact info', e);

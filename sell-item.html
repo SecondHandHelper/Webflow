@@ -70,12 +70,6 @@
     async function sellItemMainAuthenticated() {
         console.log("sellItemMainAuthenticated " + new Date());
 
-        // Be inte om telefonnummer i formuläret
-        if (user.current?.phoneNumber) {
-            phoneNumberDiv.style.display = "none";
-            document.getElementById("itemPhoneNumber").required = false;
-        }
-
         // Visa alla "viktiga" fält om man är inloggad
         toggleMoreInfoFields.click();
 
@@ -113,11 +107,7 @@
         await initializeSizeConfirm();
         initializeSuggestButtonsSaveState();
         initializeClearFormButton();
-        // Be om telefonnummer i formuläret
-        if (!user.current?.phoneNumber) {
-            phoneNumberDiv.style.display = "block";
-            document.getElementById("itemPhoneNumber").required = true;
-        }
+
         initializeDeleteImageListeners();
         document.getElementById('clearItemForm').addEventListener('click', clearFormFields);
 

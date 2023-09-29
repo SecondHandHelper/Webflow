@@ -712,42 +712,6 @@ function formatPersonalId(personalIdInput) {
     return null;
 }
 
-// FUNCTIONS FOR SELL ITEM PAGE
-async function writePhoneNumberToFirestore(userID, phoneNumber) {
-    var docRef = db.collection("users").doc(userID);
-    console.log("writePhoneNumberToFirestore function is running!");
-
-    var formattedPhoneNumber = formatPhoneNumber(phoneNumber);
-
-    var doc = await docRef.get();
-    if (doc.exists) {
-        console.log("Now adding the phone number to the user document");
-        // Update document
-        try {
-            await db.collection("users").doc(userID).update({
-                phoneNumber: formattedPhoneNumber
-            });
-            console.log("User document successfully updated with phone number: ", formattedPhoneNumber);
-        } catch (error) {
-            errorHandler.report(error);
-            console.error("Error writing document: ", error);
-        }
-    } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document! Creating it and adding phone number!");
-        // Add a new document in collection "users"
-        try {
-            await db.collection("users").doc(userID).set({
-                phoneNumber: formattedPhoneNumber
-            });
-            console.log("User document successfully written!");
-        } catch (error) {
-            errorHandler.report(error);
-            console.error("Error writing document: ", error);
-        }
-    }
-}
-
 function calculateSellerGets(value, elementId, feeElementId) {
 
     let div = document.getElementById(elementId);
