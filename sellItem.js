@@ -104,10 +104,10 @@ const getAndSaveMlValuation = async (itemId, userValuationApproval) => {
 
 function nextStepAfterMlValuation(mlValuationPresent, decline, valuationNeedsChecking, userValuationApproval) {
   const userPhoneSet = user.current?.phoneNumber?.length;
+  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+    return '/sign-in';
+  }
   if (!mlValuationPresent) {
-    if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-      return '/sign-in';
-    }
     return userPhoneSet ? '/item-confirmation' : '/user-contact';
   }
   if (decline) {

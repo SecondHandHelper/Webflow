@@ -2,7 +2,8 @@
     const pageSetUp = async () => {
         const item = params.id ?
             await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId}) :
-            JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
+            JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'))?.item ||
+            JSON.parse(localStorage.getItem('latestItemCreated'));
         introText.innerText = `För att fullfölja försäljningen av ditt ${item.brand}-plagg behöver vi dina uppgifter. Anges bara en gång.`
 
         mobilePhone.addEventListener('input', fieldLabelToggle('mobilePhoneLabel'));
@@ -18,7 +19,7 @@
           const personalIdError = !personalId.value?.length || isValidSwedishSsn(personalId.value) ?
                   '' : 'Ange ett giltigt personnummer';
           personalId.setCustomValidity(personalIdError);
-          if (reportValidity()) {
+          if (document.getElementById('wf-form-User-Details').reportValidity()) {
               try {
                   await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')(
                       { phoneNumber: formatPhoneNumber(mobilePhone.value), personalId: formatPersonalId(personalId.value) }

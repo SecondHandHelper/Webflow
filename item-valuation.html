@@ -76,6 +76,11 @@
     }
 
     const initialPageSetup = (item) => {
+        auth.onAuthStateChanged(function (user) {
+            if (!user) {
+                confirmButton.value = 'Acceptera värdering';
+            }
+        });
         document.getElementById('itemImage').src = window.innerWidth <= 400 ? item?.images?.enhancedFrontImageSmall : item?.images?.enhancedFrontImage;
         document.getElementById('chatLink').onclick = () => Intercom('showNewMessage',
             item.mlValuation?.decline ?
