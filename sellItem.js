@@ -103,17 +103,11 @@ const getAndSaveMlValuation = async (itemId, userValuationApproval) => {
 }
 
 function nextStepAfterMlValuation(mlValuationPresent, decline, valuationNeedsChecking, userValuationApproval) {
-  const userPhoneSet = user.current?.phoneNumber?.length;
-  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-    return '/sign-in';
-  }
-  if (!mlValuationPresent) {
-    return userPhoneSet ? '/item-confirmation' : '/user-contact';
-  }
-  if (decline) {
-    return '/item-valuation';
-  }
-  if (valuationNeedsChecking || !userValuationApproval) {
+  if (!mlValuationPresent || valuationNeedsChecking || !userValuationApproval) {
+    if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+      return '/sign-in';
+    }
+    const userPhoneSet = user.current?.phoneNumber?.length;
     return userPhoneSet ? '/item-confirmation' : '/user-contact';
   }
   return '/item-valuation';
