@@ -103,17 +103,18 @@ const getAndSaveMlValuation = async (itemId, userValuationApproval) => {
 }
 
 function nextStepAfterMlValuation(mlValuationPresent, decline, valuationNeedsChecking, userValuationApproval) {
+  const userPhoneSet = user.current?.phoneNumber?.length;
+  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+    return '/sign-in';
+  }
   if (!mlValuationPresent) {
-    if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-      return '/sign-in';
-    }
-    return '/item-confirmation';
+    return userPhoneSet ? '/item-confirmation' : '/user-contact';
   }
   if (decline) {
     return '/item-valuation';
   }
   if (valuationNeedsChecking || !userValuationApproval) {
-    return '/item-confirmation';
+    return userPhoneSet ? '/item-confirmation' : '/user-contact';
   }
   return '/item-valuation';
 }
@@ -254,29 +255,6 @@ async function addItemInner(id) {
     localStorage.setItem('latestItemCreated', JSON.stringify(item));
   }
 
-  // If first time: User submitted their phone number
-  const phoneNumber = itemPhoneNumber.value;
-  if (phoneNumber) {
-    const pn = formatPhoneNumber(phoneNumber);
-    if (authUser.current) {
-      await writePhoneNumberToFirestore(authUser.current.uid, pn);
-    } else {
-      sessionStorage.setItem('phoneNumber', pn);
-    }
-  }
-  let personalId = itemPersonalId.value;
-  if (personalId) {
-    personalId = formatPersonalId(personalId);
-    if (authUser.current) {
-      // Write to Firestore
-      const itemRef = db.collection('users').doc(authUser.current.uid);
-      itemRef.update({ personalId }).then(() => {
-          console.log(`Personal id of ${authUser.current.uid} is now updated`);
-        });
-    } else {
-      sessionStorage.setItem('personalId', personalId);
-    }
-  }
   return item;
 }
 
@@ -314,23 +292,7 @@ function initializeInputEventListeners() {
   });
   addItemForm.addEventListener("submit", addItem);
   userAddressForm.addEventListener("submit", addUserDetails);
-  document.getElementById('itemPhoneNumber').addEventListener("input", () => {
-    const pn = formatPhoneNumber(itemPhoneNumber.value);
-    const error = pn.length >= 12 && pn.includes('+') ? '' : 'Ogiltigt mobilnummer';
-    itemPhoneNumber.setCustomValidity(error);
-  });
-  itemPersonalId.addEventListener("input", () => {
-    const pid = itemPersonalId.value;
-    formattedPid = formatPersonalId(pid) || '' ;
-    const error = isValidSwedishSsn(formattedPid) ? '' : 'Ogiltigt personnummer';
-    itemPersonalId.setCustomValidity(error);
-    if (pid){
-      itemPersonalId.required = true;
-    } else {
-      itemPersonalId.required = false; // This row doesn't seem to work, therefor the safe guard below.
-      itemPersonalId.setCustomValidity('');
-    }
-  });
+
 }
 
 function isElementInView (el) {
@@ -506,8 +468,6 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
       setFieldValue('itemUserComment', data.userComment);
       setFieldValue('itemDefectDescription', data.defectDescription);
       setFieldValue('itemLowestAcceptPrice', data.acceptPrice <= 0 ? null : data.acceptPrice);
-      data.phoneNumber ? setFieldValue('itemPhoneNumber', data.phoneNumber) : '';
-      data.personalId ? setFieldValue('itemPersonalId', data.personalId) : '';
     }
 
     // Populate select fields
@@ -1051,8 +1011,6 @@ function clearFormFields() {
   setFieldValue('itemUserComment', null);
   setFieldValue('itemDefectDescription', null);
   setFieldValue('itemLowestAcceptPrice', null);
-  setFieldValue('itemPhoneNumber', null);
-  setFieldValue('itemPersonalId', null);
 
   selectFieldValue(itemAge, '');
   selectFieldValue(itemColor, '');

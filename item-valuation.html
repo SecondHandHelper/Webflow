@@ -15,7 +15,9 @@
                 maxPrice
             });
             if (!document.referrer.includes('/private')) {
-                return window.location.href = `/item-confirmation${params.id ? '?id=' + params.id : ''}`;
+                const userPhoneSet = user.current?.phoneNumber?.length;
+                return window.location.href = userPhoneSet ? `/item-confirmation${params.id ? '?id=' + params.id : ''}` :
+                    `/user-contact${params.id ? '?id=' + params.id : ''}`;
             } else {
                 return window.location.href = `/private`;
             }
@@ -74,6 +76,11 @@
     }
 
     const initialPageSetup = (item) => {
+        auth.onAuthStateChanged(function (user) {
+            if (!user) {
+                confirmButton.value = 'Acceptera värdering';
+            }
+        });
         document.getElementById('itemImage').src = window.innerWidth <= 400 ? item?.images?.enhancedFrontImageSmall : item?.images?.enhancedFrontImage;
         document.getElementById('chatLink').onclick = () => Intercom('showNewMessage',
             item.mlValuation?.decline ?
