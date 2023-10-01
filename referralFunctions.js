@@ -28,15 +28,17 @@ async function showBonusSection() {
     bonusSection.style.display = 'block';
     return;
   }
-
+  
   if ((user.current?.referralData?.referredBy ? false : true) && daysDiff <= 30) {
-    enterCodeState.style.display = 'block';
-    bonusSection.style.display = 'block';
+    if (bonusActivatedState.style.display === 'none') {
+      enterCodeState.style.display = 'block';
+      bonusSection.style.display = 'block';
+    }
   }
 }
 
 async function showActivatedBonus(referrerName, referrerCode) {
-  console.log();
+  console.log('showActivatedBonus run');
   let bonusNameText = 'BONUS';
   if (referrerName && referrerName !== 'Mai') {
     bonusNameText = "BONUS - INBJUDEN AV " + referrerName.toUpperCase();
@@ -47,6 +49,7 @@ async function showActivatedBonus(referrerName, referrerCode) {
     document.getElementById("bonusName").innerHTML = bonusNameText;
     document.getElementById("bonusActivatedState").style.display = 'block';
     document.getElementById("enterCodeState").style.display = 'none';
+    bonusSection.style.display = 'block';
   }
 }
 
