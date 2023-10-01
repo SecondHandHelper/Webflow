@@ -19,7 +19,7 @@ async function showBonusSection() {
   console.log("Days since user registered", daysDiff);
   const referralData = user.current?.referralData;
 
-  if (referralData && referralData?.referredBy && (!referralData?.referredByBonusPaid || !referralData?.referredByDiscountUsed)) { //TODO: Behöver 'referredByDiscountUsed' till FS för att kunna se om de redan löst in 1 kommissionsfri försäljning
+  if (referralData && referralData?.referredBy && !referralData?.referredByBonusPaid && !referralData?.referredByDiscountUsed) { //TODO: Behöver 'referredByDiscountUsed' till FS för att kunna se om de redan löst in 1 kommissionsfri försäljning
     // Get inviters first name
     const inviter = referralData?.referredBy;
     const res = await firebase.app().functions("europe-west3").httpsCallable('referrerName')({ referrerId: inviter });

@@ -38,7 +38,7 @@
     const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')).item;
     itemImage.src = item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || '';
     notificationText.innerHTML = `För att fullfölja försäljningen av ditt ${item.brand}-plagg behöver du logga in eller skapa konto`;
-    maiIntroForPrefillLogin.style.display = 'block';
+    itemToBeCreatedDiv.style.display = 'block';
   }
 
   // Disable Webflow form submit

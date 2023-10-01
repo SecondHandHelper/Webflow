@@ -1,34 +1,40 @@
 <script>
     const pageSetUp = async () => {
         const item = params.id ?
-            await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId}) :
+            await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId }) :
             JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'))?.item ||
             JSON.parse(localStorage.getItem('latestItemCreated'));
-        introText.innerText = `För att fullfölja försäljningen av ditt ${item.brand}-plagg behöver vi dina uppgifter. Anges bara en gång.`
+        if (item) {
+            itemImage.src = item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || '';
+            itemNotificationText.innerHTML = `Vi behöver dina uppgifter för att fullfölja försäljningen av ditt ${item.brand}-plagg. Anges bara en gång.`;
+            itemToBeCreatedDiv.style.display = 'block';
+        }
 
-        mobilePhone.addEventListener('input', fieldLabelToggle('mobilePhoneLabel'));
+        phoneNumber.addEventListener('input', function () {
+            fieldLabelToggle('phoneNumberLabel');
+            const pn = formatPhoneNumber(phoneNumber.value);
+            const error = pn.length >= 12 && pn.includes('+') ? '' : 'Ogiltigt mobilnummer';
+            phoneNumber.setCustomValidity(error);
+        });
         personalId.addEventListener('input', fieldLabelToggle('personalIdLabel'));
-
         userDetailsClose.addEventListener('click', () => {
             location.href = '/private';
         });
 
         saveUserDetailsButton.addEventListener('click', async () => {
-          const mobilePhoneError = mobilePhone.value?.length < 9 ? 'Ange ditt mobilnummer' : '';
-          mobilePhone.setCustomValidity(mobilePhoneError);
-          const personalIdError = !personalId.value?.length || isValidSwedishSsn(personalId.value) ?
-                  '' : 'Ange ett giltigt personnummer';
-          personalId.setCustomValidity(personalIdError);
-          if (document.getElementById('wf-form-User-Details').reportValidity()) {
-              try {
-                  await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')(
-                      { phoneNumber: formatPhoneNumber(mobilePhone.value), personalId: formatPersonalId(personalId.value) }
-                  );
-              } catch (e) {
-                  console.error('Failed saving user contact info', e);
-              }
-              location.href = `/item-confirmation${params.id ? '?id=' + params.id : ''}`;
-          }
+            const personalIdError = !personalId.value?.length || isValidSwedishSsn(personalId.value) ?
+                '' : 'Ange ett giltigt personnummer';
+            personalId.setCustomValidity(personalIdError);
+            if (document.getElementById('wf-form-User-Details').reportValidity()) {
+                try {
+                    await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')(
+                        { phoneNumber: formatPhoneNumber(phoneNumber.value), personalId: formatPersonalId(personalId.value) }
+                    );
+                } catch (e) {
+                    console.error('Failed saving user contact info', e);
+                }
+                location.href = `/item-confirmation${params.id ? '?id=' + params.id : ''}`;
+            }
         });
     }
 
