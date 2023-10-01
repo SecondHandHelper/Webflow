@@ -84,6 +84,7 @@ async function connectReferralUsers(inputCode) {
   // Find user with matching referral code and connect users
   try {
     const res = await firebase.app().functions("europe-west3").httpsCallable('connectReferralUser')({ code: inputCode })
+    deleteCookie('invite');
     console.log('connecReferralUser response: ', res);
     if (res?.data?.code === 400) { //User already used a referral
       return 
