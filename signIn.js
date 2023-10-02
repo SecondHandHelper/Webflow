@@ -116,6 +116,7 @@ function userIsSellingNewItem() {
 }
 
 async function signedInNextStep(fallbackRedirect) {
+  console.log('signedInNextStep');
     // User is signed in
     if (authUser.current) {
       const email = authUser.current.email || sessionStorage.getItem("email");
@@ -124,6 +125,7 @@ async function signedInNextStep(fallbackRedirect) {
       await updateFirestoreUserDocument(authUser.current.uid, email, phone, ssn); //Important that this happens first, since many other functions depend on an existing user document
     }
     // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item
+  console.log("redirecting")
     if (userIsSellingNewItem()) {
         location.href = './sell-item';
     } else if (fallbackRedirect && typeof fallbackRedirect === 'string') {
