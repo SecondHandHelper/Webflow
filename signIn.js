@@ -1,4 +1,5 @@
-if (localStorage.getItem('authUserUid')) {
+if (localStorage.getItem('authUser')) {
+  console.log("authenticating with localStorage saved user")
   authUser.current = authenticatedUser;
   getAndSetAuthUser(localStorage.getItem('authUser'), { exists: true, data: () => localStorage.getItem('dbUser') })
       .then(res => console.log('authenticated with user from localStorage'));
@@ -37,6 +38,7 @@ firebase.auth().onAuthStateChanged(async (result) => {
   } else {
     console.log('No user');
     localStorage.removeItem('authUser');
+    localStorage.removeItem('dbUser');
     // Go to landing page if no user and on logged in pages
     const path = window.location.pathname;
     // Latest page view for logged out users
