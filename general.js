@@ -546,11 +546,12 @@ function loadRecentlySold() {
 
 async function fetchAndLoadRecentlyAddedItems() {
     try {
-        const response = await firebase.app().functions("europe-west1").httpsCallable(
-            'fetchMaiShopRecentlyAddedItems',
-        )()
         const itemList = document.getElementById('ItemListRecentlyAddedItems')
+        if (!itemList) {
+            return;
+        }
         itemList.innerHTML = "";
+        const response = await firebase.app().functions("europe-west1").httpsCallable('fetchMaiShopRecentlyAddedItems')()
 
         for (const item of response.data) {
             const itemCardHTML = `<div class="div-block-14-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
