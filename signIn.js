@@ -5,11 +5,11 @@ firebase.auth().onAuthStateChanged(async (result) => {
   if (result) {
     // Get and set current user
     const authenticated = result;
+    authUser.current = authenticated;
+    console.log("authUser:", authUser.current);
     try {
       setPreferredLogInMethodCookie(authenticated.providerData[0].providerId);
       const doc = await db.collection("users").doc(authenticated.uid).get();
-      authUser.current = authenticated;
-      console.log("authUser", authUser.current);
       if (doc.exists) {
         identify(authenticated, doc.data());
         console.log("user:", doc.data());
@@ -25,10 +25,14 @@ firebase.auth().onAuthStateChanged(async (result) => {
     // Go to landing page if no user and on logged in pages
     const path = window.location.pathname;
     // Latest page view for logged out users
-    analytics.identify({latestPageView: now});
+    analytics.identify({ latestPageView: now });
 
     if (path === "/private" || path === "/personal-id-form" || path === "/address-form" || path === "/item" || path === "/ship-item" || path === "/edit-item" || path === "/order-bags") {
       location.href = './';
+    }
+    if (path === "/"){
+      headerLoginLoading.style.display = 'none';
+      headerLoginButton.style.display = 'flex';
     }
   }
 });
@@ -88,23 +92,23 @@ loginWithCookieToken();
 
 function userIsSellingNewItem() {
   return sessionStorage.getItem('itemToBeCreatedAfterSignIn') &&
-      (document.referrer.includes('/sell-item') || document.referrer.includes('/item-valuation'));
+    (document.referrer.includes('/sell-item') || document.referrer.includes('/item-valuation'));
 }
 
 async function signedInNextStep(fallbackRedirect) {
-    // User is signed in
-    if (authUser.current) {
-      const email = authUser.current.email || sessionStorage.getItem("email");
-      const phone = authUser.current.phoneNumber || sessionStorage.getItem("phoneNumber");
-      const ssn = authUser.current.personalId || sessionStorage.getItem("personalId");
-      await updateFirestoreUserDocument(authUser.current.uid, email, phone, ssn); //Important that this happens first, since many other functions depend on an existing user document
-    }
-    // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item
-    if (userIsSellingNewItem()) {
-        location.href = './sell-item';
-    } else if (fallbackRedirect && typeof fallbackRedirect === 'string') {
-        location.href = fallbackRedirect;
-    } else {
-        location.href = './private';
-    }
+  // User is signed in
+  if (authUser.current) {
+    const email = authUser.current.email || sessionStorage.getItem("email");
+    const phone = authUser.current.phoneNumber || sessionStorage.getItem("phoneNumber");
+    const ssn = authUser.current.personalId || sessionStorage.getItem("personalId");
+    await updateFirestoreUserDocument(authUser.current.uid, email, phone, ssn); //Important that this happens first, since many other functions depend on an existing user document
+  }
+  // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item
+  if (userIsSellingNewItem()) {
+    location.href = './sell-item';
+  } else if (fallbackRedirect && typeof fallbackRedirect === 'string') {
+    location.href = fallbackRedirect;
+  } else {
+    location.href = './private';
+  }
 }
