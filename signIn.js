@@ -23,7 +23,14 @@ firebase.auth().onAuthStateChanged(async (result) => {
   if (result) {
     // Get and set current user
     const authenticated = result;
-    localStorage.setItem('authUser', JSON.stringify({...authenticated, metadata: authenticated.metadata }));
+    localStorage.setItem('authUser', JSON.stringify({
+      ...authenticated,
+      metadata: {
+        creationTime: authenticated.metadata.creationTime,
+        lastSignInTime: authenticated.metadata.lastSignInTime
+      },
+      providerData: [{ providerId: authenticated.providerData[0].providerId }],
+    }));
     try {
       setPreferredLogInMethodCookie(authenticated.providerData[0].providerId);
       await getAndSetAuthUser(authenticated);
