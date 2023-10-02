@@ -1,6 +1,7 @@
 if (localStorage.getItem('authUser')) {
   console.log("authenticating with localStorage saved user")
-  getAndSetAuthUser(localStorage.getItem('authUser'), { exists: true, data: () => localStorage.getItem('dbUser') })
+  getAndSetAuthUser(JSON.parse(localStorage.getItem('authUser')),
+      { exists: true, data: () => JSON.parse(localStorage.getItem('dbUser')) })
       .then(res => console.log('authenticated with user from localStorage'));
 }
 
