@@ -1,3 +1,19 @@
+if (localStorage.getItem('authUser')) {
+  getAndSetUser(JSON.parse(localStorage.getItem('authUser')))
+      .then(res => console.log('authenticated with user from localStorage'));
+}
+
+async function getAndSetUser(authenticatedUser) {
+  const doc = await db.collection("users").doc(authenticatedUser.uid).get();
+  authUser.current = authenticatedUser;
+  console.log("authUser", authUser.current);
+  if (doc.exists) {
+    identify(authenticatedUser, doc.data());
+    console.log("user:", doc.data());
+    user.current = doc.data();
+  }
+}
+
 console.log('Check onAuthStateChanged: ', new Date());
 firebase.auth().onAuthStateChanged(async (result) => {
   console.log("onAuthStateChanged callback: ", new Date());
@@ -5,23 +21,20 @@ firebase.auth().onAuthStateChanged(async (result) => {
   if (result) {
     // Get and set current user
     const authenticated = result;
+    localStorage.setItem('authUser', JSON.stringify(authenticated));
     try {
       setPreferredLogInMethodCookie(authenticated.providerData[0].providerId);
-      const doc = await db.collection("users").doc(authenticated.uid).get();
-      authUser.current = authenticated;
-      console.log("authUser", authUser.current);
-      if (doc.exists) {
-        identify(authenticated, doc.data());
-        console.log("user:", doc.data());
-        user.current = doc.data();
+      await getAndSetUser(authenticated);
+      if (location.href.includes('shh-test.page')) {
+        await saveRefreshToken();
       }
-      await saveRefreshToken();
     } catch (error) {
       errorHandler.report(error);
       console.log("Error getting document:", error);
     }
   } else {
     console.log('No user');
+    localStorage.removeItem('authUser');
     // Go to landing page if no user and on logged in pages
     const path = window.location.pathname;
     // Latest page view for logged out users
