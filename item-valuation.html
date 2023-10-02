@@ -46,12 +46,14 @@
             document.getElementById('newItemButton').addEventListener('click', () => {
                 sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
                 localStorage.removeItem('newItem');
+                sessionStorage.removeItem('newItemId');
                 sessionStorage.removeItem('itemValuation');
                 window.location.href = '/sell-item';
             });
             document.getElementById('confirmButton').addEventListener('click', () => {
                 sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
                 localStorage.removeItem('newItem');
+                sessionStorage.removeItem('newItemId');
                 sessionStorage.removeItem('itemValuation');
                 window.location.href = '/private';
             });
@@ -70,6 +72,7 @@
                 }
                 sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
                 localStorage.removeItem('newItem');
+                sessionStorage.removeItem('newItemId');
                 return window.location.href = '/private';
             });
         }
@@ -84,6 +87,7 @@
         document.getElementById('valuationClose').addEventListener('click', () => {
             sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
             localStorage.removeItem('newItem');
+            sessionStorage.removeItem('newItemId');
             return window.location.href = '/private';
         })
     }

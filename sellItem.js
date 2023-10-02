@@ -23,7 +23,7 @@ async function requestUniqueId() {
 }
 
 async function addItem(event) {
-  const id = await requestUniqueId();
+  const id = sessionStorage.getItem('newItemId') || await requestUniqueId();
   try {
     document.getElementById('addItemFormDiv').style.display = 'none';
     document.getElementById('loadingDiv').style.display = 'flex';
@@ -45,7 +45,7 @@ function needsHumanCheck({ humanCheckNeeded, newMinMaxLog }) {
   return humanCheckNeeded || newMinMaxLog.match(/accept price is above max/i)
 }
 
-async function saveItemValuation(itemId, mlValuationData) {
+async function saveItemValuation(itemId, mlValuationData, userValuationApproval) {
   const { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version,
     newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog } = mlValuationData || {};
   if (!minPrice && !decline) {
@@ -65,7 +65,8 @@ async function saveItemValuation(itemId, mlValuationData) {
       valuationDate: new Date().toISOString(),
       infoRequests: {
         price: {
-          status: 'Active',
+          status: userValuationApproval ? 'Active' : 'Resolved',
+          response: userValuationApproval ? '' : 'Accepted',
           description: 'Värderingen utgår från vad liknande plagg sålts för nyligen. Vi börjar alltid i den övre delen av spannet och sänker successivt inom intervallet under säljperioden på 30 dagar.',
           minPrice: newMinPriceEstimate || minPrice,
           maxPrice: newMaxPriceEstimate || maxPrice,
@@ -94,7 +95,7 @@ const getAndSaveMlValuation = async (itemId, userValuationApproval) => {
   try {
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});
     const { minPrice, maxPrice, decline } = res.data || {};
-    await saveItemValuation(itemId, res.data);
+    await saveItemValuation(itemId, res.data, userValuationApproval);
     return nextStepAfterMlValuation(minPrice && maxPrice, decline, needsHumanCheck(res.data), userValuationApproval);
   } catch (e) {
     console.error('Failed to get ml valuation', e);
@@ -245,6 +246,7 @@ async function addItemInner(id) {
     await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
     localStorage.removeItem('newItem');
     localStorage.removeItem('newItemImages');
+    sessionStorage.removeItem('newItemId');
     item.id = id;
     localStorage.setItem('latestItemCreated', JSON.stringify(item));
   }
@@ -305,6 +307,7 @@ function isElementInView (el) {
 async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
+  sessionStorage.removeItem('newItemId');
   await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
   localStorage.removeItem('newItem');
   localStorage.removeItem('newItemImages');
@@ -664,7 +667,10 @@ function rememberNewItemImageField(imageName, imageUrl, imageUrlSmall) {
 }
 
 async function uploadTempImage(input, fileName) {
-  const tempId = await requestUniqueId();
+  if (!sessionStorage.getItem('newItemId')) {
+    sessionStorage.setItem('newItemId', await  requestUniqueId());
+  }
+  const tempId = sessionStorage.getItem('newItemId');
   let image = await scaleImageToMaxSize(input);
   if (!image) {
     throw 'Fel vid bearbetning av vald bild.';
@@ -1031,6 +1037,7 @@ function clearFormFields() {
     document.getElementById('itemUserValuationApproval').click();
     document.getElementById('itemUserValuationApproval').previousElementSibling.classList.add("w--redirected-checked");
   }
+  sessionStorage.removeItem('newItemId');
   localStorage.removeItem('newItem');
   localStorage.removeItem('newItemImages');
 }
