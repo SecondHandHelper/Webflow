@@ -1,13 +1,15 @@
-if (localStorage.getItem('authUser')) {
-  getAndSetUser(JSON.parse(localStorage.getItem('authUser')))
+if (localStorage.getItem('authUserUid')) {
+  authUser.current = authenticatedUser;
+  getAndSetAuthUser(localStorage.getItem('authUser'), { exists: true, data: () => localStorage.getItem('dbUser') })
       .then(res => console.log('authenticated with user from localStorage'));
 }
 
-async function getAndSetUser(authenticatedUser) {
-  const doc = await db.collection("users").doc(authenticatedUser.uid).get();
+async function getAndSetAuthUser(authenticatedUser, dbUser) {
+  const doc = dbUser || await db.collection("users").doc(authenticatedUser.uid).get();
   authUser.current = authenticatedUser;
   console.log("authUser", authUser.current);
   if (doc.exists) {
+    localStorage.setItem('dbUser', JSON.stringify(doc.data()))
     identify(authenticatedUser, doc.data());
     console.log("user:", doc.data());
     user.current = doc.data();
@@ -21,10 +23,10 @@ firebase.auth().onAuthStateChanged(async (result) => {
   if (result) {
     // Get and set current user
     const authenticated = result;
-    localStorage.setItem('authUser', JSON.stringify(authenticated));
+    localStorage.setItem('authUser', JSON.stringify({...authenticated, metadata: authenticated.metadata }));
     try {
       setPreferredLogInMethodCookie(authenticated.providerData[0].providerId);
-      await getAndSetUser(authenticated);
+      await getAndSetAuthUser(authenticated);
       if (location.href.includes('shh-test.page')) {
         await saveRefreshToken();
       }
