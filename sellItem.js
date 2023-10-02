@@ -63,6 +63,7 @@ async function saveItemValuation(itemId, mlValuationData, userValuationApproval)
     ...(decline || needsHumanCheck(mlValuationData) ? {} : {
       valuationStatus: 'Completed',
       valuationDate: new Date().toISOString(),
+      ...(userValuationApproval ? {} : { minPriceEstimate: minPrice, maxPriceEstimate: maxPrice }),
       infoRequests: {
         price: {
           status: userValuationApproval ? 'Active' : 'Resolved',
@@ -71,7 +72,8 @@ async function saveItemValuation(itemId, mlValuationData, userValuationApproval)
           minPrice: newMinPriceEstimate || minPrice,
           maxPrice: newMaxPriceEstimate || maxPrice,
         }
-    }})
+      }
+    })
   }
   if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
     const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
