@@ -16,8 +16,8 @@
             });
             if (!document.referrer.includes('/private')) {
                 const userPhoneSet = user.current?.phoneNumber?.length;
-                return window.location.href = userPhoneSet ? `/item-confirmation${params.id ? '?id=' + params.id : ''}` :
-                    `/user-contact${params.id ? '?id=' + params.id : ''}`;
+                return window.location.href = userPhoneSet ? `/item-confirmation` :
+                    `/user-contact`;
             } else {
                 return window.location.href = `/private`;
             }
