@@ -1,0 +1,8 @@
+<script>
+    // Set invite code cookie
+  const inviteCode = checkCookie("photo_invite");
+  if (inviteCode){
+    referralCodeText.innerHTML = inviteCode;
+    activeCode.style.display = 'flex';
+  }
+</script>

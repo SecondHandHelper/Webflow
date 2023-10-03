@@ -39,6 +39,12 @@
         if (inviteCode) {
             await connectReferralUsers(inviteCode);
         }
+        // Set invite code cookie
+        const photoInvite = checkCookie("photo_invite");
+        if (photoInvite) {
+            photoShootOffer.style.display = 'block';
+            bonusSection.style.display = 'block';
+        }
         showBonusSection();
         loadItemCards(items);
         loadInfoRequests(userId);

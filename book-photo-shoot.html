@@ -1,0 +1,29 @@
+<script>
+    function submitPhotoShootForm() {
+        const addressFields = getFormAddressFields();
+        let amount = amount.value;
+        let pn = formatPhoneNumber(phoneNumber.value);
+
+        // Write to Firestore
+        db.collection('users').doc(authUser.current.uid).update({
+            ...addressFields,
+            phoneNumber: pn
+        })
+            .then(() => {
+                console.log(`Address and phone of ${authUser.current.uid} is now updated`);
+                confirmationScreen.style.display = 'block';
+                formDiv.style.display = 'none';
+            })
+            .catch((error) => {
+                errorHandler.report(error);
+                console.error("Error updating document: ", error);
+            });
+    }
+
+    photoShootForm.addEventListener("submit", submitPhotoShootForm);
+    phoneNumber.addEventListener('input', function () {
+        const pn = formatPhoneNumber(phoneNumber.value);
+        const error = pn.length >= 12 && pn.includes('+') ? '' : 'Ogiltigt mobilnummer';
+        phoneNumber.setCustomValidity(error);
+    });
+</script>
