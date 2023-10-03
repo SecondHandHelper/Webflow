@@ -1,5 +1,5 @@
 console.log('Check onAuthStateChanged: ', new Date());
-if (localStorage.getItem('authUserId')) {
+if (localStorage.getItem('authUserId') && location.href === '/') {
   location.href = '/private';
 }
 firebase.auth().onAuthStateChanged(async (result) => {
