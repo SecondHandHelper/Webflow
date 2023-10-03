@@ -7,6 +7,7 @@ firebase.auth().onAuthStateChanged(async (result) => {
     const authenticated = result;
     authUser.current = authenticated;
     console.log("authUser:", authUser.current);
+    localStorage.setItem('authUserId', authenticated.uid);
     try {
       setPreferredLogInMethodCookie(authenticated.providerData[0].providerId);
       const doc = await db.collection("users").doc(authenticated.uid).get();
@@ -22,6 +23,7 @@ firebase.auth().onAuthStateChanged(async (result) => {
     }
   } else {
     console.log('No user');
+    localStorage.removeItem('authUserId')
     // Go to landing page if no user and on logged in pages
     const path = window.location.pathname;
     // Latest page view for logged out users
