@@ -247,7 +247,6 @@ async function addItemInner(id) {
   } else {
     await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
     localStorage.removeItem('newItem');
-    localStorage.removeItem('newItemImages');
     sessionStorage.removeItem('newItemId');
     item.id = id;
     localStorage.setItem('latestItemCreated', JSON.stringify(item));
@@ -312,7 +311,6 @@ async function createItemAfterSignIn() {
   sessionStorage.removeItem('newItemId');
   await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
   localStorage.removeItem('newItem');
-  localStorage.removeItem('newItemImages');
   itemFromStorage.item.id = itemFromStorage.id;
   localStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
 }
@@ -339,7 +337,6 @@ function rememberUnsavedChanges() {
     acc[key] = itemToSave[key] === '' ? null : itemToSave[key];
     return acc;
   }, {});
-  item.images = JSON.parse(localStorage.getItem('newItemImages')) || {};
   item.defects = item.defects ? item.defects : [];
   item.userValuationApproval = item.preferences.userValuationApproval;
   delete item.preferences;
@@ -356,7 +353,6 @@ function rememberUnsavedChanges() {
     localStorage.setItem('newItem', JSON.stringify(item));
   } else {
     localStorage.removeItem('newItem');
-    localStorage.removeItem('newItemImages');
   }
 }
 
@@ -662,10 +658,12 @@ function hideImageError(imageName) {
 }
 
 function rememberNewItemImageField(imageName, imageUrl, imageUrlSmall) {
-  let newItemImages = JSON.parse(localStorage.getItem('newItemImages') || JSON.stringify({}));
-  newItemImages[imageName] = imageUrl;
-  newItemImages[`${imageName}Small`] = imageUrlSmall;
-  localStorage.setItem('newItemImages', JSON.stringify(newItemImages));
+  let newItem = JSON.parse(localStorage.getItem('newItem') || JSON.stringify({}));
+  const images = newItem.images || {};
+  images[imageName] = imageUrl;
+  images[`${imageName}Small`] = imageUrlSmall;
+  newItem.images = images;
+  localStorage.setItem('newItem', JSON.stringify(newItem));
 }
 
 async function uploadTempImage(input, fileName) {
@@ -1041,7 +1039,6 @@ function clearFormFields() {
   }
   sessionStorage.removeItem('newItemId');
   localStorage.removeItem('newItem');
-  localStorage.removeItem('newItemImages');
 }
 
 function initializeDeleteImageListeners() {
@@ -1060,12 +1057,9 @@ function initializeDeleteImageListeners() {
 }
 
 function removeSavedImage(imageName) {
-  const newItemImages = JSON.parse(localStorage.getItem('newItemImages'));
   const newItem = JSON.parse(localStorage.getItem('newItem'));
-  delete newItemImages[imageName];
-  delete newItemImages[`${imageName}Small`];
   delete newItem?.images?.[imageName];
-  localStorage.setItem('newItemImages', JSON.stringify(newItemImages));
+  delete newItem?.images?.[`${imageName}Small`];
   localStorage.setItem('newItem', JSON.stringify(newItem));
 }
 

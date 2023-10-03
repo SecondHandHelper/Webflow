@@ -91,7 +91,6 @@
                 sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
             }
         }
-
         // Get user's item count to be able to send 'User Activated' event
         const items = await getItems(authUser.current.uid);
         userItemsCount = items.size;
