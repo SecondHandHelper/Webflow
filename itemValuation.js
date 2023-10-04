@@ -27,6 +27,9 @@ async function showDeclineValuation(item) {
     }
 }
 async function acceptValuation(itemId, minPrice, maxPrice) {
+    if (!document.getElementById('wf-form-Valuation-form').reportValidity()) {
+        return;
+    }
     const minInput = document.getElementById('minPrice');
     const maxInput = document.getElementById('maxPrice');
     if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {

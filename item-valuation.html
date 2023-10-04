@@ -20,6 +20,11 @@
         adjustmentMinInput.style.color = adjustmentMin > minPrice * 1.5 ? '#E20000' : '#333';
         if (adjustmentMax > maxPrice * 1.5 || adjustmentMin > minPrice * 1.5) {
             document.getElementById('adjustmentMotivation').style.display = 'block';
+            const highPrice = [
+                adjustmentMax > maxPrice * 1.5 ? 'startpris' : null,
+                adjustmentMin > minPrice * 1.5 ? 'lägsta pris' : null
+            ].filter(p => p).join(' och ');
+            document.getElementById('adjustmentWarningText').innerText = `Ovanligt högt ${highPrice}, kräver granskning.`
             document.getElementById('adjustmentTips').style.display = 'none';
             document.getElementById('adjustmentNote').style.display = 'none';
             document.getElementById('confirmButton').innerText = 'Skicka för granskning';
@@ -79,8 +84,8 @@
             })
             document.getElementById('minPrice').addEventListener('input', () => {
                 const adjustmentMinInput = document.getElementById('minPrice');
-                const adjustmentMin = Number(adjustmentMinInput.value);
                 const adjustmentMaxInput = document.getElementById('maxPrice');
+                const adjustmentMin = Number(adjustmentMinInput.value);
                 const adjustmentMax = Number(adjustmentMaxInput.value);
                 if (adjustmentMin !== minPrice) {
                     document.getElementById('origMinPrice').style.display = 'block';
@@ -88,30 +93,29 @@
                     document.getElementById('origMinPrice').style.display = 'none';
                 }
                 if (adjustmentMin > adjustmentMax) {
-                    document.getElementById('confirmButton').disabled = true;
                     document.getElementById('minPrice').setCustomValidity('Lägsta pris måste vara mindre än startpris');
-                    document.getElementById('minPrice').reportValidity();
                 } else {
                     document.getElementById('minPrice').setCustomValidity('');
-                    document.getElementById('minPrice').reportValidity();
                 }
+                document.getElementById('minPrice').reportValidity();
                 adjustmentValidations(minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
             });
             document.getElementById('maxPrice').addEventListener('input', () => {
                 const adjustmentMaxInput = document.getElementById('maxPrice');
                 const adjustmentMinInput = document.getElementById('minPrice');
-                if (adjustmentMaxInput.value !== `${maxPrice}`) {
+                const adjustmentMin = Number(adjustmentMinInput.value);
+                const adjustmentMax = Number(adjustmentMaxInput.value);
+                if (adjustmentMax !== maxPrice) {
                     document.getElementById('origMaxPrice').style.display = 'block';
                 } else {
                     document.getElementById('origMaxPrice').style.display = 'none';
                 }
-                if (adjustmentMinInput.value > adjustmentMaxInput.value) {
-                    document.getElementById('confirmButton').disabled = true;
+                if (adjustmentMin > adjustmentMax) {
                     adjustmentMaxInput.setCustomValidity('Startpris måste vara högre än lägsta pris');
-                    adjustmentMaxInput.reportValidity();
                 } else {
                     adjustmentMaxInput.setCustomValidity('');
                 }
+                adjustmentMaxInput.reportValidity();
                 adjustmentValidations(minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
             });
         }
