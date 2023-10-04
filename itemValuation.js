@@ -34,8 +34,8 @@ async function acceptValuation(itemId, minPrice, maxPrice) {
         savedItem.item.infoRequests.price.status = 'Resolved';
         savedItem.item.infoRequests.price.response = 'Accepted';
         if (featureIsEnabled('adjustValuation') && (minInput?.value !== `${minPrice}` || maxInput?.value !== `${maxPrice}`)) {
-            savedItem.item.infoRequests.price.userAdjustedMin = minInput.value;
-            savedItem.item.infoRequests.price.userAdjustedMax = maxInput.value;
+            savedItem.item.infoRequests.price.userAdjustedMin = Number(minInput.value);
+            savedItem.item.infoRequests.price.userAdjustedMax = Number(maxInput.value);
             if (!adjustmentOk(minPrice, maxPrice)) {
                 savedItem.item.infoRequests.price.response = 'User proposal';
                 savedItem.item.infoRequests.price.userProposalMotivation = document.getElementById('userProposalMotivation').value;
@@ -48,7 +48,7 @@ async function acceptValuation(itemId, minPrice, maxPrice) {
         return window.location.href = '/sign-in';
     } else {
         await firebase.app().functions("europe-west1").httpsCallable('saveAcceptedValuation')({
-            itemId, minPrice, maxPrice, adjustmentMin: minInput.value, adjustmentMax: maxInput.value,
+            itemId, minPrice, maxPrice, adjustmentMin: Number(minInput.value), adjustmentMax: Number(maxInput.value),
             userProposalMotivation: document.getElementById('userProposalMotivation').value
         });
         if (!document.referrer.includes('/private')) {

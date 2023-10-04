@@ -1,4 +1,4 @@
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test622/itemValuation.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test623/itemValuation.js"></script>
 
 <script>
     const adjustmentOk = (minPrice, maxPrice) => {
@@ -33,13 +33,14 @@
                 for (const element of elements) {
                     visible ? element.classList.remove('tooltip-show') : element.classList.add('tooltip-show');
                 }
-                document.getElementById('tooltipMotivation').addEventListener('click', hideTooltip);
                 e.stopPropagation();
             });
             document.body.addEventListener('click', hideTooltip);
             document.getElementById('valuationRange').style.display = 'flex';
             document.getElementById('minPrice').value = minPrice;
+            document.getElementById('minPrice').disabled = true;
             document.getElementById('maxPrice').value = maxPrice;
+            document.getElementById('maxPrice').disabled = true;
             document.getElementById('origMinPrice').innerText = minPrice;
             document.getElementById('origMinPrice').style.display = 'none';
             document.getElementById('origMaxPrice').innerText = maxPrice;
@@ -56,7 +57,7 @@
             document.getElementById('minPrice').addEventListener('input', () => {
                 const adjustmentMin = document.getElementById('minPrice').value;
                 const adjustmentMax = document.getElementById('maxPrice').value;
-                if (adjustmentMin !== minPrice) {
+                if (adjustmentMin !== `${minPrice}`) {
                     document.getElementById('origMinPrice').style.display = 'block';
                 } else {
                     document.getElementById('origMinPrice').style.display = 'none';
@@ -72,7 +73,7 @@
             document.getElementById('maxPrice').addEventListener('input', () => {
                 const adjustmentMaxInput = document.getElementById('maxPrice');
                 const adjustmentMin = document.getElementById('minPrice').value;
-                if (adjustmentMaxInput.value !== maxPrice) {
+                if (adjustmentMaxInput.value !== `${maxPrice}`) {
                     document.getElementById('origMaxPrice').style.display = 'block';
                 } else {
                     document.getElementById('origMaxPrice').style.display = 'none';
@@ -99,7 +100,7 @@
                 } else {
                     document.getElementById('adjustmentTips').style.display = 'block';
                     document.getElementById('adjustmentNote').style.display = 'none';
-                    document.getElementById('adjustmentMotivation').style.display = 'none;'
+                    document.getElementById('adjustmentMotivation').style.display = 'none';
                     document.getElementById('confirmButton').innerText = 'Påbörja försäljning';
                     adjustmentMaxInput.style.color = '#333';
                 }
