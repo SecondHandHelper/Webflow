@@ -76,3 +76,17 @@ const initialPageSetup = (item) => {
         return window.location.href = '/private';
     })
 }
+
+const rejectValuation = async (item) => {
+    if (item.id) {
+        await firebase.app().functions("europe-west1").httpsCallable('markItemRejected')({
+            itemId: item.id, userDecline: true
+        });
+    }
+    sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
+    if (!params.id) {
+        localStorage.removeItem('newItem');
+        sessionStorage.removeItem('newItemId');
+    }
+    return window.location.href = '/private';
+}
