@@ -1,12 +1,6 @@
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test624/itemValuation.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test626/itemValuation.js"></script>
 
 <script>
-    const adjustmentOk = (minPrice, maxPrice) => {
-        const minInput = document.getElementById('minPrice').value;
-        const maxInput = document.getElementById('maxPrice').value;
-        return minInput <= minPrice * 1.5 && maxInput <= maxPrice * 1.5 && minInput < maxInput && minInput >= 100;
-    }
-
     const hideTooltip = () => {
         for (const element of document.getElementsByClassName('tooltip-motivation')) {
             element.classList.remove('tooltip-show');
@@ -91,6 +85,9 @@
                     document.getElementById('origMinPrice').style.display = 'block';
                 } else {
                     document.getElementById('origMinPrice').style.display = 'none';
+                }
+                if (adjustmentMin < 100) {
+                    document.getElementById('minPrice').setCustomValidity('Vi försöker tyvärr aldrig sälja något under 100kr');
                 }
                 if (adjustmentMin > adjustmentMax) {
                     document.getElementById('minPrice').setCustomValidity('Lägsta pris måste vara mindre än startpris');

@@ -26,6 +26,13 @@ async function showDeclineValuation(item) {
         });
     }
 }
+
+const adjustmentOk = (minPrice, maxPrice) => {
+    const minInput = document.getElementById('minPrice').value;
+    const maxInput = document.getElementById('maxPrice').value;
+    return minInput <= minPrice * 1.5 && maxInput <= maxPrice * 1.5 && minInput < maxInput && minInput >= 100;
+}
+
 async function acceptValuation(itemId, minPrice, maxPrice) {
     if (!document.getElementById('wf-form-Valuation-form').reportValidity()) {
         return;
