@@ -26,3 +26,37 @@ async function showDeclineValuation(item) {
         });
     }
 }
+async function acceptValuation(itemId, minPrice, maxPrice) {
+    const minInput = document.getElementById('minPrice');
+    const maxInput = document.getElementById('maxPrice');
+    if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+        const savedItem = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
+        savedItem.item.infoRequests.price.status = 'Resolved';
+        savedItem.item.infoRequests.price.response = 'Accepted';
+        if (featureIsEnabled('adjustValuation') && (minInput?.value !== `${minPrice}` || maxInput?.value !== `${maxPrice}`)) {
+            savedItem.item.infoRequests.price.userAdjustedMin = minInput.value;
+            savedItem.item.infoRequests.price.userAdjustedMax = maxInput.value;
+            if (!adjustmentOk(minPrice, maxPrice)) {
+                savedItem.item.infoRequests.price.response = 'User proposal';
+                savedItem.item.infoRequests.price.userProposalMotivation = document.getElementById('userProposalMotivation').value;
+            }
+        } else {
+            savedItem.item.minPriceEstimate = minPrice;
+            savedItem.item.maxPriceEstimate = maxPrice;
+        }
+        sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify(savedItem));
+        return window.location.href = '/sign-in';
+    } else {
+        await firebase.app().functions("europe-west1").httpsCallable('saveAcceptedValuation')({
+            itemId, minPrice, maxPrice, adjustmentMin: minInput.value, adjustmentMax: maxInput.value,
+            userProposalMotivation: document.getElementById('userProposalMotivation').value
+        });
+        if (!document.referrer.includes('/private')) {
+            const userPhoneSet = user.current?.phoneNumber?.length;
+            return window.location.href = userPhoneSet ? `/item-confirmation` :
+                `/user-contact`;
+        } else {
+            return window.location.href = `/private`;
+        }
+    }
+}
