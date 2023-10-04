@@ -47,7 +47,7 @@ function needsHumanCheck({ humanCheckNeeded, newMinMaxLog }) {
 
 async function saveItemValuation(itemId, mlValuationData, userValuationApproval) {
   const { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version,
-    newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog } = mlValuationData || {};
+    newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog, adjustmentAllowed } = mlValuationData || {};
   if (!minPrice && !decline) {
     return;
   }
@@ -58,7 +58,7 @@ async function saveItemValuation(itemId, mlValuationData, userValuationApproval)
       willNotSellPrediction: willNotSell,
       soldPriceEstimate: soldPrice,
       modelVersion: version?.toString(),
-      newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog
+      newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog, adjustmentAllowed
     },
     ...(decline || needsHumanCheck(mlValuationData) ? {} : {
       valuationStatus: 'Completed',
@@ -608,12 +608,7 @@ async function frontImageChangeHandler(event) {
       return;
     }
     const promises = [];
-    if (featureIsEnabled('colorCategory')) {
-      promises.push(detectAndFillColor(imageUrl), detectAndFillBrandAndMaterialAndSize(imageUrl));
-    }
-    if (featureIsEnabled('enhanceImage')) {
-      promises.push(enhanceFrontImage(imageUrl));
-    }
+    promises.push(detectAndFillColor(imageUrl), detectAndFillBrandAndMaterialAndSize(imageUrl), enhanceFrontImage(imageUrl));
     await Promise.all(promises);
     rememberUnsavedChanges();
   }
@@ -735,9 +730,7 @@ async function brandTagImageChangeHandler(event) {
     event.stopPropagation();
     const imageUrl = await uploadImageAndShowPreview(input, 'brandTagImage');
     showDeleteImageIcon('brandTagImage')
-    if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterialAndSize(imageUrl);
-    }
+    await detectAndFillBrandAndMaterialAndSize(imageUrl);
     rememberUnsavedChanges();
   }
 }
@@ -771,9 +764,7 @@ async function productImageChangeHandler(event) {
     event.stopPropagation();
     const imageUrl = await uploadImageAndShowPreview(input, 'productImage');
     showDeleteImageIcon('productImage')
-    if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterialAndSize(imageUrl);
-    }
+    await detectAndFillBrandAndMaterialAndSize(imageUrl);
     rememberUnsavedChanges();
   }
 }
@@ -784,9 +775,7 @@ async function defectImageChangeHandler(event) {
     event.stopPropagation();
     const imageUrl = await uploadImageAndShowPreview(input, 'defectImage');
     showDeleteImageIcon('defectImage')
-    if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterialAndSize(imageUrl);
-    }
+    await detectAndFillBrandAndMaterialAndSize(imageUrl);
     rememberUnsavedChanges();
   }
 }
@@ -797,9 +786,7 @@ async function materialTagImageChangeHandler(event) {
     event.stopPropagation();
     const imageUrl = await uploadImageAndShowPreview(input, 'materialTagImage');
     showDeleteImageIcon('materialTagImage')
-    if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterialAndSize(imageUrl);
-    }
+    await detectAndFillBrandAndMaterialAndSize(imageUrl);
     rememberUnsavedChanges();
   }
 }
@@ -810,9 +797,7 @@ async function extraImageChangeHandler(event) {
     event.stopPropagation();
     const imageUrl = await uploadImageAndShowPreview(input, 'extraImage');
     showDeleteImageIcon('extraImage')
-    if (featureIsEnabled('colorCategory')) {
-      await detectAndFillBrandAndMaterialAndSize(imageUrl);
-    }
+    await detectAndFillBrandAndMaterialAndSize(imageUrl);
     rememberUnsavedChanges();
   }
 }

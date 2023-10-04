@@ -1,99 +1,102 @@
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test629/itemValuation.js"></script>
+
 <script>
-    const acceptValuation = async (itemId, minPrice, maxPrice) => {
-        if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-            const savedItem = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
-            savedItem.item.infoRequests.price.response = 'Accepted';
-            savedItem.item.infoRequests.price.status = 'Resolved';
-            savedItem.item.minPriceEstimate = minPrice;
-            savedItem.item.maxPriceEstimate = maxPrice;
-            sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify(savedItem));
-            return window.location.href = '/sign-in';
-        } else {
-            await firebase.app().functions("europe-west1").httpsCallable('saveAcceptedValuation')({
-                itemId,
-                minPrice,
-                maxPrice
-            });
-            if (!document.referrer.includes('/private')) {
-                const userPhoneSet = user.current?.phoneNumber?.length;
-                return window.location.href = userPhoneSet ? `/item-confirmation` :
-                    `/user-contact`;
-            } else {
-                return window.location.href = `/private`;
-            }
+    const hideTooltip = () => {
+        for (const element of document.getElementsByClassName('tooltip-motivation')) {
+            element.classList.remove('tooltip-show');
         }
     }
 
     const showMlValuation = async (item) => {
-        const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline } = item.mlValuation || {};
+        const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, adjustmentAllowed } = item.mlValuation || {};
         const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
         const maxPrice =  item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
+        const estimatedPrice = Math.round((minPrice+maxPrice)/20)*10;
         document.getElementById('valuationResultDiv').style.display = 'flex';
         triggerShowContent.click();
         document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
+        if (featureIsEnabled('adjustValuation') && adjustmentAllowed) {
+            document.getElementById('valuationExplanation').style.display = 'none';
+            document.getElementById('valuationText').innerText = `${estimatedPrice} kr`;
+            document.getElementById('valuationHeading').style.display = 'block';
+            document.getElementById('valuationMotivation').style.display = 'flex';
+            document.getElementById('valuationMotivation').dataset.text = document.getElementById('valuationExplanation').innerText;
+            document.getElementById('valuationMotivation').addEventListener('click', (e) => {
+                const elements = document.getElementsByClassName('tooltip-motivation');
+                const visible = elements[0]?.classList.contains('tooltip-show');
+                for (const element of elements) {
+                    visible ? element.classList.remove('tooltip-show') : element.classList.add('tooltip-show');
+                }
+                e.stopPropagation();
+            });
+            document.body.addEventListener('click', hideTooltip);
+            document.getElementById('valuationRange').style.display = 'flex';
+            document.getElementById('minPrice').value = minPrice;
+            document.getElementById('minPrice').disabled = true;
+            document.getElementById('maxPrice').value = maxPrice;
+            document.getElementById('maxPrice').disabled = true;
+            document.getElementById('origMinPrice').innerText = minPrice;
+            document.getElementById('origMinPrice').style.display = 'none';
+            document.getElementById('origMaxPrice').innerText = maxPrice;
+            document.getElementById('origMaxPrice').style.display = 'none';
+            if (item.infoRequests?.price?.finalOffer === 'true') {
+                document.getElementById('adjustInterval').style.display = 'none';
+            }
+            document.getElementById('adjustInterval').addEventListener('click', () => {
+                document.getElementById('minPrice').disabled = false;
+                document.getElementById('maxPrice').disabled = false;
+                document.getElementById('adjustInterval').style.display = 'none';
+                document.getElementById('adjustmentTips').style.display = 'block';
+            })
+            document.getElementById('minPrice').addEventListener('input', () => {
+                const adjustmentMinInput = document.getElementById('minPrice');
+                const adjustmentMaxInput = document.getElementById('maxPrice');
+                const adjustmentMin = Number(adjustmentMinInput.value);
+                const adjustmentMax = Number(adjustmentMaxInput.value);
+                if (adjustmentMin !== minPrice) {
+                    document.getElementById('origMinPrice').style.display = 'block';
+                } else {
+                    document.getElementById('origMinPrice').style.display = 'none';
+                }
+                if (adjustmentMin < 100) {
+                    document.getElementById('minPrice').setCustomValidity('Vi försöker tyvärr aldrig sälja något under 100kr');
+                } else if (adjustmentMin > adjustmentMax) {
+                    document.getElementById('minPrice').setCustomValidity('Lägsta pris måste vara mindre än startpris');
+                } else {
+                    document.getElementById('minPrice').setCustomValidity('');
+                }
+                document.getElementById('minPrice').reportValidity();
+                adjustmentValidations(minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
+            });
+            document.getElementById('maxPrice').addEventListener('input', () => {
+                const adjustmentMaxInput = document.getElementById('maxPrice');
+                const adjustmentMinInput = document.getElementById('minPrice');
+                const adjustmentMin = Number(adjustmentMinInput.value);
+                const adjustmentMax = Number(adjustmentMaxInput.value);
+                if (adjustmentMax !== maxPrice) {
+                    document.getElementById('origMaxPrice').style.display = 'block';
+                } else {
+                    document.getElementById('origMaxPrice').style.display = 'none';
+                }
+                if (adjustmentMin > adjustmentMax) {
+                    adjustmentMaxInput.setCustomValidity('Startpris måste vara högre än lägsta pris');
+                } else {
+                    adjustmentMaxInput.setCustomValidity('');
+                }
+                adjustmentMaxInput.reportValidity();
+                adjustmentValidations(minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
+            });
+        }
         document.getElementById('valuationText').style.display = 'block';
         if (!sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
             document.getElementById('chatDiv').style.display = 'block';
         }
         if (decline) {
-            document.getElementById('valuationText').innerText = 'Säljer ej';
-            document.getElementById('valuationText').style.display = 'block';
-            document.getElementById('rejectButton').style.display = 'none';
-            document.getElementById('confirmButton').innerText = 'Okej'
-            document.getElementById('newItemButton').style.display = 'flex';
-            document.getElementById('declineExplanation').style.display = 'block';
-            document.getElementById('valuationExplanation').style.display = 'none';
-            document.getElementById('newItemButton').addEventListener('click', () => {
-                sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
-                localStorage.removeItem('newItem');
-                sessionStorage.removeItem('newItemId');
-                sessionStorage.removeItem('itemValuation');
-                window.location.href = '/sell-item';
-            });
-            document.getElementById('confirmButton').addEventListener('click', () => {
-                sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
-                localStorage.removeItem('newItem');
-                sessionStorage.removeItem('newItemId');
-                sessionStorage.removeItem('itemValuation');
-                window.location.href = '/private';
-            });
-            if (item.id) {
-                await firebase.app().functions("europe-west1").httpsCallable('markItemRejected')({
-                    itemId: item.id, userDecline: false
-                });
-            }
+            await showDeclineValuation(item);
         } else {
             document.getElementById('confirmButton').addEventListener('click', () => acceptValuation(item.id, minPrice, maxPrice));
-            document.getElementById('rejectButton').addEventListener('click', async () => {
-                if (item.id) {
-                    await firebase.app().functions("europe-west1").httpsCallable('markItemRejected')({
-                        itemId: item.id, userDecline: true
-                    });
-                }
-                sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
-                if (!params.id) {
-                    localStorage.removeItem('newItem');
-                    sessionStorage.removeItem('newItemId');
-                }
-                return window.location.href = '/private';
-            });
+            document.getElementById('rejectButton').addEventListener('click', () => rejectValuation(item));
         }
-    }
-
-    const initialPageSetup = (item) => {
-        document.getElementById('itemImage').src = window.innerWidth <= 400 ? item?.images?.enhancedFrontImageSmall : item?.images?.enhancedFrontImage;
-        document.getElementById('chatLink').onclick = () => Intercom('showNewMessage',
-            item.mlValuation?.decline ?
-                `ID: ${item.id}\n\nGällande att ni tackade nej till ${item.brand.trim()}-${item.category.toLowerCase()}:\n\n` :
-                `ID: ${item.id}\n\nGällande värderingen på ${item.mlValuation.minPriceEstimate}-${item.mlValuation.maxPriceEstimate} kr för ${item.brand.trim()}-${item.category.toLowerCase()}. Vad skulle du vilja ändra värderingen till och varför?\n\n`);
-        document.getElementById('valuationClose').addEventListener('click', () => {
-            sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
-            if (!params.id) {
-                localStorage.removeItem('newItem');
-                sessionStorage.removeItem('newItemId');
-            }
-            return window.location.href = '/private';
-        })
     }
 
     const getItem = async (itemId) => {
@@ -115,7 +118,7 @@
             return location.href = '/private';
         }
         initialPageSetup(item);
-        showMlValuation(item);
+        await user.whenSet(() => showMlValuation(item));
     }
 
     main();
