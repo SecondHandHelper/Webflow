@@ -219,9 +219,9 @@
 
   // FEATURE TOGGLE FUNCTION
   const featureConfig = {
-    alpha: { modelDB: false, colorCategory: true, enhanceImage: true },
-    beta: { modelDB: false, colorCategory: true, enhanceImage: true },
-    default: { modelDB: false, colorCategory: true, enhanceImage: true }
+    alpha: { modelDB: false, adjustValuation: true },
+    beta: { modelDB: false, adjustValuation: false },
+    default: { modelDB: false, adjustValuation: false }
   };
 
   function featureIsEnabled(featureName) {
