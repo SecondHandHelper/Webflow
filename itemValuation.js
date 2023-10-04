@@ -33,6 +33,47 @@ const adjustmentOk = (minPrice, maxPrice) => {
     return minInput <= minPrice * 1.5 && maxInput <= maxPrice * 1.5 && minInput < maxInput && minInput >= 100;
 }
 
+const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput) => {
+    const adjustmentMin = Number(adjustmentMinInput.value);
+    const adjustmentMax = Number(adjustmentMaxInput.value);
+    adjustmentMaxInput.style.color = adjustmentMax > maxPrice * 1.5 ? '#E20000' : '#333';
+    adjustmentMinInput.style.color = adjustmentMin > minPrice * 1.5 ? '#E20000' : '#333';
+    if (adjustmentMax > maxPrice * 1.5 || adjustmentMin > minPrice * 1.5) {
+        document.getElementById('adjustmentMotivation').style.display = 'block';
+        const highPrice = [
+            adjustmentMax > maxPrice * 1.5 ? 'startpris' : null,
+            adjustmentMin > minPrice * 1.5 ? 'lägsta pris' : null
+        ].filter(p => p).join(' och ');
+        document.getElementById('adjustmentWarningText').innerText = `Ovanligt högt ${highPrice}, kräver granskning.`
+        document.getElementById('adjustmentTips').style.display = 'none';
+        document.getElementById('adjustmentNote').style.display = 'none';
+        document.getElementById('confirmButton').innerText = 'Skicka för granskning';
+    } else if (adjustmentMax > maxPrice || adjustmentMin > minPrice || adjustmentMin < minPrice || adjustmentMax < maxPrice) {
+        document.getElementById('adjustmentNote').style.display = 'block';
+        if (adjustmentMax > maxPrice) {
+            document.getElementById('higherMaxPrice').style.display = 'block';
+            document.getElementById('higherMinPrice').style.display = 'none';
+            document.getElementById('lowerMinOrMaxPrice').style.display = 'none';
+        } else if (adjustmentMin > minPrice) {
+            document.getElementById('higherMaxPrice').style.display = 'none';
+            document.getElementById('higherMinPrice').style.display = 'block';
+            document.getElementById('lowerMinOrMaxPrice').style.display = 'none';
+        } else {
+            document.getElementById('higherMaxPrice').style.display = 'none';
+            document.getElementById('higherMinPrice').style.display = 'none';
+            document.getElementById('lowerMinOrMaxPrice').style.display = 'block';
+        }
+        document.getElementById('adjustmentMotivation').style.display = 'none;'
+        document.getElementById('adjustmentTips').style.display = 'none';
+        document.getElementById('confirmButton').innerText = 'Påbörja försäljning';
+    } else {
+        document.getElementById('adjustmentTips').style.display = 'block';
+        document.getElementById('adjustmentNote').style.display = 'none';
+        document.getElementById('adjustmentMotivation').style.display = 'none';
+        document.getElementById('confirmButton').innerText = 'Påbörja försäljning';
+    }
+}
+
 async function acceptValuation(itemId, minPrice, maxPrice) {
     if (!document.getElementById('wf-form-Valuation-form').reportValidity()) {
         return;

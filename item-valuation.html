@@ -1,4 +1,4 @@
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test626/itemValuation.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test627/itemValuation.js"></script>
 
 <script>
     const hideTooltip = () => {
@@ -7,43 +7,15 @@
         }
     }
 
-    const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput) => {
-        const adjustmentMin = Number(adjustmentMinInput.value);
-        const adjustmentMax = Number(adjustmentMaxInput.value);
-        adjustmentMaxInput.style.color = adjustmentMax > maxPrice * 1.5 ? '#E20000' : '#333';
-        adjustmentMinInput.style.color = adjustmentMin > minPrice * 1.5 ? '#E20000' : '#333';
-        if (adjustmentMax > maxPrice * 1.5 || adjustmentMin > minPrice * 1.5) {
-            document.getElementById('adjustmentMotivation').style.display = 'block';
-            const highPrice = [
-                adjustmentMax > maxPrice * 1.5 ? 'startpris' : null,
-                adjustmentMin > minPrice * 1.5 ? 'lägsta pris' : null
-            ].filter(p => p).join(' och ');
-            document.getElementById('adjustmentWarningText').innerText = `Ovanligt högt ${highPrice}, kräver granskning.`
-            document.getElementById('adjustmentTips').style.display = 'none';
-            document.getElementById('adjustmentNote').style.display = 'none';
-            document.getElementById('confirmButton').innerText = 'Skicka för granskning';
-        } else if (adjustmentMax > maxPrice || adjustmentMin > minPrice) {
-            document.getElementById('adjustmentNote').style.display = 'block';
-            document.getElementById('adjustmentMotivation').style.display = 'none;'
-            document.getElementById('adjustmentTips').style.display = 'none';
-            document.getElementById('confirmButton').innerText = 'Påbörja försäljning';
-        } else {
-            document.getElementById('adjustmentTips').style.display = 'block';
-            document.getElementById('adjustmentNote').style.display = 'none';
-            document.getElementById('adjustmentMotivation').style.display = 'none';
-            document.getElementById('confirmButton').innerText = 'Påbörja försäljning';
-        }
-    }
-
     const showMlValuation = async (item) => {
-        const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline } = item.mlValuation || {};
+        const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, adjustmentAllowed } = item.mlValuation || {};
         const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
         const maxPrice =  item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
         const estimatedPrice = Math.round((minPrice+maxPrice)/20)*10;
         document.getElementById('valuationResultDiv').style.display = 'flex';
         triggerShowContent.click();
         document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
-        if (featureIsEnabled('adjustValuation')) {
+        if (featureIsEnabled('adjustValuation') && adjustmentAllowed) {
             document.getElementById('valuationExplanation').style.display = 'none';
             document.getElementById('valuationText').innerText = `${estimatedPrice} kr`;
             document.getElementById('valuationHeading').style.display = 'block';
@@ -88,8 +60,7 @@
                 }
                 if (adjustmentMin < 100) {
                     document.getElementById('minPrice').setCustomValidity('Vi försöker tyvärr aldrig sälja något under 100kr');
-                }
-                if (adjustmentMin > adjustmentMax) {
+                } else if (adjustmentMin > adjustmentMax) {
                     document.getElementById('minPrice').setCustomValidity('Lägsta pris måste vara mindre än startpris');
                 } else {
                     document.getElementById('minPrice').setCustomValidity('');
