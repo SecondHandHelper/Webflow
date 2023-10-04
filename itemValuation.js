@@ -60,3 +60,19 @@ async function acceptValuation(itemId, minPrice, maxPrice) {
         }
     }
 }
+
+const initialPageSetup = (item) => {
+    document.getElementById('itemImage').src = window.innerWidth <= 400 ? item?.images?.enhancedFrontImageSmall : item?.images?.enhancedFrontImage;
+    document.getElementById('chatLink').onclick = () => Intercom('showNewMessage',
+        item.mlValuation?.decline ?
+            `ID: ${item.id}\n\nGällande att ni tackade nej till ${item.brand.trim()}-${item.category.toLowerCase()}:\n\n` :
+            `ID: ${item.id}\n\nGällande värderingen på ${item.mlValuation.minPriceEstimate}-${item.mlValuation.maxPriceEstimate} kr för ${item.brand.trim()}-${item.category.toLowerCase()}. Vad skulle du vilja ändra värderingen till och varför?\n\n`);
+    document.getElementById('valuationClose').addEventListener('click', () => {
+        sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
+        if (!params.id) {
+            localStorage.removeItem('newItem');
+            sessionStorage.removeItem('newItemId');
+        }
+        return window.location.href = '/private';
+    })
+}

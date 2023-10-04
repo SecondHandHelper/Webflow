@@ -1,27 +1,42 @@
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test622/itemValuation.js"></script>
 
 <script>
-    import {acceptValuation} from "./itemValuation";
-
     const adjustmentOk = (minPrice, maxPrice) => {
         const minInput = document.getElementById('minPrice');
         const maxInput = document.getElementById('maxPrice');
         return minInput.value <= minPrice * 2 || maxInput.value <= maxPrice * 2;
     }
 
+    const hideTooltip = () => {
+        for (const element of document.getElementsByClassName('tooltip-motivation')) {
+            element.classList.remove('tooltip-show');
+        }
+    }
+
     const showMlValuation = async (item) => {
-        const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, soldPrice } = item.mlValuation || {};
+        const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline } = item.mlValuation || {};
         const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
         const maxPrice =  item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
+        const estimatedPrice = Math.round((minPrice+maxPrice)/20)*10;
         document.getElementById('valuationResultDiv').style.display = 'flex';
         triggerShowContent.click();
         document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
         if (featureIsEnabled('adjustValuation')) {
             document.getElementById('valuationExplanation').style.display = 'none';
-            document.getElementById('valuationText').innerText = `${soldPrice} kr`;
+            document.getElementById('valuationText').innerText = `${estimatedPrice} kr`;
             document.getElementById('valuationHeading').style.display = 'block';
             document.getElementById('valuationMotivation').style.display = 'flex';
             document.getElementById('valuationMotivation').dataset.text = document.getElementById('valuationExplanation').innerText;
+            document.getElementById('valuationMotivation').addEventListener('click', (e) => {
+                const elements = document.getElementsByClassName('tooltip-motivation');
+                const visible = elements[0]?.classList.contains('tooltip-show');
+                for (const element of elements) {
+                    visible ? element.classList.remove('tooltip-show') : element.classList.add('tooltip-show');
+                }
+                document.getElementById('tooltipMotivation').addEventListener('click', hideTooltip);
+                e.stopPropagation();
+            });
+            document.body.addEventListener('click', hideTooltip);
             document.getElementById('valuationRange').style.display = 'flex';
             document.getElementById('minPrice').value = minPrice;
             document.getElementById('maxPrice').value = maxPrice;
@@ -39,22 +54,38 @@
                 document.getElementById('adjustmentTips').style.display = 'block';
             })
             document.getElementById('minPrice').addEventListener('input', () => {
-                let adjustmentMin = document.getElementById('minPrice').value;
+                const adjustmentMin = document.getElementById('minPrice').value;
+                const adjustmentMax = document.getElementById('maxPrice').value;
                 if (adjustmentMin !== minPrice) {
                     document.getElementById('origMinPrice').style.display = 'block';
                 } else {
                     document.getElementById('origMinPrice').style.display = 'none';
                 }
+                if (adjustmentMin > adjustmentMax) {
+                    document.getElementById('confirmButton').disabled = true;
+                    document.getElementById('minPrice').setCustomValidity('Lägsta pris måste vara mindre än startpris');
+                    document.getElementById('minPrice').reportValidity();
+                } else {
+                    document.getElementById('minPrice').setCustomValidity('');
+                }
             });
             document.getElementById('maxPrice').addEventListener('input', () => {
-                let adjustmentMaxInput = document.getElementById('maxPrice');
+                const adjustmentMaxInput = document.getElementById('maxPrice');
+                const adjustmentMin = document.getElementById('minPrice').value;
                 if (adjustmentMaxInput.value !== maxPrice) {
                     document.getElementById('origMaxPrice').style.display = 'block';
                 } else {
                     document.getElementById('origMaxPrice').style.display = 'none';
                 }
+                if (adjustmentMin > adjustmentMaxInput.value) {
+                    document.getElementById('confirmButton').disabled = true;
+                    adjustmentMaxInput.setCustomValidity('Startpris måste vara högre än lägsta pris');
+                    adjustmentMaxInput.reportValidity();
+                } else {
+                    adjustmentMaxInput.setCustomValidity('');
+                }
                 if (adjustmentMaxInput.value > maxPrice * 2) {
-                    document.getElementById('adjustmentMotivation').style.display = 'flex';
+                    document.getElementById('adjustmentMotivation').style.display = 'block';
                     document.getElementById('adjustmentTips').style.display = 'none';
                     document.getElementById('adjustmentNote').style.display = 'none';
                     document.getElementById('confirmButton').innerText = 'Skicka för granskning';
@@ -98,22 +129,6 @@
         }
     }
 
-    const initialPageSetup = (item) => {
-        document.getElementById('itemImage').src = window.innerWidth <= 400 ? item?.images?.enhancedFrontImageSmall : item?.images?.enhancedFrontImage;
-        document.getElementById('chatLink').onclick = () => Intercom('showNewMessage',
-            item.mlValuation?.decline ?
-                `ID: ${item.id}\n\nGällande att ni tackade nej till ${item.brand.trim()}-${item.category.toLowerCase()}:\n\n` :
-                `ID: ${item.id}\n\nGällande värderingen på ${item.mlValuation.minPriceEstimate}-${item.mlValuation.maxPriceEstimate} kr för ${item.brand.trim()}-${item.category.toLowerCase()}. Vad skulle du vilja ändra värderingen till och varför?\n\n`);
-        document.getElementById('valuationClose').addEventListener('click', () => {
-            sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
-            if (!params.id) {
-                localStorage.removeItem('newItem');
-                sessionStorage.removeItem('newItemId');
-            }
-            return window.location.href = '/private';
-        })
-    }
-
     const getItem = async (itemId) => {
         const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId })
         return { ...(res?.data || {}), id: itemId };
@@ -133,7 +148,7 @@
             return location.href = '/private';
         }
         initialPageSetup(item);
-        showMlValuation(item);
+        await user.whenSet(() => showMlValuation(item));
     }
 
     main();
