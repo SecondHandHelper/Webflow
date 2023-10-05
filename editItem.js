@@ -42,23 +42,13 @@ async function updateItem(itemId, changedImages) {
           }
         });
         // Uploads files and add the new imageUrls to the changes object
-        const storageRef = storage.ref();
         await Promise.all(Array.from(images).map(async ([imageName, value]) => {
           console.log(`${imageName}: ${value}`);
           // If images was changed, set photo directions to default, since an 'info request' of images could have been shown
           photoDirectionsText.style.display = 'block';
           infoRequestImagesDiv.style.display = 'none';
-
-          let imagePathReference = `images/${itemId}/${imageName}`;
-          let fileRef = storageRef.child(imagePathReference);
-          await fileRef.put(value);
-          const imageDownloadUrl = await fileRef.getDownloadURL();
-          let k = "images." + imageName;
-          changes[k] = imageDownloadUrl;
-          changes[`images.${imageName}Small`] = "";
-          changes[`images.${imageName}Medium`] = "";
-          changes[`images.${imageName}Large`] = "";
-          changes[`images.versionsStatus.${imageName}`] = '';
+          const { url: imageUrl } = await uploadTempImage(value, imageName);
+          await firebase.app().functions("europe-west1").httpsCallable('saveItemImage')({ itemId, fileName: imageName, url: imageUrl });
         }));
         if (changedImages.indexOf('frontImage') > -1) {
           // Front image was changed, also save the enhancedFrontImage in the right place
