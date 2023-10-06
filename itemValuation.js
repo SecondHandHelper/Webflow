@@ -37,9 +37,9 @@ const adjustmentOk = (minPrice, maxPrice) => {
 const priceTooHigh = (price, adjustedPrice) => {
     if (price < 500 && adjustedPrice > price * 1.5) {
         return true;
-    } else if (price < 1000 && adjustedPrice > price * 1.4) {
+    } else if (price >= 500 && price < 1000 && adjustedPrice > price * 1.4) {
         return true;
-    } else if (price > 1000 && adjustedPrice > price * 1.3) {
+    } else if (price >= 1000 && adjustedPrice > price * 1.3) {
         return true
     }
     return false;
@@ -85,7 +85,7 @@ const adjustmentValidations = (estimatedPrice, minPrice, maxPrice, adjustmentMin
     } else if (adjustmentMax !== maxPrice || adjustmentMin !== minPrice) {
         document.getElementById('adjustmentNote').style.display = 'block';
         document.getElementById('adjustmentTips').style.display = 'none';
-        document.getElementById('adjustmentMotivation').style.display = 'none;'
+        document.getElementById('adjustmentMotivation').style.display = 'none';
         if (adjustmentMax > maxPrice) {
             document.getElementById('higherMaxPriceText').style.display = 'block';
             document.getElementById('higherMinPriceText').style.display = 'none';
@@ -199,6 +199,26 @@ const hideTooltip = () => {
     }
 }
 
+const priceAdjustment = (inputValue) => {
+    if (inputValue < 200) {
+        return 20;
+    } else if (inputValue < 500) {
+        return 50;
+    }
+    return 100;
+}
+const lowerPrice = (input) => {
+    const value = Number(input.value);
+    input.value = Math.max(value - priceAdjustment(value), 100);
+    input.dispatchEvent(new Event('input'));
+}
+
+const increasePrice = (input) => {
+    const value = Number(input.value);
+    input.value = value + priceAdjustment(value);
+    input.dispatchEvent(new Event('input'));
+}
+
 const showMlValuation = async (item) => {
     const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, adjustmentAllowed } = item.mlValuation || {};
     const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
@@ -208,6 +228,7 @@ const showMlValuation = async (item) => {
     triggerShowContent.click();
     document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
     if (featureIsEnabled('adjustValuation') && adjustmentAllowed) {
+        rangeSlider(minPrice, maxPrice, estimatedPrice);
         document.getElementById('valuationExplanation').style.display = 'none';
         document.getElementById('valuationText').innerText = `${estimatedPrice} kr`;
         document.getElementById('valuationHeading').style.display = 'block';
@@ -240,6 +261,7 @@ const showMlValuation = async (item) => {
             document.getElementById('adjustInterval').style.display = 'none';
             document.getElementById('adjustmentTips').style.display = 'block';
             document.getElementById('adjustmentNote').style.display = 'none';
+            document.getElementById('sliderDiv').style.display = 'block';
         })
         document.getElementById('minPrice').addEventListener('input', () => {
             const adjustmentMinInput = document.getElementById('minPrice');
@@ -252,6 +274,12 @@ const showMlValuation = async (item) => {
             }
             adjustmentValidations(estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
         });
+        document.getElementById('minIncrease').addEventListener('click', () =>
+            increasePrice(document.getElementById('minPrice'))
+        );
+        document.getElementById('minDecrease').addEventListener('click', () =>
+            lowerPrice(document.getElementById('minPrice'))
+        );
         document.getElementById('maxPrice').addEventListener('input', () => {
             const adjustmentMaxInput = document.getElementById('maxPrice');
             const adjustmentMinInput = document.getElementById('minPrice');
@@ -263,6 +291,12 @@ const showMlValuation = async (item) => {
             }
             adjustmentValidations(estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
         });
+        document.getElementById('maxIncrease').addEventListener('click', () =>
+            increasePrice(document.getElementById('maxPrice'))
+        );
+        document.getElementById('maxDecrease').addEventListener('click', () =>
+            lowerPrice(document.getElementById('maxPrice'))
+        );
     }
     document.getElementById('valuationText').style.display = 'block';
     if (!sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
@@ -279,6 +313,58 @@ const showMlValuation = async (item) => {
 const getItem = async (itemId) => {
     const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId })
     return { ...(res?.data || {}), id: itemId };
+}
+
+const maxIncrease = (price) => {
+    if (price < 500) {
+        return price * 1.5 - price;
+    } else if (price < 1000) {
+        return price * 1.4 - price;
+    }
+    return price * 1.3 - price;
+}
+
+const minPriceMaxIncrease = (minPrice, estimatedPrice) => Math.min(maxIncrease(minPrice), estimatedPrice-minPrice);
+
+function rangeSlider(minPrice, maxPrice, estimatedPrice) {
+    const range = document.getElementById('adjustmentSlider');
+    range.addEventListener('change', function() {
+        console.log(range.value);
+        let minInput = document.getElementById('minPrice');
+        let maxInput = document.getElementById('maxPrice');
+        switch(range.value) {
+            case '0': // -50%
+                minInput.value = Math.max(100, Math.round((minPrice*0.5)/10)*10);
+                maxInput.value = Math.max(100, Math.round((maxPrice*0.5)/10)*10);
+                break;
+            case '1': // -33%
+                minInput.value = Math.max(100, Math.round((minPrice*0.66)/10)*10);
+                maxInput.value = Math.max(100, Math.round((maxPrice*0.66)/10)*10);
+                break;
+            case '2': // -17%
+                minInput.value = Math.max(100, Math.round((minPrice*0.83)/10)*10);
+                maxInput.value = Math.max(100, Math.round((maxPrice*0.83)/10)*10);
+                break;
+            case '3':
+                minInput.value = minPrice;
+                maxInput.value = maxPrice;
+                break;
+            case '4':
+                minInput.value = Math.round((minPrice+minPriceMaxIncrease(minPrice, estimatedPrice)*0.33)/10)*10;
+                maxInput.value = Math.round((maxPrice+maxIncrease(maxPrice)*0.33)/10)*10;
+                break;
+            case '5':
+                minInput.value = Math.round((minPrice+minPriceMaxIncrease(minPrice, estimatedPrice)*0.67)/10)*10;
+                maxInput.value = Math.round((maxPrice+maxIncrease(maxPrice)*0.67)/10)*10;
+                break;
+            case '6':
+                minInput.value = Math.round((minPrice+minPriceMaxIncrease(minPrice, estimatedPrice))/10)*10;
+                maxInput.value = Math.round((maxPrice+maxIncrease(maxPrice))/10)*10;
+                break;
+        }
+        minInput.dispatchEvent(new Event('input'));
+        maxInput.dispatchEvent(new Event('input'));
+    });
 }
 
 const main = async () => {
