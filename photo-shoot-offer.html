@@ -4,5 +4,8 @@
   if (inviteCode){
     referralCodeText.innerHTML = inviteCode;
     activeCode.style.display = 'flex';
+  } else {
+    missingInviteCodeDiv.style.display = 'flex';
+    introText.style.display = 'none';
   }
 </script>

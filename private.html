@@ -41,7 +41,7 @@
         }
         // Set invite code cookie
         const photoInvite = checkCookie("photo_invite");
-        if (photoInvite) {
+        if (photoInvite && !localStorage.getItem('photoShootBooked')) {
             photoShootOffer.style.display = 'block';
             bonusSection.style.display = 'block';
         }
