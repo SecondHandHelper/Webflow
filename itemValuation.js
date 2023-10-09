@@ -207,15 +207,19 @@ const priceAdjustment = (inputValue) => {
     }
     return 100;
 }
-const lowerPrice = (input) => {
+const lowerPrice = (input, origValue) => {
     const value = Number(input.value);
-    input.value = Math.max(value - priceAdjustment(value), 100);
+    const valPriceAdjustment = priceAdjustment(origValue);
+    const newValue = Math.floor(value/valPriceAdjustment)*valPriceAdjustment;
+    input.value = Math.max(100, newValue === value ? value - valPriceAdjustment : newValue);
     input.dispatchEvent(new Event('input'));
 }
 
-const increasePrice = (input) => {
+const increasePrice = (input, origValue) => {
     const value = Number(input.value);
-    input.value = value + priceAdjustment(value);
+    const valPriceAdjustment = priceAdjustment(origValue);
+    const newValue = Math.ceil(value/valPriceAdjustment)*valPriceAdjustment;
+    input.value = newValue === value ? value + valPriceAdjustment : newValue;
     input.dispatchEvent(new Event('input'));
 }
 
@@ -257,6 +261,7 @@ const showMlValuation = async (item) => {
             document.getElementById('adjustInterval').style.display = 'none';
         }
         document.getElementById('adjustInterval').addEventListener('click', () => {
+            document.getElementById('resetButton').style.visibility = 'visible';
             document.getElementById('valuationExplanation').style.display = 'none';
             document.getElementById('minPrice').disabled = false;
             document.getElementById('maxPrice').disabled = false;
@@ -265,6 +270,13 @@ const showMlValuation = async (item) => {
             document.getElementById('adjustmentNote').style.display = 'none';
             document.getElementById('sliderDiv').style.display = 'block';
         })
+        document.getElementById('resetButton').addEventListener('click', () => {
+           document.getElementById('minPrice').value = minPrice;
+           document.getElementById('maxPrice').value = maxPrice;
+           document.getElementById('minPrice').dispatchEvent(new Event('input'));
+           document.getElementById('maxPrice').dispatchEvent(new Event('input'));
+           document.getElementById('adjustmentSlider').value = 3;
+        });
         document.getElementById('minPrice').addEventListener('input', () => {
             const adjustmentMinInput = document.getElementById('minPrice');
             const adjustmentMaxInput = document.getElementById('maxPrice');
@@ -277,10 +289,10 @@ const showMlValuation = async (item) => {
             adjustmentValidations(estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
         });
         document.getElementById('minIncrease').addEventListener('click', () =>
-            increasePrice(document.getElementById('minPrice'))
+            increasePrice(document.getElementById('minPrice'), minPrice)
         );
         document.getElementById('minDecrease').addEventListener('click', () =>
-            lowerPrice(document.getElementById('minPrice'))
+            lowerPrice(document.getElementById('minPrice'), minPrice)
         );
         document.getElementById('maxPrice').addEventListener('input', () => {
             const adjustmentMaxInput = document.getElementById('maxPrice');
@@ -294,10 +306,10 @@ const showMlValuation = async (item) => {
             adjustmentValidations(estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
         });
         document.getElementById('maxIncrease').addEventListener('click', () =>
-            increasePrice(document.getElementById('maxPrice'))
+            increasePrice(document.getElementById('maxPrice'), maxPrice)
         );
         document.getElementById('maxDecrease').addEventListener('click', () =>
-            lowerPrice(document.getElementById('maxPrice'))
+            lowerPrice(document.getElementById('maxPrice'), maxPrice)
         );
     }
     document.getElementById('valuationText').style.display = 'block';
@@ -333,7 +345,6 @@ function rangeSlider(minPrice, maxPrice, estimatedPrice) {
     range.addEventListener('touchend', () => range.value = Math.round(Number(range.value)) );
     range.addEventListener('mouseup', () => range.value = Math.round(Number(range.value)) );
     range.addEventListener('input', function() {
-        console.log(range.value);
         let minInput = document.getElementById('minPrice');
         let maxInput = document.getElementById('maxPrice');
         const closestValue = Math.round(Number(range.value));
