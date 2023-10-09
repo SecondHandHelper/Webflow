@@ -72,6 +72,7 @@ const adjustmentWarningText = (estimatedPrice, minPrice, maxPrice, adjustmentMin
 }
 
 const adjustmentValidations = (estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput) => {
+    document.getElementById('resetButton').style.visibility = 'visible';
     const adjustmentMin = Number(adjustmentMinInput.value);
     const adjustmentMax = Number(adjustmentMaxInput.value);
     adjustmentMaxInput.style.color = priceOutsideOkRange(estimatedPrice, maxPrice, adjustmentMax) ? '#E20000' : '#333';
@@ -263,7 +264,6 @@ const showMlValuation = async (item) => {
             document.getElementById('adjustInterval').style.display = 'none';
         }
         document.getElementById('adjustInterval').addEventListener('click', () => {
-            document.getElementById('resetButton').style.visibility = 'visible';
             document.getElementById('valuationExplanation').style.display = 'none';
             document.getElementById('minPrice').disabled = false;
             document.getElementById('maxPrice').disabled = false;
