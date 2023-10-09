@@ -249,9 +249,9 @@ const showMlValuation = async (item) => {
         document.getElementById('maxPrice').value = maxPrice;
         document.getElementById('maxPrice').disabled = true;
         document.getElementById('origMinPrice').innerText = minPrice;
-        document.getElementById('origMinPrice').style.display = 'none';
+        document.getElementById('origMinPrice').style.visibility = 'hidden';
         document.getElementById('origMaxPrice').innerText = maxPrice;
-        document.getElementById('origMaxPrice').style.display = 'none';
+        document.getElementById('origMaxPrice').style.visibility = 'hidden';
         if (item.infoRequests?.price?.finalOffer === 'true') {
             document.getElementById('adjustInterval').style.display = 'none';
         }
@@ -268,9 +268,9 @@ const showMlValuation = async (item) => {
             const adjustmentMaxInput = document.getElementById('maxPrice');
             const adjustmentMin = Number(adjustmentMinInput.value);
             if (adjustmentMin !== minPrice) {
-                document.getElementById('origMinPrice').style.display = 'block';
+                document.getElementById('origMinPrice').style.visibility = 'visible';
             } else {
-                document.getElementById('origMinPrice').style.display = 'none';
+                document.getElementById('origMinPrice').style.visibility = 'hidden';
             }
             adjustmentValidations(estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
         });
@@ -285,9 +285,9 @@ const showMlValuation = async (item) => {
             const adjustmentMinInput = document.getElementById('minPrice');
             const adjustmentMax = Number(adjustmentMaxInput.value);
             if (adjustmentMax !== maxPrice) {
-                document.getElementById('origMaxPrice').style.display = 'block';
+                document.getElementById('origMaxPrice').style.visibility = 'visible';
             } else {
-                document.getElementById('origMaxPrice').style.display = 'none';
+                document.getElementById('origMaxPrice').style.visibility = 'hidden';
             }
             adjustmentValidations(estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
         });
