@@ -1,5 +1,5 @@
 <script>
-  if (localStorage.getItem('authUserId') && (window.location.pathname === '/' || window.location.pathname === 'sign-in')) {
+  if (localStorage.getItem('authUserId') && (window.location.pathname === '/' || window.location.pathname === '/sign-in')) {
     location.href = '/private';
   }
 </script>
