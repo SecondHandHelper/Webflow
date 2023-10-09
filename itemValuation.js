@@ -72,7 +72,6 @@ const adjustmentWarningText = (estimatedPrice, minPrice, maxPrice, adjustmentMin
 }
 
 const adjustmentValidations = (estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput) => {
-    document.getElementById('resetButton').style.visibility = 'visible';
     const adjustmentMin = Number(adjustmentMinInput.value);
     const adjustmentMax = Number(adjustmentMaxInput.value);
     adjustmentMaxInput.style.color = priceOutsideOkRange(estimatedPrice, maxPrice, adjustmentMax) ? '#E20000' : '#333';
@@ -84,6 +83,7 @@ const adjustmentValidations = (estimatedPrice, minPrice, maxPrice, adjustmentMin
         document.getElementById('adjustmentNote').style.display = 'none';
         document.getElementById('confirmButton').innerText = 'Skicka för granskning';
     } else if (adjustmentMax !== maxPrice || adjustmentMin !== minPrice) {
+        document.getElementById('resetButton').style.visibility = 'visible';
         document.getElementById('adjustmentNote').style.display = 'block';
         document.getElementById('adjustmentTips').style.display = 'none';
         document.getElementById('adjustmentMotivation').style.display = 'none';
@@ -102,6 +102,7 @@ const adjustmentValidations = (estimatedPrice, minPrice, maxPrice, adjustmentMin
         }
         document.getElementById('confirmButton').innerText = 'Påbörja försäljning';
     } else {
+        document.getElementById('resetButton').style.visibility = 'hidden';
         document.getElementById('adjustmentTips').style.display = 'block';
         document.getElementById('adjustmentNote').style.display = 'none';
         document.getElementById('adjustmentMotivation').style.display = 'none';
@@ -278,6 +279,7 @@ const showMlValuation = async (item) => {
            document.getElementById('minPrice').dispatchEvent(new Event('input'));
            document.getElementById('maxPrice').dispatchEvent(new Event('input'));
            document.getElementById('adjustmentSlider').value = 3;
+           document.getElementById('resetButton').style.visibility = 'hidden';
         });
         document.getElementById('minPrice').addEventListener('input', () => {
             const adjustmentMinInput = document.getElementById('minPrice');
