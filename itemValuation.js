@@ -234,6 +234,8 @@ const showMlValuation = async (item) => {
     if (featureIsEnabled('adjustValuation') && adjustmentAllowed) {
         rangeSlider(minPrice, maxPrice, estimatedPrice);
         document.getElementById('oldButtons').style.display = 'none';
+        document.getElementById('headerTitle').style.display = 'none';
+        document.getElementById('chatDiv').style.display = 'none';
         document.getElementById('stickyButtons').style.display = 'block';
         document.getElementById('valuationText').innerText = `${estimatedPrice} kr`;
         document.getElementById('valuationHeading').style.display = 'block';
