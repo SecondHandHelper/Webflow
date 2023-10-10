@@ -81,7 +81,7 @@ const adjustmentValidations = (estimatedPrice, minPrice, maxPrice, adjustmentMin
         document.getElementById('adjustmentWarningText').innerText = adjustmentWarningText(estimatedPrice, minPrice, maxPrice, adjustmentMin, adjustmentMax);
         document.getElementById('adjustmentTips').style.display = 'none';
         document.getElementById('adjustmentNote').style.display = 'none';
-        document.getElementById('confirmButton').innerText = 'Skicka för granskning';
+        document.getElementById('stickyConfirmButton').innerText = 'Skicka för granskning';
     } else if (adjustmentMax !== maxPrice || adjustmentMin !== minPrice) {
         document.getElementById('resetButton').style.visibility = 'visible';
         document.getElementById('adjustmentNote').style.display = 'block';
@@ -100,17 +100,17 @@ const adjustmentValidations = (estimatedPrice, minPrice, maxPrice, adjustmentMin
             document.getElementById('higherMinPriceText').style.display = 'none';
             document.getElementById('lowerMinOrMaxPriceText').style.display = 'block';
         }
-        document.getElementById('confirmButton').innerText = 'Påbörja försäljning';
+        document.getElementById('stickyConfirmButton').innerText = 'Påbörja försäljning';
     } else {
         document.getElementById('resetButton').style.visibility = 'hidden';
         document.getElementById('adjustmentTips').style.display = 'block';
         document.getElementById('adjustmentNote').style.display = 'none';
         document.getElementById('adjustmentMotivation').style.display = 'none';
-        document.getElementById('confirmButton').innerText = 'Påbörja försäljning';
+        document.getElementById('stickyConfirmButton').innerText = 'Påbörja försäljning';
     }
 }
 
-function validateInput() {
+function validateInput(reportValidity = true) {
     const adjustmentMinInput = document.getElementById('minPrice');
     const adjustmentMaxInput = document.getElementById('maxPrice');
     const adjustmentMin = Number(adjustmentMinInput.value);
@@ -124,22 +124,37 @@ function validateInput() {
         adjustmentMinInput.setCustomValidity('');
         adjustmentMaxInput.setCustomValidity('');
     }
+    return reportValidity ?
+        document.getElementById('wf-form-Valuation-form').reportValidity() :
+        true;
+}
+
+const validateMotivation = () => {
+    const adjustmentMotivation = document.getElementById('adjustmentMotivation');
+    const userMotivationInput = document.getElementById('userProposalMotivation');
+    if (adjustmentMotivation.style.display === 'block' && !userMotivationInput.value?.trim().length) {
+        userMotivationInput.setCustomValidity('Ange en motivering till din ändring');
+    } else {
+        userMotivationInput.setCustomValidity('');
+    }
     return document.getElementById('wf-form-Valuation-form').reportValidity();
 }
 
 async function acceptValuation(itemId, minPrice, maxPrice) {
-    if (!validateInput()) {
+    if (!validateInput(false) || !validateMotivation()) {
         return;
     }
-    const minInput = Number(document.getElementById('minPrice').value);
-    const maxInput = Number(document.getElementById('maxPrice').value);
+    const minInput = document.getElementById('minPrice');
+    const adjustedMin = Number(minInput.value);
+    const maxInput = document.getElementById('maxPrice');
+    const adjustedMax = Number(maxInput.value);
     if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
         const savedItem = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
         savedItem.item.infoRequests.price.status = 'Resolved';
         savedItem.item.infoRequests.price.response = 'Accepted';
-        if (featureIsEnabled('adjustValuation') && (minInput?.value !== minPrice || maxInput?.value !== maxPrice)) {
-            savedItem.item.infoRequests.price.userAdjustedMin = Number(minInput.value);
-            savedItem.item.infoRequests.price.userAdjustedMax = Number(maxInput.value);
+        if (featureIsEnabled('adjustValuation') && (adjustedMin !== minPrice || adjustedMax !== maxPrice)) {
+            savedItem.item.infoRequests.price.userAdjustedMin = adjustedMin;
+            savedItem.item.infoRequests.price.userAdjustedMax = adjustedMax;
             if (!adjustmentOk(minPrice, maxPrice)) {
                 savedItem.item.infoRequests.price.response = 'User proposal';
                 savedItem.item.infoRequests.price.userProposalMotivation = document.getElementById('userProposalMotivation').value;
@@ -152,7 +167,7 @@ async function acceptValuation(itemId, minPrice, maxPrice) {
         return window.location.href = '/sign-in';
     } else {
         await firebase.app().functions("europe-west1").httpsCallable('saveAcceptedValuation')({
-            itemId, minPrice, maxPrice, adjustmentMin: Number(minInput.value), adjustmentMax: Number(maxInput.value),
+            itemId, minPrice, maxPrice, adjustmentMin: adjustedMin, adjustmentMax: adjustedMax,
             userProposalMotivation: document.getElementById('userProposalMotivation').value
         });
         if (!document.referrer.includes('/private')) {
@@ -280,7 +295,9 @@ const showMlValuation = async (item) => {
            document.getElementById('maxPrice').dispatchEvent(new Event('input'));
            document.getElementById('adjustmentSlider').value = 3;
            document.getElementById('resetButton').style.visibility = 'hidden';
+           validateInput();
         });
+        document.getElementById('minPrice').addEventListener('blur', () => validateInput());
         document.getElementById('minPrice').addEventListener('input', () => {
             const adjustmentMinInput = document.getElementById('minPrice');
             const adjustmentMaxInput = document.getElementById('maxPrice');
@@ -292,12 +309,15 @@ const showMlValuation = async (item) => {
             }
             adjustmentValidations(estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
         });
-        document.getElementById('minIncrease').addEventListener('click', () =>
-            increasePrice(document.getElementById('minPrice'), minPrice)
-        );
-        document.getElementById('minDecrease').addEventListener('click', () =>
-            lowerPrice(document.getElementById('minPrice'), minPrice)
-        );
+        document.getElementById('minIncrease').addEventListener('click', () => {
+            increasePrice(document.getElementById('minPrice'), minPrice);
+            validateInput();
+        });
+        document.getElementById('minDecrease').addEventListener('click', () => {
+            lowerPrice(document.getElementById('minPrice'), minPrice);
+            validateInput();
+        });
+        document.getElementById('maxPrice').addEventListener('blur', () => validateInput());
         document.getElementById('maxPrice').addEventListener('input', () => {
             const adjustmentMaxInput = document.getElementById('maxPrice');
             const adjustmentMinInput = document.getElementById('minPrice');
@@ -309,12 +329,14 @@ const showMlValuation = async (item) => {
             }
             adjustmentValidations(estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
         });
-        document.getElementById('maxIncrease').addEventListener('click', () =>
-            increasePrice(document.getElementById('maxPrice'), maxPrice)
-        );
-        document.getElementById('maxDecrease').addEventListener('click', () =>
-            lowerPrice(document.getElementById('maxPrice'), maxPrice)
-        );
+        document.getElementById('maxIncrease').addEventListener('click', () => {
+            increasePrice(document.getElementById('maxPrice'), maxPrice);
+            validateInput();
+        });
+        document.getElementById('maxDecrease').addEventListener('click', () => {
+            lowerPrice(document.getElementById('maxPrice'), maxPrice);
+            validateInput();
+        });
     }
     document.getElementById('valuationText').style.display = 'block';
     if (!sessionStorage.getItem('itemToBeCreatedAfterSignIn') && !(featureIsEnabled('adjustValuation') && adjustmentAllowed)) {
@@ -323,7 +345,9 @@ const showMlValuation = async (item) => {
     if (decline) {
         await showDeclineValuation(item);
     } else {
+        document.getElementById('stickyConfirmButton').addEventListener('click', () => acceptValuation(item.id, minPrice, maxPrice));
         document.getElementById('confirmButton').addEventListener('click', () => acceptValuation(item.id, minPrice, maxPrice));
+        document.getElementById('stickyRejectButton').addEventListener('click', () => rejectValuation(item));
         document.getElementById('rejectButton').addEventListener('click', () => rejectValuation(item));
     }
 }
@@ -346,8 +370,14 @@ const minPriceMaxIncrease = (minPrice, estimatedPrice) => Math.min(maxIncrease(m
 
 function rangeSlider(minPrice, maxPrice, estimatedPrice) {
     const range = document.getElementById('adjustmentSlider');
-    range.addEventListener('touchend', () => range.value = Math.round(Number(range.value)) );
-    range.addEventListener('mouseup', () => range.value = Math.round(Number(range.value)) );
+    range.addEventListener('touchend', () => {
+        range.value = Math.round(Number(range.value));
+        validateInput();
+    });
+    range.addEventListener('mouseup', () => {
+        range.value = Math.round(Number(range.value));
+        validateInput();
+    });
     range.addEventListener('input', function() {
         let minInput = document.getElementById('minPrice');
         let maxInput = document.getElementById('maxPrice');
