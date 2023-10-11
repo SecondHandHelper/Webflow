@@ -249,7 +249,7 @@ const showMlValuation = async (item) => {
     const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
     const estimatedPrice = Math.round((minPrice + maxPrice) / 20) * 10;
     if (featureIsEnabled('adjustValuation') && adjustmentAllowed) {
-        document.getElementById('adjustInterval').style.display = 'block';
+        document.getElementById('adjustInterval').style.display = 'flex';
         document.getElementById('chatDiv').style.display = 'none';
     }
 
