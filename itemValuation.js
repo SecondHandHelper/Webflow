@@ -230,7 +230,7 @@ const priceAdjustment = (inputValue) => {
 const lowerPrice = (input, origValue) => {
     const value = Number(input.value);
     const valPriceAdjustment = priceAdjustment(origValue);
-    const newValue = Math.floor(value/valPriceAdjustment)*valPriceAdjustment;
+    const newValue = Math.floor(value / valPriceAdjustment) * valPriceAdjustment;
     input.value = Math.max(100, newValue === value ? value - valPriceAdjustment : newValue);
     input.dispatchEvent(new Event('input'));
 }
@@ -238,7 +238,7 @@ const lowerPrice = (input, origValue) => {
 const increasePrice = (input, origValue) => {
     const value = Number(input.value);
     const valPriceAdjustment = priceAdjustment(origValue);
-    const newValue = Math.ceil(value/valPriceAdjustment)*valPriceAdjustment;
+    const newValue = Math.ceil(value / valPriceAdjustment) * valPriceAdjustment;
     input.value = newValue === value ? value + valPriceAdjustment : newValue;
     input.dispatchEvent(new Event('input'));
 }
@@ -246,105 +246,105 @@ const increasePrice = (input, origValue) => {
 const showMlValuation = async (item) => {
     const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, adjustmentAllowed, newBrand, newBrandCategory } = item.mlValuation || {};
     const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
-    const maxPrice =  item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
-    const estimatedPrice = Math.round((minPrice+maxPrice)/20)*10;
+    const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
+    const estimatedPrice = Math.round((minPrice + maxPrice) / 20) * 10;
+    if (featureIsEnabled('adjustValuation') && adjustmentAllowed) {
+        document.getElementById('adjustInterval').style.display = 'block';
+        document.getElementById('chatDiv').style.display = 'none';
+    }
+
+    rangeSlider(minPrice, maxPrice, estimatedPrice);
+    document.getElementById('valuationText').innerText = `${estimatedPrice} kr`;
     document.getElementById('valuationResultDiv').style.display = 'flex';
     triggerShowContent.click();
-    document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
-    if (featureIsEnabled('adjustValuation') && adjustmentAllowed) {
-        rangeSlider(minPrice, maxPrice, estimatedPrice);
-        document.getElementById('headerTitle').style.display = 'none';
-        document.getElementById('chatDiv').style.display = 'none';
-        document.getElementById('valuationText').innerText = `${estimatedPrice} kr`;
-        document.getElementById('valuationHeading').style.display = 'block';
-        document.getElementById('valuationMotivation').style.display = 'flex';
-        document.getElementById('valuationMotivation').addEventListener('click', (e) => {
-            const elements = document.getElementsByClassName('tooltip-motivation');
-            const visible = elements[0]?.classList.contains('tooltip-show');
-            for (const element of elements) {
-                visible ? element.classList.remove('tooltip-show') : element.classList.add('tooltip-show');
-            }
-            e.stopPropagation();
-        });
-        document.body.addEventListener('click', hideTooltip);
-        document.getElementById('valuationRange').style.display = 'flex';
-        document.getElementById('minPrice').value = minPrice;
-        document.getElementById('minPrice').disabled = true;
-        document.getElementById('maxPrice').value = maxPrice;
-        document.getElementById('maxPrice').disabled = true;
-        document.getElementById('origMinPrice').innerText = minPrice;
-        document.getElementById('origMinPrice').style.visibility = 'hidden';
-        document.getElementById('origMaxPrice').innerText = maxPrice;
-        document.getElementById('origMaxPrice').style.visibility = 'hidden';
-        if (item.infoRequests?.price?.finalOffer === 'true') {
-            document.getElementById('adjustInterval').style.display = 'none';
+
+    document.getElementById('valuationMotivation').addEventListener('click', (e) => {
+        const elements = document.getElementsByClassName('tooltip-motivation');
+        const visible = elements[0]?.classList.contains('tooltip-show');
+        for (const element of elements) {
+            visible ? element.classList.remove('tooltip-show') : element.classList.add('tooltip-show');
         }
-        document.getElementById('adjustInterval').addEventListener('click', () => {
-            document.getElementById('valuationExplanation').style.display = 'none';
-            document.getElementById('valuationExplanationHeader').style.display = 'none';
-            document.getElementById('minPrice').disabled = false;
-            document.getElementById('maxPrice').disabled = false;
-            document.getElementById('adjustInterval').style.display = 'none';
-            document.getElementById('adjustmentTips').style.display = 'block';
-            document.getElementById('adjustmentNote').style.display = 'none';
-            document.getElementById('sliderDiv').style.display = 'block';
-        })
-        document.getElementById('resetButton').addEventListener('click', () => {
-           document.getElementById('minPrice').value = minPrice;
-           document.getElementById('maxPrice').value = maxPrice;
-           document.getElementById('minPrice').dispatchEvent(new Event('input'));
-           document.getElementById('maxPrice').dispatchEvent(new Event('input'));
-           document.getElementById('adjustmentSlider').value = 3;
-           document.getElementById('resetButton').style.visibility = 'hidden';
-           validateInput();
-        });
-        document.getElementById('minPrice').addEventListener('blur', () => validateInput());
-        document.getElementById('minPrice').addEventListener('input', () => {
-            const adjustmentMinInput = document.getElementById('minPrice');
-            const adjustmentMaxInput = document.getElementById('maxPrice');
-            const adjustmentMin = Number(adjustmentMinInput.value);
-            if (adjustmentMin !== minPrice) {
-                document.getElementById('origMinPrice').style.visibility = 'visible';
-            } else {
-                document.getElementById('origMinPrice').style.visibility = 'hidden';
-            }
-            adjustmentValidations(estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
-        });
-        document.getElementById('minIncrease').addEventListener('click', () => {
-            increasePrice(document.getElementById('minPrice'), minPrice);
-            validateInput();
-        });
-        document.getElementById('minDecrease').addEventListener('click', () => {
-            lowerPrice(document.getElementById('minPrice'), minPrice);
-            validateInput();
-        });
-        document.getElementById('maxPrice').addEventListener('blur', () => validateInput());
-        document.getElementById('maxPrice').addEventListener('input', () => {
-            const adjustmentMaxInput = document.getElementById('maxPrice');
-            const adjustmentMinInput = document.getElementById('minPrice');
-            const adjustmentMax = Number(adjustmentMaxInput.value);
-            if (adjustmentMax !== maxPrice) {
-                document.getElementById('origMaxPrice').style.visibility = 'visible';
-            } else {
-                document.getElementById('origMaxPrice').style.visibility = 'hidden';
-            }
-            adjustmentValidations(estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
-        });
-        document.getElementById('maxIncrease').addEventListener('click', () => {
-            increasePrice(document.getElementById('maxPrice'), maxPrice);
-            validateInput();
-        });
-        document.getElementById('maxDecrease').addEventListener('click', () => {
-            lowerPrice(document.getElementById('maxPrice'), maxPrice);
-            validateInput();
-        });
-        if (newBrand || newBrandCategory) {
-            document.getElementById('valuationExplanationHeader').style.display = 'block';
-            document.getElementById('valuationExplanation').innerText = newBrand ?
-                'Vi har inte sålt så mycket av detta varumärke tidigare och har därför lite mindre data. Du får justera om du upplever att värderingen inte är rimlig. Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar.' :
-                'Vi har inte sålt så mycket av denna kategori från varumärket tidigare och har därför lite mindre data. Du får justera om du upplever att värderingen inte är rimlig. Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar.';
-        }
+        e.stopPropagation();
+    });
+    document.body.addEventListener('click', hideTooltip);
+    document.getElementById('valuationRange').style.display = 'flex';
+    document.getElementById('minPrice').value = minPrice;
+    document.getElementById('minPrice').disabled = true;
+    document.getElementById('maxPrice').value = maxPrice;
+    document.getElementById('maxPrice').disabled = true;
+    document.getElementById('origMinPrice').innerText = minPrice;
+    document.getElementById('origMinPrice').style.visibility = 'hidden';
+    document.getElementById('origMaxPrice').innerText = maxPrice;
+    document.getElementById('origMaxPrice').style.visibility = 'hidden';
+    if (item.infoRequests?.price?.finalOffer === 'true') {
+        document.getElementById('adjustInterval').style.display = 'none';
     }
+    document.getElementById('adjustInterval').addEventListener('click', () => {
+        document.getElementById('valuationExplanation').style.display = 'none';
+        document.getElementById('valuationExplanationHeader').style.display = 'none';
+        document.getElementById('minPrice').disabled = false;
+        document.getElementById('maxPrice').disabled = false;
+        document.getElementById('adjustInterval').style.display = 'none';
+        document.getElementById('adjustmentTips').style.display = 'block';
+        document.getElementById('adjustmentNote').style.display = 'none';
+        document.getElementById('sliderDiv').style.display = 'block';
+    })
+    document.getElementById('resetButton').addEventListener('click', () => {
+        document.getElementById('minPrice').value = minPrice;
+        document.getElementById('maxPrice').value = maxPrice;
+        document.getElementById('minPrice').dispatchEvent(new Event('input'));
+        document.getElementById('maxPrice').dispatchEvent(new Event('input'));
+        document.getElementById('adjustmentSlider').value = 3;
+        document.getElementById('resetButton').style.visibility = 'hidden';
+        validateInput();
+    });
+    document.getElementById('minPrice').addEventListener('blur', () => validateInput());
+    document.getElementById('minPrice').addEventListener('input', () => {
+        const adjustmentMinInput = document.getElementById('minPrice');
+        const adjustmentMaxInput = document.getElementById('maxPrice');
+        const adjustmentMin = Number(adjustmentMinInput.value);
+        if (adjustmentMin !== minPrice) {
+            document.getElementById('origMinPrice').style.visibility = 'visible';
+        } else {
+            document.getElementById('origMinPrice').style.visibility = 'hidden';
+        }
+        adjustmentValidations(estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
+    });
+    document.getElementById('minIncrease').addEventListener('click', () => {
+        increasePrice(document.getElementById('minPrice'), minPrice);
+        validateInput();
+    });
+    document.getElementById('minDecrease').addEventListener('click', () => {
+        lowerPrice(document.getElementById('minPrice'), minPrice);
+        validateInput();
+    });
+    document.getElementById('maxPrice').addEventListener('blur', () => validateInput());
+    document.getElementById('maxPrice').addEventListener('input', () => {
+        const adjustmentMaxInput = document.getElementById('maxPrice');
+        const adjustmentMinInput = document.getElementById('minPrice');
+        const adjustmentMax = Number(adjustmentMaxInput.value);
+        if (adjustmentMax !== maxPrice) {
+            document.getElementById('origMaxPrice').style.visibility = 'visible';
+        } else {
+            document.getElementById('origMaxPrice').style.visibility = 'hidden';
+        }
+        adjustmentValidations(estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
+    });
+    document.getElementById('maxIncrease').addEventListener('click', () => {
+        increasePrice(document.getElementById('maxPrice'), maxPrice);
+        validateInput();
+    });
+    document.getElementById('maxDecrease').addEventListener('click', () => {
+        lowerPrice(document.getElementById('maxPrice'), maxPrice);
+        validateInput();
+    });
+    if (newBrand || newBrandCategory) {
+        document.getElementById('valuationExplanationHeader').style.display = 'block';
+        document.getElementById('valuationExplanation').innerText = newBrand ?
+            'Vi har inte sålt så mycket av detta varumärke tidigare och har därför lite mindre data. Du får justera om du upplever att värderingen inte är rimlig. Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar.' :
+            'Vi har inte sålt så mycket av denna kategori från varumärket tidigare och har därför lite mindre data. Du får justera om du upplever att värderingen inte är rimlig. Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar.';
+    }
+    
     document.getElementById('valuationText').style.display = 'block';
     if (!sessionStorage.getItem('itemToBeCreatedAfterSignIn') && !(featureIsEnabled('adjustValuation') && adjustmentAllowed)) {
         document.getElementById('chatDiv').style.display = 'block';
@@ -371,7 +371,7 @@ const maxIncrease = (price) => {
     return price * 0.3;
 }
 
-const minPriceMaxIncrease = (minPrice, estimatedPrice) => Math.min(maxIncrease(minPrice), estimatedPrice-minPrice);
+const minPriceMaxIncrease = (minPrice, estimatedPrice) => Math.min(maxIncrease(minPrice), estimatedPrice - minPrice);
 
 function rangeSlider(minPrice, maxPrice, estimatedPrice) {
     const range = document.getElementById('adjustmentSlider');
@@ -383,38 +383,38 @@ function rangeSlider(minPrice, maxPrice, estimatedPrice) {
         range.value = Math.round(Number(range.value));
         validateInput();
     });
-    range.addEventListener('input', function() {
+    range.addEventListener('input', function () {
         let minInput = document.getElementById('minPrice');
         let maxInput = document.getElementById('maxPrice');
         const closestValue = Math.round(Number(range.value));
-        switch(closestValue) {
+        switch (closestValue) {
             case 0: // -50%
-                minInput.value = Math.max(100, Math.round((minPrice*0.5)/10)*10);
-                maxInput.value = Math.max(100, Math.round((maxPrice*0.5)/10)*10);
+                minInput.value = Math.max(100, Math.round((minPrice * 0.5) / 10) * 10);
+                maxInput.value = Math.max(100, Math.round((maxPrice * 0.5) / 10) * 10);
                 break;
             case 1: // -33%
-                minInput.value = Math.max(100, Math.round((minPrice*0.66)/10)*10);
-                maxInput.value = Math.max(100, Math.round((maxPrice*0.66)/10)*10);
+                minInput.value = Math.max(100, Math.round((minPrice * 0.66) / 10) * 10);
+                maxInput.value = Math.max(100, Math.round((maxPrice * 0.66) / 10) * 10);
                 break;
             case 2: // -17%
-                minInput.value = Math.max(100, Math.round((minPrice*0.83)/10)*10);
-                maxInput.value = Math.max(100, Math.round((maxPrice*0.83)/10)*10);
+                minInput.value = Math.max(100, Math.round((minPrice * 0.83) / 10) * 10);
+                maxInput.value = Math.max(100, Math.round((maxPrice * 0.83) / 10) * 10);
                 break;
             case 3:
                 minInput.value = minPrice;
                 maxInput.value = maxPrice;
                 break;
             case 4:
-                minInput.value = Math.round((minPrice+minPriceMaxIncrease(minPrice, estimatedPrice)*0.33)/10)*10;
-                maxInput.value = Math.round((maxPrice+maxIncrease(maxPrice)*0.33)/10)*10;
+                minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, estimatedPrice) * 0.33) / 10) * 10;
+                maxInput.value = Math.round((maxPrice + maxIncrease(maxPrice) * 0.33) / 10) * 10;
                 break;
             case 5:
-                minInput.value = Math.round((minPrice+minPriceMaxIncrease(minPrice, estimatedPrice)*0.67)/10)*10;
-                maxInput.value = Math.round((maxPrice+maxIncrease(maxPrice)*0.67)/10)*10;
+                minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, estimatedPrice) * 0.67) / 10) * 10;
+                maxInput.value = Math.round((maxPrice + maxIncrease(maxPrice) * 0.67) / 10) * 10;
                 break;
             case 6:
-                minInput.value = Math.floor((minPrice+minPriceMaxIncrease(minPrice, estimatedPrice))/10)*10;
-                maxInput.value = Math.floor((maxPrice+maxIncrease(maxPrice))/10)*10;
+                minInput.value = Math.floor((minPrice + minPriceMaxIncrease(minPrice, estimatedPrice)) / 10) * 10;
+                maxInput.value = Math.floor((maxPrice + maxIncrease(maxPrice)) / 10) * 10;
                 break;
         }
         minInput.dispatchEvent(new Event('input'));
