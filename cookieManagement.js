@@ -9,8 +9,7 @@ function setCookie(cname, cvalue, exdays) {
 }
 
 function deleteCookie(cname) {
-  const domain = location.hostname.split('.').reverse().splice(0,2).reverse().join('.');
-  document.cookie = cname +'=; Path=/;  Domain=.' + domain +  '; Expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=None; Secure';
+  document.cookie = cname + '=; Max-Age=-99999999;';
 }
 
 function getCookie(cname) {

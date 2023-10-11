@@ -47,7 +47,7 @@ function needsHumanCheck({ humanCheckNeeded, newMinMaxLog }) {
 
 async function saveItemValuation(itemId, mlValuationData, userValuationApproval) {
   const { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version,
-    newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog, adjustmentAllowed } = mlValuationData || {};
+    newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog, adjustmentAllowed, newBrand, newBrandCategory } = mlValuationData || {};
   if (!minPrice && !decline) {
     return;
   }
@@ -58,7 +58,7 @@ async function saveItemValuation(itemId, mlValuationData, userValuationApproval)
       willNotSellPrediction: willNotSell,
       soldPriceEstimate: soldPrice,
       modelVersion: version?.toString(),
-      newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog, adjustmentAllowed
+      newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog, adjustmentAllowed, newBrand, newBrandCategory
     },
     ...(decline || needsHumanCheck(mlValuationData) ? {} : {
       valuationStatus: 'Completed',

@@ -7,6 +7,7 @@ async function showDeclineValuation(item) {
     document.getElementById('newItemButton').style.display = 'flex';
     document.getElementById('declineExplanation').style.display = 'block';
     document.getElementById('valuationExplanation').style.display = 'none';
+    document.getElementById('valuationExplanationHeader').style.display = 'none';
     document.getElementById('newItemButton').addEventListener('click', () => {
         sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
         localStorage.removeItem('newItem');
@@ -241,7 +242,7 @@ const increasePrice = (input, origValue) => {
 }
 
 const showMlValuation = async (item) => {
-    const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, adjustmentAllowed } = item.mlValuation || {};
+    const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, adjustmentAllowed, newBrand, newBrandCategory } = item.mlValuation || {};
     const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
     const maxPrice =  item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
     const estimatedPrice = Math.round((minPrice+maxPrice)/20)*10;
@@ -257,7 +258,6 @@ const showMlValuation = async (item) => {
         document.getElementById('valuationText').innerText = `${estimatedPrice} kr`;
         document.getElementById('valuationHeading').style.display = 'block';
         document.getElementById('valuationMotivation').style.display = 'flex';
-        document.getElementById('valuationMotivation').dataset.text = document.getElementById('valuationExplanation').innerText;
         document.getElementById('valuationMotivation').addEventListener('click', (e) => {
             const elements = document.getElementsByClassName('tooltip-motivation');
             const visible = elements[0]?.classList.contains('tooltip-show');
@@ -281,6 +281,7 @@ const showMlValuation = async (item) => {
         }
         document.getElementById('adjustInterval').addEventListener('click', () => {
             document.getElementById('valuationExplanation').style.display = 'none';
+            document.getElementById('valuationExplanationHeader').style.display = 'none';
             document.getElementById('minPrice').disabled = false;
             document.getElementById('maxPrice').disabled = false;
             document.getElementById('adjustInterval').style.display = 'none';
@@ -337,6 +338,12 @@ const showMlValuation = async (item) => {
             lowerPrice(document.getElementById('maxPrice'), maxPrice);
             validateInput();
         });
+        if (newBrand || newBrandCategory) {
+            document.getElementById('valuationExplanationHeader').style.display = 'block';
+            document.getElementById('valuationExplanation').innerText = newBrand ?
+                'Vi har inte sålt så mycket av detta varumärke tidigare och har därför lite mindre data. Du får justera om du upplever att värderingen inte är rimlig. Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar.' :
+                'Vi har inte sålt så mycket av denna kategori från varumärket tidigare och har därför lite mindre data. Du får justera om du upplever att värderingen inte är rimlig. Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar.';
+        }
     }
     document.getElementById('valuationText').style.display = 'block';
     if (!sessionStorage.getItem('itemToBeCreatedAfterSignIn') && !(featureIsEnabled('adjustValuation') && adjustmentAllowed)) {
