@@ -3,7 +3,8 @@ async function showDeclineValuation(item) {
     document.getElementById('valuationText').innerText = 'Säljer ej';
     document.getElementById('valuationText').style.display = 'block';
     document.getElementById('rejectButton').style.display = 'none';
-    document.getElementById('confirmButton').innerText = 'Okej'
+    document.getElementById('confirmButton').style.display = 'none';
+    document.getElementById('okejButton').style.display = 'flex';
     document.getElementById('newItemButton').style.display = 'flex';
     document.getElementById('declineExplanation').style.display = 'block';
     document.getElementById('valuationExplanation').style.display = 'none';
@@ -15,7 +16,7 @@ async function showDeclineValuation(item) {
         sessionStorage.removeItem('itemValuation');
         window.location.href = '/sell-item';
     });
-    document.getElementById('confirmButton').addEventListener('click', () => {
+    document.getElementById('okejButton').addEventListener('click', () => {
         sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
         localStorage.removeItem('newItem');
         sessionStorage.removeItem('newItemId');
@@ -65,9 +66,9 @@ const adjustmentWarningText = (estimatedPrice, minPrice, maxPrice, adjustmentMin
         priceTooHigh(minPrice, adjustmentMin) ? 'lägsta pris' : null
     ].filter(p => p).join(' och ');
     if (highPrice.length) {
-        return `Ovanligt högt ${highPrice}, kräver granskning.`;
+        return `Ovanligt högt ${highPrice}`;
     } else if (adjustmentMin > estimatedPrice) {
-        return 'Lägsta priset överstiger värdering, kräver granskning.'
+        return 'Lägsta priset överstiger vår värdering'
     }
     return '';
 }
@@ -83,6 +84,7 @@ const adjustmentValidations = (estimatedPrice, minPrice, maxPrice, adjustmentMin
         document.getElementById('adjustmentTips').style.display = 'none';
         document.getElementById('adjustmentNote').style.display = 'none';
         document.getElementById('stickyConfirmButton').innerText = 'Skicka för granskning';
+        document.getElementById('stickyRejectButton').style.display = 'none';
     } else if (adjustmentMax !== maxPrice || adjustmentMin !== minPrice) {
         document.getElementById('resetButton').style.visibility = 'visible';
         document.getElementById('adjustmentNote').style.display = 'block';
@@ -251,10 +253,8 @@ const showMlValuation = async (item) => {
     document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
     if (featureIsEnabled('adjustValuation') && adjustmentAllowed) {
         rangeSlider(minPrice, maxPrice, estimatedPrice);
-        document.getElementById('oldButtons').style.display = 'none';
         document.getElementById('headerTitle').style.display = 'none';
         document.getElementById('chatDiv').style.display = 'none';
-        document.getElementById('stickyButtons').style.display = 'block';
         document.getElementById('valuationText').innerText = `${estimatedPrice} kr`;
         document.getElementById('valuationHeading').style.display = 'block';
         document.getElementById('valuationMotivation').style.display = 'flex';

@@ -15,6 +15,7 @@
                 confirmationScreen.style.display = 'block';
                 header.style.display = 'none';
                 formDiv.style.display = 'none';
+                deleteCookie('photo_invite');
             })
             .catch((error) => {
                 errorHandler.report(error);
