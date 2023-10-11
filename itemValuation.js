@@ -83,8 +83,8 @@ const adjustmentValidations = (estimatedPrice, minPrice, maxPrice, adjustmentMin
         document.getElementById('adjustmentWarningText').innerText = adjustmentWarningText(estimatedPrice, minPrice, maxPrice, adjustmentMin, adjustmentMax);
         document.getElementById('adjustmentTips').style.display = 'none';
         document.getElementById('adjustmentNote').style.display = 'none';
-        document.getElementById('stickyConfirmButton').innerText = 'Skicka för granskning';
-        document.getElementById('stickyRejectButton').style.display = 'none';
+        document.getElementById('confirmButton').innerText = 'Skicka för granskning';
+        document.getElementById('rejectButton').style.display = 'none';
     } else if (adjustmentMax !== maxPrice || adjustmentMin !== minPrice) {
         document.getElementById('resetButton').style.visibility = 'visible';
         document.getElementById('adjustmentNote').style.display = 'block';
@@ -103,13 +103,13 @@ const adjustmentValidations = (estimatedPrice, minPrice, maxPrice, adjustmentMin
             document.getElementById('higherMinPriceText').style.display = 'none';
             document.getElementById('lowerMinOrMaxPriceText').style.display = 'block';
         }
-        document.getElementById('stickyConfirmButton').innerText = 'Påbörja försäljning';
+        document.getElementById('confirmButton').innerText = 'Påbörja försäljning';
     } else {
         document.getElementById('resetButton').style.visibility = 'hidden';
         document.getElementById('adjustmentTips').style.display = 'block';
         document.getElementById('adjustmentNote').style.display = 'none';
         document.getElementById('adjustmentMotivation').style.display = 'none';
-        document.getElementById('stickyConfirmButton').innerText = 'Påbörja försäljning';
+        document.getElementById('confirmButton').innerText = 'Påbörja försäljning';
     }
 }
 
@@ -352,9 +352,7 @@ const showMlValuation = async (item) => {
     if (decline) {
         await showDeclineValuation(item);
     } else {
-        document.getElementById('stickyConfirmButton').addEventListener('click', () => acceptValuation(item.id, minPrice, maxPrice));
         document.getElementById('confirmButton').addEventListener('click', () => acceptValuation(item.id, minPrice, maxPrice));
-        document.getElementById('stickyRejectButton').addEventListener('click', () => rejectValuation(item));
         document.getElementById('rejectButton').addEventListener('click', () => rejectValuation(item));
     }
 }
