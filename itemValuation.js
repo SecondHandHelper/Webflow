@@ -366,11 +366,11 @@ const getItem = async (itemId) => {
 
 const maxIncrease = (price) => {
     if (price < 500) {
-        return price * 1.5 - price;
+        return price * 0.5;
     } else if (price < 1000) {
-        return price * 1.4 - price;
+        return price * 0.4;
     }
-    return price * 1.3 - price;
+    return price * 0.3;
 }
 
 const minPriceMaxIncrease = (minPrice, estimatedPrice) => Math.min(maxIncrease(minPrice), estimatedPrice-minPrice);
@@ -415,8 +415,8 @@ function rangeSlider(minPrice, maxPrice, estimatedPrice) {
                 maxInput.value = Math.round((maxPrice+maxIncrease(maxPrice)*0.67)/10)*10;
                 break;
             case 6:
-                minInput.value = Math.round((minPrice+minPriceMaxIncrease(minPrice, estimatedPrice))/10)*10;
-                maxInput.value = Math.round((maxPrice+maxIncrease(maxPrice))/10)*10;
+                minInput.value = Math.floor((minPrice+minPriceMaxIncrease(minPrice, estimatedPrice))/10)*10;
+                maxInput.value = Math.floor((maxPrice+maxIncrease(maxPrice))/10)*10;
                 break;
         }
         minInput.dispatchEvent(new Event('input'));
