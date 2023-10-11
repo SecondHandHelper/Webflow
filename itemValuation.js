@@ -104,12 +104,14 @@ const adjustmentValidations = (estimatedPrice, minPrice, maxPrice, adjustmentMin
             document.getElementById('lowerMinOrMaxPriceText').style.display = 'block';
         }
         document.getElementById('confirmButton').innerText = 'Påbörja försäljning';
+        document.getElementById('rejectButton').style.display = 'flex';
     } else {
         document.getElementById('resetButton').style.visibility = 'hidden';
         document.getElementById('adjustmentTips').style.display = 'block';
         document.getElementById('adjustmentNote').style.display = 'none';
         document.getElementById('adjustmentMotivation').style.display = 'none';
         document.getElementById('confirmButton').innerText = 'Påbörja försäljning';
+        document.getElementById('rejectButton').style.display = 'flex';
     }
 }
 
