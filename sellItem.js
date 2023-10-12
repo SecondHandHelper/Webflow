@@ -68,7 +68,7 @@ async function saveItemValuation(itemId, mlValuationData, userValuationApproval)
         price: {
           status: userValuationApproval ? 'Active' : 'Resolved',
           response: userValuationApproval ? '' : 'Accepted',
-          description: 'Värderingen utgår från vad liknande plagg sålts för nyligen. Vi börjar alltid i den övre delen av spannet och sänker successivt inom intervallet under säljperioden på 30 dagar.',
+          description: 'Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar. Värderingen utgår från vad liknande sålts för.',
           minPrice: newMinPriceEstimate || minPrice,
           maxPrice: newMaxPriceEstimate || maxPrice,
         }

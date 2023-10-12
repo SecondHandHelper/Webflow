@@ -174,8 +174,8 @@ async function saveValuationStatus(itemId, minPrice, maxPrice) {
 }
 
 const initialPageSetup = (item) => {
-    document.getElementById('itemImage').src = window.innerWidth <= 400 ? 
-        item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || item?.images?.frontImageSmall || item?.images?.frontImage : 
+    document.getElementById('itemImage').src = window.innerWidth <= 400 ?
+        item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || item?.images?.frontImageSmall || item?.images?.frontImage :
         item?.images?.enhancedFrontImage || item?.images?.frontImage;
     document.getElementById('chatLink').onclick = () => Intercom('showNewMessage',
         item.mlValuation?.decline ?
@@ -235,7 +235,7 @@ const increasePrice = (input, origValue) => {
     input.dispatchEvent(new Event('input'));
 }
 
-const estimatedPrice = (minPrice, maxPrice)  => Math.round((minPrice + maxPrice) / 20) * 10;
+const estimatedPrice = (minPrice, maxPrice) => Math.round((minPrice + maxPrice) / 20) * 10;
 const showMlValuation = async (item) => {
     const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, adjustmentAllowed, newBrand, newBrandCategory } = item.mlValuation || {};
     const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
@@ -335,9 +335,11 @@ const showMlValuation = async (item) => {
     });
 
     if (item.infoRequests?.price?.description) {
-        document.getElementById('valuationExplanationHeader').innerText = 'Motivering';
-        document.getElementById('valuationExplanationHeader').style.display = 'block';
         document.getElementById('valuationExplanation').innerText = item.infoRequests.price.description;
+        if (item.infoRequests?.price?.type === 'Final Offer') {
+            document.getElementById('valuationExplanationHeader').innerText = 'Motivering';
+            document.getElementById('valuationExplanationHeader').style.display = 'block';
+        }
     } else if (newBrand || newBrandCategory) {
         document.getElementById('valuationExplanationHeader').style.display = 'block';
         document.getElementById('valuationExplanation').innerText = newBrand ?
