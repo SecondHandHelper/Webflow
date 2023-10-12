@@ -191,8 +191,8 @@ const initialPageSetup = (item) => {
         item?.images?.enhancedFrontImage || item?.images?.frontImage;
     document.getElementById('chatLink').onclick = () => Intercom('showNewMessage',
         item.mlValuation?.decline ?
-            `ID: ${item.id}\n\nGällande att ni tackade nej till ${item.brand.trim()}-${item.category.toLowerCase()}:\n\n` :
-            `ID: ${item.id}\n\nGällande värderingen på ${item.mlValuation.minPriceEstimate}-${item.mlValuation.maxPriceEstimate} kr för ${item.brand.trim()}-${item.category.toLowerCase()}. Vad skulle du vilja ändra värderingen till och varför?\n\n`);
+            `ID: ${item.id}\n\nGällande att ni tackat nej till ${item.brand.trim()}-${item.category.toLowerCase()}:\n\n` :
+            `ID: ${item.id}\n\nGällande prisintervallet på ${item.mlValuation.minPriceEstimate}-${item.mlValuation.maxPriceEstimate} kr för ${item.brand.trim()}-${item.category.toLowerCase()}. Vad skulle du vilja ändra det till och varför?\n\n`);
     document.getElementById('valuationClose').addEventListener('click', () => {
         sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
         if (!params.id) {
@@ -255,6 +255,16 @@ const showMlValuation = async (item) => {
     if (featureIsEnabled('adjustValuation') && adjustmentAllowed) {
         document.getElementById('adjustInterval').style.display = 'flex';
         document.getElementById('chatDiv').style.display = 'none';
+        document.getElementById('adjustInterval').addEventListener('click', () => {
+            document.getElementById('valuationExplanation').style.display = 'none';
+            document.getElementById('valuationExplanationHeader').style.display = 'none';
+            document.getElementById('minPrice').disabled = false;
+            document.getElementById('maxPrice').disabled = false;
+            document.getElementById('adjustInterval').style.display = 'none';
+            document.getElementById('adjustmentTips').style.display = 'block';
+            document.getElementById('adjustmentNote').style.display = 'none';
+            document.getElementById('sliderDiv').style.display = 'block';
+        })
     }
 
     rangeSlider(minPrice, maxPrice, estimatedPrice);
@@ -283,16 +293,6 @@ const showMlValuation = async (item) => {
     if (item.infoRequests?.price?.finalOffer === 'true') {
         document.getElementById('adjustInterval').style.display = 'none';
     }
-    document.getElementById('adjustInterval').addEventListener('click', () => {
-        document.getElementById('valuationExplanation').style.display = 'none';
-        document.getElementById('valuationExplanationHeader').style.display = 'none';
-        document.getElementById('minPrice').disabled = false;
-        document.getElementById('maxPrice').disabled = false;
-        document.getElementById('adjustInterval').style.display = 'none';
-        document.getElementById('adjustmentTips').style.display = 'block';
-        document.getElementById('adjustmentNote').style.display = 'none';
-        document.getElementById('sliderDiv').style.display = 'block';
-    })
     document.getElementById('resetButton').addEventListener('click', () => {
         document.getElementById('minPrice').value = minPrice;
         document.getElementById('maxPrice').value = maxPrice;
