@@ -280,7 +280,7 @@ const showMlValuation = async (item) => {
     document.getElementById('origMinPrice').style.visibility = 'hidden';
     document.getElementById('origMaxPrice').innerText = maxPrice;
     document.getElementById('origMaxPrice').style.visibility = 'hidden';
-    if (item.infoRequests?.price?.finalOffer === 'true') {
+    if (item.infoRequests?.price?.type === 'Final Offer') {
         document.getElementById('adjustInterval').style.display = 'none';
     }
     document.getElementById('resetButton').addEventListener('click', () => {
