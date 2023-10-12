@@ -250,6 +250,8 @@ const showMlValuation = async (item) => {
             document.getElementById('maxPrice').disabled = false;
             document.getElementById('adjustInterval').style.display = 'none';
             document.getElementById('adjustmentTips').style.display = 'block';
+            document.getElementById('origMinPrice').style.display = 'block';
+            document.getElementById('origMaxPrice').style.display = 'block';
             document.getElementById('adjustmentNote').style.display = 'none';
             document.getElementById('sliderDiv').style.display = 'block';
             document.querySelectorAll(".field-underline").forEach(x => x.style.visibility = 'visible');
@@ -259,7 +261,6 @@ const showMlValuation = async (item) => {
     rangeSlider(minPrice, maxPrice);
     document.getElementById('valuationText').innerText = `${estimatedPrice(minPrice, maxPrice)} kr`;
     document.getElementById('valuationResultDiv').style.display = 'flex';
-    triggerShowContent.click();
 
     document.getElementById('valuationMotivation').addEventListener('click', (e) => {
         const elements = document.getElementsByClassName('tooltip-motivation');
@@ -270,6 +271,7 @@ const showMlValuation = async (item) => {
         e.stopPropagation();
     });
     document.body.addEventListener('click', hideTooltip);
+
     document.getElementById('valuationRange').style.display = 'flex';
     document.getElementById('minPrice').value = minPrice;
     document.getElementById('minPrice').disabled = true;
@@ -331,13 +333,19 @@ const showMlValuation = async (item) => {
         lowerPrice(document.getElementById('maxPrice'), maxPrice);
         validateInput();
     });
-    if (newBrand || newBrandCategory) {
+
+    if (item.infoRequests?.price?.description) {
+        document.getElementById('valuationExplanationHeader').innerText = 'Motivering';
+        document.getElementById('valuationExplanationHeader').style.display = 'block';
+        document.getElementById('valuationExplanation').innerText = item.infoRequests.price.description;
+    } else if (newBrand || newBrandCategory) {
         document.getElementById('valuationExplanationHeader').style.display = 'block';
         document.getElementById('valuationExplanation').innerText = newBrand ?
             'Vi har inte sålt så mycket av detta varumärke tidigare och har därför lite mindre data. Du får justera om du upplever att värderingen inte är rimlig. Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar.' :
             'Vi har inte sålt så mycket av denna kategori från varumärket tidigare och har därför lite mindre data. Du får justera om du upplever att värderingen inte är rimlig. Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar.';
     }
-    
+
+
     document.getElementById('valuationText').style.display = 'block';
     if (!sessionStorage.getItem('itemToBeCreatedAfterSignIn') && !(featureIsEnabled('adjustValuation') && adjustmentAllowed)) {
         document.getElementById('chatDiv').style.display = 'block';
@@ -349,6 +357,7 @@ const showMlValuation = async (item) => {
         document.getElementById('sendForReviewButton').addEventListener('click', () => saveValuationStatus(item.id, minPrice, maxPrice));
         document.getElementById('rejectButton').addEventListener('click', () => rejectValuation(item));
     }
+    triggerShowContent.click();
 }
 
 const getItem = async (itemId) => {
