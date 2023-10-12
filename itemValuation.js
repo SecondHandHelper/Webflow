@@ -393,10 +393,12 @@ function rangeSlider(minPrice, maxPrice) {
     const range = document.getElementById('adjustmentSlider');
     range.addEventListener('touchend', () => {
         range.value = Math.round(Number(range.value));
+        analytics.track('Click', { elementID: 'slider' });
         validateInput();
     });
     range.addEventListener('mouseup', () => {
         range.value = Math.round(Number(range.value));
+        analytics.track('Click', { elementID: 'slider' });
         validateInput();
     });
     range.addEventListener('input', function () {
