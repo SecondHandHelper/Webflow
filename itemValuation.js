@@ -335,7 +335,7 @@ const showMlValuation = async (item) => {
     });
 
     if (item.infoRequests?.price?.type === 'Final Offer' || item.infoRequests?.price?.type === 'Valuation') {
-        document.getElementById('valuationMotivation').style.display = 'block';
+        document.getElementById('valuationMotivation').style.display = 'none';
     }
 
     if (item.infoRequests?.price?.description) {
