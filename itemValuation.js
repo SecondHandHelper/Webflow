@@ -69,7 +69,8 @@ const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmen
     adjustmentMaxInput.style.color = priceTooHigh(maxPrice, adjustmentMax) ? '#E20000' : '#333';
     adjustmentMinInput.style.color = minPriceNotOk(minPrice, maxPrice, adjustmentMin) ? '#E20000' : '#333';
     if (adjustmentRequiresReview(minPrice, maxPrice, adjustmentMin, adjustmentMax)) {
-        document.getElementById('adjustmentMotivation').style.display = 'block';
+        document.getElementById('requiresReviewDiv').style.display = 'block';
+        analytics.track("Element Viewed", { elementID: "requiresReviewDiv" });
         document.getElementById('adjustmentWarningText').innerHTML = adjustmentWarningText(minPrice, maxPrice, adjustmentMin, adjustmentMax);
         document.getElementById('adjustmentTips').style.display = 'none';
         document.getElementById('adjustmentNote').style.display = 'none';
@@ -80,9 +81,10 @@ const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmen
         document.getElementById('confirmButton').style.display = 'flex';
         document.getElementById('sendForReviewButton').style.display = 'none';
         document.getElementById('resetButton').style.visibility = 'visible';
+        analytics.track("Element Viewed", { elementID: "resetButton" });
         document.getElementById('adjustmentNote').style.display = 'block';
         document.getElementById('adjustmentTips').style.display = 'none';
-        document.getElementById('adjustmentMotivation').style.display = 'none';
+        document.getElementById('requiresReviewDiv').style.display = 'none';
         if (adjustmentMax > maxPrice) {
             document.getElementById('higherMaxPriceText').style.display = 'block';
             document.getElementById('higherMinPriceText').style.display = 'none';
@@ -102,7 +104,7 @@ const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmen
         document.getElementById('resetButton').style.visibility = 'hidden';
         document.getElementById('adjustmentTips').style.display = 'block';
         document.getElementById('adjustmentNote').style.display = 'none';
-        document.getElementById('adjustmentMotivation').style.display = 'none';
+        document.getElementById('requiresReviewDiv').style.display = 'none';
         document.getElementById('confirmButton').style.display = 'flex';
         document.getElementById('sendForReviewButton').style.display = 'none';
         document.getElementById('rejectButton').style.display = 'flex';
@@ -241,14 +243,15 @@ const showMlValuation = async (item) => {
     const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
     const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
     if (featureIsEnabled('adjustValuation') && adjustmentAllowed) {
-        document.getElementById('adjustInterval').style.display = 'flex';
+        document.getElementById('adjustIntervalButton').style.display = 'flex';
+        analytics.track("Element Viewed", { elementID: "adjustIntervalButton" });
         document.getElementById('chatDiv').style.display = 'none';
-        document.getElementById('adjustInterval').addEventListener('click', () => {
+        document.getElementById('adjustIntervalButton').addEventListener('click', () => {
             document.getElementById('valuationExplanation').style.display = 'none';
             document.getElementById('valuationExplanationHeader').style.display = 'none';
             document.getElementById('minPrice').disabled = false;
             document.getElementById('maxPrice').disabled = false;
-            document.getElementById('adjustInterval').style.display = 'none';
+            document.getElementById('adjustIntervalButton').style.display = 'none';
             document.getElementById('adjustmentTips').style.display = 'block';
             document.getElementById('origMinPrice').style.display = 'block';
             document.getElementById('origMaxPrice').style.display = 'block';
@@ -282,7 +285,7 @@ const showMlValuation = async (item) => {
     document.getElementById('origMaxPrice').innerText = maxPrice;
     document.getElementById('origMaxPrice').style.visibility = 'hidden';
     if (item.infoRequests?.price?.type === 'Final Offer') {
-        document.getElementById('adjustInterval').style.display = 'none';
+        document.getElementById('adjustIntervalButton').style.display = 'none';
     }
     document.getElementById('resetButton').addEventListener('click', () => {
         document.getElementById('minPrice').value = minPrice;
@@ -307,10 +310,12 @@ const showMlValuation = async (item) => {
     });
     document.getElementById('minIncrease').addEventListener('click', () => {
         increasePrice(document.getElementById('minPrice'), minPrice);
+        analytics.track('Click', { elementID: 'minIncrease' });
         validateInput();
     });
     document.getElementById('minDecrease').addEventListener('click', () => {
         lowerPrice(document.getElementById('minPrice'), minPrice);
+        analytics.track('Click', { elementID: 'minDecrease' });
         validateInput();
     });
     document.getElementById('maxPrice').addEventListener('blur', () => validateInput());
@@ -327,10 +332,12 @@ const showMlValuation = async (item) => {
     });
     document.getElementById('maxIncrease').addEventListener('click', () => {
         increasePrice(document.getElementById('maxPrice'), maxPrice);
+        analytics.track('Click', { elementID: 'maxIncrease' });
         validateInput();
     });
     document.getElementById('maxDecrease').addEventListener('click', () => {
         lowerPrice(document.getElementById('maxPrice'), maxPrice);
+        analytics.track('Click', { elementID: 'maxDecrease' });
         validateInput();
     });
 
