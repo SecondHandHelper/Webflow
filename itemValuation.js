@@ -69,8 +69,10 @@ const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmen
     adjustmentMaxInput.style.color = priceTooHigh(maxPrice, adjustmentMax) ? '#E20000' : '#333';
     adjustmentMinInput.style.color = minPriceNotOk(minPrice, maxPrice, adjustmentMin) ? '#E20000' : '#333';
     if (adjustmentRequiresReview(minPrice, maxPrice, adjustmentMin, adjustmentMax)) {
-        document.getElementById('requiresReviewDiv').style.display = 'block';
-        analytics.track("Element Viewed", { elementID: "requiresReviewDiv" });
+        if (document.getElementById('requiresReviewDiv').style.display !== 'block') {
+            document.getElementById('requiresReviewDiv').style.display = 'block';
+            analytics.track("Element Viewed", { elementID: "requiresReviewDiv" });
+        }
         document.getElementById('adjustmentWarningText').innerHTML = adjustmentWarningText(minPrice, maxPrice, adjustmentMin, adjustmentMax);
         document.getElementById('adjustmentTips').style.display = 'none';
         document.getElementById('adjustmentNote').style.display = 'none';
@@ -80,8 +82,10 @@ const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmen
     } else if (adjustmentMax !== maxPrice || adjustmentMin !== minPrice) {
         document.getElementById('confirmButton').style.display = 'flex';
         document.getElementById('sendForReviewButton').style.display = 'none';
-        document.getElementById('resetButton').style.visibility = 'visible';
-        analytics.track("Element Viewed", { elementID: "resetButton" });
+        if (document.getElementById('resetButton').style.visibility !== 'visible') {
+            document.getElementById('resetButton').style.visibility = 'visible';
+            analytics.track("Element Viewed", { elementID: "resetButton" });
+        }
         document.getElementById('adjustmentNote').style.display = 'block';
         document.getElementById('adjustmentTips').style.display = 'none';
         document.getElementById('requiresReviewDiv').style.display = 'none';
@@ -393,12 +397,12 @@ function rangeSlider(minPrice, maxPrice) {
     const range = document.getElementById('adjustmentSlider');
     range.addEventListener('touchend', () => {
         range.value = Math.round(Number(range.value));
-        analytics.track('Click', { elementID: 'slider' });
+        analytics.track('Click', { elementID: 'adjustmentSlider' });
         validateInput();
     });
     range.addEventListener('mouseup', () => {
         range.value = Math.round(Number(range.value));
-        analytics.track('Click', { elementID: 'slider' });
+        analytics.track('Click', { elementID: 'adjustmentSlider' });
         validateInput();
     });
     range.addEventListener('input', function () {
