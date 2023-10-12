@@ -186,7 +186,9 @@ async function acceptValuation(itemId, minPrice, maxPrice) {
 }
 
 const initialPageSetup = (item) => {
-    document.getElementById('itemImage').src = window.innerWidth <= 400 ? item?.images?.enhancedFrontImageSmall : item?.images?.enhancedFrontImage;
+    document.getElementById('itemImage').src = window.innerWidth <= 400 ? 
+        item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || item?.images?.frontImageSmall || item?.images?.frontImage : 
+        item?.images?.enhancedFrontImage || item?.images?.frontImage;
     document.getElementById('chatLink').onclick = () => Intercom('showNewMessage',
         item.mlValuation?.decline ?
             `ID: ${item.id}\n\nGällande att ni tackade nej till ${item.brand.trim()}-${item.category.toLowerCase()}:\n\n` :
