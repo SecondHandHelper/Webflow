@@ -252,6 +252,7 @@ const showMlValuation = async (item) => {
             document.getElementById('adjustmentTips').style.display = 'block';
             document.getElementById('adjustmentNote').style.display = 'none';
             document.getElementById('sliderDiv').style.display = 'block';
+            document.querySelectorAll(".field-underline").forEach(x => x.style.visibility = 'visible');
         })
     }
 
