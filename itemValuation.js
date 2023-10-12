@@ -225,7 +225,7 @@ const lowerPrice = (input, origValue) => {
     const value = Number(input.value);
     const valPriceAdjustment = priceAdjustment(origValue);
     const newValue = Math.floor(value / valPriceAdjustment) * valPriceAdjustment;
-    input.value = Math.max(100, newValue === value ? value - valPriceAdjustment : newValue);
+    input.value = Math.max(0, newValue === value ? value - valPriceAdjustment : newValue);
     input.dispatchEvent(new Event('input'));
 }
 
