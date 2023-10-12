@@ -33,7 +33,11 @@
     function initializeFields(item) {
         initializeSlider(item);
         const { humanCheckNeeded, minPriceEstimate, maxPriceEstimate, newMinMaxLog } = item.mlValuation || {};
-        if (humanCheckNeeded || !minPriceEstimate || newMinMaxLog) {
+        if (item.infoRequests.price.response === 'User proposal') {
+            document.getElementById('nextStepTitle').style.display = 'block';
+            document.getElementById('nextStepTitle').innerText = 'Granskar prisändringar';
+            document.getElementById('nextStepText').innerText = 'Vi kikar på dina prisändringar, och om det ser bra ut så påbörjar vi försäljningen. Vi tar sedan hand om säljprocessen och hör av oss på SMS när plagget är sålt.';
+        } else if (humanCheckNeeded || !minPriceEstimate || newMinMaxLog) {
             document.getElementById('nextStepTitle').style.display = 'block';
             document.getElementById('nextStepText').innerText = 'Du kommer få ett SMS när vi värderat plagget som du kan ta ställning till';
         }

@@ -31,9 +31,9 @@ async function showDeclineValuation(item) {
 }
 
 const adjustmentOk = (minPrice, maxPrice) => {
-    const minInput = document.getElementById('minPrice').value;
-    const maxInput = document.getElementById('maxPrice').value;
-    return minInput <= minPrice * 1.5 && maxInput <= maxPrice * 1.5 && minInput < maxInput && minInput >= 100;
+    const adjustedMin = document.getElementById('minPrice').value;
+    const adjustedMax = document.getElementById('maxPrice').value;
+    return !adjustmentRequiresReview(minPrice, maxPrice, Number(adjustedMin), Number(adjustedMax));
 }
 
 const priceTooHigh = (price, adjustedPrice) => {
@@ -46,46 +46,39 @@ const priceTooHigh = (price, adjustedPrice) => {
     }
     return false;
 }
-const priceOutsideOkRange = (estimatedPrice, minOrMaxPrice, adjustedPrice) => {
-    if (priceTooHigh(minOrMaxPrice, adjustedPrice)) {
-        return true;
-    } else if (minOrMaxPrice < estimatedPrice && adjustedPrice > estimatedPrice) {
-        return true;
-    }
-    return false;
-}
 
-const adjustmentRequiresReview = (estimatedPrice, minPrice, maxPrice, adjustmentMin, adjustmentMax) => {
-    return priceOutsideOkRange(estimatedPrice, minPrice, adjustmentMin) ||
-        priceOutsideOkRange(estimatedPrice, maxPrice, adjustmentMax);
-}
+const minPriceNotOk = (minPrice, maxPrice, adjustedMin) =>
+    priceTooHigh(minPrice, adjustedMin) || adjustedMin > estimatedPrice(minPrice, maxPrice);
 
-const adjustmentWarningText = (estimatedPrice, minPrice, maxPrice, adjustmentMin, adjustmentMax) => {
-    const highPrice = [
-        priceTooHigh(maxPrice, adjustmentMax) ? 'startpris' : null,
-        priceTooHigh(minPrice, adjustmentMin) ? 'lägsta pris' : null
-    ].filter(p => p).join(' och ');
-    if (highPrice.length) {
-        return `Ovanligt högt ${highPrice}`;
-    } else if (adjustmentMin > estimatedPrice) {
-        return 'Lägsta priset överstiger vår värdering'
-    }
-    return '';
-}
+const adjustmentRequiresReview = (minPrice, maxPrice, adjustmentMin, adjustmentMax) =>
+    minPriceNotOk(minPrice, maxPrice, adjustmentMin) || priceTooHigh(maxPrice, adjustmentMax);
 
-const adjustmentValidations = (estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput) => {
+const maxTooHighWarning = (maxPrice, adjustmentMax) => priceTooHigh(maxPrice, adjustmentMax) ? 'Ovanligt högt startpris' : null;
+const minTooHighWarning = (minPrice, adjustmentMin) => priceTooHigh(minPrice, adjustmentMin) ? 'Ovanligt högt lägsta pris' : null;
+const minAboveValuationWarning = (adjustmentMin, estimatedPrice) => adjustmentMin > estimatedPrice ? 'Lägsta priset överstiger vår värdering' : null;
+
+const adjustmentWarningText = (minPrice, maxPrice, adjustmentMin, adjustmentMax) => [
+    maxTooHighWarning(maxPrice, adjustmentMax),
+    minTooHighWarning(minPrice, adjustmentMin),
+    minAboveValuationWarning(adjustmentMin, estimatedPrice(minPrice, maxPrice))
+].filter(p => p).join('<br>');
+
+const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput) => {
     const adjustmentMin = Number(adjustmentMinInput.value);
     const adjustmentMax = Number(adjustmentMaxInput.value);
-    adjustmentMaxInput.style.color = priceOutsideOkRange(estimatedPrice, maxPrice, adjustmentMax) ? '#E20000' : '#333';
-    adjustmentMinInput.style.color = priceOutsideOkRange(estimatedPrice, minPrice, adjustmentMin) ? '#E20000' : '#333';
-    if (adjustmentRequiresReview(estimatedPrice, minPrice, maxPrice, adjustmentMin, adjustmentMax)) {
+    adjustmentMaxInput.style.color = priceTooHigh(maxPrice, adjustmentMax) ? '#E20000' : '#333';
+    adjustmentMinInput.style.color = minPriceNotOk(minPrice, maxPrice, adjustmentMin) ? '#E20000' : '#333';
+    if (adjustmentRequiresReview(minPrice, maxPrice, adjustmentMin, adjustmentMax)) {
         document.getElementById('adjustmentMotivation').style.display = 'block';
-        document.getElementById('adjustmentWarningText').innerText = adjustmentWarningText(estimatedPrice, minPrice, maxPrice, adjustmentMin, adjustmentMax);
+        document.getElementById('adjustmentWarningText').innerHTML = adjustmentWarningText(minPrice, maxPrice, adjustmentMin, adjustmentMax);
         document.getElementById('adjustmentTips').style.display = 'none';
         document.getElementById('adjustmentNote').style.display = 'none';
-        document.getElementById('confirmButton').innerText = 'Skicka för granskning';
+        document.getElementById('sendForReviewButton').style.display = 'flex';
+        document.getElementById('confirmButton').style.display = 'none';
         document.getElementById('rejectButton').style.display = 'none';
     } else if (adjustmentMax !== maxPrice || adjustmentMin !== minPrice) {
+        document.getElementById('confirmButton').style.display = 'flex';
+        document.getElementById('sendForReviewButton').style.display = 'none';
         document.getElementById('resetButton').style.visibility = 'visible';
         document.getElementById('adjustmentNote').style.display = 'block';
         document.getElementById('adjustmentTips').style.display = 'none';
@@ -110,7 +103,8 @@ const adjustmentValidations = (estimatedPrice, minPrice, maxPrice, adjustmentMin
         document.getElementById('adjustmentTips').style.display = 'block';
         document.getElementById('adjustmentNote').style.display = 'none';
         document.getElementById('adjustmentMotivation').style.display = 'none';
-        document.getElementById('confirmButton').innerText = 'Påbörja försäljning';
+        document.getElementById('confirmButton').style.display = 'flex';
+        document.getElementById('sendForReviewButton').style.display = 'none';
         document.getElementById('rejectButton').style.display = 'flex';
     }
 }
@@ -134,19 +128,8 @@ function validateInput(reportValidity = true) {
         true;
 }
 
-const validateMotivation = () => {
-    const adjustmentMotivation = document.getElementById('adjustmentMotivation');
-    const userMotivationInput = document.getElementById('userProposalMotivation');
-    if (adjustmentMotivation.style.display === 'block' && !userMotivationInput.value?.trim().length) {
-        userMotivationInput.setCustomValidity('Ange en motivering till din ändring');
-    } else {
-        userMotivationInput.setCustomValidity('');
-    }
-    return document.getElementById('wf-form-Valuation-form').reportValidity();
-}
-
-async function acceptValuation(itemId, minPrice, maxPrice) {
-    if (!validateInput(false) || !validateMotivation()) {
+async function saveValuationStatus(itemId, minPrice, maxPrice) {
+    if (!validateInput(false)) {
         return;
     }
     const minInput = document.getElementById('minPrice');
@@ -160,7 +143,10 @@ async function acceptValuation(itemId, minPrice, maxPrice) {
         if (featureIsEnabled('adjustValuation') && (adjustedMin !== minPrice || adjustedMax !== maxPrice)) {
             savedItem.item.infoRequests.price.userAdjustedMin = adjustedMin;
             savedItem.item.infoRequests.price.userAdjustedMax = adjustedMax;
-            if (!adjustmentOk(minPrice, maxPrice)) {
+            if (adjustmentOk(minPrice, maxPrice)) {
+                savedItem.item.minPriceEstimate = minPrice;
+                savedItem.item.maxPriceEstimate = maxPrice;
+            } else {
                 savedItem.item.infoRequests.price.response = 'User proposal';
                 savedItem.item.infoRequests.price.userProposalMotivation = document.getElementById('userProposalMotivation').value;
             }
@@ -171,10 +157,14 @@ async function acceptValuation(itemId, minPrice, maxPrice) {
         sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify(savedItem));
         return window.location.href = '/sign-in';
     } else {
-        await firebase.app().functions("europe-west1").httpsCallable('saveAcceptedValuation')({
+        await firebase.app().functions("europe-west1").httpsCallable('saveValuationStatus')({
             itemId, minPrice, maxPrice, adjustmentMin: adjustedMin, adjustmentMax: adjustedMax,
-            userProposalMotivation: document.getElementById('userProposalMotivation').value
+            userProposalMotivation: document.getElementById('userProposalMotivation').value,
+            adjustmentRequiresReview: !adjustmentOk(minPrice, maxPrice)
         });
+        const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
+        latestItemCreated.infoRequests.price.response = adjustmentOk(minPrice, maxPrice) ? 'Accepted' : 'User proposal';
+        localStorage.setItem('latestItemCreated', JSON.stringify(latestItemCreated));
         if (!document.referrer.includes('/private')) {
             const userPhoneSet = user.current?.phoneNumber?.length;
             return window.location.href = userPhoneSet ? `/item-confirmation` :
@@ -247,11 +237,11 @@ const increasePrice = (input, origValue) => {
     input.dispatchEvent(new Event('input'));
 }
 
+const estimatedPrice = (minPrice, maxPrice)  => Math.round((minPrice + maxPrice) / 20) * 10;
 const showMlValuation = async (item) => {
     const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, adjustmentAllowed, newBrand, newBrandCategory } = item.mlValuation || {};
     const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
     const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
-    const estimatedPrice = Math.round((minPrice + maxPrice) / 20) * 10;
     if (featureIsEnabled('adjustValuation') && adjustmentAllowed) {
         document.getElementById('adjustInterval').style.display = 'flex';
         document.getElementById('chatDiv').style.display = 'none';
@@ -267,8 +257,8 @@ const showMlValuation = async (item) => {
         })
     }
 
-    rangeSlider(minPrice, maxPrice, estimatedPrice);
-    document.getElementById('valuationText').innerText = `${estimatedPrice} kr`;
+    rangeSlider(minPrice, maxPrice);
+    document.getElementById('valuationText').innerText = `${estimatedPrice(minPrice, maxPrice)} kr`;
     document.getElementById('valuationResultDiv').style.display = 'flex';
     triggerShowContent.click();
 
@@ -312,7 +302,7 @@ const showMlValuation = async (item) => {
         } else {
             document.getElementById('origMinPrice').style.visibility = 'hidden';
         }
-        adjustmentValidations(estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
+        adjustmentValidations(minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
     });
     document.getElementById('minIncrease').addEventListener('click', () => {
         increasePrice(document.getElementById('minPrice'), minPrice);
@@ -332,7 +322,7 @@ const showMlValuation = async (item) => {
         } else {
             document.getElementById('origMaxPrice').style.visibility = 'hidden';
         }
-        adjustmentValidations(estimatedPrice, minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
+        adjustmentValidations(minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
     });
     document.getElementById('maxIncrease').addEventListener('click', () => {
         increasePrice(document.getElementById('maxPrice'), maxPrice);
@@ -356,7 +346,8 @@ const showMlValuation = async (item) => {
     if (decline) {
         await showDeclineValuation(item);
     } else {
-        document.getElementById('confirmButton').addEventListener('click', () => acceptValuation(item.id, minPrice, maxPrice));
+        document.getElementById('confirmButton').addEventListener('click', () => saveValuationStatus(item.id, minPrice, maxPrice));
+        document.getElementById('sendForReviewButton').addEventListener('click', () => saveValuationStatus(item.id, minPrice, maxPrice));
         document.getElementById('rejectButton').addEventListener('click', () => rejectValuation(item));
     }
 }
@@ -375,9 +366,9 @@ const maxIncrease = (price) => {
     return price * 0.3;
 }
 
-const minPriceMaxIncrease = (minPrice, estimatedPrice) => Math.min(maxIncrease(minPrice), estimatedPrice - minPrice);
+const minPriceMaxIncrease = (minPrice, maxPrice) => Math.min(maxIncrease(minPrice), estimatedPrice(minPrice, maxPrice) - minPrice);
 
-function rangeSlider(minPrice, maxPrice, estimatedPrice) {
+function rangeSlider(minPrice, maxPrice) {
     const range = document.getElementById('adjustmentSlider');
     range.addEventListener('touchend', () => {
         range.value = Math.round(Number(range.value));
@@ -409,15 +400,15 @@ function rangeSlider(minPrice, maxPrice, estimatedPrice) {
                 maxInput.value = maxPrice;
                 break;
             case 4:
-                minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, estimatedPrice) * 0.33) / 10) * 10;
+                minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, estimatedPrice(minPrice, maxPrice)) * 0.33) / 10) * 10;
                 maxInput.value = Math.round((maxPrice + maxIncrease(maxPrice) * 0.33) / 10) * 10;
                 break;
             case 5:
-                minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, estimatedPrice) * 0.67) / 10) * 10;
+                minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, estimatedPrice(minPrice, maxPrice)) * 0.67) / 10) * 10;
                 maxInput.value = Math.round((maxPrice + maxIncrease(maxPrice) * 0.67) / 10) * 10;
                 break;
             case 6:
-                minInput.value = Math.floor((minPrice + minPriceMaxIncrease(minPrice, estimatedPrice)) / 10) * 10;
+                minInput.value = Math.floor((minPrice + minPriceMaxIncrease(minPrice, estimatedPrice(minPrice, maxPrice))) / 10) * 10;
                 maxInput.value = Math.floor((maxPrice + maxIncrease(maxPrice)) / 10) * 10;
                 break;
         }
