@@ -109,7 +109,7 @@ const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmen
     }
 }
 
-function validateInput(reportValidity = true) {
+function validateInput() {
     const adjustmentMinInput = document.getElementById('minPrice');
     const adjustmentMaxInput = document.getElementById('maxPrice');
     const adjustmentMin = Number(adjustmentMinInput.value);
@@ -123,13 +123,11 @@ function validateInput(reportValidity = true) {
         adjustmentMinInput.setCustomValidity('');
         adjustmentMaxInput.setCustomValidity('');
     }
-    return reportValidity ?
-        document.getElementById('wf-form-Valuation-form').reportValidity() :
-        true;
+    return document.getElementById('wf-form-Valuation-form').reportValidity();
 }
 
 async function saveValuationStatus(itemId, minPrice, maxPrice) {
-    if (!validateInput(false)) {
+    if (!validateInput()) {
         return;
     }
     const minInput = document.getElementById('minPrice');
