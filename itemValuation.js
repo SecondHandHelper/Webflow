@@ -166,9 +166,11 @@ async function saveValuationStatus(itemId, minPrice, maxPrice) {
             userProposalMotivation: document.getElementById('userProposalMotivation').value,
             adjustmentRequiresReview: !adjustmentOk(minPrice, maxPrice)
         });
-        const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
-        latestItemCreated.infoRequests.price.response = adjustmentOk(minPrice, maxPrice) ? 'Accepted' : 'User proposal';
-        localStorage.setItem('latestItemCreated', JSON.stringify(latestItemCreated));
+        if (localStorage.getItem('latestItemCreated')) {
+            const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
+            latestItemCreated.infoRequests.price.response = adjustmentOk(minPrice, maxPrice) ? 'Accepted' : 'User proposal';
+            localStorage.setItem('latestItemCreated', JSON.stringify(latestItemCreated));
+        }
         if (!document.referrer.includes('/private')) {
             const userPhoneSet = user.current?.phoneNumber?.length;
             return window.location.href = userPhoneSet ? `/item-confirmation` :
