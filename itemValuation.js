@@ -270,6 +270,7 @@ const showMlValuation = async (item) => {
     }
 
     if (item.infoRequests?.price?.type === 'Final Offer') {
+        document.getElementById('adjustIntervalButton').style.display = 'none';
         document.getElementById('chatDiv').style.display = 'none';
     }
 
