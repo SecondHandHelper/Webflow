@@ -246,7 +246,9 @@ const showMlValuation = async (item) => {
     const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, adjustmentAllowed, newBrand, newBrandCategory } = item.mlValuation || {};
     const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
     const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
-    if (featureIsEnabled('adjustValuation') && adjustmentAllowed) {
+    if (featureIsEnabled('adjustValuation')
+        && (adjustmentAllowed || (['1A', '1B', '1C', '2A', '3', '5A', '7', '8'].includes(item.brandSegment)) ) // Lade till detta som en tillfällig grej, fråga mig varför /Tobias
+        && item.infoRequests?.price?.type !== 'Final Offer') {
         document.getElementById('adjustIntervalButton').style.display = 'flex';
         analytics.track("Element Viewed", { elementID: "adjustIntervalButton" });
         document.getElementById('chatDiv').style.display = 'none';
