@@ -741,11 +741,16 @@ function calculateSellerGets(value, elementId, feeElementId) {
 
 function itemCoverImage(item) {
     const images = item.images;
-    return images.coverImage ?
-      (images.coverImageSmall || images.coverImage) :
-      (images.enhancedFrontImage ?
-        (images.enhancedFrontImageSmall || images.enhancedFrontImage) :
-        (images.frontImageSmall || images.frontImage));
+    if (images.modelImage) {
+        return images.modelImageSmall || images.modelImage
+    }
+    if (images.coverImage) {
+        return images.coverImageSmall || images.coverImage
+    } 
+    if (images.images.enhancedFrontImage) {
+        return images.images.enhancedFrontImageSmall || images.images.enhancedFrontImage
+    }
+    return images.frontImageSmall || images.frontImage
 }
 
 
@@ -761,8 +766,8 @@ Läs mer och använd min kod här:`
             text: text,
             url: `https://maiapp.se/?invite=${code}`
         }).then(() => { console.log('Thanks for sharing!'); }).catch((e) => {
-          console.error(e);
-          errorHandler.report(e);
+            console.error(e);
+            errorHandler.report(e);
         });
     } else {
         console.log("Browser doesn't support navigator.share => Copy to clipboard!");
@@ -774,13 +779,13 @@ Läs mer och använd min kod här:`
 }
 
 async function createEnhancedImage(imageUrl) {
-  try {
-    const response = await firebase.app().functions("europe-west1").httpsCallable('enhanceFrontImage')({ imageUrl });
-    sessionStorage.setItem('enhancedFrontImage', response.data.url)
-    return response.data;
-  } catch (ex) {
-    errorHandler.report(ex);
-    console.error(ex);
-    return '';
-  }
+    try {
+        const response = await firebase.app().functions("europe-west1").httpsCallable('enhanceFrontImage')({ imageUrl });
+        sessionStorage.setItem('enhancedFrontImage', response.data.url)
+        return response.data;
+    } catch (ex) {
+        errorHandler.report(ex);
+        console.error(ex);
+        return '';
+    }
 }
