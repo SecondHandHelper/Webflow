@@ -249,7 +249,7 @@ const showMlValuation = async (item) => {
     const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
     const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
     if (featureIsEnabled('adjustValuation')) {
-        if ((adjustmentAllowed || ['1A', '1B', '1C', '2A', '3', '5A', '7', '8'].includes(item.brandSegment))){ // Lade till detta som en tillfällig grej, fråga mig varför /Tobias
+        if ((adjustmentAllowed || ['1A', '1B', '1C', '2A', '3', '5A', '7', '8'].includes(item.brandSegment))) { // Lade till detta som en tillfällig grej, fråga mig varför /Tobias
             document.getElementById('adjustIntervalButton').style.display = 'flex';
             analytics.track("Element Viewed", { elementID: "adjustIntervalButton" });
             document.getElementById('chatDiv').style.display = 'none';
@@ -268,120 +268,119 @@ const showMlValuation = async (item) => {
             })
         }
     }
-}
 
-if (item.infoRequests?.price?.type === 'Final Offer'){
-    document.getElementById('adjustIntervalButton').style.display = 'none';
-    document.getElementById('chatDiv').style.display = 'none';
-}
-
-rangeSlider(minPrice, maxPrice);
-document.getElementById('valuationText').innerText = `${estimatedPrice(minPrice, maxPrice)} kr`;
-document.getElementById('valuationResultDiv').style.display = 'flex';
-
-document.getElementById('valuationMotivation').addEventListener('click', (e) => {
-    const elements = document.getElementsByClassName('tooltip-motivation');
-    const visible = elements[0]?.classList.contains('tooltip-show');
-    for (const element of elements) {
-        visible ? element.classList.remove('tooltip-show') : element.classList.add('tooltip-show');
-    }
-    e.stopPropagation();
-});
-document.body.addEventListener('click', hideTooltip);
-
-document.getElementById('valuationRange').style.display = 'flex';
-document.getElementById('minPrice').value = minPrice;
-document.getElementById('minPrice').disabled = true;
-document.getElementById('maxPrice').value = maxPrice;
-document.getElementById('maxPrice').disabled = true;
-document.getElementById('origMinPrice').innerText = minPrice;
-document.getElementById('origMinPrice').style.visibility = 'hidden';
-document.getElementById('origMaxPrice').innerText = maxPrice;
-document.getElementById('origMaxPrice').style.visibility = 'hidden';
-document.getElementById('resetButton').addEventListener('click', () => {
-    document.getElementById('minPrice').value = minPrice;
-    document.getElementById('maxPrice').value = maxPrice;
-    document.getElementById('minPrice').dispatchEvent(new Event('input'));
-    document.getElementById('maxPrice').dispatchEvent(new Event('input'));
-    document.getElementById('adjustmentSlider').value = 3;
-    document.getElementById('resetButton').style.visibility = 'hidden';
-    validateInput();
-});
-document.getElementById('minPrice').addEventListener('blur', () => validateInput());
-document.getElementById('minPrice').addEventListener('input', () => {
-    const adjustmentMinInput = document.getElementById('minPrice');
-    const adjustmentMaxInput = document.getElementById('maxPrice');
-    const adjustmentMin = Number(adjustmentMinInput.value);
-    if (adjustmentMin !== minPrice) {
-        document.getElementById('origMinPrice').style.visibility = 'visible';
-    } else {
-        document.getElementById('origMinPrice').style.visibility = 'hidden';
-    }
-    adjustmentValidations(minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
-});
-document.getElementById('minIncrease').addEventListener('click', () => {
-    increasePrice(document.getElementById('minPrice'), minPrice);
-    analytics.track('Click', { elementID: 'minIncrease' });
-    validateInput();
-});
-document.getElementById('minDecrease').addEventListener('click', () => {
-    lowerPrice(document.getElementById('minPrice'), minPrice);
-    analytics.track('Click', { elementID: 'minDecrease' });
-    validateInput();
-});
-document.getElementById('maxPrice').addEventListener('blur', () => validateInput());
-document.getElementById('maxPrice').addEventListener('input', () => {
-    const adjustmentMaxInput = document.getElementById('maxPrice');
-    const adjustmentMinInput = document.getElementById('minPrice');
-    const adjustmentMax = Number(adjustmentMaxInput.value);
-    if (adjustmentMax !== maxPrice) {
-        document.getElementById('origMaxPrice').style.visibility = 'visible';
-    } else {
-        document.getElementById('origMaxPrice').style.visibility = 'hidden';
-    }
-    adjustmentValidations(minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
-});
-document.getElementById('maxIncrease').addEventListener('click', () => {
-    increasePrice(document.getElementById('maxPrice'), maxPrice);
-    analytics.track('Click', { elementID: 'maxIncrease' });
-    validateInput();
-});
-document.getElementById('maxDecrease').addEventListener('click', () => {
-    lowerPrice(document.getElementById('maxPrice'), maxPrice);
-    analytics.track('Click', { elementID: 'maxDecrease' });
-    validateInput();
-});
-
-if (item.infoRequests?.price?.type === 'Final Offer' || item.infoRequests?.price?.type === 'Valuation') {
-    document.getElementById('valuationMotivation').style.display = 'none';
-}
-
-if (item.infoRequests?.price?.description) {
-    document.getElementById('valuationExplanation').innerText = item.infoRequests.price.description;
     if (item.infoRequests?.price?.type === 'Final Offer') {
-        document.getElementById('valuationExplanationHeader').innerText = 'Motivering';
-        document.getElementById('valuationExplanationHeader').style.display = 'block';
+        document.getElementById('chatDiv').style.display = 'none';
     }
-} else if (newBrand || newBrandCategory) {
-    document.getElementById('valuationExplanationHeader').style.display = 'block';
-    document.getElementById('valuationExplanation').innerText = newBrand ?
-        'Vi har inte sålt så mycket av detta varumärke tidigare och har därför lite mindre data. Du får justera om du upplever att värderingen inte är rimlig. Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar.' :
-        'Vi har inte sålt så mycket av denna kategori från varumärket tidigare och har därför lite mindre data. Du får justera om du upplever att värderingen inte är rimlig. Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar.';
-}
+
+    rangeSlider(minPrice, maxPrice);
+    document.getElementById('valuationText').innerText = `${estimatedPrice(minPrice, maxPrice)} kr`;
+    document.getElementById('valuationResultDiv').style.display = 'flex';
+
+    document.getElementById('valuationMotivation').addEventListener('click', (e) => {
+        const elements = document.getElementsByClassName('tooltip-motivation');
+        const visible = elements[0]?.classList.contains('tooltip-show');
+        for (const element of elements) {
+            visible ? element.classList.remove('tooltip-show') : element.classList.add('tooltip-show');
+        }
+        e.stopPropagation();
+    });
+    document.body.addEventListener('click', hideTooltip);
+
+    document.getElementById('valuationRange').style.display = 'flex';
+    document.getElementById('minPrice').value = minPrice;
+    document.getElementById('minPrice').disabled = true;
+    document.getElementById('maxPrice').value = maxPrice;
+    document.getElementById('maxPrice').disabled = true;
+    document.getElementById('origMinPrice').innerText = minPrice;
+    document.getElementById('origMinPrice').style.visibility = 'hidden';
+    document.getElementById('origMaxPrice').innerText = maxPrice;
+    document.getElementById('origMaxPrice').style.visibility = 'hidden';
+    document.getElementById('resetButton').addEventListener('click', () => {
+        document.getElementById('minPrice').value = minPrice;
+        document.getElementById('maxPrice').value = maxPrice;
+        document.getElementById('minPrice').dispatchEvent(new Event('input'));
+        document.getElementById('maxPrice').dispatchEvent(new Event('input'));
+        document.getElementById('adjustmentSlider').value = 3;
+        document.getElementById('resetButton').style.visibility = 'hidden';
+        validateInput();
+    });
+    document.getElementById('minPrice').addEventListener('blur', () => validateInput());
+    document.getElementById('minPrice').addEventListener('input', () => {
+        const adjustmentMinInput = document.getElementById('minPrice');
+        const adjustmentMaxInput = document.getElementById('maxPrice');
+        const adjustmentMin = Number(adjustmentMinInput.value);
+        if (adjustmentMin !== minPrice) {
+            document.getElementById('origMinPrice').style.visibility = 'visible';
+        } else {
+            document.getElementById('origMinPrice').style.visibility = 'hidden';
+        }
+        adjustmentValidations(minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
+    });
+    document.getElementById('minIncrease').addEventListener('click', () => {
+        increasePrice(document.getElementById('minPrice'), minPrice);
+        analytics.track('Click', { elementID: 'minIncrease' });
+        validateInput();
+    });
+    document.getElementById('minDecrease').addEventListener('click', () => {
+        lowerPrice(document.getElementById('minPrice'), minPrice);
+        analytics.track('Click', { elementID: 'minDecrease' });
+        validateInput();
+    });
+    document.getElementById('maxPrice').addEventListener('blur', () => validateInput());
+    document.getElementById('maxPrice').addEventListener('input', () => {
+        const adjustmentMaxInput = document.getElementById('maxPrice');
+        const adjustmentMinInput = document.getElementById('minPrice');
+        const adjustmentMax = Number(adjustmentMaxInput.value);
+        if (adjustmentMax !== maxPrice) {
+            document.getElementById('origMaxPrice').style.visibility = 'visible';
+        } else {
+            document.getElementById('origMaxPrice').style.visibility = 'hidden';
+        }
+        adjustmentValidations(minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
+    });
+    document.getElementById('maxIncrease').addEventListener('click', () => {
+        increasePrice(document.getElementById('maxPrice'), maxPrice);
+        analytics.track('Click', { elementID: 'maxIncrease' });
+        validateInput();
+    });
+    document.getElementById('maxDecrease').addEventListener('click', () => {
+        lowerPrice(document.getElementById('maxPrice'), maxPrice);
+        analytics.track('Click', { elementID: 'maxDecrease' });
+        validateInput();
+    });
+
+    if (item.infoRequests?.price?.type === 'Final Offer' || item.infoRequests?.price?.type === 'Valuation') {
+        document.getElementById('valuationMotivation').style.display = 'none';
+    }
+
+    if (item.infoRequests?.price?.description) {
+        document.getElementById('valuationExplanation').innerText = item.infoRequests.price.description;
+        if (item.infoRequests?.price?.type === 'Final Offer') {
+            document.getElementById('valuationExplanationHeader').innerText = 'Motivering';
+            document.getElementById('valuationExplanationHeader').style.display = 'block';
+        }
+    } else if (newBrand || newBrandCategory) {
+        document.getElementById('valuationExplanationHeader').style.display = 'block';
+        document.getElementById('valuationExplanation').innerText = newBrand ?
+            'Vi har inte sålt så mycket av detta varumärke tidigare och har därför lite mindre data. Du får justera om du upplever att värderingen inte är rimlig. Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar.' :
+            'Vi har inte sålt så mycket av denna kategori från varumärket tidigare och har därför lite mindre data. Du får justera om du upplever att värderingen inte är rimlig. Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar.';
+    }
 
 
-document.getElementById('valuationText').style.display = 'block';
-if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-    document.getElementById('chatDiv').style.display = 'none';
+    document.getElementById('valuationText').style.display = 'block';
+    if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+        document.getElementById('chatDiv').style.display = 'none';
+    }
+    if (decline) {
+        await showDeclineValuation(item);
+    } else {
+        document.getElementById('confirmButton').addEventListener('click', () => saveValuationStatus(item.id, minPrice, maxPrice));
+        document.getElementById('sendForReviewButton').addEventListener('click', () => saveValuationStatus(item.id, minPrice, maxPrice));
+        document.getElementById('rejectButton').addEventListener('click', () => rejectValuation(item));
+    }
+    triggerShowContent.click();
 }
-if (decline) {
-    await showDeclineValuation(item);
-} else {
-    document.getElementById('confirmButton').addEventListener('click', () => saveValuationStatus(item.id, minPrice, maxPrice));
-    document.getElementById('sendForReviewButton').addEventListener('click', () => saveValuationStatus(item.id, minPrice, maxPrice));
-    document.getElementById('rejectButton').addEventListener('click', () => rejectValuation(item));
-}
-triggerShowContent.click();
 
 const getItem = async (itemId) => {
     const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId })
