@@ -748,7 +748,7 @@
             return images.coverImageSmall || images.coverImage
         } 
         if (images.enhancedFrontImage) {
-            return images.enhancedFrontImageSmall || image.enhancedFrontImage
+            return images.enhancedFrontImageSmall || images.enhancedFrontImage
         }
         return images.frontImageSmall || images.frontImage
     }
