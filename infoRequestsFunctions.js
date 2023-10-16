@@ -106,8 +106,8 @@ async function storePriceResponse(itemId, max, min, response, status) {
 
 async function openNewPriceToast(itemId, status, max, min, brand, description, category, type, currentMax, currentMin) {
     console.log("openNewPriceToast", itemId, status, max, min, brand, description, category, type, currentMax, currentMin);
-    currentMinPrice.style.display = 'none';
-    currentMaxPrice.style.display = 'none';
+    previousMinPrice.style.display = 'none';
+    previousMaxPrice.style.display = 'none';
     maxPriceDiv.style.display = 'block';
     minPriceDiv.style.display = 'block';
 
