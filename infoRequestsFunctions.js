@@ -120,11 +120,11 @@ async function openNewPriceToast(itemId, status, max, min, brand, description, c
     minPrice.innerHTML = min;
     if (currentMax && max !== currentMax){
         previousMaxPrice.innerHTML = currentMax;
-        previousMaxPrice.display.style = 'block';
+        previousMaxPrice.style.display = 'block';
     }
     if (currentMin && min !== currentMin){
         previousMinPrice.innerHTML = currentMin;
-        previousMinPrice.display.style = 'block';
+        previousMinPrice.style.display = 'block';
     }
     acceptNewPriceButton.innerHTML = "Sälj med nytt pris";
     denyNewPriceButton.innerHTML = "Sänk ej";
