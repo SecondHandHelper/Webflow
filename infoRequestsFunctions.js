@@ -118,11 +118,11 @@ async function openNewPriceToast(itemId, status, max, min, brand, description, c
     if (c && c !== "null") { newPriceHeading.innerHTML = `${brand}-${c}`; }
     maxPrice.innerHTML = max;
     minPrice.innerHTML = min;
-    if (currentMax && max !== currentMax){
+    if (currentMax && currentMax !== 'null' && currentMax !== '' && currentMax !== 'undefined' && max !== currentMax){
         previousMaxPrice.innerHTML = currentMax;
         previousMaxPrice.style.display = 'block';
     }
-    if (currentMin && min !== currentMin){
+    if (currentMin && currentMin !== 'null' && currentMin !== '' && currentMin !== 'undefined' && min !== currentMin){
         previousMinPrice.innerHTML = currentMin;
         previousMinPrice.style.display = 'block';
     }
@@ -196,7 +196,7 @@ function loadInfoRequests(userId) {
                             const max = infoRequests[req].maxPrice;
                             const min = infoRequests[req].minPrice;
                             href = `javascript:openNewPriceToast('${itemId}', '${status}', ${max}, ${min}, '${brand}', '${description}', '${category}', '${type}', '${currentMaxPrice}', '${currentMinPrice}');`;
-                            if (status === "New" && infoRequests[req]?.type !== 'Adjusted ML Valuation') {
+                            if (status === "New" && type !== 'Adjusted ML Valuation') {
                                 title = "Värdering";
                                 buttonClass = "acceptnewpricebutton";
                                 buttonTextClass = "text-block-69-copy-copy";
