@@ -196,7 +196,7 @@ function loadInfoRequests(userId) {
                             const max = infoRequests[req].maxPrice;
                             const min = infoRequests[req].minPrice;
                             href = `javascript:openNewPriceToast('${itemId}', '${status}', ${max}, ${min}, '${brand}', '${description}', '${category}', '${type}', '${currentMaxPrice}', '${currentMinPrice}');`;
-                            if (status === "New" && infoRequests[req]?.type === 'Valuation') {
+                            if (status === "New" && infoRequests[req]?.type !== 'Adjusted ML Valuation') {
                                 title = "Värdering";
                                 buttonClass = "acceptnewpricebutton";
                                 buttonTextClass = "text-block-69-copy-copy";
