@@ -464,7 +464,8 @@ const main = async () => {
         return location.href = '/private';
     }
     initialPageSetup(item);
-    await user.whenSet(() => showMlValuation(item));
+    //await user.whenSet(() => showMlValuation(item));
+    await showMlValuation(item);
 }
 
 main();
