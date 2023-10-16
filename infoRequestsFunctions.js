@@ -104,23 +104,45 @@ async function storePriceResponse(itemId, max, min, response, status) {
     }
 }
 
-async function openNewPriceToast(itemId, status, max, min, brand, description, category) {
-    console.log("openNewPriceToast", itemId, status, max, min, brand, description, category);
+async function openNewPriceToast(itemId, status, max, min, brand, description, category, type, currentMax, currentMin) {
+    console.log("openNewPriceToast", itemId, status, max, min, brand, description, category, type, currentMax, currentMin);
+    currentMinPrice.style.display = 'none';
+    currentMaxPrice.style.display = 'none';
+    maxPriceDiv.style.display = 'block';
+    minPriceDiv.style.display = 'block';
+
     // Set content of toast
     newPriceToastTitle.innerHTML = "Nytt lägsta pris";
     newPriceHeading.innerHTML = `${brand}-plagg`;
     const c = category.toLowerCase();
     if (c && c !== "null") { newPriceHeading.innerHTML = `${brand}-${c}`; }
-    newPrice.innerHTML = `${min} kr`;
+    maxPrice.innerHTML = max;
+    minPrice.innerHTML = min;
+    if (currentMax && max !== currentMax){
+        previousMaxPrice.innerHTML = currentMax;
+        previousMaxPrice.display.style = 'block';
+    }
+    if (currentMin && min !== currentMin){
+        previousMinPrice.innerHTML = currentMin;
+        previousMinPrice.display.style = 'block';
+    }
     acceptNewPriceButton.innerHTML = "Sälj med nytt pris";
     denyNewPriceButton.innerHTML = "Sänk ej";
-    if (status === "New") {
+
+    if (status === "New" && type === 'Valuation') {
         newPriceToastTitle.innerHTML = "Värdering";
-        newPrice.innerHTML = `${min}-${max} kr`;
         acceptNewPriceButton.innerHTML = "Sälj till värdering";
         denyNewPriceButton.innerHTML = "Avböj och avsluta";
     }
-    if (description !== 'undefined' && description !== '' && description !== 'null') {
+    if (type === 'Adjusted ML Valuation'){
+        newPriceToastTitle.innerHTML = "Nytt prisintervall";
+
+    }
+    if (type !== 'Valuation' && type !== 'Adjusted ML Valuation'){ //Custom lowered price and automatic price dump cases
+        minPrice.innerHTML = `${min} kr`;
+        maxPriceDiv.style.display = 'none';
+    }
+    if (description && description !== 'undefined' && description !== '' && description !== 'null') {
         newPriceText.innerHTML = description;
         descriptionDiv.style.display = 'block';
     }
@@ -141,6 +163,7 @@ function loadInfoRequests(userId) {
             var status = item.status;
             var brand = item.brand.replace(/'/g, '');
             var currentMinPrice = item.minPriceEstimate;
+            var currentMaxPrice = item.maxPriceEstimate;
             var deniedBefore = item?.infoRequests?.price?.response === "Denied" ? true : false;
             var archived = item.archived;
             var category = item.category;
@@ -160,9 +183,11 @@ function loadInfoRequests(userId) {
                         let buttonClass = "completerequestbutton";
                         let buttonTextClass = "text-block-69";
                         let description = infoRequests[req].description;
+                        
                         if (description) { description = description.replace(/'/g, ''); }
                         // PRICE REQUEST
                         if (req === "price") {
+                            const type = infoRequests[req].type;
                             title = "Lägre pris";
                             buttonClass = "acceptnewpricebutton";
                             buttonTextClass = "text-block-69-copy-copy";
@@ -170,8 +195,8 @@ function loadInfoRequests(userId) {
                             subText = "Vill du sänka priset och få det sålt?";
                             const max = infoRequests[req].maxPrice;
                             const min = infoRequests[req].minPrice;
-                            href = `javascript:openNewPriceToast('${itemId}', '${status}', ${max}, ${min}, '${brand}', '${description}', '${category}');`;
-                            if (status === "New") {
+                            href = `javascript:openNewPriceToast('${itemId}', '${status}', ${max}, ${min}, '${brand}', '${description}', '${category}', '${type}', '${currentMaxPrice}', '${currentMinPrice}');`;
+                            if (status === "New" && infoRequests[req]?.type === 'Valuation') {
                                 title = "Värdering";
                                 buttonClass = "acceptnewpricebutton";
                                 buttonTextClass = "text-block-69-copy-copy";
