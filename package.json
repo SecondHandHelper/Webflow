@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel itemValuation.js --hmr-port 50619"
+    "start": "parcel itemValuation.js itemPage.js --hmr-port 50619",
+    "clean": "rm -rf .parcel-cache dist"
   },
   "repository": {
     "type": "git",
