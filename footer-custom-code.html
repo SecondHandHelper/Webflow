@@ -236,17 +236,23 @@
     return featureConfig.default[featureName]
   }
 
-  // SEND SLACK PING
-  async function slackPing(channel, text) {
-    fetch('https://europe-west3-second-hand-helper.cloudfunctions.net/slackPing', {
-      method: 'POST',
-      body: JSON.stringify({
-        text,
-        channel
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+  function appendJsScript(scriptSrc, onError) {
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = scriptSrc;
+    script.onerror = onError;
+    document.head.appendChild(script);
+  }
+
+  function urlDependentLoadJs(jsFile, version) {
+    function loadFromGitHack() {
+      appendJsScript(`https://rawcdn.githack.com/SecondHandHelper/Webflow/${version}/${jsFile}`);
+    }
+
+    if (location.href.match(/shh-test.page/)) {
+      appendJsScript(`http://localhost:1234/${jsFile}`, loadFromGitHack);
+    } else {
+      loadFromGitHack();
+    }
   }
 </script>
