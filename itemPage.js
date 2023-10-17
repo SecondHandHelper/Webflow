@@ -209,6 +209,9 @@ function getEventComponent(event, style) {
     if (event.type === 'payoutCompleted') {
         return eventComponentHtml(displayLine, icon, className, `Du fick ${event.data.amount} kr utbetalt`, time);
     }
+    if (event.type === 'valuationUserAdjusted') {
+        return eventComponentHtml(displayLine, icon, className, `Du justerade värderingen till ${event.data.min}-${event.data.max} kr`, time);
+    }
     return false;
 }
 
