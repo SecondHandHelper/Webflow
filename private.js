@@ -8,6 +8,12 @@ function showAccountInfo() {
     if (identifier) {
         accountInfoText.innerHTML = `Inloggad med ${identifier}`;
         accountInfoText.style.display = 'block';
+        account.innerHTML = identifier;
+        account.style.display = 'block'
+    }
+    if (user.current.addressFirstName && user.current.addressFirstName) {
+        accountName.innerHTML = user.current.addressFirstName + ' ' + user.current.addressFirstName;
+        accountName.style.display = 'block';
     }
 }
 
