@@ -26,9 +26,6 @@
         }
         const items = await getItems(userId);
 
-        // If user has items since before, they'll add the shipping method from this page. If not, they'll add it when they add their first item
-        if (items.size > 0 && !user.current?.preferences?.shippingMethod) location.href = './choose-shipping-method';
-
         showNpsSurvey(items);
         showInviteToast(items);
         if (user.current?.referralData?.referralCode) {
