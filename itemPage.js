@@ -164,6 +164,9 @@ function getEventComponent(event, style) {
     if (event.type === 'valuationAccepted') {
         return eventComponentHtml(displayLine, icon, className, `Du accepterade värderingen`, time);
     }
+    if (event.type === 'valuationFinalOffer') {
+        return eventComponentHtml(displayLine, icon, className, `Omvärderades till ${event.data.min}-${event.data.max} kr`, time);
+    }
     if (event.type === 'itemPublished') {
         return eventComponentHtml(displayLine, icon, className, `Försäljning påbörjades`, time);
     }
