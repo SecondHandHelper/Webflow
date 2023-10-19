@@ -97,19 +97,19 @@ const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmen
         document.getElementById('requiresReviewDiv').style.display = 'none';
         if (adjustmentMax > maxPrice) {
             noteHeading.innerHTML = 'Notera!';
-            noteText.innerHTML = 'Ett höjt startpris kan innebära att det tar längre tid för plagget att säljas.';
+            document.getElementById('noteText').innerText = 'Ett höjt startpris kan innebära att det tar längre tid för plagget att säljas.';
             //document.getElementById('higherMaxPriceText').style.display = 'block';
             //document.getElementById('higherMinPriceText').style.display = 'none';
             //document.getElementById('lowerMinOrMaxPriceText').style.display = 'none';
         } else if (adjustmentMin > minPrice) {
             noteHeading.innerHTML = 'Notera!';
-            noteText.innerHTML = 'Ett höjt lägsta pris minskar sannolikheten att det blir sålt.';
+            noteText.innerText = 'Ett höjt lägsta pris minskar sannolikheten att det blir sålt.';
             //document.getElementById('higherMaxPriceText').style.display = 'none';
             //document.getElementById('higherMinPriceText').style.display = 'block';
             //document.getElementById('lowerMinOrMaxPriceText').style.display = 'none';
         } else {
             noteHeading.innerHTML = 'Notera!';
-            noteText.innerHTML = 'Bra att du kan tänka dig sänka priset! Det ökar sannolikheten att det blir sålt.';
+            noteText.innerText = 'Bra att du kan tänka dig sänka priset! Det ökar sannolikheten att det blir sålt.';
             //document.getElementById('higherMaxPriceText').style.display = 'none';
             //document.getElementById('higherMinPriceText').style.display = 'none';
             //document.getElementById('lowerMinOrMaxPriceText').style.display = 'block';
