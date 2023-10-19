@@ -3,11 +3,6 @@ const imageElements = ["frontImage", "brandTagImage", "defectImage", "materialTa
 
 let userItemsCount;
 
-// Call sellItemMain directly
-sellItemMain();
-// and call sellItemMainAuthenticated after/when a user has logged in
-user.whenSet(sellItemMainAuthenticated);
-
 function imageUploadHandlers() {
   let frontImageUpload = document.getElementById("frontImage");
   let brandTagImageUpload = document.getElementById("brandTagImage");
@@ -1334,3 +1329,8 @@ export const isNoBgImage = async (source) => {
     return true;
   }
 };
+
+// Call sellItemMain directly
+sellItemMain();
+// and call sellItemMainAuthenticated after/when a user has logged in
+user.whenSet(sellItemMainAuthenticated);
