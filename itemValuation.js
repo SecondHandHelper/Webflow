@@ -91,6 +91,7 @@ const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmen
             analytics.track("Element Viewed", { elementID: "resetButton" });
         }
         document.getElementById('requiresReviewDiv').style.display = 'none';
+        const noteTextBefore = document.getElementById('noteText').innerText;
         if (adjustmentMax > maxPrice) {
             document.getElementById('noteHeading').innerHTML = 'Notera!';
             document.getElementById('noteText').innerText = 'Ett höjt startpris kan innebära att det tar längre tid för plagget att säljas.';
@@ -102,6 +103,9 @@ const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmen
             document.getElementById('noteText').innerText = 'Bra att du kan tänka dig sänka priset! Det ökar sannolikheten att det blir sålt.';
         }
         document.getElementById('noteDiv').style.display = 'block';
+        if (noteTextBefore !== document.getElementById('noteText').innerText){
+            document.getElementById('noteDiv').click(); // Animation trigger to get users attention
+        }
         document.getElementById('confirmButton').innerText = 'Påbörja försäljning';
         document.getElementById('rejectButton').style.display = 'flex';
     } else {
