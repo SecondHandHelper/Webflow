@@ -329,10 +329,12 @@ const showAdjustValuation = async (item) => {
                 document.getElementById('minPrice').disabled = false;
                 document.getElementById('maxPrice').disabled = false;
                 document.getElementById('adjustIntervalButton').style.display = 'none';
-                document.getElementById('adjustmentTips').style.display = 'block';
+                document.getElementById('noteDiv').style.display = 'block';
+                //document.getElementById('adjustmentTips').style.display = 'block';
+                //document.getElementById('adjustmentNote').style.display = 'none';
                 document.getElementById('origMinPrice').style.display = 'block';
                 document.getElementById('origMaxPrice').style.display = 'block';
-                document.getElementById('adjustmentNote').style.display = 'none';
+                
                 document.getElementById('sliderDiv').style.display = 'block';
                 document.querySelectorAll(".field-underline").forEach(x => x.style.visibility = 'visible');
             })
