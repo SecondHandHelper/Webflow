@@ -1,7 +1,11 @@
-const defectsChoicesInSwedish = new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
-const imageElements = ["frontImage", "brandTagImage", "defectImage", "materialTagImage", "extraImage"];
+function defectsChoicesInSwedish() {
+  return new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
+}
+function imageElements() {
+  return ["frontImage", "brandTagImage", "defectImage", "materialTagImage", "extraImage"];
+}
 
-let userItemsCount;
+var userItemsCount;
 
 function imageUploadHandlers() {
   let frontImageUpload = document.getElementById("frontImage");
@@ -300,7 +304,7 @@ function collect() {
   if (condition === 'Använd, tecken på slitage') {
     defectElements.forEach((value, key) => {
       if (value) {
-        let string = defectsChoicesInSwedish.get(key);
+        let string = defectsChoicesInSwedish().get(key);
         defects.push(string);
       }
     });
@@ -558,7 +562,7 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
     for (const imageName in images) {
       let urlSmall = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName] || images[`${imageName}Large`];
       let urlLarge = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
-      if (imageElements.includes(imageName)) {
+      if (imageElements().includes(imageName)) {
         rememberNewItemImageField(imageName, urlLarge, urlSmall);
         if (imageName === 'frontImage' && images.enhancedFrontImage) {
           urlSmall = images['enhancedFrontImageSmall'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImage'] || images['enhancedFrontImageLarge'];
@@ -623,7 +627,7 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
     }
 
     // Populate checkboxes
-    defectsChoicesInSwedish.forEach((value, key) => {
+    defectsChoicesInSwedish().forEach((value, key) => {
       if (data.defects && data.defects.includes(value)) {
         document.getElementById(key).previousElementSibling.classList.add("w--redirected-checked");
         document.getElementById(key).checked = true;
@@ -1115,7 +1119,7 @@ async function initializeColorConfirm() {
 
 function clearFormFields() {
   document.getElementById('clearItemForm').style.display = 'none';
-  imageElements.forEach(imageName => {
+  imageElements().forEach(imageName => {
     document.getElementById(`${imageName}Preview`).style.backgroundImage = '';
     showImageState(imageName, 'default-state');
   });
@@ -1148,7 +1152,7 @@ function clearFormFields() {
   document.getElementById('Woman').checked = true;
 
   // Populate checkboxes
-  defectsChoicesInSwedish.forEach((value, key) => {
+  defectsChoicesInSwedish().forEach((value, key) => {
     document.getElementById(key).previousElementSibling.classList.remove("w--redirected-checked");
     document.getElementById(key).checked = false;
   });
@@ -1161,7 +1165,7 @@ function clearFormFields() {
 }
 
 function initializeDeleteImageListeners() {
-  imageElements.forEach(imageName => {
+  imageElements().forEach(imageName => {
     document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).addEventListener('click', () => {
       removeSavedImage(imageName);
     });
