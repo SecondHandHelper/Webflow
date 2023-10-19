@@ -2,11 +2,12 @@
   "name": "webflow",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "browserslist": ["> 0.5%", "last 2 versions", "not dead"],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "rm -rf .parcel-cache dist && parcel itemConfirmation.js sellItem.js itemValuation.js itemPage.js --hmr-port 50619",
-    "clean": "rm -rf .parcel-cache dist"
+    "clean": "rm -rf .parcel-cache dist",
+    "build": "npm run clean && npx parcel build itemConfirmation.js && npx parcel build sellItem.js && npx parcel build itemValuation.js && npx parcel build itemPage.js"
   },
   "repository": {
     "type": "git",

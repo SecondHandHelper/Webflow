@@ -10,7 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.1.81';
+  const JS_VERSION = 'v1.1.84';
   var errorHandler = new StackdriverErrorReporter();
   const environment = location.href.includes('shh-test.page') ? 'web-test' : 'web-prod';
   $(document).ready(function () {
@@ -246,7 +246,7 @@
 
   function urlDependentLoadJs(jsFile, version = JS_VERSION) {
     function loadFromGitHack() {
-      appendJsScript(`https://rawcdn.githack.com/SecondHandHelper/Webflow/${version}/${jsFile}`);
+      appendJsScript(`https://rawcdn.githack.com/SecondHandHelper/Webflow/${version}/dist/${jsFile}`);
     }
 
     if (location.href.match(/shh-test.page/)) {
