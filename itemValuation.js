@@ -80,8 +80,6 @@ const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmen
         }
         document.getElementById('adjustmentWarningText').innerHTML = adjustmentWarningText(minPrice, maxPrice, adjustmentMin, adjustmentMax);
         document.getElementById('noteDiv').style.display = 'none';
-        //document.getElementById('adjustmentTips').style.display = 'none';
-        //document.getElementById('adjustmentNote').style.display = 'none';
         document.getElementById('sendForReviewButton').style.display = 'flex';
         document.getElementById('confirmButton').style.display = 'none';
         document.getElementById('rejectButton').style.display = 'none';
@@ -92,38 +90,25 @@ const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmen
             document.getElementById('resetButton').style.visibility = 'visible';
             analytics.track("Element Viewed", { elementID: "resetButton" });
         }
-        //document.getElementById('adjustmentNote').style.display = 'block';
-        //document.getElementById('adjustmentTips').style.display = 'none';
         document.getElementById('requiresReviewDiv').style.display = 'none';
         if (adjustmentMax > maxPrice) {
-            noteHeading.innerHTML = 'Notera!';
+            document.getElementById('noteHeading').innerHTML = 'Notera!';
             document.getElementById('noteText').innerText = 'Ett höjt startpris kan innebära att det tar längre tid för plagget att säljas.';
-            //document.getElementById('higherMaxPriceText').style.display = 'block';
-            //document.getElementById('higherMinPriceText').style.display = 'none';
-            //document.getElementById('lowerMinOrMaxPriceText').style.display = 'none';
         } else if (adjustmentMin > minPrice) {
-            noteHeading.innerHTML = 'Notera!';
-            noteText.innerText = 'Ett höjt lägsta pris minskar sannolikheten att det blir sålt.';
-            //document.getElementById('higherMaxPriceText').style.display = 'none';
-            //document.getElementById('higherMinPriceText').style.display = 'block';
-            //document.getElementById('lowerMinOrMaxPriceText').style.display = 'none';
+            document.getElementById('noteHeading').innerHTML = 'Notera!';
+            document.getElementById('noteText').innerText = 'Ett höjt lägsta pris minskar sannolikheten att det blir sålt.';
         } else {
-            noteHeading.innerHTML = 'Notera!';
-            noteText.innerText = 'Bra att du kan tänka dig sänka priset! Det ökar sannolikheten att det blir sålt.';
-            //document.getElementById('higherMaxPriceText').style.display = 'none';
-            //document.getElementById('higherMinPriceText').style.display = 'none';
-            //document.getElementById('lowerMinOrMaxPriceText').style.display = 'block';
+            document.getElementById('noteHeading').innerHTML = 'Notera!';
+            document.getElementById('noteText').innerText = 'Bra att du kan tänka dig sänka priset! Det ökar sannolikheten att det blir sålt.';
         }
         document.getElementById('noteDiv').style.display = 'block';
         document.getElementById('confirmButton').innerText = 'Påbörja försäljning';
         document.getElementById('rejectButton').style.display = 'flex';
     } else {
         document.getElementById('resetButton').style.visibility = 'hidden';
-        noteHeading.innerHTML = 'Tips!';
-        noteText.innerHTML = 'Sänkta priser ger en säkrare och snabbare försäljning. Höjda priser kan ge mer pengar, men riskerar också att det blir osålt eller tar längre tid.';
+        document.getElementById('noteHeading').innerHTML = 'Tips!';
+        document.getElementById('noteText').innerText = 'Sänkta priser ger en säkrare och snabbare försäljning. Höjda priser kan ge mer pengar, men riskerar också att det blir osålt eller tar längre tid.';
         document.getElementById('noteDiv').style.display = 'block';
-        //document.getElementById('adjustmentTips').style.display = 'block';
-        //document.getElementById('adjustmentNote').style.display = 'none';
         document.getElementById('requiresReviewDiv').style.display = 'none';
         document.getElementById('confirmButton').style.display = 'flex';
         document.getElementById('sendForReviewButton').style.display = 'none';
@@ -330,8 +315,6 @@ const showAdjustValuation = async (item) => {
                 document.getElementById('maxPrice').disabled = false;
                 document.getElementById('adjustIntervalButton').style.display = 'none';
                 document.getElementById('noteDiv').style.display = 'block';
-                //document.getElementById('adjustmentTips').style.display = 'block';
-                //document.getElementById('adjustmentNote').style.display = 'none';
                 document.getElementById('origMinPrice').style.display = 'block';
                 document.getElementById('origMaxPrice').style.display = 'block';
                 
