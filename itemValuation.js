@@ -92,18 +92,20 @@ const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmen
         }
         document.getElementById('requiresReviewDiv').style.display = 'none';
         const noteTextBefore = document.getElementById('noteText').innerText;
+        let noteText = '';
         if (adjustmentMax > maxPrice) {
-            document.getElementById('noteHeading').innerHTML = 'Notera!';
-            document.getElementById('noteText').innerText = 'Ett höjt startpris kan innebära att det tar längre tid för plagget att säljas.';
-        } else if (adjustmentMin > minPrice) {
-            document.getElementById('noteHeading').innerHTML = 'Notera!';
-            document.getElementById('noteText').innerText = 'Ett höjt lägsta pris minskar sannolikheten att det blir sålt.';
-        } else {
-            document.getElementById('noteHeading').innerHTML = 'Notera!';
-            document.getElementById('noteText').innerText = 'Bra att du kan tänka dig sänka priset! Det ökar sannolikheten att det blir sålt.';
+            noteText += 'Ett höjt startpris kan innebära att det tar längre tid för plagget att säljas.';
+        } 
+        if (adjustmentMin > minPrice) {
+            noteText += `${noteText ? ' ' : ''}Ett höjt lägsta pris minskar sannolikheten att det blir sålt.`;
+        } 
+        if(!noteText) {
+            noteText = 'Bra att du kan tänka dig sänka priset! Det ökar sannolikheten att det blir sålt.';
         }
+        document.getElementById('noteHeading').innerHTML = 'Notera!';
+        document.getElementById('noteText').innerText = noteText;
         document.getElementById('noteDiv').style.display = 'block';
-        if (noteTextBefore !== document.getElementById('noteText').innerText){
+        if (noteText !== noteTextBefore) {
             document.getElementById('noteDiv').click(); // Animation trigger to get users attention
         }
         document.getElementById('confirmButton').innerText = 'Påbörja försäljning';
@@ -321,7 +323,7 @@ const showAdjustValuation = async (item) => {
                 document.getElementById('noteDiv').style.display = 'block';
                 document.getElementById('origMinPrice').style.display = 'block';
                 document.getElementById('origMaxPrice').style.display = 'block';
-                
+
                 document.getElementById('sliderDiv').style.display = 'block';
                 document.querySelectorAll(".field-underline").forEach(x => x.style.visibility = 'visible');
             })
