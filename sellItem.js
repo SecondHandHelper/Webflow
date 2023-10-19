@@ -1,6 +1,151 @@
 const defectsChoicesInSwedish = new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
 const imageElements = ["frontImage", "brandTagImage", "defectImage", "materialTagImage", "extraImage"];
 
+let userItemsCount;
+
+// Call sellItemMain directly
+sellItemMain();
+// and call sellItemMainAuthenticated after/when a user has logged in
+user.whenSet(sellItemMainAuthenticated);
+
+function imageUploadHandlers() {
+  let frontImageUpload = document.getElementById("frontImage");
+  let brandTagImageUpload = document.getElementById("brandTagImage");
+  let productImageUpload = document.getElementById("productImage");
+  let defectImageUpload = document.getElementById("defectImage");
+  let materialTagImageUpload = document.getElementById("materialTagImage");
+  let extraImageUpload = document.getElementById("extraImage");
+
+  // display image when file has been selected
+  $('#frontImage').off('change');
+  frontImageUpload.addEventListener('change', frontImageChangeHandler, {capture: true});
+  $('#brandTagImage').off('change');
+  brandTagImageUpload.addEventListener('change', brandTagImageChangeHandler, {capture: true});
+  $('#productImage').off('change');
+  productImageUpload.addEventListener('change', productImageChangeHandler, {capture: true});
+  $('#defectImage').off('change');
+  defectImageUpload.addEventListener('change', defectImageChangeHandler, {capture: true});
+  $('#materialTag').off('change');
+  materialTagImageUpload.addEventListener('change', materialTagImageChangeHandler, {capture: true});
+  $('#extraImage').off('change');
+  extraImageUpload.addEventListener('change', extraImageChangeHandler, {capture: true});
+}
+
+async function sellItemMainAuthenticated() {
+  console.log("sellItemMainAuthenticated " + new Date());
+
+  // Visa alla "viktiga" fält om man är inloggad
+  toggleMoreInfoFields.click();
+
+  // Create item from sessionStorage
+  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+    // ... if we are redirected here from the sign-in page
+    if (document.referrer.includes('/sign-in')) {
+      document.getElementById('loadingDiv').style.display = 'flex';
+      document.getElementById('creatingItemText').style.display = 'block';
+      await createItemAfterSignIn();
+      const shippingMethod = sessionStorage.getItem('shippingMethod');
+      if (shippingMethod) {
+        await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
+      }
+      const userPhoneSet = user.current?.phoneNumber?.length;
+      return location.href = userPhoneSet ? '/item-confirmation' : '/user-contact';
+    } else {
+      // otherwise make sure to remove any previously saved item as a precaution
+      sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
+    }
+  }
+
+  // Get user's item count to be able to send 'User Activated' event
+  const items = await getItems(authUser.current.uid);
+  userItemsCount = items.size;
+}
+
+async function sellItemMain() {
+  localStorage.removeItem('latestItemCreated');
+  sessionStorage.removeItem('itemValuation');
+
+  // Initial state
+  imageUploadHandlers();
+  setupModelSearchEventListeners();
+  initializeSelectColor();
+  initializeInputEventListeners();
+  autocomplete(document.getElementById("itemBrand"), brands);
+
+  // Hide/Show warning about difficulty to sell certain brands
+  let brand = document.getElementById("itemBrand");
+  let hardToSellDiv = document.getElementById("hardToSellDiv");
+  let words = ["H&M", "HM", "Zara", "ASOS", "Nelly", "Gina Tricot", "BikBok", "Bik Bok", "Lindex", "Kappahl", "Cubus", "NA-KD", "NAKD", "Mango", "Ellos", "Primark", "Shein", "Vila", "Forever 21", "Pull & Bear", "Bershka", "Stradivarius", "Okänt", "Unknown", "Vet ej", "...", "Vet inte", "Okänd", "-", "Se bild"];
+
+  brand.oninput = function () {
+    shareSoldDiv.style.display = 'none';
+    let value = this.value;
+    if (!checkBrand(value)) {
+      //checkAndDisplayShareSold(value);
+      //displayFindModelDiv(value);
+    }
+  };
+
+  // Hide/Show extra fields for defects
+  itemCondition.onchange = function () {
+    let input = this.value;
+    if (input == "Använd, tecken på slitage") {
+      defectInfoDiv.style.display = 'block';
+      itemCondition.style.color = "#333";
+    } else if (input == "") {
+      defectInfoDiv.style.display = 'none';
+      itemCondition.style.color = "#929292";
+    } else {
+      defectInfoDiv.style.display = 'none';
+      itemCondition.style.color = "#333";
+    }
+  };
+
+  personalId.addEventListener("input", () => {
+    const error = isValidSwedishSsn(personalId.value) ? '' : 'Ogiltigt personnummer';
+    personalId.setCustomValidity(error);
+  })
+
+  await initializeCategorySelect();
+  await initializeColorConfirm();
+  await initializeBrandConfirm();
+  await initializeMaterialConfirm();
+  await initializeSizeConfirm();
+  initializeSuggestButtonsSaveState();
+  initializeClearFormButton();
+
+  initializeDeleteImageListeners();
+  document.getElementById('clearItemForm').addEventListener('click', clearFormFields);
+
+  if (params.id) {
+    // Fill form if the user comes from a prefill link (re-sell item)
+    sessionStorage.removeItem('newItemId');
+    localStorage.removeItem('newItem');
+    auth.onAuthStateChanged(function (user) {
+      if (!user) { document.getElementById('maiIntro').style.display = 'block'; }
+    });
+    document.getElementById('resellIntro').style.display = 'block';
+    await fillForm(params.id);
+    document.getElementById("triggerShowSellItemContent").click();
+  } else if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
+    // A new item will be created in sellItemMainAuthenticated
+  } else if (localStorage.getItem('newItem') && !isDefaultFormState(JSON.parse(localStorage.getItem('newItem')))) {
+    // Saved state from a previous visit to /sell-item - restore the data
+    const newItem = JSON.parse(localStorage.getItem('newItem'));
+    document.getElementById("frontImage").required = true;
+    document.getElementById("brandTagImage").required = true;
+    await fillForm(null, newItem, true);
+    document.getElementById('clearItemForm').style.display = 'block';
+    document.getElementById("triggerShowSellItemContent").click();
+  } else {
+    document.getElementById("triggerShowSellItemContent").click();
+    document.getElementById("frontImage").required = true;
+    document.getElementById("brandTagImage").required = true;
+  }
+  initializeSaveStateListeners();
+  initializeRestoreOnNavigation();
+}
+
 async function requestUniqueId() {
   const endpointUrl = 'https://generateuniqueid-heypmjzjfq-ew.a.run.app';
   try {
@@ -88,7 +233,7 @@ async function saveItemValuation(itemId, mlValuationData, userValuationApproval)
   }
 }
 
-const getAndSaveMlValuation = async (itemId, userValuationApproval) => {
+async function getAndSaveMlValuation(itemId, userValuationApproval) {
   const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}').item;
   if (!itemId && !item) {
     console.error('No item and no itemId, unexpected!!');
@@ -234,24 +379,18 @@ async function addItemInner(id) {
   if (modelCoverImageUrl) {
     images['coverImage'] = modelCoverImageUrl;
     pageData['coverImageUpdatedAt'] = new Date().toISOString();
-  } else if (sessionStorage.getItem('coverImagePreviewUrl')) {
-    images['coverImage'] = sessionStorage.getItem('coverImagePreviewUrl');
-    pageData['coverImageUpdatedAt'] = new Date().toISOString();
   }
   const createdFromItem = params.id ? { createdFromItem: params.id } : {};
   const item = { ...pageData, shippingMethod, images, ...createdFromItem, version: "2" };
-  item.maiMaterial = getMaiMaterial(item);
 
   if (!authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
-    await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
+    const createItemResponse = await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
     localStorage.removeItem('newItem');
     sessionStorage.removeItem('newItemId');
-    item.id = id;
-    localStorage.setItem('latestItemCreated', JSON.stringify(item));
+    localStorage.setItem('latestItemCreated', JSON.stringify(createItemResponse.data));
   }
-
   return item;
 }
 
@@ -407,7 +546,7 @@ function showSuggestButtons(fieldName, restoreSavedState, showConfirmation) {
   }
 }
 
-async function fillForm(itemId, savedItem, restoreSavedState = false) {
+async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
   try {
     let item = { data: savedItem };
     if (!savedItem) {
@@ -437,14 +576,14 @@ async function fillForm(itemId, savedItem, restoreSavedState = false) {
       }
     }
 
-    // Show cover image preview
+    // Show cover image preview if it is a model image, if it is a noBg image we skip it
     sessionStorage.removeItem('coverImagePreviewUrl');
     const coverImageLarge = images.coverImageLarge || images.coverImage || null;
     const coverImageSmall = images.coverImage || images.coverImageLarge || null;
-    if (coverImageLarge) {
+    if (coverImageLarge && !(await isNoBgImage(coverImageSmall))) {
       document.getElementById('coverImageContainer').style.backgroundImage = `url('${coverImageSmall}')`;
       document.getElementById('coverImagePreview').style.display = 'block';
-      sessionStorage.setItem('coverImagePreviewUrl', coverImageLarge);
+      rememberNewItemImageField('modelImage', coverImageLarge, coverImageSmall);
     }
 
     // Populate text input fields
@@ -1049,6 +1188,30 @@ function removeSavedImage(imageName) {
 }
 
 async function initializeCategorySelect() {
+  const itemCategories = [
+    {"id": "", "text": "",},
+    {"text": "Överdelar", "children": [
+        {"id": "Tröja", "text": "Tröja",}, {"id": "Blus", "text": "Blus",}, {"id": "Topp", "text": "Topp",}, {"id": "Skjorta", "text": "Skjorta",}, {"id": "Linneskjorta", "text": "Linneskjorta",}, {"id": "T-shirt", "text": "T-shirt",}, {"id": "Kavaj", "text": "Kavaj",}, {"id": "Sweatshirt", "text": "Sweatshirt",}, {"id": "Hoodie", "text": "Hoodie",}, {"id": "Polotröja", "text": "Polotröja",}, {"id": "Tunika", "text": "Tunika",}, {"id": "Väst", "text": "Väst",}, {"id": "Kofta", "text": "Kofta",}, {"id": "Linne", "text": "Linne",}, {"id": "Träningströja", "text": "Träningströja",}, {"id": "Poncho", "text": "Poncho",}, {"id": "Piké", "text": "Piké",}, {"id": "Långärmad T-shirt", "text": "Långärmad T-shirt",}, {"id": "Kostymväst", "text": "Kostymväst",}
+      ]},
+    {"text": "Underdelar", "children": [
+        {"id": "Kjol", "text": "Kjol",}, {"id": "Byxor", "text": "Byxor",}, {"id": "Jeans", "text": "Jeans",}, {"id": "Chinos", "text": "Chinos",}, {"id": "Fritidsbyxor", "text": "Fritidsbyxor",}, {"id": "Träningsbyxor", "text": "Träningsbyxor",}, {"id": "Tights", "text": "Tights",}, {"id": "Strumpbyxor", "text": "Strumpbyxor",}, {"id": "Mjukisbyxor", "text": "Mjukisbyxor",}, {"id": "Kostymbyxor", "text": "Kostymbyxor",}, {"id": "Shorts", "text": "Shorts",}, {"id": "Sarong", "text": "Sarong",}
+      ]},
+    {"text": "Helkropp", "children": [
+        {"id": "Klänning", "text": "Klänning",}, {"id": "Kaftan", "text": "Kaftan",}, {"id": "Kostym", "text": "Kostym",}, {"id": "Set", "text": "Set",}, {"id": "Jumpsuit", "text": "Jumpsuit",}, {"id": "Baddräkt", "text": "Baddräkt",}, {"id": "Bikini", "text": "Bikini",}, {"id": "Pyjamas", "text": "Pyjamas",}, {"id": "Morgonrock", "text": "Morgonrock",}, {"id": "Bröllopsklänning", "text": "Bröllopsklänning",}, {"id": "Balklänning", "text": "Balklänning",}, {"id": "Bodysuit", "text": "Bodysuit",}, {"id": "Underställ", "text": "Underställ",}
+      ]},
+    {"text": "Ytterkläder", "children": [
+        {"id": "Jacka", "text": "Jacka",}, {"id": "Kappa", "text": "Kappa",}, {"id": "Rock", "text": "Rock",}, {"id": "Fritidsjacka", "text": "Fritidsjacka",}, {"id": "Trenchcoat", "text": "Trenchcoat",}, {"id": "Skinnjacka", "text": "Skinnjacka",}, {"id": "Dunjacka", "text": "Dunjacka",}, {"id": "Regnjacka", "text": "Regnjacka",}, {"id": "Pälsjacka", "text": "Pälsjacka",}
+      ]},
+    {"text": "Skor", "children": [
+        {"id": "Sneakers", "text": "Sneakers",}, {"id": "Sandaler", "text": "Sandaler",}, {"id": "Klackar", "text": "Klackar",}, {"id": "Ballerinaskor", "text": "Ballerinaskor",}, {"id": "Loafers", "text": "Loafers",}, {"id": "Flip-flops", "text": "Flip-flops",}, {"id": "Boots", "text": "Boots",}, {"id": "Kängor", "text": "Kängor",}, {"id": "Vinterskor", "text": "Vinterskor",}, {"id": "Skor", "text": "Annat (Skor)",}
+      ]},
+    {"text": "Väskor", "children": [
+        {"id": "Axelremsväska", "text": "Axelremsväska",}, {"id": "Handväska", "text": "Handväska",}, {"id": "Kuvertväska", "text": "Kuvertväska",}, {"id": "Ryggsäck", "text": "Ryggsäck",}, {"id": "Träningsväska", "text": "Träningsväska",}, {"id": "Resväska", "text": "Resväska",}, {"id": "Datorväska", "text": "Datorväska",}, {"id": "Väska", "text": "Annat (Väska)",}
+      ]},
+    {"text": "Accessoarer", "children": [
+        {"id": "Solglasögon", "text": "Solglasögon",}, {"id": "Glasögon", "text": "Glasögon",}, {"id": "Örhänge", "text": "Örhänge",}, {"id": "Halsband", "text": "Halsband",}, {"id": "Armband", "text": "Armband",}, {"id": "Ring", "text": "Ring",}, {"id": "Brosch", "text": "Brosch",}, {"id": "Keps", "text": "Keps",}, {"id": "Sjal", "text": "Sjal",}, {"id": "Krage", "text": "Krage",}, {"id": "Bälte", "text": "Bälte",}, {"id": "Plånbok", "text": "Plånbok",}, {"id": "Halsduk", "text": "Halsduk",}, {"id": "Hatt", "text": "Hatt",}, {"id": "Mössa", "text": "Mössa",}, {"id": "Vantar", "text": "Vantar",}, {"id": "Necessär", "text": "Necessär",}, {"id": "Slips", "text": "Slips",}, {"id": "Handduk", "text": "Handduk",}, {"id": "Klocka", "text": "Klocka",}
+      ]}
+  ];
   $('#itemCategory').select2({ selectionCssClass: 'form-field', placeholder: 'Kategori', data: itemCategories });
   $("body").on('click', '.select2-container--open .select2-results__group', function () {
     if ($(this).parent().attr('class').match(/expanded-group/)) {
@@ -1127,512 +1290,47 @@ const partsMatch = (s0, s1) => {
   return !blackListed(s0) && !blackListed(s1) && (s0.indexOf(s1) > -1 || s1.indexOf(s0) > -1);
 };
 
-function getMaiMaterial(item) {
-  const materials = item.material?.toLowerCase()?.trim().split(/\s*,?\s+/);
-  if (!materials?.length) return null;
-  for (const material of materials) {
-    if (material?.length <= 1) return false;
-    const match = maiMaterials.find(({ name, words }) => {
-      if (material === 'ull' && name === 'Cotton') return false; // Special case!
-      return [name, ...words].find((word) => {
-        const w = word?.toLowerCase() || '';
-        return partsMatch(w, material);
-      });
-    });
-    if (match?.name) {
-      return match?.name;
+export const isNoBgImage = async (source) => {
+  const getImageMeta = async (url) => {
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.src = url;
+    await img.decode();
+    return img
+  };
+  const checkUniformColor = (data) => {
+    const [r, g, b, a] = [data[0], data[1], data[2], data[3]];
+    let nonConformingCount = 0;
+    for (let i = 4; i < data.length; i += 4) {
+      if (data[i] !== r || data[i + 1] !== g || data[i + 2] !== b || data[i + 3] !== a) {
+        return false;
+      }
     }
-  }
-  return null;
-}
+    return true;
+  };
+  try {
+    if (source.match(/nobg|no-bg/i)) {
+      return true;
+    }
+    const img = await getImageMeta(source);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
 
-const maiMaterials = [
-  {
-    "id": "selgdlc4B1zgu9mlA",
-    "name": "Cashmere",
-    "words": ["kashmir", "kaschmir"]
-  },
-  {
-    "id": "selt2pAmVBnZ39qM2",
-    "name": "Cotton",
-    "words": ["bomull"]
-  },
-  {
-    "id": "selKuQUkJMxcjMUqt",
-    "name": "Leather",
-    "words": ["läder", "skinn"]
-  },
-  {
-    "id": "sel23NBtqvBHJk78G",
-    "name": "Exotic leathers",
-    "words": ["exotiskt läder", "exotiskt skinn"]
-  },
-  {
-    "id": "selFcI7M3LJgLAjox",
-    "name": "Denim - Jeans",
-    "words": ["twill", "jeans"]
-  },
-  {
-    "id": "selIhCRlvkNKKMUUr",
-    "name": "Spandex",
-    "words": []
-  },
-  {
-    "id": "selxhEtnyAXM4ACsq",
-    "name": "Wool",
-    "words": ["ull", "ylle", "alpaca", "merino"]
-  },
-  {
-    "id": "selKSXPlNux42EfA9",
-    "name": "Linen",
-    "words": ["linne"]
-  },
-  {
-    "id": "sel67FYak6CsTk4jr",
-    "name": "Patent leather",
-    "words": ["lackat läder", "konstläder", "lackläder", "lackat skinn"]
-  },
-  {
-    "id": "selnsZKTprFfdpbpL",
-    "name": "Plastic",
-    "words": ["plast", "av plast"]
-  },
-  {
-    "id": "sel8yyj30LsADDnFx",
-    "name": "Polyester",
-    "words": ["ployester", "polyster", "polyamid", "polamid"]
-  },
-  {
-    "id": "selBcoAapTVv0zATJ",
-    "name": "Rubber",
-    "words": ["gummi", "av gummi", "gummiband"]
-  },
-  {
-    "id": "seliYLcDX1mwC8LV1",
-    "name": "Silk",
-    "words": ["siden", "silke"]
-  },
-  {
-    "id": "sel12c4p1edN9vlJS",
-    "name": "Suede",
-    "words": ["mocka", "mocca"]
-  },
-  {
-    "id": "selE8vZST4IiS6GQW",
-    "name": "Synthetic",
-    "words": ["syntetisk", "syntetiska", "syntetiskt", "acryl", "akryl", "lyocell", "nylon", "elestan", "rayon", "acetat", "gore"]
-  },
-  {
-    "id": "selvDLHRONrlhlt5R",
-    "name": "Cloth",
-    "words": []
-  },
-  {
-    "id": "seleLvSJq0ZKuQlKV",
-    "name": "Velvet",
-    "words": ["sammet", "sammetsväv"]
-  },
-  {
-    "id": "selgREajUjUk3flrO",
-    "name": "Viscose",
-    "words": ["viskos"]
-  },
-  {
-    "id": "selJgx9Y5xvyeeUAJ",
-    "name": "Tweed",
-    "words": []
-  },
-  {
-    "id": "selHldRLi8o3USJ80",
-    "name": "Faux fur",
-    "words": ["fuskpäls", "imitationspäls"]
-  },
-  {
-    "id": "selOl9VjI6qQBBzB9",
-    "name": "Fur",
-    "words": ["päls"]
-  },
-  {
-    "id": "selsHi8HpO2EMmGlC",
-    "name": "Glitter",
-    "words": []
-  },
-  {
-    "id": "selfN2I0IR0LPoX26",
-    "name": "Sponge",
-    "words": ["svamp"]
-  },
-  {
-    "id": "seld9hDGKjA7JNje7",
-    "name": "White gold",
-    "words": ["vitt guld"]
-  },
-  {
-    "id": "selsGCyjVIcgNpNm3",
-    "name": "Yellow gold",
-    "words": ["gult guld"]
-  },
-  {
-    "id": "selQWYSJF3XR3wGAC",
-    "name": "Pink gold",
-    "words": ["rosa guld", "roséguld"]
-  },
-  {
-    "id": "selN5o1szUKuAk47p",
-    "name": "Gold plated",
-    "words": ["guldpläterad", "förgylld"]
-  },
-  {
-    "id": "sel1V9oOI0UrPI8um",
-    "name": "Silver",
-    "words": []
-  },
-  {
-    "id": "selAwYRPXIBUfseOT",
-    "name": "Silver Plated",
-    "words": ["silverpläterad", "silverpläterat"]
-  },
-  {
-    "id": "seljnrN35XuczyPMV",
-    "name": "Metal",
-    "words": ["metall"]
-  },
-  {
-    "id": "selIfTH2wkuWLXvKw",
-    "name": "Steel",
-    "words": ["stål"]
-  },
-  {
-    "id": "selVbpscPPj0e6RSP",
-    "name": "Wood",
-    "words": ["trä"]
-  },
-  {
-    "id": "sel47FuFUekEVcyzW",
-    "name": "Other",
-    "words": ["annat"]
-  }
-]
+    const topBorder = ctx.getImageData(0, 0, img.naturalWidth, 10).data;
+    const bottomBorder = ctx.getImageData(0, img.naturalHeight - 10, img.naturalWidth, 10).data;
+    const leftBorder = ctx.getImageData(0, 0, 10, img.naturalHeight).data;
+    const rightBorder = ctx.getImageData(img.naturalWidth - 10, 0, 10, img.naturalHeight).data;
 
-const itemCategories = [
-  {
-    "id": "",
-    "text": "",
-  },
-  {
-    "text": "Överdelar",
-    "children": [
-      {
-        "id": "Tröja",
-        "text": "Tröja",
-      }, {
-        "id": "Blus",
-        "text": "Blus",
-      }, {
-        "id": "Topp",
-        "text": "Topp",
-      }, {
-        "id": "Skjorta",
-        "text": "Skjorta",
-      }, {
-        "id": "Linneskjorta",
-        "text": "Linneskjorta",
-      }, {
-        "id": "T-shirt",
-        "text": "T-shirt",
-      }, {
-        "id": "Kavaj",
-        "text": "Kavaj",
-      }, {
-        "id": "Sweatshirt",
-        "text": "Sweatshirt",
-      }, {
-        "id": "Hoodie",
-        "text": "Hoodie",
-      }, {
-        "id": "Polotröja",
-        "text": "Polotröja",
-      }, {
-        "id": "Tunika",
-        "text": "Tunika",
-      }, {
-        "id": "Väst",
-        "text": "Väst",
-      }, {
-        "id": "Kofta",
-        "text": "Kofta",
-      }, {
-        "id": "Linne",
-        "text": "Linne",
-      }, {
-        "id": "Träningströja",
-        "text": "Träningströja",
-      }, {
-        "id": "Poncho",
-        "text": "Poncho",
-      }, {
-        "id": "Piké",
-        "text": "Piké",
-      }, {
-        "id": "Långärmad T-shirt",
-        "text": "Långärmad T-shirt",
-      }, {
-        "id": "Kostymväst",
-        "text": "Kostymväst",
-      }
-    ]
-  },
-  {
-    "text": "Underdelar",
-    "children": [
-      {
-        "id": "Kjol",
-        "text": "Kjol",
-      }, {
-        "id": "Byxor",
-        "text": "Byxor",
-      }, {
-        "id": "Jeans",
-        "text": "Jeans",
-      }, {
-        "id": "Chinos",
-        "text": "Chinos",
-      }, {
-        "id": "Fritidsbyxor",
-        "text": "Fritidsbyxor",
-      }, {
-        "id": "Träningsbyxor",
-        "text": "Träningsbyxor",
-      }, {
-        "id": "Tights",
-        "text": "Tights",
-      }, {
-        "id": "Strumpbyxor",
-        "text": "Strumpbyxor",
-      }, {
-        "id": "Mjukisbyxor",
-        "text": "Mjukisbyxor",
-      }, {
-        "id": "Kostymbyxor",
-        "text": "Kostymbyxor",
-      }, {
-        "id": "Shorts",
-        "text": "Shorts",
-      }, {
-        "id": "Sarong",
-        "text": "Sarong",
-      }
-    ]
-  },
-  {
-    "text": "Helkropp",
-    "children": [
-      {
-        "id": "Klänning",
-        "text": "Klänning",
-      }, {
-        "id": "Kaftan",
-        "text": "Kaftan",
-      }, {
-        "id": "Kostym",
-        "text": "Kostym",
-      }, {
-        "id": "Set",
-        "text": "Set",
-      }, {
-        "id": "Jumpsuit",
-        "text": "Jumpsuit",
-      }, {
-        "id": "Baddräkt",
-        "text": "Baddräkt",
-      }, {
-        "id": "Bikini",
-        "text": "Bikini",
-      }, {
-        "id": "Pyjamas",
-        "text": "Pyjamas",
-      }, {
-        "id": "Morgonrock",
-        "text": "Morgonrock",
-      }, {
-        "id": "Bröllopsklänning",
-        "text": "Bröllopsklänning",
-      }, {
-        "id": "Balklänning",
-        "text": "Balklänning",
-      }, {
-        "id": "Bodysuit",
-        "text": "Bodysuit",
-      }, {
-        "id": "Underställ",
-        "text": "Underställ",
-      }
-    ]
-  },
-  {
-    "text": "Ytterkläder",
-    "children": [
-      {
-        "id": "Jacka",
-        "text": "Jacka",
-      },
-      {
-        "id": "Kappa",
-        "text": "Kappa",
-      }, {
-        "id": "Rock",
-        "text": "Rock",
-      }, {
-        "id": "Fritidsjacka",
-        "text": "Fritidsjacka",
-      }, {
-        "id": "Trenchcoat",
-        "text": "Trenchcoat",
-      }, {
-        "id": "Skinnjacka",
-        "text": "Skinnjacka",
-      }, {
-        "id": "Dunjacka",
-        "text": "Dunjacka",
-      }, {
-        "id": "Regnjacka",
-        "text": "Regnjacka",
-      }, {
-        "id": "Pälsjacka",
-        "text": "Pälsjacka",
-      }
-    ]
-  },
-  {
-    "text": "Skor",
-    "children": [
-      {
-        "id": "Sneakers",
-        "text": "Sneakers",
-      }, {
-        "id": "Sandaler",
-        "text": "Sandaler",
-      }, {
-        "id": "Klackar",
-        "text": "Klackar",
-      }, {
-        "id": "Ballerinaskor",
-        "text": "Ballerinaskor",
-      }, {
-        "id": "Loafers",
-        "text": "Loafers",
-      }, {
-        "id": "Flip-flops",
-        "text": "Flip-flops",
-      }, {
-        "id": "Boots",
-        "text": "Boots",
-      }, {
-        "id": "Kängor",
-        "text": "Kängor",
-      }, {
-        "id": "Vinterskor",
-        "text": "Vinterskor",
-      }, {
-        "id": "Skor",
-        "text": "Annat (Skor)",
-      }
-    ]
-  },
-  {
-    "text": "Väskor",
-    "children": [
-      {
-        "id": "Axelremsväska",
-        "text": "Axelremsväska",
-      }, {
-        "id": "Handväska",
-        "text": "Handväska",
-      }, {
-        "id": "Kuvertväska",
-        "text": "Kuvertväska",
-      }, {
-        "id": "Ryggsäck",
-        "text": "Ryggsäck",
-      }, {
-        "id": "Träningsväska",
-        "text": "Träningsväska",
-      }, {
-        "id": "Resväska",
-        "text": "Resväska",
-      }, {
-        "id": "Datorväska",
-        "text": "Datorväska",
-      }, {
-        "id": "Väska",
-        "text": "Annat (Väska)",
-      }
-    ]
-  },
-  {
-    "text": "Accessoarer",
-    "children": [
-      {
-        "id": "Solglasögon",
-        "text": "Solglasögon",
-      }, {
-        "id": "Glasögon",
-        "text": "Glasögon",
-      }, {
-        "id": "Örhänge",
-        "text": "Örhänge",
-      }, {
-        "id": "Halsband",
-        "text": "Halsband",
-      }, {
-        "id": "Armband",
-        "text": "Armband",
-      }, {
-        "id": "Ring",
-        "text": "Ring",
-      }, {
-        "id": "Brosch",
-        "text": "Brosch",
-      }, {
-        "id": "Keps",
-        "text": "Keps",
-      }, {
-        "id": "Sjal",
-        "text": "Sjal",
-      }, {
-        "id": "Krage",
-        "text": "Krage",
-      }, {
-        "id": "Bälte",
-        "text": "Bälte",
-      }, {
-        "id": "Plånbok",
-        "text": "Plånbok",
-      }, {
-        "id": "Halsduk",
-        "text": "Halsduk",
-      }, {
-        "id": "Hatt",
-        "text": "Hatt",
-      }, {
-        "id": "Mössa",
-        "text": "Mössa",
-      }, {
-        "id": "Vantar",
-        "text": "Vantar",
-      }, {
-        "id": "Necessär",
-        "text": "Necessär",
-      }, {
-        "id": "Slips",
-        "text": "Slips",
-      }, {
-        "id": "Handduk",
-        "text": "Handduk",
-      }, {
-        "id": "Klocka",
-        "text": "Klocka",
-      }
-    ]
+    return (
+        checkUniformColor(topBorder) &&
+        checkUniformColor(bottomBorder) &&
+        checkUniformColor(leftBorder) &&
+        checkUniformColor(rightBorder)
+    );
+  } catch(e) {
+    console.error(e);
+    // If we cannot load the image, play it safe and assume it is the no-bg image
+    return true;
   }
-]
+};

@@ -169,6 +169,10 @@ async function saveValuationStatus(itemId, minPrice, maxPrice) {
         if (localStorage.getItem('latestItemCreated')) {
             const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
             latestItemCreated.infoRequests.price.response = adjustmentOk(minPrice, maxPrice) ? 'Accepted' : 'User proposal';
+            if (adjustmentOk(minPrice, maxPrice)) {
+                latestItemCreated.minPriceEstimate = adjustedMin;
+                latestItemCreated.maxPriceEstimate = adjustedMax;
+            }
             localStorage.setItem('latestItemCreated', JSON.stringify(latestItemCreated));
         }
         if (!document.referrer.includes('/private')) {
@@ -183,8 +187,8 @@ async function saveValuationStatus(itemId, minPrice, maxPrice) {
 
 const initialPageSetup = (item) => {
     document.getElementById('itemImage').src = window.innerWidth <= 400 ?
-        item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || item?.images?.frontImageSmall || item?.images?.frontImage :
-        item?.images?.enhancedFrontImage || item?.images?.frontImage;
+        item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || item?.images?.modelImage || item?.images?.frontImageSmall || item?.images?.frontImage :
+        item?.images?.enhancedFrontImage || item?.images?.modelImage || item?.images?.frontImage;
     const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate } = item.mlValuation || {};
     const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
     const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
@@ -212,6 +216,7 @@ const rejectValuation = async (item) => {
     sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
     if (!params.id) {
         localStorage.removeItem('newItem');
+        localStorage.removeItem('latestItemCreated');
         sessionStorage.removeItem('newItemId');
     }
     return window.location.href = '/private';

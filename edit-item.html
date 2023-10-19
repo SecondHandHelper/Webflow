@@ -1,4 +1,5 @@
 <script>
+    urlDependentLoadJs('sellItem.js'); // We need some functions from sellItem.js
     async function fillForm(itemId) {
       try {
         const userId = authUser.current.uid;
