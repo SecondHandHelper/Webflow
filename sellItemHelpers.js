@@ -131,7 +131,7 @@ export function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export async function uploadImageAndShowPreview(input, imageName) {
+export async function uploadImageAndShowPreview(input, imageName, saveState = true) {
     try {
         hideImageError(imageName);
         let src = URL.createObjectURL(input);
@@ -140,7 +140,9 @@ export async function uploadImageAndShowPreview(input, imageName) {
         showLoadingIcon(imageName)
         showImageState(imageName, 'success-state');
         const { url: imageUrl, urlSmall: imageUrlSmall } = await uploadTempImage(input, imageName);
-        rememberNewItemImageField(imageName, imageUrl, imageUrlSmall);
+        if (saveState) {
+            rememberNewItemImageField(imageName, imageUrl, imageUrlSmall);
+        }
         return imageUrl;
     } catch (ex) {
         console.error('Failed to upload image', ex);

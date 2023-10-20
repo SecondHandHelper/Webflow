@@ -228,7 +228,7 @@ function setUpEventListeners() {
     document.getElementById('frontImage').addEventListener('change', async function () {
         let input = this.files[0];
         if (input) {
-            const imageUrl = await uploadImageAndShowPreview(input, 'frontImage');
+            const imageUrl = await uploadImageAndShowPreview(input, 'frontImage', false);
             if (!imageUrl || Object.keys(imageUrl).length === 0) {
                 return;
             }
