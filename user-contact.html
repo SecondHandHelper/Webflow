@@ -33,5 +33,11 @@
         });
     }
 
+    function fieldLabelToggle(labelId) {
+        return (event) => {
+            document.getElementById(labelId).style.display = event.target.value.length > 0 ? 'inline-block' : 'none'
+        }
+    }
+
     pageSetUp();
 </script>
