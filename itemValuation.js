@@ -95,11 +95,11 @@ const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmen
         let noteText = '';
         if (adjustmentMax > maxPrice) {
             noteText += 'Ett höjt startpris kan innebära att det tar längre tid för plagget att säljas.';
-        } 
+        }
         if (adjustmentMin > minPrice) {
             noteText += `${noteText ? ' ' : ''}Ett höjt lägsta pris minskar sannolikheten att det blir sålt.`;
-        } 
-        if(!noteText) {
+        }
+        if (!noteText) {
             noteText = 'Bra att du kan tänka dig sänka priset! Det ökar sannolikheten att det blir sålt.';
         }
         document.getElementById('noteHeading').innerHTML = 'Notera!';
@@ -151,7 +151,7 @@ async function saveValuationStatus(itemId, minPrice, maxPrice) {
         const savedItem = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
         savedItem.item.infoRequests.price.status = 'Resolved';
         savedItem.item.infoRequests.price.response = 'Accepted';
-        if (featureIsEnabled('adjustValuation') && (adjustedMin !== minPrice || adjustedMax !== maxPrice)) {
+        if (adjustedMin !== minPrice || adjustedMax !== maxPrice) {
             savedItem.item.infoRequests.price.userAdjustedMin = adjustedMin;
             savedItem.item.infoRequests.price.userAdjustedMax = adjustedMax;
             if (adjustmentOk(minPrice, maxPrice)) {
@@ -264,18 +264,14 @@ const showMlValuation = async (item) => {
     const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, newBrand, newBrandCategory } = item.mlValuation || {};
     const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
     const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
-
     document.getElementById('valuationText').innerText = `${estimatedPrice(minPrice, maxPrice)} kr`;
     document.getElementById('valuationResultDiv').style.display = 'flex';
-
     document.body.addEventListener('click', hideTooltip);
-
     document.getElementById('valuationRange').style.display = 'flex';
     document.getElementById('minPrice').value = minPrice;
     document.getElementById('minPrice').disabled = true;
     document.getElementById('maxPrice').value = maxPrice;
     document.getElementById('maxPrice').disabled = true;
-
     if (item.infoRequests?.price?.description) {
         document.getElementById('valuationExplanation').innerText = item.infoRequests.price.description;
         if (item.infoRequests?.price?.type === 'Final Offer') {
@@ -288,12 +284,13 @@ const showMlValuation = async (item) => {
             'Vi har inte sålt så mycket av detta varumärke tidigare och har därför lite mindre data. Du får justera om du upplever att värderingen inte är rimlig. Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar.' :
             'Vi har inte sålt så mycket av denna kategori från varumärket tidigare och har därför lite mindre data. Du får justera om du upplever att värderingen inte är rimlig. Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar.';
     }
-
-
     document.getElementById('valuationText').style.display = 'block';
     if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
         document.getElementById('chatDiv').style.display = 'none';
     }
+
+    await showAdjustValuation(item);
+
     if (decline) {
         await showDeclineValuation(item);
     } else {
@@ -305,104 +302,103 @@ const showMlValuation = async (item) => {
 }
 
 const showAdjustValuation = async (item) => {
-    if (featureIsEnabled('adjustValuation')) {
-        const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, adjustmentAllowed } = item.mlValuation || {};
-        const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
-        const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
 
-        if ((adjustmentAllowed || ['1A', '1B', '1C', '2A', '3', '5A', '7', '8'].includes(item.brandSegment))) { // Lade till detta som en tillfällig grej, fråga mig varför /Tobias
-            document.getElementById('adjustIntervalButton').style.display = 'flex';
-            analytics.track("Element Viewed", { elementID: "adjustIntervalButton" });
-            document.getElementById('chatDiv').style.display = 'none';
-            document.getElementById('adjustIntervalButton').addEventListener('click', () => {
-                document.getElementById('valuationExplanation').style.display = 'none';
-                document.getElementById('valuationExplanationHeader').style.display = 'none';
-                document.getElementById('minPrice').disabled = false;
-                document.getElementById('maxPrice').disabled = false;
-                document.getElementById('adjustIntervalButton').style.display = 'none';
-                document.getElementById('noteDiv').style.display = 'block';
-                document.getElementById('origMinPrice').style.display = 'block';
-                document.getElementById('origMaxPrice').style.display = 'block';
+    const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, adjustmentAllowed } = item.mlValuation || {};
+    const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
+    const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
 
-                document.getElementById('sliderDiv').style.display = 'block';
-                document.querySelectorAll(".field-underline").forEach(x => x.style.visibility = 'visible');
-            })
-        }
-        if (item.infoRequests?.price?.type === 'Final Offer') {
+    if ((adjustmentAllowed || ['1A', '1B', '1C', '2A', '3', '5A', '7', '8'].includes(item.brandSegment))) { // Lade till detta som en tillfällig grej, fråga mig varför /Tobias
+        document.getElementById('adjustIntervalButton').style.display = 'flex';
+        analytics.track("Element Viewed", { elementID: "adjustIntervalButton" });
+        document.getElementById('chatDiv').style.display = 'none';
+        document.getElementById('adjustIntervalButton').addEventListener('click', () => {
+            document.getElementById('valuationExplanation').style.display = 'none';
+            document.getElementById('valuationExplanationHeader').style.display = 'none';
+            document.getElementById('minPrice').disabled = false;
+            document.getElementById('maxPrice').disabled = false;
             document.getElementById('adjustIntervalButton').style.display = 'none';
-            document.getElementById('chatDiv').style.display = 'none';
-        }
+            document.getElementById('noteDiv').style.display = 'block';
+            document.getElementById('origMinPrice').style.display = 'block';
+            document.getElementById('origMaxPrice').style.display = 'block';
 
-        rangeSlider(minPrice, maxPrice);
-        document.getElementById('valuationMotivation').addEventListener('click', (e) => {
-            const elements = document.getElementsByClassName('tooltip-motivation');
-            const visible = elements[0]?.classList.contains('tooltip-show');
-            for (const element of elements) {
-                visible ? element.classList.remove('tooltip-show') : element.classList.add('tooltip-show');
-            }
-            e.stopPropagation();
-        });
-        document.getElementById('origMinPrice').innerText = minPrice;
-        document.getElementById('origMinPrice').style.visibility = 'hidden';
-        document.getElementById('origMaxPrice').innerText = maxPrice;
-        document.getElementById('origMaxPrice').style.visibility = 'hidden';
-        document.getElementById('resetButton').addEventListener('click', () => {
-            document.getElementById('minPrice').value = minPrice;
-            document.getElementById('maxPrice').value = maxPrice;
-            document.getElementById('minPrice').dispatchEvent(new Event('input'));
-            document.getElementById('maxPrice').dispatchEvent(new Event('input'));
-            document.getElementById('adjustmentSlider').value = 3;
-            document.getElementById('resetButton').style.visibility = 'hidden';
-            validateInput();
-        });
-        document.getElementById('minPrice').addEventListener('blur', () => validateInput());
-        document.getElementById('minPrice').addEventListener('input', () => {
-            const adjustmentMinInput = document.getElementById('minPrice');
-            const adjustmentMaxInput = document.getElementById('maxPrice');
-            const adjustmentMin = Number(adjustmentMinInput.value);
-            if (adjustmentMin !== minPrice) {
-                document.getElementById('origMinPrice').style.visibility = 'visible';
-            } else {
-                document.getElementById('origMinPrice').style.visibility = 'hidden';
-            }
-            adjustmentValidations(minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
-        });
-        document.getElementById('minIncrease').addEventListener('click', () => {
-            increasePrice(document.getElementById('minPrice'), minPrice);
-            analytics.track('Click', { elementID: 'minIncrease' });
-            validateInput();
-        });
-        document.getElementById('minDecrease').addEventListener('click', () => {
-            lowerPrice(document.getElementById('minPrice'), minPrice);
-            analytics.track('Click', { elementID: 'minDecrease' });
-            validateInput();
-        });
-        document.getElementById('maxPrice').addEventListener('blur', () => validateInput());
-        document.getElementById('maxPrice').addEventListener('input', () => {
-            const adjustmentMaxInput = document.getElementById('maxPrice');
-            const adjustmentMinInput = document.getElementById('minPrice');
-            const adjustmentMax = Number(adjustmentMaxInput.value);
-            if (adjustmentMax !== maxPrice) {
-                document.getElementById('origMaxPrice').style.visibility = 'visible';
-            } else {
-                document.getElementById('origMaxPrice').style.visibility = 'hidden';
-            }
-            adjustmentValidations(minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
-        });
-        document.getElementById('maxIncrease').addEventListener('click', () => {
-            increasePrice(document.getElementById('maxPrice'), maxPrice);
-            analytics.track('Click', { elementID: 'maxIncrease' });
-            validateInput();
-        });
-        document.getElementById('maxDecrease').addEventListener('click', () => {
-            lowerPrice(document.getElementById('maxPrice'), maxPrice);
-            analytics.track('Click', { elementID: 'maxDecrease' });
-            validateInput();
-        });
+            document.getElementById('sliderDiv').style.display = 'block';
+            document.querySelectorAll(".field-underline").forEach(x => x.style.visibility = 'visible');
+        })
+    }
+    if (item.infoRequests?.price?.type === 'Final Offer') {
+        document.getElementById('adjustIntervalButton').style.display = 'none';
+        document.getElementById('chatDiv').style.display = 'none';
+    }
 
-        if (item.infoRequests?.price?.type === 'Final Offer' || item.infoRequests?.price?.type === 'Valuation') {
-            document.getElementById('valuationMotivation').style.display = 'none';
+    rangeSlider(minPrice, maxPrice);
+    document.getElementById('valuationMotivation').addEventListener('click', (e) => {
+        const elements = document.getElementsByClassName('tooltip-motivation');
+        const visible = elements[0]?.classList.contains('tooltip-show');
+        for (const element of elements) {
+            visible ? element.classList.remove('tooltip-show') : element.classList.add('tooltip-show');
         }
+        e.stopPropagation();
+    });
+    document.getElementById('origMinPrice').innerText = minPrice;
+    document.getElementById('origMinPrice').style.visibility = 'hidden';
+    document.getElementById('origMaxPrice').innerText = maxPrice;
+    document.getElementById('origMaxPrice').style.visibility = 'hidden';
+    document.getElementById('resetButton').addEventListener('click', () => {
+        document.getElementById('minPrice').value = minPrice;
+        document.getElementById('maxPrice').value = maxPrice;
+        document.getElementById('minPrice').dispatchEvent(new Event('input'));
+        document.getElementById('maxPrice').dispatchEvent(new Event('input'));
+        document.getElementById('adjustmentSlider').value = 3;
+        document.getElementById('resetButton').style.visibility = 'hidden';
+        validateInput();
+    });
+    document.getElementById('minPrice').addEventListener('blur', () => validateInput());
+    document.getElementById('minPrice').addEventListener('input', () => {
+        const adjustmentMinInput = document.getElementById('minPrice');
+        const adjustmentMaxInput = document.getElementById('maxPrice');
+        const adjustmentMin = Number(adjustmentMinInput.value);
+        if (adjustmentMin !== minPrice) {
+            document.getElementById('origMinPrice').style.visibility = 'visible';
+        } else {
+            document.getElementById('origMinPrice').style.visibility = 'hidden';
+        }
+        adjustmentValidations(minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
+    });
+    document.getElementById('minIncrease').addEventListener('click', () => {
+        increasePrice(document.getElementById('minPrice'), minPrice);
+        analytics.track('Click', { elementID: 'minIncrease' });
+        validateInput();
+    });
+    document.getElementById('minDecrease').addEventListener('click', () => {
+        lowerPrice(document.getElementById('minPrice'), minPrice);
+        analytics.track('Click', { elementID: 'minDecrease' });
+        validateInput();
+    });
+    document.getElementById('maxPrice').addEventListener('blur', () => validateInput());
+    document.getElementById('maxPrice').addEventListener('input', () => {
+        const adjustmentMaxInput = document.getElementById('maxPrice');
+        const adjustmentMinInput = document.getElementById('minPrice');
+        const adjustmentMax = Number(adjustmentMaxInput.value);
+        if (adjustmentMax !== maxPrice) {
+            document.getElementById('origMaxPrice').style.visibility = 'visible';
+        } else {
+            document.getElementById('origMaxPrice').style.visibility = 'hidden';
+        }
+        adjustmentValidations(minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput);
+    });
+    document.getElementById('maxIncrease').addEventListener('click', () => {
+        increasePrice(document.getElementById('maxPrice'), maxPrice);
+        analytics.track('Click', { elementID: 'maxIncrease' });
+        validateInput();
+    });
+    document.getElementById('maxDecrease').addEventListener('click', () => {
+        lowerPrice(document.getElementById('maxPrice'), maxPrice);
+        analytics.track('Click', { elementID: 'maxDecrease' });
+        validateInput();
+    });
+
+    if (item.infoRequests?.price?.type === 'Final Offer' || item.infoRequests?.price?.type === 'Valuation') {
+        document.getElementById('valuationMotivation').style.display = 'none';
     }
 }
 
@@ -488,7 +484,6 @@ const main = async () => {
     }
     initialPageSetup(item);
     await showMlValuation(item);
-    await user.whenSet(() => showAdjustValuation(item));
 }
 
 main();
