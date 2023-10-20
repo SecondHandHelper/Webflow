@@ -84,7 +84,9 @@ export async function requestUniqueId() {
 export async function enhanceFrontImage(imageUrl, saveState = true) {
     const enhancedImageUrls = await createEnhancedImage(imageUrl);
     if (enhancedImageUrls?.url) {
-        rememberNewItemImageField('enhancedFrontImage', enhancedImageUrls.url, enhancedImageUrls.urlSmall);
+        if (saveState) {
+            rememberNewItemImageField('enhancedFrontImage', enhancedImageUrls.url, enhancedImageUrls.urlSmall);
+        }
         showImagePreview('frontImage', window.innerWidth <= 400 ? enhancedImageUrls.urlSmall : enhancedImageUrls.url);
     }
     showDeleteImageIcon('frontImage');
