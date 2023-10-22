@@ -173,7 +173,7 @@ async function saveValuationStatus(itemId, minPrice, maxPrice) {
             userProposalMotivation: document.getElementById('userProposalMotivation').value,
             adjustmentRequiresReview: !adjustmentOk(minPrice, maxPrice)
         });
-        if (localStorage.getItem('latestItemCreated')) {
+        if (localStorage.getItem('latestItemCreated') && !params.id) {
             const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
             latestItemCreated.infoRequests.price.response = adjustmentOk(minPrice, maxPrice) ? 'Accepted' : 'User proposal';
             if (adjustmentOk(minPrice, maxPrice)) {

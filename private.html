@@ -5,6 +5,7 @@
 </script>
 <script>    
     checkCookie("invite");
+    localStorage.removeItem('latestItemCreated');
     sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
     user.whenSet(privateMain);
     async function privateMain() {
