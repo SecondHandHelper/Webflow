@@ -1,6 +1,6 @@
 {
   "name": "webflow",
-  "version": "1.0.0",
+  "version": "v1.1.88",
   "description": "",
   "browserslist": ["> 0.5%", "last 2 versions", "not dead"],
   "scripts": {
