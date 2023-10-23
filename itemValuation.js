@@ -409,11 +409,11 @@ const getItem = async (itemId) => {
 
 const maxIncrease = (price) => {
     if (price < 500) {
-        return price * 0.5;
-    } else if (price < 1000) {
         return price * 0.4;
+    } else if (price < 1000) {
+        return price * 0.3;
     }
-    return price * 0.3;
+    return price * 0.2;
 }
 
 const minPriceMaxIncrease = (minPrice, maxPrice) => Math.min(maxIncrease(minPrice), estimatedPrice(minPrice, maxPrice) - minPrice);
