@@ -307,7 +307,7 @@ const showAdjustValuation = async (item) => {
     const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
     const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
 
-    if ((adjustmentAllowed || ['1A', '1B', '1C', '2A', '3', '5A', '7', '8'].includes(item.brandSegment))) { // Lade till detta som en tillfällig grej, fråga mig varför /Tobias
+    if ((adjustmentAllowed || ['1A', '1B', '1C', '2A', '3', '5A', '7', '8'].includes(item.brandSegment))) { // Lade till detta som en tillfällig grej, för att man ska få det när man kommer från private page /Tobias
         document.getElementById('adjustIntervalButton').style.display = 'flex';
         analytics.track("Element Viewed", { elementID: "adjustIntervalButton" });
         document.getElementById('chatDiv').style.display = 'none';
