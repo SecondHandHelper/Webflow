@@ -43,7 +43,18 @@
   #closePricingInfoBox{
     -webkit-tap-highlight-color: transparent !important;
   }
-  
+
+  #blurryOverlay {
+    display: block;
+    backdrop-filter: blur(8px);
+  }
+  #onlyMobileBox{display:block;}
+
+  @media screen and (max-width: 480px) {
+    #blurryOverlay { display: none; }
+    #onlyMobileBox { display: none; }
+  }
+
   #modelSearchInput { -webkit-border-radius: 0; }
   .suggest-buttons{display:none;}
 
