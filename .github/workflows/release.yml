@@ -1,0 +1,40 @@
+name: Release
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      type:
+        description: 'Type of release test or prod'
+        default: 'test'
+        required: true
+        type: string
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "release"
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Type of release ${{ inputs.type }}"
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.8.1
+        with:
+          # Used to specify a package manager for caching in the default directory. Supported values: npm, yarn, pnpm.
+          cache: npm # optional
+          # Used to specify the path to a dependency file: package-lock.json, yarn.lock, etc. Supports wildcards or a list of file names for caching multiple dependencies.
+          cache-dependency-path: package-lock.json # optional
+      - name: Build
+        run: npm run build
+      - name: Bump version
+        run: npm version patch
+      - name: Commit and push
+        run: git add package.json && git commit -m "Bump version" && git tag && git push origin master
+      - name: Github Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        # TODO: create a git tag and do the release from that tag
+        run: gh release create -t v$(npm version) "$(date +%Y%m%d%H%M%S)" --generate-notes
+
