@@ -10,6 +10,8 @@
                     let imgUrl = itemCoverImage(data);
                     const category = data.category ? data.category : "";
                     const postnordQrCode = data.postnordQrCode;
+                    const dhlBarcode = data.dhlLicensePlateBarcodeSrc;
+                    const dhlLicensePlate = data.dhlLicensePlate;
                     const fn = data.buyer?.FirstName || data.buyerFirstName || '';
                     const ln = data.buyer?.LastName || data.buyerLastName || '';
                     const street = data.buyer?.StreetAddress || data.buyerAddressStreetAddress || '';
@@ -25,10 +27,23 @@
 
                     if (shippingMethod) {
                         if (shippingMethod === 'Service point') {
-                            if (!(soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') && postnordQrCode) {
+                            if (postnordQrCode && !(soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed')) {
                                 qrCodeImage.style.backgroundImage = `url('${postnordQrCode}')`;
-                                qrCodeDiv.style.display = "block";
-                                howToShipQrDiv.style.display = "block";
+                                postnordQrCodeDiv.style.display = 'flex';
+                                scanCodeDiv.style.display = 'block';
+                                howToShipQrDiv.style.display = 'block';
+                            } else if (dhlBarcode && soldPlatform === 'Vestiaire Collective') {
+                                barcodeImage.style.backgroundImage = `url('${dhlBarcode}')`;
+                                dhlBarcodeDiv.style.display = 'flex';
+                                if (dhlLicensePlate) { 
+                                    dhlLicensePlateText.innerHTML = dhlLicensePlate;
+                                    dhlLicensePlateText.style.display = 'block';
+                                    findDhlServicePointLink.style.display = 'flex';
+                                }
+                                mainInstructionText.innerText = 'Lämna påsen till ett ombud och\nbe dom scanna streckkoden';
+                                findDhlServicePointLink.style.display = "flex";
+                                scanCodeDiv.style.display = "block";
+                                howToShipDhlBarcodeDiv.style.display = "block";
                             } else {
                                 howToShipNoQrDiv.style.display = "block";
                                 dividerTop.style.display = "none";

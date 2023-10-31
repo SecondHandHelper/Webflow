@@ -12,7 +12,7 @@ async function loadItemCards(items) {
     var shippingStatus = doc.data().shippingStatus;
     var brand = doc.data().brand;
     var soldPrice = doc.data().soldPrice;
-    var sellerGets = doc.data().sellerGets ? Math.ceil(doc.data().sellerGets) : doc.data().sellerGets ;
+    var sellerGets = doc.data().sellerGets ? Math.ceil(doc.data().sellerGets) : doc.data().sellerGets;
     var buyerFirstName = doc.data().buyer?.FirstName || doc.data().buyerFirstName;
     var buyerAddressCity = doc.data().buyer?.City || doc.data().buyerAddressCity;
     var minPriceEstimate = doc.data().minPriceEstimate;
@@ -21,6 +21,7 @@ async function loadItemCards(items) {
     var pickupDate = doc.data().pickupDate;
     var shippingMethod = doc.data().shippingMethod;
     var postnordQrCode = doc.data().postnordQrCode;
+    var dhlBarcode = doc.data().dhlLicensePlateBarcodeSrc;
     var bagReceived = doc.data().bagReceived;
     var soldPlatform = doc.data().soldPlatform;
     var archived = doc.data().archived;
@@ -102,10 +103,14 @@ async function loadItemCards(items) {
         var userActionDiv = '';
         var shippingInfoDiv = '';
         let changeShippingMethod = '';
+        let shipper = 'postnord';
 
-        // Add a user action, such as 'show QR button' or 'bag received checkbox'
+        // Add a user action, such as 'show QR button', 'show barcode' or 'bag received checkbox'
         if (shippingMethod === 'Service point') {
-          if (soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') {
+          if (dhlBarcode) {
+            userActionDiv = getBarcodeButton(itemId);
+            shipper = 'dhl';
+          } else if (soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') {
             if (!bagReceived) {
               userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
             }
@@ -113,19 +118,17 @@ async function loadItemCards(items) {
           else if (postnordQrCode) {
             userActionDiv = getQrCodeButton(itemId);
           }
-        } else if (shippingMethod === 'Pickup') {
+        }
+        if (shippingMethod === 'Pickup') {
           if (!bagReceived) {
             userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
           } else if (bagReceived && !pickupDate) {
             userActionDiv = getBookPickupButton(itemId, soldDate);
           }
-        } else if (!shippingMethod && !pickupDate) { // Temporary for items that have been sold but not sent before this release and therefor have no shippingMethod
-          // ...
-          userActionDiv = getBagReceivedCheckbox(itemId, soldDate); //TODO: Rename bagReceived to labelReceived everywhere
         }
 
         // Always show the 'shippingInfoDiv' - Styling depending on state is set in the function
-        shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate, bagReceived);
+        shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate, bagReceived, shipper);
 
         // Add "change shipping method" when applicable and some spacing
         if (bagReceived && (shippingMethod === "Service point" || (shippingMethod === "Pickup" && pickupDate))) {

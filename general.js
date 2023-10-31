@@ -204,6 +204,17 @@
         return div;
     }
 
+    function getBarcodeButton(itemId) {
+        let itemPageUrl = window.location.origin + `/ship-item?id=${itemId}`;
+        const div = `<a id="barcodeButton" href="${itemPageUrl}" class="link-block-39">
+                            <div class="div-block-194">
+                                            <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/65418186f29682eaff3f74be_barcode-icon%20(1).svg" class="image-100">
+                                            <div class="text-block-113">Visa QR</div>
+                            </div>
+                    </a>`;
+        return div;
+    }
+
     // TODO: Show a "Boka hämtning" button when the user has pressed bagreceievd but still hasn't picked a pickup
     function getBookPickupButton(itemId, soldDate) {
         const div = `<a id="bookPickupButton" href="javascript:openPickupToast('${itemId}', '${soldDate}');" class="link-block-39">
@@ -227,14 +238,18 @@
         return div;
     }
 
-    function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived) {
+    function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived, shipper) {
         let shippingInfo = ``;
         const infoIcon = !bagReceived || (bagReceived && method == "Pickup" && !pickupDate) ? `<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="image-44">` : '';
         const shipItemPageUrl = window.location.origin + `/ship-item?id=${itemId}`;
 
         if (method == "Service point") {
+            let shipperIcon = '6297d3d527db5dd4cf02e924/654181f9d2145803f405ae90_postnord-square-icon.svg';
+            if (shipper === 'dhl'){
+                shipperIcon = '6297d3d527db5dd4cf02e924/654181f526f0fcce5f6be4cf_dhl-square-icon.svg';
+            }
             shippingInfo += `
-                        <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg" class="image-38">
+                        <img src="https://global-uploads.webflow.com/${shipperIcon}" class="shipper-icon">
                         <div class="next-step-text-small">Lämnas till ombud</div>
                         ${infoIcon}
                     `;
