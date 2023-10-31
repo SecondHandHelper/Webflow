@@ -209,7 +209,7 @@
         const div = `<a id="barcodeButton" href="${itemPageUrl}" class="link-block-39">
                             <div class="div-block-194">
                                             <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/65418186f29682eaff3f74be_barcode-icon%20(1).svg" class="image-100">
-                                            <div class="text-block-113">Visa QR</div>
+                                            <div class="text-block-113">Visa streckkod</div>
                             </div>
                     </a>`;
         return div;
