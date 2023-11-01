@@ -244,7 +244,10 @@
         const shipItemPageUrl = window.location.origin + `/ship-item?id=${itemId}`;
 
         if (method == "Service point") {
-            let shipperIcon = '6297d3d527db5dd4cf02e924/654181f9d2145803f405ae90_postnord-square-icon.svg';
+            let shipperIcon = '6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg';
+            if (shipper === 'postnord'){
+                shipperIcon = '6297d3d527db5dd4cf02e924/654181f9d2145803f405ae90_postnord-square-icon.svg';
+            }
             if (shipper === 'dhl'){
                 shipperIcon = '6297d3d527db5dd4cf02e924/654181f526f0fcce5f6be4cf_dhl-square-icon.svg';
             }

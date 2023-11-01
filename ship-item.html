@@ -33,7 +33,7 @@
                                 scanCodeDiv.style.display = 'block';
                                 howToShipQrDiv.style.display = 'block';
                             } else if (dhlBarcode && soldPlatform === 'Vestiaire Collective') {
-                                barcodeImage.style.backgroundImage = `url('${dhlBarcode}')`;
+                                barcodeImageContainer.innerHTML = `<img src="${dhlBarcode}" alt="barcode" class="image-98">`;
                                 dhlBarcodeDiv.style.display = 'flex';
                                 if (dhlLicensePlate) { 
                                     dhlLicensePlateText.innerHTML = dhlLicensePlate;

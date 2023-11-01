@@ -103,7 +103,7 @@ async function loadItemCards(items) {
         var userActionDiv = '';
         var shippingInfoDiv = '';
         let changeShippingMethod = '';
-        let shipper = 'postnord';
+        let shipper = '';
 
         // Add a user action, such as 'show QR button', 'show barcode' or 'bag received checkbox'
         if (shippingMethod === 'Service point') {
@@ -116,6 +116,7 @@ async function loadItemCards(items) {
             }
           }
           else if (postnordQrCode) {
+            shipper = 'postnord';
             userActionDiv = getQrCodeButton(itemId);
           }
         }
