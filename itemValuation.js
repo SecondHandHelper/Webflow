@@ -262,6 +262,10 @@ const increasePrice = (input, origValue) => {
 const estimatedPrice = (minPrice, maxPrice) => Math.round((minPrice + maxPrice) / 20) * 10;
 const showMlValuation = async (item) => {
     const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, newBrand, newBrandCategory } = item.mlValuation || {};
+    if (!params.id && decline) { // Don't show decline screen based on mlValuation if the user come from a infoRequest on private page
+        await showDeclineValuation(item);
+        return;
+    }
     const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
     const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
     document.getElementById('valuationText').innerText = `${estimatedPrice(minPrice, maxPrice)} kr`;
@@ -290,15 +294,9 @@ const showMlValuation = async (item) => {
     }
 
     await showAdjustValuation(item);
-
-    if (decline) {
-        await showDeclineValuation(item);
-    } else {
-        document.getElementById('confirmButton').addEventListener('click', () => saveValuationStatus(item.id, minPrice, maxPrice));
-        document.getElementById('sendForReviewButton').addEventListener('click', () => saveValuationStatus(item.id, minPrice, maxPrice));
-        document.getElementById('rejectButton').addEventListener('click', () => rejectValuation(item));
-    }
-    triggerShowContent.click();
+    document.getElementById('confirmButton').addEventListener('click', () => saveValuationStatus(item.id, minPrice, maxPrice));
+    document.getElementById('sendForReviewButton').addEventListener('click', () => saveValuationStatus(item.id, minPrice, maxPrice));
+    document.getElementById('rejectButton').addEventListener('click', () => rejectValuation(item));
 }
 
 const showAdjustValuation = async (item) => {
@@ -484,6 +482,7 @@ const main = async () => {
     }
     initialPageSetup(item);
     await showMlValuation(item);
+    triggerShowContent.click();
 }
 
 main();
