@@ -364,8 +364,7 @@ async function addItemInner(id) {
   const { modelCoverImageUrl, images, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
   if (modelCoverImageUrl) {
-    images['coverImage'] = modelCoverImageUrl;
-    pageData['coverImageUpdatedAt'] = new Date().toISOString();
+    images['modelImage'] = modelCoverImageUrl;
   }
   const createdFromItem = params.id ? { createdFromItem: params.id } : {};
   const item = { ...pageData, shippingMethod, images, ...createdFromItem, version: "2" };
@@ -525,22 +524,33 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
       let urlLarge = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
       if (imageElements().includes(imageName)) {
         rememberNewItemImageField(imageName, urlLarge, urlSmall);
-        if (imageName === 'frontImage' && images.enhancedFrontImage) {
-          urlSmall = images['enhancedFrontImageSmall'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImage'] || images['enhancedFrontImageLarge'];
-          urlLarge = images['enhancedFrontImage'] || images['enhancedFrontImageLarge'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImageSmall'];
-          rememberNewItemImageField('enhancedFrontImage', urlLarge, urlSmall);
+        if (imageName === 'frontImage') {
+          if (!images.enhancedFrontImage) {
+            const urls = await enhanceFrontImage(urlLarge);
+            urlLarge = urls.url;
+            urlSmall = urls.urlSmall;
+          } else {
+            urlSmall = images['enhancedFrontImageSmall'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImage'] || images['enhancedFrontImageLarge'];
+            urlLarge = images['enhancedFrontImage'] || images['enhancedFrontImageLarge'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImageSmall'];
+            rememberNewItemImageField('enhancedFrontImage', urlLarge, urlSmall);
+          }
         }
         showImagePreview(imageName, urlSmall);
         showImageState(imageName, 'success-state');
         document.getElementById(imageName).required = false;
       }
     }
-
-    // Show cover image preview if it is a model image, if it is a noBg image we skip it
-    sessionStorage.removeItem('coverImagePreviewUrl');
-    const coverImageLarge = images.coverImageLarge || images.coverImage || null;
-    const coverImageSmall = images.coverImage || images.coverImageLarge || null;
-    if (coverImageLarge && !(await isNoBgImage(coverImageSmall))) {
+    if (images.modelImage) {
+        const modelImageLarge = images.modelImageLarge || images.modelImage;
+        const modelImageSmall = images.modelImageSmall || images.modelImageMedium || images.modelImage;
+        document.getElementById('coverImageContainer').style.backgroundImage = `url('${modelImageSmall}')`;
+        document.getElementById('coverImagePreview').style.display = 'block';
+        rememberNewItemImageField('modelImage', modelImageLarge, modelImageSmall);
+    } else if (images.coverImage && !(await isNoBgImage(images.coverImage))) {
+      // Show cover image preview if it is a model image, if it is a noBg image we skip it
+      sessionStorage.removeItem('coverImagePreviewUrl');
+      const coverImageLarge = images.coverImageLarge || images.coverImage;
+      const coverImageSmall = images.coverImage;
       document.getElementById('coverImageContainer').style.backgroundImage = `url('${coverImageSmall}')`;
       document.getElementById('coverImagePreview').style.display = 'block';
       rememberNewItemImageField('modelImage', coverImageLarge, coverImageSmall);
