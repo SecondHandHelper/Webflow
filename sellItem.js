@@ -3,8 +3,11 @@ import {
   enhanceFrontImage,
   rememberNewItemImageField,
   requestUniqueId,
-  showDeleteImageIcon, showImagePreview, showImageState, uploadImageAndShowPreview,
-  uploadTempImage
+  showDeleteImageIcon,
+  showImagePreview,
+  showImageState,
+  showLoadingIcon,
+  uploadImageAndShowPreview
 } from "./sellItemHelpers";
 
 function defectsChoicesInSwedish() {
@@ -161,7 +164,7 @@ async function addItem(event) {
     document.getElementById('loadingDiv').style.display = 'flex';
     document.getElementById('clearItemForm').style.display = 'none';
     const item = await addItemInner(id);
-    const nextStep = await getAndSaveMlValuation(id, item.preferences.userValuationApproval);
+    const nextStep = await getAndSaveValuation(id, item);
     // Track with segment 'User Activated'
     if (userItemsCount === 0) {
       analytics.track('User Activated');
@@ -220,24 +223,55 @@ async function saveItemValuation(itemId, mlValuationData, userValuationApproval)
   }
 }
 
-async function getAndSaveMlValuation(itemId, userValuationApproval) {
-  const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}').item;
+async function getAndSaveValuation(itemId, item) {
+  const userValuationApproval = item.preferences.userValuationApproval
   if (!itemId && !item) {
     console.error('No item and no itemId, unexpected!!');
     return '/item-confirmation';
+  }
+  if (params.id) {
+    const getItemResponse = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: params.id });
+    const resellItem = getItemResponse.data;
+    // Set valuation
+    const valuationData = {
+      valuationStatus: 'Completed',
+      valuationDate: new Date().toISOString(),
+      infoRequests: {
+        price: {
+          status: 'Active',
+          response: '',
+          description: 'Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar. Värderingen utgår från vad liknande sålts för.',
+          minPrice: resellItem.minPriceEstimate,
+          maxPrice: resellItem.maxPriceEstimate,
+          type: 'Valuation',
+          adjustmentAllowed: true,
+        }
+      }
+    }
+    if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+      sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
+        id: item.id,
+        item: { ...item.item, ...valuationData }
+      }));
+    } else {
+      await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
+      const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
+      localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData }));
+    }
+    return '/item-valuation';
   }
   try {
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});
     const { minPrice, maxPrice, decline } = res.data || {};
     await saveItemValuation(itemId, res.data, userValuationApproval);
-    return nextStepAfterMlValuation(minPrice && maxPrice, decline, needsHumanCheck(res.data), userValuationApproval);
+    return nextStepAfterValuation(minPrice && maxPrice, decline, needsHumanCheck(res.data), userValuationApproval);
   } catch (e) {
     console.error('Failed to get ml valuation', e);
   }
-  return nextStepAfterMlValuation();
+  return nextStepAfterValuation();
 }
 
-function nextStepAfterMlValuation(mlValuationPresent, decline, valuationNeedsChecking, userValuationApproval) {
+function nextStepAfterValuation(mlValuationPresent, decline, valuationNeedsChecking, userValuationApproval) {
   if (!mlValuationPresent || valuationNeedsChecking || !userValuationApproval) {
     if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
       return '/sign-in';
@@ -525,14 +559,14 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
       if (imageElements().includes(imageName)) {
         rememberNewItemImageField(imageName, urlLarge, urlSmall);
         if (imageName === 'frontImage') {
-          if (!images.enhancedFrontImage) {
-            const urls = await enhanceFrontImage(urlLarge);
-            urlLarge = urls.url;
-            urlSmall = urls.urlSmall;
-          } else {
+          if (images.enhancedFrontImage) {
             urlSmall = images['enhancedFrontImageSmall'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImage'] || images['enhancedFrontImageLarge'];
             urlLarge = images['enhancedFrontImage'] || images['enhancedFrontImageLarge'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImageSmall'];
             rememberNewItemImageField('enhancedFrontImage', urlLarge, urlSmall);
+          } else {
+            whenLoadingDivHidden(() => showLoadingIcon(imageName))
+            // Don't await here to don't block the form from showing with the front image
+            enhanceFrontImage(urlLarge).then(() => console.log('Image enhanced'));
           }
         }
         showImagePreview(imageName, urlSmall);
@@ -572,13 +606,16 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
       setFieldValue('itemUserComment', data.userComment);
       setFieldValue('itemDefectDescription', data.defectDescription);
       setFieldValue('itemLowestAcceptPrice', data.acceptPrice <= 0 ? null : data.acceptPrice);
+      selectFieldValue(itemCondition, data.condition);
+    }
+    if (params.id) {
+      document.getElementById('priceSettings').style.display = 'none';
     }
 
     // Populate select fields
     selectFieldValue(itemAge, data.age);
     selectFieldValue(itemColor, data.color);
     showSuggestButtons('itemColor', restoreSavedState, data.itemColorConfirm);
-    selectFieldValue(itemCondition, data.condition);
     if (itemCondition.selectedIndex >= 0 && itemCondition.options[itemCondition.selectedIndex].text === "Använd, tecken på slitage") {
       defectInfoDiv.style.display = 'block';
     }
@@ -597,14 +634,14 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
       document.getElementById('Woman').checked = true;
     }
 
-    // Populate checkboxes
-    defectsChoicesInSwedish().forEach((value, key) => {
-      if (data.defects && data.defects.includes(value)) {
-        document.getElementById(key).previousElementSibling.classList.add("w--redirected-checked");
-        document.getElementById(key).checked = true;
-      }
-    });
     if (restoreSavedState) {
+      // Populate checkboxes
+      defectsChoicesInSwedish().forEach((value, key) => {
+        if (data.defects && data.defects.includes(value)) {
+          document.getElementById(key).previousElementSibling.classList.add("w--redirected-checked");
+          document.getElementById(key).checked = true;
+        }
+      });
       if ('userValuationApproval' in data && !data.userValuationApproval) {
         document.getElementById('itemUserValuationApproval').click();
         document.getElementById('itemUserValuationApproval').previousElementSibling.classList.remove("w--redirected-checked");
@@ -615,6 +652,12 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
     errorHandler.report(error);
   }
   document.getElementById('loadingDiv').style.display = 'none';
+}
+
+function whenLoadingDivHidden(cb) {
+  const observer = new MutationObserver(cb);
+  const elm = document.getElementById('loadingDiv');
+  observer.observe(elm, { attributeFilter: ['style'] })
 }
 
 function selectFieldValue(field, value) {

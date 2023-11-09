@@ -18,7 +18,7 @@ function initializeFields(item) {
         document.getElementById('nextStepText').innerText = 'Du kommer få ett SMS när vi värderat plagget som du kan ta ställning till';
     }
     document.getElementById('itemTitle').innerText = (item.cleanedBrand || item.brand).trim() + "-" + item.category.toLowerCase();
-    document.getElementById('itemPrice').innerText = mlMaxPriceEstimate && !humanCheckNeeded && !newMinMaxLog ? `${item.maxPriceEstimate || mlMaxPriceEstimate} SEK` : '';
+    document.getElementById('itemPrice').innerText = item.maxPriceEstimate && !humanCheckNeeded && !newMinMaxLog ? `${item.maxPriceEstimate || mlMaxPriceEstimate} SEK` : '';
     document.getElementById('itemPrice').style.display = 'block';
     document.getElementById('itemSubtitle').innerText = item.model ? `${item.model}, ${colorName(item.color)}` : colorName(item.color);
     document.getElementById('itemSize').innerText = item.size;

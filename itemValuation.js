@@ -260,7 +260,7 @@ const increasePrice = (input, origValue) => {
 }
 
 const estimatedPrice = (minPrice, maxPrice) => Math.round((minPrice + maxPrice) / 20) * 10;
-const showMlValuation = async (item) => {
+const showValuation = async (item) => {
     const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, newBrand, newBrandCategory } = item.mlValuation || {};
     if (!params.id && decline) { // Don't show decline screen based on mlValuation if the user come from a infoRequest on private page
         await showDeclineValuation(item);
@@ -304,8 +304,10 @@ const showAdjustValuation = async (item) => {
     const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, adjustmentAllowed } = item.mlValuation || {};
     const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
     const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
+    const showAdjustPrice = adjustmentAllowed || ['1A', '1B', '1C', '2A', '3', '5A', '7', '8'].includes(item.brandSegment) ||
+        item.infoRequests?.price?.adjustmentAllowed
 
-    if ((adjustmentAllowed || ['1A', '1B', '1C', '2A', '3', '5A', '7', '8'].includes(item.brandSegment))) { // Lade till detta som en tillfällig grej, för att man ska få det när man kommer från private page /Tobias
+    if (showAdjustPrice) {
         document.getElementById('adjustIntervalButton').style.display = 'flex';
         analytics.track("Element Viewed", { elementID: "adjustIntervalButton" });
         document.getElementById('chatDiv').style.display = 'none';
@@ -481,7 +483,7 @@ const main = async () => {
         return location.href = '/private';
     }
     initialPageSetup(item);
-    await showMlValuation(item);
+    await showValuation(item);
     triggerShowContent.click();
 }
 

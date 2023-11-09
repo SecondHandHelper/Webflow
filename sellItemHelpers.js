@@ -183,7 +183,7 @@ export function showImageState(imageName, state) {
     }
 }
 
-function showLoadingIcon(imageName) {
+export function showLoadingIcon(imageName) {
     if (imageName === 'frontImage'){
         document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
         document.getElementById('enhancedAnimationDiv').style.display = 'block';
