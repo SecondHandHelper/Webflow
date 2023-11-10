@@ -613,7 +613,7 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
       setFieldValue('itemLowestAcceptPrice', data.acceptPrice <= 0 ? null : data.acceptPrice);
       selectFieldValue(itemCondition, data.condition);
     }
-    if (params.id && item.status === 'Sold') {
+    if (params.id && data.status === 'Sold') {
       document.getElementById('priceSettings').style.display = 'none';
     }
 
