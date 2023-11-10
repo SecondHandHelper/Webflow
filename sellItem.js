@@ -223,6 +223,34 @@ async function saveItemValuation(itemId, mlValuationData, userValuationApproval)
   }
 }
 
+async function setValuationFromResellItem(resellItem, item, itemId) {
+  const valuationData = {
+    valuationStatus: 'Completed',
+    valuationDate: new Date().toISOString(),
+    infoRequests: {
+      price: {
+        status: 'Active',
+        response: '',
+        description: 'Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar. Värderingen utgår från vad liknande sålts för.',
+        minPrice: resellItem.minPriceEstimate,
+        maxPrice: resellItem.maxPriceEstimate,
+        type: 'Valuation',
+        adjustmentAllowed: true,
+      }
+    }
+  }
+  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+    sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
+      id: item.id,
+      item: {...item.item, ...valuationData}
+    }));
+  } else {
+    await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({itemId, ...valuationData});
+    const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
+    localStorage.setItem('latestItemCreated', JSON.stringify({...latestItemCreated, ...valuationData}));
+  }
+}
+
 async function getAndSaveValuation(itemId, item) {
   const userValuationApproval = item.preferences.userValuationApproval
   if (!itemId && !item) {
@@ -232,33 +260,10 @@ async function getAndSaveValuation(itemId, item) {
   if (params.id) {
     const getItemResponse = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: params.id });
     const resellItem = getItemResponse.data;
-    // Set valuation
-    const valuationData = {
-      valuationStatus: 'Completed',
-      valuationDate: new Date().toISOString(),
-      infoRequests: {
-        price: {
-          status: 'Active',
-          response: '',
-          description: 'Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar. Värderingen utgår från vad liknande sålts för.',
-          minPrice: resellItem.minPriceEstimate,
-          maxPrice: resellItem.maxPriceEstimate,
-          type: 'Valuation',
-          adjustmentAllowed: true,
-        }
-      }
+    if (resellItem.status === 'Sold') {
+      await setValuationFromResellItem(resellItem, item, itemId);
+      return '/item-valuation';
     }
-    if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-      sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
-        id: item.id,
-        item: { ...item.item, ...valuationData }
-      }));
-    } else {
-      await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
-      const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
-      localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData }));
-    }
-    return '/item-valuation';
   }
   try {
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({itemId, item});

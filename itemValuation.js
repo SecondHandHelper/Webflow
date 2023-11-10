@@ -264,6 +264,7 @@ const showValuation = async (item) => {
     const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, newBrand, newBrandCategory } = item.mlValuation || {};
     if (!params.id && decline) { // Don't show decline screen based on mlValuation if the user come from a infoRequest on private page
         await showDeclineValuation(item);
+        document.getElementById('valuationResultDiv').style.display = 'flex';
         return;
     }
     const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
@@ -452,15 +453,15 @@ function rangeSlider(minPrice, maxPrice) {
                 maxInput.value = maxPrice;
                 break;
             case 4:
-                minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, estimatedPrice(minPrice, maxPrice)) * 0.33) / 10) * 10;
+                minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, maxPrice) * 0.33) / 10) * 10;
                 maxInput.value = Math.round((maxPrice + maxIncrease(maxPrice) * 0.33) / 10) * 10;
                 break;
             case 5:
-                minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, estimatedPrice(minPrice, maxPrice)) * 0.67) / 10) * 10;
+                minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, maxPrice) * 0.67) / 10) * 10;
                 maxInput.value = Math.round((maxPrice + maxIncrease(maxPrice) * 0.67) / 10) * 10;
                 break;
             case 6:
-                minInput.value = Math.floor((minPrice + minPriceMaxIncrease(minPrice, estimatedPrice(minPrice, maxPrice))) / 10) * 10;
+                minInput.value = Math.floor((minPrice + minPriceMaxIncrease(minPrice, maxPrice)) / 10) * 10;
                 maxInput.value = Math.floor((maxPrice + maxIncrease(maxPrice)) / 10) * 10;
                 break;
         }

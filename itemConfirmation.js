@@ -13,7 +13,7 @@ function initializeFields(item) {
         document.getElementById('nextStepTitle').style.display = 'block';
         document.getElementById('nextStepTitle').innerText = 'Granskar prisändringar';
         document.getElementById('nextStepText').innerText = 'Vi kikar på dina prisändringar, och om det ser bra ut så påbörjar vi försäljningen. Vi tar sedan hand om säljprocessen och hör av oss på SMS när plagget är sålt.';
-    } else if (humanCheckNeeded || !mlMaxPriceEstimate || newMinMaxLog) {
+    } else if (humanCheckNeeded || (!mlMaxPriceEstimate && !item.infoRequests?.price?.maxPrice) || newMinMaxLog) {
         document.getElementById('nextStepTitle').style.display = 'block';
         document.getElementById('nextStepText').innerText = 'Du kommer få ett SMS när vi värderat plagget som du kan ta ställning till';
     }
