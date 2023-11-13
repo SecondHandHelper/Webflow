@@ -547,9 +547,14 @@ function showSuggestButtons(fieldName, restoreSavedState, showConfirmation) {
 async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
   try {
     let item = { data: savedItem };
+    let atItemResponse = null;
     if (!savedItem) {
-      item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId });
+      [item, atItemResponse] = await Promise.all([
+        firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId}),
+        fetch(`https://getatitem-heypmjzjfq-ew.a.run.app?itemId=${itemId}`)
+      ]);
     }
+    const atItem = await atItemResponse.json();
     const data = item.data;
     const images = data.images || {};
     let originalPrice = data.originalPrice;
@@ -604,8 +609,8 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
     showSuggestButtons('itemSize', restoreSavedState, data.itemSizeConfirm);
     setFieldValue('itemMaterial', data.material);
     showSuggestButtons('itemMaterial', restoreSavedState, data.itemMaterialConfirm);
-    setFieldValue('itemModel', data.model);
-    setFieldValue('itemOriginalPrice', originalPrice);
+    setFieldValue('itemModel', data.model || atItem?.model);
+    setFieldValue('itemOriginalPrice', originalPrice || atItem?.originalPrice);
 
     if (restoreSavedState) {
       setFieldValue('itemUserComment', data.userComment);
@@ -619,7 +624,7 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
 
     // Populate select fields
     selectFieldValue(itemAge, data.age);
-    selectFieldValue(itemColor, data.color);
+    selectFieldValue(itemColor, data.color || atItem?.color);
     showSuggestButtons('itemColor', restoreSavedState, data.itemColorConfirm);
     if (itemCondition.selectedIndex >= 0 && itemCondition.options[itemCondition.selectedIndex].text === "Använd, tecken på slitage") {
       defectInfoDiv.style.display = 'block';
