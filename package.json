@@ -2,7 +2,11 @@
   "name": "webflow",
   "version": "1.0.0",
   "description": "",
-  "browserslist": ["> 0.5%", "last 2 versions", "not dead"],
+  "browserslist": [
+    "> 0.5%",
+    "last 2 versions",
+    "not dead"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run clean && parcel itemConfirmation.js sellItem.js itemValuation.js itemPage.js editItem.js --hmr-port 50619",
@@ -23,5 +27,6 @@
     "parcel": "^2.9.3"
   },
   "dependencies": {
+    "qrcode": "^1.5.3"
   }
 }

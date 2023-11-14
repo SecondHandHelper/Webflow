@@ -9,6 +9,8 @@ import {
   showLoadingIcon,
   uploadImageAndShowPreview
 } from "./sellItemHelpers";
+import QRCode from "qrcode";
+
 
 function defectsChoicesInSwedish() {
   return new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
@@ -73,6 +75,13 @@ async function sellItemMainAuthenticated() {
 }
 
 async function sellItemMain() {
+  const qrCanvas = document.getElementById('qrCanvas')
+  if (qrCanvas) {
+    QRCode.toCanvas(qrCanvas, window.location.href, function (error) {
+      if (error) console.error(error)
+      console.log('success!');
+    });
+  }
   localStorage.removeItem('latestItemCreated');
   sessionStorage.removeItem('itemValuation');
 
