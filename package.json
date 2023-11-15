@@ -7,11 +7,14 @@
     "last 2 versions",
     "not dead"
   ],
+  "config": {
+    "files": "itemConfirmation.js sellItem.js itemValuation.js itemPage.js editItem.js referral.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run clean && parcel itemConfirmation.js sellItem.js itemValuation.js itemPage.js editItem.js --hmr-port 50619",
+    "start": "npm run clean && parcel $npm_package_config_files --hmr-port 50619",
     "clean": "rm -rf .parcel-cache dist",
-    "build": "npm run clean && npx parcel build itemConfirmation.js && npx parcel build sellItem.js && npx parcel build itemValuation.js && npx parcel build itemPage.js && npx parcel build editItem.js"
+    "build": "npm run clean && npx parcel build $npm_package_config_files"
   },
   "repository": {
     "type": "git",

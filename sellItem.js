@@ -1199,7 +1199,6 @@ export const isNoBgImage = async (source) => {
   };
   const checkUniformColor = (data) => {
     const [r, g, b, a] = [data[0], data[1], data[2], data[3]];
-    let nonConformingCount = 0;
     for (let i = 4; i < data.length; i += 4) {
       if (data[i] !== r || data[i + 1] !== g || data[i + 2] !== b || data[i + 3] !== a) {
         return false;
@@ -1214,13 +1213,13 @@ export const isNoBgImage = async (source) => {
     const img = await getImageMeta(source);
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
     ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
-
     const topBorder = ctx.getImageData(0, 0, img.naturalWidth, 10).data;
-    const bottomBorder = ctx.getImageData(0, img.naturalHeight - 10, img.naturalWidth, 10).data;
+    const bottomBorder = ctx.getImageData(0, img.naturalHeight, img.naturalWidth, -10).data;
     const leftBorder = ctx.getImageData(0, 0, 10, img.naturalHeight).data;
-    const rightBorder = ctx.getImageData(img.naturalWidth - 10, 0, 10, img.naturalHeight).data;
-
+    const rightBorder = ctx.getImageData(img.naturalWidth, 0, -10, img.naturalHeight).data;
     return (
         checkUniformColor(topBorder) &&
         checkUniformColor(bottomBorder) &&
