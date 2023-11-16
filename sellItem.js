@@ -244,6 +244,7 @@ async function setValuationFromResellItem(resellItem, item, itemId) {
         minPrice: resellItem.minPriceEstimate,
         maxPrice: resellItem.maxPriceEstimate,
         type: 'Valuation',
+        source: 'createdFromItem',
         adjustmentAllowed: true,
       }
     }
