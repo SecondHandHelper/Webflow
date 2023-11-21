@@ -4,7 +4,7 @@ async function main() {
   }
   document.getElementById('referralCode').innerText = user.current.referralData.referralCode;
   if (user.current?.referralData?.referredUsers?.length > 0) {
-    document.getElementById('topStats').style['background-position-x'] = '-135px';
+    document.getElementById('topStats').style['background-position-x'] = '-162px';
     const referralStatsResponse = await firebase.app().functions("europe-west1").httpsCallable('referralStats')();
     const referralStats = referralStatsResponse.data;
     document.getElementById('invitedFriends').innerText = user.current.referralData.referredUsers.length;
