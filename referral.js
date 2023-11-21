@@ -4,9 +4,9 @@ async function main() {
   }
   document.getElementById('referralCode').innerText = user.current.referralData.referralCode;
   if (user.current?.referralData?.referredUsers?.length > 0) {
-    document.getElementById('topStats').style['background-position-x'] = '-162px';
     const referralStatsResponse = await firebase.app().functions("europe-west1").httpsCallable('referralStats')();
     const referralStats = referralStatsResponse.data;
+    document.getElementById('topStats').style['background-position-x'] = '-180px';
     document.getElementById('invitedFriends').innerText = user.current.referralData.referredUsers.length;
     let friendsSoldItems = referralStats.referredUsers.reduce((acc, usr) => acc + usr.soldItems, 0);
     document.getElementById('soldItems').innerText = `${friendsSoldItems}`;
@@ -19,7 +19,7 @@ async function main() {
     document.getElementById('nextFreePill').style.display = referralStats.freeSells > referralStats.usedFreeSells ? 'block' : 'none';
     document.getElementById('freeSells').innerText = referralStats.freeSells;
     document.getElementById('usedFreeSells').innerText = referralStats.usedFreeSells;
-    document.getElementById('availableFreeSells').innerText = `/${referralStats.freeSells - referralStats.usedFreeSells}`;
+    document.getElementById('availableFreeSells').innerText = `/${referralStats.freeSells}`;
     document.getElementById('invitesRegistered').innerText = referralStats.referredUsers.filter(usr => usr.status === 'registered').length
     document.getElementById('invitesAddedItems').innerText = referralStats.referredUsers.filter(usr => usr.status === 'activated').length;
     document.getElementById('invitesSoldItems').innerText = referralStats.referredUsers.filter(usr => usr.status === 'sold').length;
@@ -44,5 +44,6 @@ function statusText(status) {
   }[status];
 }
 
+shareReferralLinkButton.addEventListener('click', shareCode);
 document.getElementById('referralCode').innerText = '';
 user.whenSet(main);
