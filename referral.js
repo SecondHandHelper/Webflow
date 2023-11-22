@@ -21,7 +21,7 @@ async function main() {
     document.getElementById('usedFreeSells').innerText = referralStats.usedFreeSells;
     document.getElementById('availableFreeSells').innerText = `/${referralStats.freeSells}`;
     document.getElementById('invitesRegistered').innerText = referralStats.referredUsers.length
-    document.getElementById('invitesAddedItems').innerText = referralStats.referredUsers.filter(usr => usr.status === 'activated').length;
+    document.getElementById('invitesAddedItems').innerText = referralStats.referredUsers.filter(usr => usr.status === 'activated' || usr.status === 'sold').length;
     document.getElementById('invitesSoldItems').innerText = referralStats.referredUsers.filter(usr => usr.status === 'sold').length;
     const invitedFriendRow = document.getElementById('invitedFriendRow');
     const invitedFriendStatusesDiv = document.getElementById('invitedFriendStatusesDiv');
