@@ -15,7 +15,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run clean && parcel $npm_package_config_files --hmr-port 50619",
     "clean": "rm -rf .parcel-cache dist",
-    "build": "npm run clean && npx parcel build $npm_package_config_files"
+    "build": "npm run clean && npx parcel build $npm_package_config_files --no-scope-hoist"
   },
   "repository": {
     "type": "git",
