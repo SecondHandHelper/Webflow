@@ -163,7 +163,7 @@ async function sellItemMain() {
 
   initializeDeleteImageListeners();
   document.getElementById('clearItemForm').addEventListener('click', clearFormFields);
-
+  const params = getParamsObject();
   if (params.id) {
     // Fill form if the user comes from a prefill link (re-sell item)
     sessionStorage.removeItem('newItemId');
@@ -294,6 +294,7 @@ async function getAndSaveValuation(itemId, item) {
     console.error('No item and no itemId, unexpected!!');
     return '/item-confirmation';
   }
+  const params = getParamsObject();
   if (params.id) {
     const getItemResponse = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: params.id });
     const resellItem = getItemResponse.data;
@@ -442,6 +443,7 @@ async function addItemInner(id) {
   if (modelCoverImageUrl) {
     images['modelImage'] = modelCoverImageUrl;
   }
+  const params = getParamsObject();
   const createdFromItem = params.id ? { createdFromItem: params.id } : {};
   const item = { ...pageData, shippingMethod, images, ...createdFromItem, version: "2" };
 
@@ -655,6 +657,7 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
       setFieldValue('itemLowestAcceptPrice', data.acceptPrice <= 0 ? null : data.acceptPrice);
       selectFieldValue(itemCondition, data.condition);
     }
+    const params = getParamsObject();
     if (params.id && data.status === 'Sold') {
       document.getElementById('priceSettings').style.display = 'none';
     }

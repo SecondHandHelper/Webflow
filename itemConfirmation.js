@@ -81,6 +81,7 @@ const getItem = async (itemId) => {
 }
 
 const main = async () => {
+    const params = getParamsObject();
     const item = params.id ? await getItem(params.id) : JSON.parse(localStorage.getItem('latestItemCreated'));
     if (!item) {
         console.error("Invalid item id param or no recently created item");

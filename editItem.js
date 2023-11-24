@@ -207,6 +207,7 @@ async function fillForm(itemId) {
 async function saveChanges() {
     saveChangesButtonText.style.color = "#e2dede";
     console.log("changedImages: ", changedImages);
+    const params = getParamsObject();
     await updateItem(params.id, changedImages);
 }
 
@@ -277,5 +278,6 @@ function setUpEventListeners() {
 let changedImages = [];
 sessionStorage.removeItem('enhancedFrontImage');
 setUpEventListeners();
+const params = getParamsObject();
 user.whenSet(async () => await fillForm(params.id));
 autocomplete(document.getElementById("itemBrand"), brands); // Enable autocomplete

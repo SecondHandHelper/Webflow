@@ -77,4 +77,5 @@ function loadItem(itemId) {
 }
 
 // Load item
+const params = getParamsObject();
 loadItem(params.id);

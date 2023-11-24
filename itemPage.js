@@ -221,9 +221,11 @@ function getEventComponent(event, style) {
 }
 
 editItemLink.addEventListener('click', function () {
-    location.href = `/edit-item?id=${params.id}`;
+  const params = getParamsObject();
+  location.href = `/edit-item?id=${params.id}`;
 });
 
 // Load item
+const params = getParamsObject();
 loadItem(params.id);
 loadItemEvents(params.id);

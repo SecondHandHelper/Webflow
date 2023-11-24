@@ -173,6 +173,7 @@ async function saveValuationStatus(itemId, minPrice, maxPrice) {
             userProposalMotivation: document.getElementById('userProposalMotivation').value,
             adjustmentRequiresReview: !adjustmentOk(minPrice, maxPrice)
         });
+        const params = getParamsObject();
         if (localStorage.getItem('latestItemCreated') && !params.id) {
             const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
             latestItemCreated.infoRequests.price.response = adjustmentOk(minPrice, maxPrice) ? 'Accepted' : 'User proposal';
@@ -206,6 +207,7 @@ const initialPageSetup = (item) => {
             `ID: ${item.id}\n\nGällande prisintervallet på ${minPrice}-${maxPrice} kr för ${item.brand.trim()}-${item.category.toLowerCase()}. Vad skulle du vilja ändra det till och varför?\n\n`);
     document.getElementById('valuationClose').addEventListener('click', () => {
         sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
+        const params = getParamsObject();
         if (!params.id) {
             localStorage.removeItem('newItem');
             sessionStorage.removeItem('newItemId');
@@ -221,6 +223,7 @@ const rejectValuation = async (item) => {
         });
     }
     sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
+    const params = getParamsObject();
     if (!params.id) {
         localStorage.removeItem('newItem');
         localStorage.removeItem('latestItemCreated');
@@ -262,6 +265,7 @@ const increasePrice = (input, origValue) => {
 const estimatedPrice = (minPrice, maxPrice) => Math.round((minPrice + maxPrice) / 20) * 10;
 const showValuation = async (item) => {
     const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, newBrand, newBrandCategory } = item.mlValuation || {};
+    const params = getParamsObject();
     if (!params.id && decline) { // Don't show decline screen based on mlValuation if the user come from a infoRequest on private page
         await showDeclineValuation(item);
         document.getElementById('valuationResultDiv').style.display = 'flex';
@@ -476,7 +480,7 @@ const main = async () => {
     };
     (function () { var w = window; var ic = w.Intercom; if (typeof ic === "function") { ic('reattach_activator'); ic('update', w.intercomSettings); } else { var d = document; var i = function () { i.c(arguments); }; i.q = []; i.c = function (args) { i.q.push(args); }; w.Intercom = i; var l = function () { var s = d.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = 'https://widget.intercom.io/widget/klyy0le5'; var x = d.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x); }; if (w.attachEvent) { w.attachEvent('onload', l); } else { w.addEventListener('load', l, false); } } })();
     Intercom('update', { 'hide_default_launcher': true });
-
+    const params = getParamsObject();
     const item = params.id ? (await getItem(params.id)) :
         (JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn') || '{}')?.item || JSON.parse(localStorage.getItem('latestItemCreated') || '{}'));
     if (!item) {

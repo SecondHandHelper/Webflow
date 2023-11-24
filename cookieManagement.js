@@ -42,6 +42,7 @@ function getCookie(cname) {
 
 function checkCookie(cname) {
   const c = getCookie(cname);
+  const params = getParamsObject();
   if (!c) {
     if (params[cname]) {
       setCookie(cname, params[cname], 7);

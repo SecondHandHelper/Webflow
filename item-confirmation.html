@@ -24,7 +24,7 @@
             }
         }
     }
-
+    const params = getParamsObject();
     if (params.id) {
         getItem(params.id).then(initializeSlider)
             .catch(e => location.href = '/private');

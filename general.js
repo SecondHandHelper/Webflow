@@ -1,5 +1,3 @@
-import {deleteCookie} from "./cookieManagement";
-
 function signOut() {
     firebase.auth().signOut().then(() => {
         console.log('User signed out');
