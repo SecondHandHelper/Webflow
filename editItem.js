@@ -1,4 +1,5 @@
 import { enhanceFrontImage, uploadImageAndShowPreview, uploadTempImage } from "./sellItemHelpers";
+import {autocomplete, brands} from "./autocomplete-brands";
 
 async function updateItem(itemId, changedImages) {
     console.log("updateItem()");

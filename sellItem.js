@@ -10,7 +10,34 @@ import {
   uploadImageAndShowPreview
 } from "./sellItemHelpers";
 import QRCode from "qrcode";
+import {formatPersonalId, getFormAddressFields, isValidSwedishSsn} from "./general";
+import {autocomplete, brands} from "./autocomplete-brands";
+import {setFieldValue, setupModelSearchEventListeners} from "./sellItemModelSearch";
 
+
+async function addUserDetails() {
+  // Grab values from form
+  const addressFields = getFormAddressFields();
+
+  let personalId = document.getElementById("personalId").value;
+  personalId = personalId ? formatPersonalId(personalId) : null;
+
+  // Write to Firestore
+  const itemRef = db.collection('users').doc(authUser.current.uid);
+  itemRef.update({
+    ...addressFields,
+    personalId
+  })
+    .then(() => {
+      console.log(`User address of ${authUser.current.uid} is now updated`);
+      itemConfirmationScreen.style.display = 'block';
+      addressFormDiv.style.display = 'none';
+    })
+    .catch((error) => {
+      errorHandler.report(error);
+      console.error("Error updating document: ", error);
+    });
+}
 
 function defectsChoicesInSwedish() {
   return new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");

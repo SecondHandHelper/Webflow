@@ -1,4 +1,4 @@
-function autocomplete(inp, arr) {
+export function autocomplete(inp, arr) {
   /*the autocomplete function takes two arguments,
   the text field element and an array of possible autocompleted values:*/
   var currentFocus;
@@ -116,8 +116,7 @@ function autocomplete(inp, arr) {
   });
 }
 
-/*An array containing all the country names in the world:*/
-var brands = ["& Other Stories",
+export const brands = ["& Other Stories",
   "2nd Day",
   "3.1 Phillip Lim",
   "5 Preview",

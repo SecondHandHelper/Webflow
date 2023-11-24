@@ -1,7 +1,3 @@
 <script>
-  document.getElementById('userPersonalIdForm').addEventListener("submit", addPersonalId);
-  document.getElementById('personalId').addEventListener("input", () => {
-    const error = isValidSwedishSsn(document.getElementById('personalId').value) ? '' : 'Ogiltigt personnummer';
-    document.getElementById("personalId").setCustomValidity(error);
-  })
+  urlDependentLoadJs('personalIdForm.js');
 </script>

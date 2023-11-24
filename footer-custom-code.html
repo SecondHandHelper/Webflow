@@ -10,7 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'test687';
+  const JS_VERSION = 'test688';
   var errorHandler = new StackdriverErrorReporter();
   const environment = location.href.includes('shh-test') ? 'web-test' : 'web-prod';
   $(document).ready(function () {
@@ -126,19 +126,6 @@
   }
 </script>
 
-
-
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test686/general.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.49/cookieManagement.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.67/signIn.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.77/infoRequestsFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.64/referralFunctions.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.49/autocomplete-brands.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.90/loadItemCards.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.49/sellItemModelSearch.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.80/private.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.1.62/settings.js"></script>
-
 <!-- Google Tag Manager (noscript) -->
 <noscript>
   <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KWV4J65" height="0" width="0"
@@ -147,7 +134,19 @@
 <!-- End Google Tag Manager (noscript) -->
 
 <script>
-
+  function checkCookie(cname) {
+    const c = getCookie(cname);
+    const paramsObj = getParamsObject();
+    if (!c) {
+      if (paramsObj[cname]) {
+        setCookie(cname, paramsObj[cname], 7);
+        return paramsObj[cname];
+      }
+    } if (c) {
+      return c;
+    }
+    return "";
+  }
   // Set attribution cookies (could be put on any campaign page)
   checkCookie("utm_campaign");
   checkCookie("utm_source");

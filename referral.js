@@ -1,3 +1,5 @@
+import {shareCode} from "./general";
+
 async function main() {
   if (!user.current.referralData?.referralCode) {
       return location.href = '/private';

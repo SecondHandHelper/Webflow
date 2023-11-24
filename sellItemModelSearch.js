@@ -1,4 +1,4 @@
-const setFieldValue = (fieldId, value) => {
+export const setFieldValue = (fieldId, value) => {
   document.getElementById(fieldId).value = value || '';
   document.getElementById(fieldId).dispatchEvent(new Event('input'));
 }
@@ -151,7 +151,7 @@ const closeModelSelect = () => {
   document.getElementById('modelSizeSelect').style.display = 'none';
 }
 
-const setupModelSearchEventListeners = () => {
+export const setupModelSearchEventListeners = () => {
   document.getElementById('findModelBoxEmpty').addEventListener('click', showFindModelPage)
   document.getElementById('findNewModel').addEventListener('click', showFindModelPage)
   document.getElementById('modelSelectClose').addEventListener('click', () => {
@@ -182,7 +182,7 @@ const setupModelSearchEventListeners = () => {
   });
 }
 
-const displayFindModelDiv = async (value) => {
+export const displayFindModelDiv = async (value) => {
   if (featureIsEnabled('modelDB')) {
     if (value === 'Rodebjer'){
       findModelDiv.style.display = 'block';

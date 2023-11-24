@@ -1,3 +1,5 @@
+import {itemCoverImage} from "./general";
+
 function loadItem(itemId) {
     db.collection("items").doc(itemId)
         .get().then((doc) => {

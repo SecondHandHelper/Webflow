@@ -1,3 +1,5 @@
+import {itemCoverImage} from "./general";
+
 async function openMeasurementsToast(itemId, description) {
     measurementDescriptionText.innerHTML = description;
     measurementsSubmitButton.addEventListener('click', async function () {
@@ -153,7 +155,7 @@ async function openNewPriceToast(itemId, status, max, min, brand, description, c
     triggerNewPriceToastOpen.click();
 }
 
-function loadInfoRequests(userId) {
+export function loadInfoRequests(userId) {
     infoRequestsList.innerHTML = "";
     db.collection("items").where("user", "==", userId).get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {

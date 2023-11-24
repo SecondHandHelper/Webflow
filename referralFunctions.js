@@ -1,5 +1,7 @@
 // REFERRAL PROGRAM FUNCTIONS
-async function showReferralSection() {
+import {deleteCookie} from "./cookieManagement";
+
+export async function showReferralSection() {
   if (user.current?.referralData?.referralCode) {
     document.getElementById("myReferralCodeText").innerHTML = user.current.referralData.referralCode;
     if (user.current?.referralData?.activatedReferredUsersCount > 0) {
@@ -12,7 +14,7 @@ async function showReferralSection() {
   referralSection.style.display = 'block';
 }
 
-async function showBonusSection() {
+export async function showBonusSection() {
   const userCreatedDate = new Date(authUser.current.metadata.creationTime);
   const now = new Date();
   let daysDiff = (now.getTime() - userCreatedDate.getTime()) / (1000 * 3600 * 24);
@@ -53,7 +55,7 @@ async function showActivatedBonus(referrerName, referrerCode) {
   }
 }
 
-async function createReferralCode() {
+export async function createReferralCode() {
   if (!user.current?.referralData?.referralCode) {
     const referralCode = await firebase.app().functions("europe-west3").httpsCallable('setUserReferralCode')();
     console.log("New referral code stored: ", referralCode?.data?.referralCode);
@@ -74,7 +76,7 @@ async function showReferralErrorMessage(msg) {
   }, 2500);
 }
 
-async function connectReferralUsers(inputCode) {
+export async function connectReferralUsers(inputCode) {
   inputCode = inputCode.trim().toUpperCase();
   if (inputCode === user.current?.referralData?.referralCode) {
     await showReferralErrorMessage('Du kan inte aktivera din egen kod');
@@ -100,14 +102,4 @@ async function connectReferralUsers(inputCode) {
     errorHandler.report(e);
     console.log("Failed to use referral code", e);
   }
-}
-
-async function checkSoldItemExists() {
-  // Check if an item is sold
-  await db.collection("items").where("user", "==", userId).where("status", "==", "Sold").get().then((querySnapshot) => {
-    if (querySnapshot.size > 0) {
-      return true;
-    }
-  });
-  return false
 }

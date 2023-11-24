@@ -1,4 +1,6 @@
-function setCookie(cname, cvalue, exdays) {
+import { getParamsObject } from "./general";
+
+export function setCookie(cname, cvalue, exdays) {
     const d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
     let expires = "expires=" + d.toUTCString();
@@ -8,11 +10,11 @@ function setCookie(cname, cvalue, exdays) {
     //console.log("Cookie set: ", cname + "=" + cvalue);
 }
 
-function deleteCookie(cname) {
+export function deleteCookie(cname) {
   document.cookie = cname + '=; Max-Age=-99999999;';
 }
 
-function getCookie(cname) {
+export function getCookie(cname) {
     let name = cname + "=";
     let ca = document.cookie.split(';');
     for (let i = 0; i < ca.length; i++) {
@@ -28,23 +30,10 @@ function getCookie(cname) {
     return "";
 }
 
-function checkCookie(cname) {
-    const c = getCookie(cname);
-    if (!c) {
-        if (params[cname]) {
-            setCookie(cname, params[cname], 7);
-            return params[cname];
-        }
-    } if (c) {
-        return c;
-    }
-    return "";
-}
-
 const preferredLoginMethodCookieName = 'preferredLoginMethod';
 
-const getPreferredLogInMethod = () => getCookie(preferredLoginMethodCookieName);
+export const getPreferredLogInMethod = () => getCookie(preferredLoginMethodCookieName);
 
-function setPreferredLogInMethodCookie(providerId) {
+export function setPreferredLogInMethodCookie(providerId) {
     setCookie(preferredLoginMethodCookieName, providerId, 6000);
 }

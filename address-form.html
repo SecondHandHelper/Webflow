@@ -1,3 +1,21 @@
 <script>
-    userAddressForm.addEventListener("submit", addUserAddress);
+  async function addUserAddress() {
+    // Grab values from form
+    const addressFields = getFormAddressFields();
+
+    // Write to Firestore
+    const itemRef = db.collection('users').doc(authUser.current.uid);
+    itemRef.update(addressFields)
+      .then(() => {
+        console.log(`User address of ${authUser.current.uid} is now updated`);
+        location.href = "/private";
+      })
+      .catch((error) => {
+        errorHandler.report(error);
+        // The document probably doesn't exist.
+        console.error("Error updating document: ", error);
+      });
+  }
+
+  userAddressForm.addEventListener("submit", addUserAddress);
 </script>
