@@ -40,6 +40,19 @@ function getCookie(cname) {
     return "";
 }
 
+function checkCookie(cname) {
+  const c = getCookie(cname);
+  if (!c) {
+    if (params[cname]) {
+      setCookie(cname, params[cname], 7);
+      return params[cname];
+    }
+  } if (c) {
+    return c;
+  }
+  return "";
+}
+
 const preferredLoginMethodCookieName = 'preferredLoginMethod';
 
 const getPreferredLogInMethod = () => getCookie(preferredLoginMethodCookieName);
