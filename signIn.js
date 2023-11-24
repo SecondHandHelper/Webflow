@@ -16,7 +16,6 @@ firebase.auth().onAuthStateChanged(async (result) => {
         console.log("user:", doc.data());
         user.current = doc.data();
       }
-      await saveRefreshToken();
     } catch (error) {
       errorHandler.report(error);
       console.log("Error getting document:", error);
@@ -38,59 +37,6 @@ firebase.auth().onAuthStateChanged(async (result) => {
     }
   }
 });
-
-async function saveRefreshToken() {
-  const refreshToken = authUser.current.refreshToken
-  const idToken = await authUser.current.getIdToken();
-  try {
-    // TODO: Change to maiapp.se to go live
-    return await fetch('https://api.shh-test.page/maiappAuth', {
-      credentials: 'include',
-      headers: {
-        'Authorization': 'Bearer ' + idToken,
-        'X-Mai-Refresh-Token': refreshToken,
-      }
-    });
-  } catch (ex) {
-    errorHandler.report(ex);
-    console.log('Error setting cookie with refresh token', ex);
-  }
-}
-
-async function loginWithCookieToken() {
-  const cookie = getCookie('maiAuth');
-  if (!cookie?.length) {
-    return;
-  }
-  if (authUser.current) {
-    return; // No need to log in
-  }
-  try {
-    // Get an id token that can be validated by the firebase function maiappAuth
-    const refreshResponse = await fetch(`https://securetoken.googleapis.com/v1/token?key=${firebaseConfig.apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        grant_type: 'refresh_token',
-        refresh_token: cookie
-      })
-    });
-    const refreshJson = await refreshResponse.json();
-    if (refreshJson.id_token && !authUser.current) {
-      // Get a custom token that we can use to sign in
-      const customTokenResponse = await fetch(`https://api.shh-test.page/maiappAuth?id_token=${refreshJson.id_token}`);
-      const customTokenJson = await customTokenResponse.json();
-      if (customTokenJson.status === 'customToken' && !authUser.current) {
-        await firebase.auth().signInWithCustomToken(customTokenJson.customToken);
-      }
-    }
-  } catch (ex) {
-    errorHandler.report(ex);
-    console.log('Failed to log in using saved token', ex);
-  }
-}
-
-loginWithCookieToken();
 
 function userIsSellingNewItem() {
   return sessionStorage.getItem('itemToBeCreatedAfterSignIn') &&
