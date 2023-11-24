@@ -1,5 +1,3 @@
-import {connectReferralUsers} from "./referralFunctions";
-
 window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sendCodeButton', {
   'size': 'invisible',
   'callback': (response) => {
