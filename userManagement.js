@@ -1,6 +1,3 @@
-import { getParamsObject } from "./general";
-import {setCookie} from "./cookieManagement";
-
 function getParameterByName(name) {
   const paramsObj = getParamsObject();
   return paramsObj[name];

@@ -1,4 +1,3 @@
-import {getCookie, getPreferredLogInMethod, setPreferredLogInMethodCookie} from "./cookieManagement";
 import {connectReferralUsers} from "./referralFunctions";
 
 window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sendCodeButton', {
@@ -155,7 +154,7 @@ async function updateFirestoreUserDocument(userId, email, phone, ssn) {
   }
 }
 
-export async function signedInNextStep(fallbackRedirect) {
+async function signedInNextStep(fallbackRedirect) {
   // User is signed in
   if (authUser.current) {
     const email = authUser.current.email || sessionStorage.getItem("email");
@@ -407,7 +406,7 @@ function checkEmail() {
   firebase.auth().fetchSignInMethodsForEmail(email)
     .then((signInMethods) => {
       if (signInMethods.indexOf(
-        firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD) != -1) {
+        firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD) !== -1) {
         // User can sign in with email/password.
         console.log("Account exists -> Login with email");
         chooseEmailDiv.style.display = 'none';

@@ -218,8 +218,10 @@ async function askForAdditionalUserDetails(userID) {
 checkCookie("invite");
 localStorage.removeItem('latestItemCreated');
 sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
+console.log(`user ${user.current}`);
 user.whenSet(privateMain);
 async function privateMain() {
+  console.log('privateMain running')
   if (!user.current) {
     return;
   }
@@ -384,8 +386,10 @@ async function storeFeedback() {
     closeFeedbackForm();
   });
 }
+let loadHandlerHasRun = false;
 
-window.addEventListener('load', function () {
+function onLoadHandler() {
+  console.log('onLoadHandler running');
   signoutButton.addEventListener('click', signOut);
   menuSignoutButton.addEventListener('click', signOut);
   bookPickupForm.addEventListener("submit", bookPickup);
@@ -415,7 +419,14 @@ window.addEventListener('load', function () {
   shareCodeButton.addEventListener('click', shareCode);
   sharePersonalLinkButton.addEventListener('click', shareCode);
   headerInviteButton.addEventListener("click", function () { triggerInviteToastOpen.click(); });
-});
+  loadHandlerHasRun = true;
+}
+window.addEventListener('load', onLoadHandler);
+console.log(`document.readyState ${document.readyState}`);
+if (document.readyState === "complete" && !loadHandlerHasRun) {
+  console.log("Running it since event listener did not")
+  onLoadHandler();
+}
 
 window.addEventListener('pageshow', (event) => {
   if (event.persisted) {

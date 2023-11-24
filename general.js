@@ -1,19 +1,5 @@
 import {deleteCookie} from "./cookieManagement";
 
-export function getParamsObject() {
-  // Get params
-  var queryStr = window.location.search;
-  var paramPairs = queryStr.substring(1).split('&');
-  var params = {};
-  for (var i = 0; i < paramPairs.length; i++) {
-    var parts = paramPairs[i].split('=');
-    params[parts[0]] = decodeURIComponent(parts[1]);
-  }
-  return params;
-}
-
-
-
 function signOut() {
     firebase.auth().signOut().then(() => {
         console.log('User signed out');

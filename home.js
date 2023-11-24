@@ -1,5 +1,4 @@
 import {itemCoverImage} from "./general";
-import {signedInNextStep} from "./signIn";
 
 var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 var domain = window.location.origin;
