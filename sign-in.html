@@ -1,3 +1,10 @@
 <script>
+  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sendCodeButton', {
+    'size': 'invisible',
+    'callback': (response) => {
+      // reCAPTCHA solved, allow signInWithPhoneNumber.
+      onSignInSubmit();
+    }
+  });
   urlDependentLoadJs('signIn.js');
 </script>

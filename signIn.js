@@ -1,11 +1,3 @@
-window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sendCodeButton', {
-  'size': 'invisible',
-  'callback': (response) => {
-    // reCAPTCHA solved, allow signInWithPhoneNumber.
-    onSignInSubmit();
-  }
-});
-
 console.log('Check onAuthStateChanged: ', new Date());
 firebase.auth().onAuthStateChanged(async (result) => {
   console.log("onAuthStateChanged callback: ", new Date());

@@ -1,7 +1,5 @@
 import {itemCoverImage, shareCode} from "./general";
-import {setPreferredLogInMethodCookie} from "./cookieManagement";
 import {loadInfoRequests} from "./infoRequestsFunctions";
-import {connectReferralUsers, createReferralCode, showBonusSection, showReferralSection} from "./referralFunctions";
 import {loadItemCards} from "./loadItemCards";
 
 var userId;
