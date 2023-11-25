@@ -1,14 +1,13 @@
 import {shareCode} from "./general";
 
 async function main() {
-  if (!user.current.referralData?.referralCode) {
+  if (!user.current?.referralData?.referralCode) {
       return location.href = '/private';
   }
   document.getElementById('referralCode').innerText = user.current.referralData.referralCode;
   if (user.current?.referralData?.referredUsers?.length > 0) {
       //TOP STATS
       document.getElementById('invitedFriends').innerText = user.current.referralData.referredUsers.length;
-      document.getElementById('referralDetails').style.display = 'block';
       const referredUserStatsResponse = await firebase.app().functions("europe-west1").httpsCallable('referredUserStats')();
       const referredUserStats = referredUserStatsResponse.data;
       document.getElementById('soldItems').innerText = `${referredUserStats.soldItems}`;
@@ -32,12 +31,16 @@ async function main() {
           newRow.childNodes[1].innerText = statusText(invitedFriend.status);
           invitedFriendStatusesDiv.appendChild(newRow);
       }
+      document.getElementById('referralDetails').style.display = 'block';
       firebase.app().functions("europe-west1").httpsCallable('referralStats')().then(referralStatsResponse => {
         const referralStats = referralStatsResponse.data;
         document.getElementById('nextFreePill').style.display = referralStats.freeSells > referralStats.usedFreeSells ? 'block' : 'none';
         document.getElementById('freeSells').innerText = referralStats.freeSells;
         document.getElementById('usedFreeSells').innerText = referralStats.usedFreeSells;
         document.getElementById('availableFreeSells').innerText = `/${referralStats.freeSells}`;
+        freeSellsStats.style.visibility = 'visible';
+        freeSellsStatsLoadingIcon.style.display = 'none';
+        //To add: Show airtable data...
       });
   }
 }
@@ -52,4 +55,6 @@ function statusText(status) {
 
 shareReferralLinkButton.addEventListener('click', shareCode);
 document.getElementById('referralCode').innerText = '';
+const referralCode = sessionStorage.getItem('sessionUser')?.referralData?.referralCode;
+document.getElementById('referralCode').innerText = referralCode || '';
 user.whenSet(main);

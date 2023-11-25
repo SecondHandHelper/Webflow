@@ -245,6 +245,7 @@ async function privateMain() {
   if (user.current?.referralData?.referralCode) {
     referralCodeText.innerHTML = user.current.referralData.referralCode;
     headerInviteButton.style.display = 'flex';
+    menuInviteLink.style.display = 'block';
   }
   const inviteCode = checkCookie("invite");
   if (inviteCode) {
