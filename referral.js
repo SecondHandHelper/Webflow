@@ -55,6 +55,6 @@ function statusText(status) {
 
 shareReferralLinkButton.addEventListener('click', shareCode);
 document.getElementById('referralCode').innerText = '';
-const referralCode = sessionStorage.getItem('sessionUser')?.referralData?.referralCode;
+const referralCode = JSON.parse(sessionStorage.getItem('sessionUser'))?.referralData?.referralCode;
 document.getElementById('referralCode').innerText = referralCode || '';
 user.whenSet(main);

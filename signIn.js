@@ -15,7 +15,7 @@ firebase.auth().onAuthStateChanged(async (result) => {
         identify(authenticated, doc.data());
         console.log("user:", doc.data());
         user.current = doc.data();
-        sessionStorage.setItem('sessionUser', user.current);
+        sessionStorage.setItem('sessionUser', JSON.stringify(user.current));
       }
     } catch (error) {
       errorHandler.report(error);
