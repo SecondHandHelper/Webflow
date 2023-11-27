@@ -71,8 +71,8 @@ function showAccountInfo() {
         account.innerHTML = identifier;
         account.style.display = 'block'
     }
-    if (user.current.addressFirstName && user.current.addressFirstName) {
-        accountName.innerHTML = user.current.addressFirstName + ' ' + user.current.addressFirstName;
+    if (user.current.addressFirstName && user.current.addressLastName) {
+        accountName.innerHTML = user.current.addressFirstName + ' ' + user.current.addressLastName;
         accountName.style.display = 'block';
     }
 }
