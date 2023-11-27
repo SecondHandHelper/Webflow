@@ -234,7 +234,7 @@ async function saveItemValuation(itemId, mlValuationData, userValuationApproval)
     ...(decline || needsHumanCheck(mlValuationData) ? {} : {
       valuationStatus: 'Completed',
       valuationDate: new Date().toISOString(),
-      ...(userValuationApproval ? {} : { minPriceEstimate: minPrice, maxPriceEstimate: maxPrice }),
+      ...(userValuationApproval ? {} : { minPriceEstimate: newMinPriceEstimate || minPrice, maxPriceEstimate: newMaxPriceEstimate || maxPrice }),
       infoRequests: {
         price: {
           status: userValuationApproval ? 'Active' : 'Resolved',
