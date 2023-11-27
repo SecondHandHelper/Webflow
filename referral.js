@@ -55,6 +55,10 @@ function statusText(status) {
 
 shareReferralLinkButton.addEventListener('click', shareCode);
 document.getElementById('referralCode').innerText = '';
-const referralCode = JSON.parse(sessionStorage.getItem('sessionUser'))?.referralData?.referralCode;
+const sessionUser = JSON.parse(sessionStorage.getItem('sessionUser'));
+const referralCode = sessionUser?.referralData?.referralCode;
 document.getElementById('referralCode').innerText = referralCode || '';
+if (sessionUser?.referralData?.referredUsers?.length > 0){
+    document.getElementById('topStatsLoadingIcon').style.display = 'block';
+}
 user.whenSet(main);

@@ -417,7 +417,6 @@ function onLoadHandler() {
   closeLongerPeriodToastButton.addEventListener("click", function () { triggerLongerPeriodToastClose.click(); });
   shareCodeButton.addEventListener('click', shareCode);
   sharePersonalLinkButton.addEventListener('click', shareCode);
-  headerInviteButton.addEventListener("click", function () { triggerInviteToastOpen.click(); });
   loadHandlerHasRun = true;
 }
 window.addEventListener('load', onLoadHandler);

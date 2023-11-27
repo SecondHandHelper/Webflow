@@ -17,6 +17,8 @@ async function openMeasurementsToast(itemId, description) {
 }
 
 async function openLongerPeriodToast(itemId, brand, currentMinPrice, deniedBefore) {
+    if(!itemId){return}
+    console.log('is this happening?');
     // If user is qualified to get the discount question -> Show it to the user
     const price = currentMinPrice;
     const priceWithDiscount30 = Math.ceil((price * 0.7) / 10) * 10;
@@ -156,6 +158,7 @@ async function openNewPriceToast(itemId, status, max, min, brand, description, c
 }
 
 export function loadInfoRequests(userId) {
+    const measurementsClone = document.getElementById('infoRequestMeasurementsTemplate').cloneNode(true);
     infoRequestsList.innerHTML = "";
     db.collection("items").where("user", "==", userId).get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
@@ -209,10 +212,26 @@ export function loadInfoRequests(userId) {
                         }
                         // MEASUREMENTS REQUEST
                         if (req === "measurements") {
+                            const newRequest = measurementsClone.cloneNode(true);
+                            newRequest.id = `infoRequestMeasurementsButton-${itemId}`;
+                            console.log(`openMeasurementsToast(${itemId}, ${description});`);
+                            //openMeasurementsToast(itemId, description);
+                            newRequest.querySelector('.img-container').style.backgroundImage = `url('${frontImageUrl}')`;
+                            console.log("Finding node", newRequest.querySelector('.info-request-button'));
+                            infoRequestsList.appendChild(newRequest);
+
+                            document.querySelector(`#infoRequestMeasurementsButton-${itemId} .info-request-button`).addEventListener('click', function () {
+                                console.log('click');
+                                //openMeasurementsToast(itemId, description);
+                            });
+
+                            continue;
+                            /*
                             title = "Mått";
                             subText = "Vi behöver mått för detta plagg";
                             buttonText = "Se mer";
                             href = `javascript:openMeasurementsToast('${itemId}', '${description}');`;
+                            */
                         }
                         // IMAGES REQUEST
                         if (req === "images") {
@@ -237,7 +256,7 @@ export function loadInfoRequests(userId) {
                                                 </div>
                                                 <div class="text-block-73">${title}</div>
                                                 <div class="text-block-72">${subText}</div>
-                                                <a href="${href}" id="" class="link-block-23 w-inline-block">
+                                                <a href="${href}" id="" class="info-request-button w-inline-block">
                                                     <div class="${buttonClass}">
                                                         <div class="${buttonTextClass}">${buttonText}</div>
                                                     </div>
