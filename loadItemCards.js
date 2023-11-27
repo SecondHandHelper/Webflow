@@ -450,7 +450,7 @@ export async function loadItemCards(items) {
           document.getElementById(`bagReceivedCheckbox-${itemId}`).addEventListener('click', (event) => {
             bagReceivedAction(event.target, itemId, soldDate, shippingMethod);
           });
-          document.getElementById('changeShippingMethodA').addEventListener('click', () => {
+          document.getElementById(`changeShippingMethodA-${itemId}`).addEventListener('click', () => {
             openShippingToast(itemId, soldDate);
           })
         }, 0)
