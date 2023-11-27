@@ -45,8 +45,8 @@ function getBarcodeButton(itemId) {
 }
 
 // TODO: Show a "Boka hämtning" button when the user has pressed bagreceievd but still hasn't picked a pickup
-function getBookPickupButton() {
-  const div = `<a id="bookPickupButton" href="#" class="link-block-39">
+function getBookPickupButton(itemId) {
+  const div = `<a id="bookPickupButton-${itemId}" href="#" class="link-block-39">
                             <div class="div-block-194">
                                 <div class="text-block-113">Boka hämtning</div>
                             </div>
@@ -69,14 +69,16 @@ async function storeShippingMethod(itemId, method) {
 }
 
 function openShippingToast(itemId, soldDate) {
-  console.log("openShippingToast");
+  console.log(`openShippingToast(${itemId}, ${soldDate})`);
   window.pickupFlowItemId = itemId;
-  servicePointButton.addEventListener.click(async () => {
-    await storeShippingMethod(itemId, 'Service point');
-  });
-  bookPickupButton.addEventListener('click', () => {
-    openPickupToast(itemId, soldDate);
-  });
+  setTimeout(() => {
+    document.getElementById('servicePointButton').addEventListener('click', async () => {
+      await storeShippingMethod(itemId, 'Service point');
+    });
+    document.getElementById('bookPickupButton').addEventListener('click', () => {
+      openPickupToast(itemId, soldDate);
+    });
+  }, 0);
   triggerShippingToastOpen.click();
 }
 
@@ -407,6 +409,11 @@ export async function loadItemCards(items) {
           } else if (soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') {
             if (!bagReceived) {
               userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
+              setTimeout(() => {
+                document.getElementById(`bagReceivedCheckbox-${itemId}`).addEventListener('click', (event) => {
+                  bagReceivedAction(event.target, itemId, soldDate, shippingMethod);
+                });
+              }, 0)
             }
           }
           else if (postnordQrCode) {
@@ -418,7 +425,12 @@ export async function loadItemCards(items) {
           if (!bagReceived) {
             userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
           } else if (bagReceived && !pickupDate) {
-            userActionDiv = getBookPickupButton();
+            userActionDiv = getBookPickupButton(itemId);
+            setTimeout(() => {
+              document.getElementById(`bookPickUpButton-${itemId}`).addEventListener('click', () => {
+                openPickupToast(itemId, soldDate);
+              });
+            }, 0)
           }
         }
 
@@ -432,6 +444,11 @@ export async function loadItemCards(items) {
           <a id="changeShippingMethodA-${itemId}" href="#">
               <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
           </a>`;
+          setTimeout(() => {
+            document.getElementById(`changeShippingMethodA-${itemId}`).addEventListener('click', () => {
+              openShippingToast(itemId, soldDate);
+            })
+          }, 0)
         }
 
         //Create card
@@ -443,17 +460,6 @@ export async function loadItemCards(items) {
                       ${changeShippingMethod}
                   </div></div></div></div>`;
         itemListSoldNotSent.innerHTML += soldNotSentCardHTML;
-        setTimeout(() => {
-          document.getElementById('bookPickUpButton').addEventListener('click', () => {
-            openPickupToast(itemId, soldDate);
-          });
-          document.getElementById(`bagReceivedCheckbox-${itemId}`).addEventListener('click', (event) => {
-            bagReceivedAction(event.target, itemId, soldDate, shippingMethod);
-          });
-          document.getElementById(`changeShippingMethodA-${itemId}`).addEventListener('click', () => {
-            openShippingToast(itemId, soldDate);
-          })
-        }, 0)
 
         // Display list
         soldNotSentDiv.style.display = "block";

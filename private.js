@@ -230,9 +230,6 @@ async function privateMain() {
   askForAdditionalUserDetails(userId);
   loadSoldByOthers(userId);
   setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
-  if (featureIsEnabled('menu')){
-    document.getElementById('menuButton').style.display = 'flex';
-  }
 
   //For testing purposes only - To see what a certain user sees
   if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
@@ -246,6 +243,7 @@ async function privateMain() {
     referralCodeText.innerHTML = user.current.referralData.referralCode;
     headerInviteButton.style.display = 'flex';
     menuInviteLink.style.display = 'block';
+    document.getElementById('menuButton').style.display = 'flex';
   }
   const inviteCode = checkCookie("invite");
   if (inviteCode) {
