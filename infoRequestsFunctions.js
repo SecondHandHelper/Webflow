@@ -164,7 +164,7 @@ export function loadInfoRequests(userId) {
     const valuationClone = document.getElementById('infoRequestValuationTemplate').cloneNode(true);
     const infoRequestsList = document.getElementById('infoRequestsList')
     infoRequestsList.replaceChildren();
-    db.collection("items").where("user", "==", '3OkW5av20HP8ScpUDS8ip9fBEZr1').get().then((querySnapshot) => {
+    db.collection("items").where("user", "==", userId).get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
             const itemId = doc.id;
             const item = doc.data();
