@@ -1,6 +1,27 @@
 import {itemCoverImage} from "./general";
 import {closePickupToast} from "./private";
 
+/**
+ * @param {String} HTML representing a single element.
+ * @param {Boolean} flag representing whether or not to trim input whitespace, defaults to true.
+ * @return {Element | HTMLCollection | null}
+ */
+function fromHTML(html, trim = true) {
+  // Process the HTML string.
+  html = trim ? html : html.trim();
+  if (!html) return null;
+
+  // Then set up a new template element.
+  const template = document.createElement('template');
+  template.innerHTML = html;
+  const result = template.content.children;
+
+  // Then return either an HTMLElement or HTMLCollection,
+  // based on whether the input HTML had one or more roots.
+  if (result.length === 1) return result[0];
+  return result;
+}
+
 function getQrCodeButton(itemId) {
   let itemPageUrl = window.location.origin + `/ship-item?id=${itemId}`;
   const div = `<a id="qrCodeButton" href="${itemPageUrl}" class="link-block-39">
@@ -24,8 +45,8 @@ function getBarcodeButton(itemId) {
 }
 
 // TODO: Show a "Boka hämtning" button when the user has pressed bagreceievd but still hasn't picked a pickup
-function getBookPickupButton(itemId, soldDate) {
-  const div = `<a id="bookPickupButton" href="javascript:openPickupToast('${itemId}', '${soldDate}');" class="link-block-39">
+function getBookPickupButton() {
+  const div = `<a id="bookPickupButton" href="#" class="link-block-39">
                             <div class="div-block-194">
                                 <div class="text-block-113">Boka hämtning</div>
                             </div>
@@ -50,14 +71,20 @@ async function storeShippingMethod(itemId, method) {
 function openShippingToast(itemId, soldDate) {
   console.log("openShippingToast");
   window.pickupFlowItemId = itemId;
-  servicePointButton.href = `javascript:storeShippingMethod('${itemId}', 'Service point')`;
-  bookPickupButton.href = `javascript:openPickupToast('${itemId}', '${soldDate}')`;
+  servicePointButton.addEventListener.click(async () => {
+    await storeShippingMethod(itemId, 'Service point');
+  });
+  bookPickupButton.addEventListener('click', () => {
+    openPickupToast(itemId, soldDate);
+  });
   triggerShippingToastOpen.click();
 }
 
 function openServicePointToast(itemId, soldDate) {
   console.log("openServicePointToast");
-  changeToPickupButton.href = `javascript:openPickupToast('${itemId}', '${soldDate}')`;
+  changeToPickupButton.addEventListener('click', () => {
+    openPickupToast(itemId, soldDate);
+  });
   triggerServicePointToastOpen.click();
 }
 
@@ -65,7 +92,9 @@ function openPickupToast(itemId, soldDate, servicePointButtonDisplay = 'none') {
   console.log(`openPickupToast(${itemId}, ${soldDate}) is running`);
   triggerShippingToastClose.click();
   triggerServicePointToastClose.click();
-  changeToServicePointButton.href = `javascript:storeShippingMethod('${itemId}', 'Service point')`;
+  changeToServicePointButton.addEventListener('click', async () => {
+    await storeShippingMethod(itemId, 'Service point');
+  });
   changeToServicePointButton.style.display = servicePointButtonDisplay;
   setDatesOfPickupToast(soldDate);
   window.pickupFlowItemId = itemId;
@@ -208,7 +237,7 @@ function getBagReceivedCheckbox(itemId, soldDate, shippingMethod) {
             <form method="get" name="wf-form-" id="bagReceivedForm">
                 <label class="w-checkbox checkbox-field-3">
                     <div class="w-checkbox-input w-checkbox-input--inputType-custom checkbox-2"></div>
-                    <input type="checkbox" id="bagReceivedCheckbox-${itemId}" style="opacity:0;position:absolute;z-index:-1" onclick="javascript:bagReceivedAction(this, '${itemId}', '${soldDate}', '${shippingMethod}');">
+                    <input type="checkbox" id="bagReceivedCheckbox-${itemId}" style="opacity:0;position:absolute;z-index:-1">
                     <span class="checkbox-label-3 w-form-label">Etiketten har kommit</span>
                 </label>
             </form>
@@ -389,7 +418,7 @@ export async function loadItemCards(items) {
           if (!bagReceived) {
             userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
           } else if (bagReceived && !pickupDate) {
-            userActionDiv = getBookPickupButton(itemId, soldDate);
+            userActionDiv = getBookPickupButton();
           }
         }
 
@@ -400,7 +429,7 @@ export async function loadItemCards(items) {
         if (bagReceived && (shippingMethod === "Service point" || (shippingMethod === "Pickup" && pickupDate))) {
           shippingInfoDiv = '<div class="spacing-15-px"></div>' + shippingInfoDiv;
           changeShippingMethod += `
-          <a href="javascript:openShippingToast('${itemId}', '${soldDate}');">
+          <a id="changeShippingMethodA-${itemId}" href="#">
               <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
           </a>`;
         }
@@ -414,6 +443,17 @@ export async function loadItemCards(items) {
                       ${changeShippingMethod}
                   </div></div></div></div>`;
         itemListSoldNotSent.innerHTML += soldNotSentCardHTML;
+        setTimeout(() => {
+          document.getElementById('bookPickUpButton').addEventListener('click', () => {
+            openPickupToast(itemId, soldDate);
+          });
+          document.getElementById(`bagReceivedCheckbox-${itemId}`).addEventListener('click', (event) => {
+            bagReceivedAction(event.target, itemId, soldDate, shippingMethod);
+          });
+          document.getElementById('changeShippingMethodA').addEventListener('click', () => {
+            openShippingToast(itemId, soldDate);
+          })
+        }, 0)
 
         // Display list
         soldNotSentDiv.style.display = "block";

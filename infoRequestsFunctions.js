@@ -150,8 +150,12 @@ async function openNewPriceToast(itemId, status, max, min, brand, description, c
         newPriceText.innerHTML = description;
         descriptionDiv.style.display = 'block';
     }
-    acceptNewPriceButton.href = `javascript:storePriceResponse('${itemId}', ${max}, ${min}, 'Accepted', '${status}');`;
-    denyNewPriceButton.href = `javascript:storePriceResponse('${itemId}', ${max}, ${min}, 'Denied', '${status}');`;
+    acceptNewPriceButton.addEventListener('click', () => {
+      storePriceResponse(itemId, max, min, 'Accepted', status);
+    })
+    denyNewPriceButton.addEventListener('click', () => {
+      storePriceResponse(itemId, max, min, 'Denied', status);
+    })
 
     // Open toast
     triggerNewPriceToastOpen.click();
