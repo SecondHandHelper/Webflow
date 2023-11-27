@@ -159,21 +159,24 @@ async function openNewPriceToast(itemId, status, max, min, brand, description, c
 
 export function loadInfoRequests(userId) {
     const measurementsClone = document.getElementById('infoRequestMeasurementsTemplate').cloneNode(true);
-    infoRequestsList.innerHTML = "";
-    db.collection("items").where("user", "==", userId).get().then((querySnapshot) => {
+    const longerPeriodClone = document.getElementById('infoRequestLongerPeriodTemplate').cloneNode(true);
+    const updateImagesClone = document.getElementById('infoRequestImagesTemplate').cloneNode(true);
+    const valuationClone = document.getElementById('infoRequestValuationTemplate').cloneNode(true);
+    const infoRequestsList = document.getElementById('infoRequestsList')
+    infoRequestsList.replaceChildren();
+    db.collection("items").where("user", "==", '3OkW5av20HP8ScpUDS8ip9fBEZr1').get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
-            var itemId = doc.id;
-            var item = doc.data();
-            var infoRequests = item.infoRequests;
-            var status = item.status;
-            var brand = item.brand.replace(/'/g, '');
-            var currentMinPrice = item.minPriceEstimate;
-            var currentMaxPrice = item.maxPriceEstimate;
-            var deniedBefore = item?.infoRequests?.price?.response === "Denied" ? true : false;
-            var archived = item.archived;
-            var category = item.category;
-            const images = item.images;
-            var frontImageUrl = itemCoverImage(item);
+            const itemId = doc.id;
+            const item = doc.data();
+            const infoRequests = item.infoRequests;
+            const status = item.status;
+            const brand = item.brand.replace(/'/g, '');
+            const currentMinPrice = item.minPriceEstimate;
+            const currentMaxPrice = item.maxPriceEstimate;
+            const deniedBefore = item?.infoRequests?.price?.response === "Denied" ? true : false;
+            const archived = item.archived;
+            const category = item.category;
+            const frontImageUrl = itemCoverImage(item);
             if (archived == undefined && status !== "Unsold" && status !== "Sold" && infoRequests) {
                 displayRequests();
             }
@@ -181,88 +184,64 @@ export function loadInfoRequests(userId) {
             function displayRequests() {
                 for (const req in infoRequests) {
                     if (infoRequests[req]?.status === "Active") {
-                        let title = "";
-                        let subText = "";
-                        let href = "";
-                        let buttonText = `Komplettera`;
-                        let buttonClass = "completerequestbutton";
-                        let buttonTextClass = "text-block-69";
                         let description = infoRequests[req].description;
                         
                         if (description) { description = description.replace(/'/g, ''); }
                         // PRICE REQUEST
                         if (req === "price") {
                             const type = infoRequests[req].type;
-                            title = "Lägre pris";
-                            buttonClass = "acceptnewpricebutton";
-                            buttonTextClass = "text-block-69-copy-copy";
-                            buttonText = "Se prisförslag";
-                            subText = "Vill du sänka priset och få det sålt?";
-                            const max = infoRequests[req].maxPrice;
-                            const min = infoRequests[req].minPrice;
-                            href = `javascript:openNewPriceToast('${itemId}', '${status}', ${max}, ${min}, '${brand}', '${description}', '${category}', '${type}', '${currentMaxPrice}', '${currentMinPrice}');`;
+                            const newRequest = valuationClone.cloneNode(true);
+                            newRequest.id = `infoRequestPrice-${itemId}`;
+                            newRequest.querySelector('.img-container').style.backgroundImage = `url('${frontImageUrl}')`;
+                            newRequest.querySelector('a .pricebuttontext').innerText = 'Se prisförslag';
+                            newRequest.querySelector('.text-block-72').innerText = "Vill du sänka priset och få det sålt?";
+                            infoRequestsList.appendChild(newRequest);
                             if (status === "New" && type !== 'Adjusted ML Valuation') {
-                                title = "Värdering";
-                                buttonClass = "acceptnewpricebutton";
-                                buttonTextClass = "text-block-69-copy-copy";
-                                buttonText = "Se värdering";
-                                subText = "Vill du sälja till vår värdering?";
-                                href = `/item-valuation?id=${itemId}`;
+                                newRequest.querySelector('a .pricebuttontext').innerText = 'Se värdering';
+                                newRequest.querySelector('.text-block-72').innerText = 'Vill du sälja till vår värdering?'
+                                newRequest.querySelector('a').href = `/item-valuation?id=${itemId}`;
+                            } else {
+                                setTimeout(() => {
+                                    const max = infoRequests[req].maxPrice;
+                                    const min = infoRequests[req].minPrice;
+                                    document.querySelector(`#infoRequestPrice-${itemId} a`).addEventListener('click', async () => {
+                                        await openNewPriceToast(itemId, status, max, min, brand, description, category, type, currentMaxPrice, currentMinPrice);
+                                    })
+                                }, 0);
                             }
                         }
                         // MEASUREMENTS REQUEST
                         if (req === "measurements") {
                             const newRequest = measurementsClone.cloneNode(true);
-                            newRequest.id = `infoRequestMeasurementsButton-${itemId}`;
-                            console.log(`openMeasurementsToast(${itemId}, ${description});`);
-                            //openMeasurementsToast(itemId, description);
+                            newRequest.id = `infoRequestMeasurements-${itemId}`;
                             newRequest.querySelector('.img-container').style.backgroundImage = `url('${frontImageUrl}')`;
-                            console.log("Finding node", newRequest.querySelector('.info-request-button'));
                             infoRequestsList.appendChild(newRequest);
-
-                            document.querySelector(`#infoRequestMeasurementsButton-${itemId} .info-request-button`).addEventListener('click', function () {
-                                console.log('click');
-                                //openMeasurementsToast(itemId, description);
-                            });
-
-                            continue;
-                            /*
-                            title = "Mått";
-                            subText = "Vi behöver mått för detta plagg";
-                            buttonText = "Se mer";
-                            href = `javascript:openMeasurementsToast('${itemId}', '${description}');`;
-                            */
+                            setTimeout(() => {
+                              document.querySelector(`#infoRequestMeasurements-${itemId} a`).addEventListener('click', async () => {
+                                await openMeasurementsToast(itemId, description);
+                              })
+                            }, 0);
                         }
                         // IMAGES REQUEST
                         if (req === "images") {
-                            title = "Bilder";
-                            subText = "Bilderna behöver kompletteras";
-                            buttonText = "Ändra bilder";
-                            href = window.location.origin + `/edit-item?id=${itemId}`;
+                            const newRequest = updateImagesClone.cloneNode(true);
+                            newRequest.id = `infoRequestImages-${itemId}`;
+                            newRequest.querySelector('.img-container').style.backgroundImage = `url('${frontImageUrl}')`;
+                            newRequest.querySelector('a').href = `/edit-item?id=${itemId}`;
+                            infoRequestsList.appendChild(newRequest);
                         }
                         // LONGER PERIOD REQUEST
                         if (req === "longerPeriod") {
-                            title = "Förläng";
-                            subText = "Vill du förlänga med 30 dagar till?";
-                            buttonText = "Svara";
-                            href = `javascript:openLongerPeriodToast('${itemId}', '${brand}', ${currentMinPrice}, ${deniedBefore});`;
+                            const newRequest = longerPeriodClone.cloneNode(true);
+                            newRequest.id = `infoRequestLongerPeriod-${itemId}`;
+                            newRequest.querySelector('.img-container').style.backgroundImage = `url('${frontImageUrl}')`;
+                            infoRequestsList.appendChild(newRequest);
+                            setTimeout(() => {
+                              document.querySelector(`#infoRequestLongerPeriod-${itemId} a`).addEventListener('click', async () => {
+                                await openLongerPeriodToast(itemId, brand, currentMinPrice, deniedBefore);
+                              })
+                            }, 0);
                         }
-                        // CARD
-                        let card = `<div class="div-block-126">
-                                                <div class="ratio-box _16-9">
-                                                    <div class="content-block with-image">
-                                                        <div class="img-container" style="background-image: url('${frontImageUrl}');"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="text-block-73">${title}</div>
-                                                <div class="text-block-72">${subText}</div>
-                                                <a href="${href}" id="" class="info-request-button w-inline-block">
-                                                    <div class="${buttonClass}">
-                                                        <div class="${buttonTextClass}">${buttonText}</div>
-                                                    </div>
-                                                </a>
-                                            </div>`;
-                        infoRequestsList.innerHTML += card;
                         infoRequestsDiv.style.display = "block";
                     }
                 }
