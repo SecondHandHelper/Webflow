@@ -335,7 +335,7 @@ const getValuationExplanation = (item) => {
     return `AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat, och vi brukar ha hög träffsäkerhet på detta varumärke. Om du mot förmodan ändå vill justera kan du göra det, men tänk på att det påverkar sannolikheten att få det sålt.`;
   }
   if (brandAccuracy < 0.8 && brandCategoryAccuracy >= 0.7 && !fewBrand) {
-    return `AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat, och för just denna kategori brukar vi ha hög träffsäkerhet för detta märke. Om du mot förmodan ändå vill justera kan du göra det, men tänk på att det påverkar sannolikheten att få det sålt.`;
+    return `AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat, och för just denna kategori från varumärket brukar vi ha hög träffsäkerhet.. Om du mot förmodan ändå vill justera kan du göra det, men tänk på att det påverkar sannolikheten att få det sålt.`;
   }
   return `Värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat. Snittvärdet för sålda plagg för varumärket är ${brandMeanSold} kr.`;
 
