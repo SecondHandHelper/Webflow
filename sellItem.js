@@ -218,18 +218,22 @@ function needsHumanCheck({ humanCheckNeeded, newMinMaxLog }) {
 
 async function saveItemValuation(itemId, mlValuationData, userValuationApproval) {
   const { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version,
-    newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog, adjustmentAllowed, newBrand, newBrandCategory } = mlValuationData || {};
+    newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog, adjustmentAllowed, newBrand, newBrandCategory,
+    valuatedBrandItems, brandMeanMax, brandAccuracy, brandCategoryAccuracy, fewBrand, brandMeanSold,
+    brandCategoryMeanSold, highPriceVarBrandCategory } = mlValuationData || {};
   if (!minPrice && !decline) {
     return;
   }
   const valuationData = {
     mlValuation: {
       decline, humanCheckNeeded, minPriceEstimate: minPrice, maxPriceEstimate: maxPrice,
-      humanCheckExplanation: humanCheckExplanation,
+      humanCheckExplanation,
       willNotSellPrediction: willNotSell,
       soldPriceEstimate: soldPrice,
       modelVersion: version?.toString(),
-      newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog, adjustmentAllowed, newBrand, newBrandCategory
+      newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog, adjustmentAllowed, newBrand, newBrandCategory,
+      valuatedBrandItems, brandMeanMax, brandAccuracy, brandCategoryAccuracy, fewBrand, brandMeanSold,
+      brandCategoryMeanSold, highPriceVarBrandCategory
     },
     ...(decline || needsHumanCheck(mlValuationData) ? {} : {
       valuationStatus: 'Completed',

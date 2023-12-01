@@ -267,7 +267,7 @@ const showValuation = async (item) => {
     const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, newBrand,
       newBrandCategory } = item.mlValuation || {};
     const params = getParamsObject();
-    const version = params.version || item.mlValuation.version;
+    const version = params.version || item.mlValuation.modelVersion;
     if (!params.id && decline) { // Don't show decline screen based on mlValuation if the user come from a infoRequest on private page
         await showDeclineValuation(item);
         document.getElementById('valuationResultDiv').style.display = 'flex';
