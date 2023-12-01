@@ -324,20 +324,21 @@ const getValuationExplanation = (item) => {
   const { mlValuation: { valuatedBrandItems, brandMeanMax, brandAccuracy, brandCategoryAccuracy, fewBrand,
     brandMeanSold } , cleanedBrand, brand } = { ...item, mlValuation: { ...getParamsOrItemMlFlags(item.mlValuation) }};
   const brandName = cleanedBrand || brand;
-
+  const bestMeanPrice = brandAccuracy > 0.8 ? `Snittpriset för sålda plagg för varumärket är ${brandMeanSold} kr.` :
+    brandCategoryAccuracy > 0.7 ? `Snittpriset för sålda plagg för varumärket i denna kategori är ${brandCategoryAccuracy} kr.` : '';
   if (brandMeanMax <= 400) {
-    return `Värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat. Snittvärdet för sålda plagg för varumärket är ${brandMeanSold} kr.`;
+    return `Värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat. ${bestMeanPrice}`;
   }
   if (brandMeanMax <= 800 && fewBrand) {
-    return 'Värderingen är mer osäker då vi har sålt ganska lite av detta varumärke. Efterfrågan på mer okända och små varumärken är ofta lägre.. För att öka sannolikheten att få det sålt kan du justera det lägsta priset.';
+    return 'Värderingen är mer osäker då vi har sålt relativt lite av detta varumärke. Efterfrågan på mer okända och små varumärken är ofta lägre. För att öka sannolikheten att få det sålt kan du justera ner lägsta priset';
   }
   if (brandAccuracy >= 0.8 && !fewBrand) {
-    return `AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat, och vi brukar ha hög träffsäkerhet på detta varumärke. Om du mot förmodan ändå vill justera kan du göra det, men tänk på att det påverkar sannolikheten att få det sålt.`;
+    return `AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat, och vi brukar ha hög träffsäkerhet på detta varumärke. Om du mot förmodan ändå vill justera kan du göra det, men tänk på att det påverkar sannolikheten att få det sålt. ${bestMeanPrice}`;
   }
   if (brandAccuracy < 0.8 && brandCategoryAccuracy >= 0.7 && !fewBrand) {
-    return `AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat, och för just denna kategori från varumärket brukar vi ha hög träffsäkerhet. Om du mot förmodan ändå vill justera kan du göra det, men tänk på att det påverkar sannolikheten att få det sålt.`;
+    return `AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat, och för just denna kategori från varumärket brukar vi ha hög träffsäkerhet. Om du mot förmodan ändå vill justera kan du göra det, men tänk på att det påverkar sannolikheten att få det sålt. ${bestMeanPrice}`;
   }
-  return `Värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat. Snittpriset för sålda plagg från varumärket är ${brandMeanSold} kr.`;
+  return `Värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat. ${bestMeanPrice}`;
 
 }
 
