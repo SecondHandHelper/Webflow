@@ -283,7 +283,7 @@ const showValuation = async (item) => {
     document.getElementById('minPrice').disabled = true;
     document.getElementById('maxPrice').value = maxPrice;
     document.getElementById('maxPrice').disabled = true;
-    if (item.infoRequests?.price?.description) {
+    if (item.infoRequests?.price?.type) {
         document.getElementById('valuationExplanation').innerText = item.infoRequests.price.description;
         if (item.infoRequests?.price?.type === 'Final Offer') {
             document.getElementById('valuationExplanationHeader').innerText = 'Motivering';
