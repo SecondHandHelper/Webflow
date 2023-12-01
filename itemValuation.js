@@ -322,10 +322,10 @@ const getParamsOrItemMlFlags = (mlValuation) => {
 
 const getValuationExplanation = (item) => {
   const { mlValuation: { valuatedBrandItems, brandMeanMax, brandAccuracy, brandCategoryAccuracy, fewBrand,
-    brandMeanSold } , cleanedBrand, brand } = { ...item, mlValuation: { ...getParamsOrItemMlFlags(item.mlValuation) }};
+    brandMeanSold, brandCategoryMeanSold } , cleanedBrand, brand } = { ...item, mlValuation: { ...getParamsOrItemMlFlags(item.mlValuation) }};
   const brandName = cleanedBrand || brand;
-  const bestMeanPrice = brandAccuracy > 0.8 ? `Snittpriset för sålda plagg för varumärket är ${brandMeanSold} kr.` :
-    brandCategoryAccuracy > 0.7 ? `Snittpriset för sålda plagg för varumärket i denna kategori är ${brandCategoryAccuracy} kr.` : '';
+  const bestMeanPrice = brandAccuracy > 0.8 && brandMeanSold > 0 ? `Snittpriset för sålda plagg för varumärket är ${brandMeanSold} kr.` :
+    brandCategoryAccuracy > 0.7 && brandCategoryMeanSold > 0 ? `Snittpriset för sålda plagg för varumärket i denna kategori är ${brandCategoryMeanSold} kr.` : '';
   if (brandMeanMax <= 400) {
     return `Värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat. ${bestMeanPrice}`;
   }
