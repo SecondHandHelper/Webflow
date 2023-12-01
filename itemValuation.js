@@ -290,7 +290,7 @@ const showValuation = async (item) => {
             document.getElementById('valuationExplanationHeader').style.display = 'block';
         }
     } else if (version === '1.76') {
-      document.querySelector('#tooltipMotivation div').innerText = 'Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar. Värderingen utgår från vad liknande sålts för.';
+      // TODO 1.76: remove the if around this code and remove the next if when version 1.76 is released
       document.getElementById('valuationExplanation').innerText = getValuationExplanation(item)
     } else if (newBrand || newBrandCategory) {
         document.getElementById('valuationExplanationHeader').style.display = 'block';
@@ -316,19 +316,15 @@ const getParamsOrItemMlFlags = (mlValuation) => {
   params.brandAccuracy = parseFloat(params.brandAccuracy || `${mlValuation.brandAccuracy}`)
   params.brandCategoryAccuracy = parseFloat(params.brandCategoryAccuracy || `${mlValuation.brandCategoryAccuracy}`)
   params.fewBrand = params.fewBrand ? params.fewBrand === 'true' : mlValuation.fewBrand;
-  params.humanCheckNeeded = params.humanCheckNeeded ? params.humanCheckNeeded === 'true' : mlValuation.humanCheckNeeded;
   params.brandMeanSold = parseInt(params.brandMeanSold || `${mlValuation.brandMeanSold}`)
   return params;
 }
 
 const getValuationExplanation = (item) => {
   const { mlValuation: { valuatedBrandItems, brandMeanMax, brandAccuracy, brandCategoryAccuracy, fewBrand,
-    humanCheckNeeded, brandMeanSold } , cleanedBrand, brand } = { ...item, mlValuation: { ...getParamsOrItemMlFlags(item.mlValuation) }};
+    brandMeanSold } , cleanedBrand, brand } = { ...item, mlValuation: { ...getParamsOrItemMlFlags(item.mlValuation) }};
   const brandName = cleanedBrand || brand;
 
-  if (humanCheckNeeded) {
-    return `Ditt ${brandName}-plagg behöver manuellt värderas. Det beror på att det är hög variation eller lägre träffsäkerhet av AI-värderaren för varumärket.`;
-  }
   if (brandMeanMax <= 400) {
     return `Värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat. Snittvärdet för sålda plagg för varumärket är ${brandMeanSold} kr.`;
   }
@@ -339,7 +335,7 @@ const getValuationExplanation = (item) => {
     return `AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat, och vi brukar ha hög träffsäkerhet på detta varumärke. Om du mot förmodan ändå vill justera kan du göra det, men tänk på att det påverkar sannolikheten att få det sålt.`;
   }
   if (brandAccuracy < 0.8 && brandCategoryAccuracy >= 0.7 && !fewBrand) {
-    return `AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat, och vi brukar ha hög träffsäkerhet på denna kategori från ${brandName}. Om du mot förmodan ändå vill justera kan du göra det, men tänk på att det påverkar sannolikheten att få det sålt.`;
+    return `AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat, och för just denna kategori brukar vi ha hög träffsäkerhet för detta märke. Om du mot förmodan ändå vill justera kan du göra det, men tänk på att det påverkar sannolikheten att få det sålt.`;
   }
   return `Värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat. Snittvärdet för sålda plagg för varumärket är ${brandMeanSold} kr.`;
 
