@@ -15,7 +15,7 @@ function initializeFields(item) {
         document.getElementById('nextStepText').innerText = 'Vi kikar på dina prisändringar, och om det ser bra ut så påbörjar vi försäljningen. Vi tar sedan hand om säljprocessen och hör av oss på SMS när plagget är sålt.';
     } else if (humanCheckNeeded || (!mlMaxPriceEstimate && !item.infoRequests?.price?.maxPrice) || newMinMaxLog) {
         document.getElementById('nextStepTitle').style.display = 'block';
-        document.getElementById('nextStepText').innerText = `Ditt ${item.cleanedBrand || item.brand}-plagg behöver värderas manuellt. Det beror på att det är hög variation och lägre träffsäkerhet för AI-värderaren på varumärket. Du kommer få ett SMS när vi värderat plagget som du kan ta ställning till.`;
+        document.getElementById('nextStepText').innerText = `Ditt ${item.cleanedBrand || item.brand}-plagg behöver värderas manuellt, då AI-värderingen har lägre träffsäkerhet på detta varumärke. Du kommer få ett SMS när vi värderat plagget som du kan ta ställning till.`;
     }
     document.getElementById('itemTitle').innerText = (item.cleanedBrand || item.brand).trim() + "-" + item.category.toLowerCase();
     document.getElementById('itemPrice').innerText = item.maxPriceEstimate && !humanCheckNeeded && !newMinMaxLog ? `${item.maxPriceEstimate || mlMaxPriceEstimate} SEK` : '';
