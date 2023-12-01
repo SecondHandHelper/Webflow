@@ -264,8 +264,10 @@ const increasePrice = (input, origValue) => {
 
 const estimatedPrice = (minPrice, maxPrice) => Math.round((minPrice + maxPrice) / 20) * 10;
 const showValuation = async (item) => {
-    const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, newBrand, newBrandCategory } = item.mlValuation || {};
+    const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, newBrand,
+      newBrandCategory } = item.mlValuation || {};
     const params = getParamsObject();
+    const version = params.version || item.mlValuation.version;
     if (!params.id && decline) { // Don't show decline screen based on mlValuation if the user come from a infoRequest on private page
         await showDeclineValuation(item);
         document.getElementById('valuationResultDiv').style.display = 'flex';
@@ -287,6 +289,9 @@ const showValuation = async (item) => {
             document.getElementById('valuationExplanationHeader').innerText = 'Motivering';
             document.getElementById('valuationExplanationHeader').style.display = 'block';
         }
+    } else if (version === '1.76') {
+      document.querySelector('#tooltipMotivation div').innerText = 'Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar. Värderingen utgår från vad liknande sålts för.';
+      document.getElementById('valuationExplanation').innerText = getValuationExplanation(item)
     } else if (newBrand || newBrandCategory) {
         document.getElementById('valuationExplanationHeader').style.display = 'block';
         document.getElementById('valuationExplanation').innerText = newBrand ?
@@ -304,13 +309,50 @@ const showValuation = async (item) => {
     document.getElementById('rejectButton').addEventListener('click', () => rejectValuation(item));
 }
 
-const showAdjustValuation = async (item) => {
+const getParamsOrItemMlFlags = (mlValuation) => {
+  const params = getParamsObject();
+  params.valuatedBrandItems = parseInt(params.valuatedBrandItems || `${mlValuation.valuatedBrandItems}`)
+  params.brandMeanMax = parseInt(params.brandMeanMax || `${mlValuation.brandMeanMax}`)
+  params.brandAccuracy = parseFloat(params.brandAccuracy || `${mlValuation.brandAccuracy}`)
+  params.brandCategoryAccuracy = parseFloat(params.brandCategoryAccuracy || `${mlValuation.brandCategoryAccuracy}`)
+  params.fewBrand = params.fewBrand ? params.fewBrand === 'true' : mlValuation.fewBrand;
+  params.humanCheckNeeded = params.humanCheckNeeded ? params.humanCheckNeeded === 'true' : mlValuation.humanCheckNeeded;
+  params.brandMeanSold = parseInt(params.brandMeanSold || `${mlValuation.brandMeanSold}`)
+  return params;
+}
 
-    const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, adjustmentAllowed } = item.mlValuation || {};
+const getValuationExplanation = (item) => {
+  const { mlValuation: { valuatedBrandItems, brandMeanMax, brandAccuracy, brandCategoryAccuracy, fewBrand,
+    humanCheckNeeded, brandMeanSold } , cleanedBrand, brand } = { ...item, mlValuation: { ...getParamsOrItemMlFlags(item.mlValuation) }};
+  const brandName = cleanedBrand || brand;
+
+  if (humanCheckNeeded) {
+    return `Ditt ${brandName}-plagg behöver manuellt värderas. Det beror på att det är hög variation eller lägre träffsäkerhet av AI-värderaren för varumärket.`;
+  }
+  if (brandMeanMax <= 400) {
+    return `Värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat. Snittvärdet för sålda plagg för varumärket är ${brandMeanSold} kr.`;
+  }
+  if (brandMeanMax <= 800 && fewBrand) {
+    return 'Värderingen är mer osäker då vi har sålt ganska lite av detta varumärke. Efterfrågan på mindre och mer okända varumärken är ofta lägre. För att öka sannolikheten att få det sålt kan du justera det lägsta priset.';
+  }
+  if (brandAccuracy >= 0.8 && !fewBrand) {
+    return `AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat, och vi brukar ha hög träffsäkerhet på detta varumärke. Om du mot förmodan ändå vill justera kan du göra det, men tänk på att det påverkar sannolikheten att få det sålt.`;
+  }
+  if (brandAccuracy < 0.8 && brandCategoryAccuracy >= 0.7 && !fewBrand) {
+    return `AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat, och vi brukar ha hög träffsäkerhet på denna kategori från ${brandName}. Om du mot förmodan ändå vill justera kan du göra det, men tänk på att det påverkar sannolikheten att få det sålt.`;
+  }
+  return `Värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat. Snittvärdet för sålda plagg för varumärket är ${brandMeanSold} kr.`;
+
+}
+
+const showAdjustValuation = async (item) => {
+    const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, adjustmentAllowed, version } = item.mlValuation || {};
     const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
     const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
-    const showAdjustPrice = adjustmentAllowed || ['1A', '1B', '1C', '2A', '3', '5A', '7', '8'].includes(item.brandSegment) ||
-        item.infoRequests?.price?.adjustmentAllowed
+    const showAdjustPrice = version === '1.76' ||
+      adjustmentAllowed ||
+      ['1A', '1B', '1C', '2A', '3', '5A', '7', '8'].includes(item.brandSegment) ||
+      item.infoRequests?.price?.adjustmentAllowed
 
     if (showAdjustPrice) {
         document.getElementById('adjustIntervalButton').style.display = 'flex';
@@ -335,7 +377,7 @@ const showAdjustValuation = async (item) => {
         document.getElementById('chatDiv').style.display = 'none';
     }
 
-    rangeSlider(minPrice, maxPrice);
+    rangeSlider(minPrice, maxPrice, item);
     document.getElementById('valuationMotivation').addEventListener('click', (e) => {
         const elements = document.getElementsByClassName('tooltip-motivation');
         const visible = elements[0]?.classList.contains('tooltip-show');
@@ -412,18 +454,22 @@ const getItem = async (itemId) => {
     return { ...(res?.data || {}), id: itemId };
 }
 
-const maxIncrease = (price) => {
-    if (price < 500) {
-        return price * 0.5;
-    } else if (price < 1000) {
-        return price * 0.4;
+const maxIncrease = (price, adjustFlags) => {
+    const { fewBrand, newBrand, brandAccuracy, brandCategoryAccuracy, highPriceVarBrandCategory } = getParamsOrItemMlFlags(adjustFlags);
+    const uncertainValuationAdjustment = fewBrand || newBrand || highPriceVarBrandCategory ||
+        brandAccuracy < 0.8 || brandCategoryAccuracy < 0.7 ? 0.1 : 0;
+    if (price <= 400) {
+        return price * (0.3 + uncertainValuationAdjustment);
+    } else if (price <= 800) {
+        return price * (0.25 + uncertainValuationAdjustment);
     }
-    return price * 0.3;
+    return price * (0.2 + uncertainValuationAdjustment);
 }
 
-const minPriceMaxIncrease = (minPrice, maxPrice) => Math.min(maxIncrease(minPrice), estimatedPrice(minPrice, maxPrice) - minPrice);
+const minPriceMaxIncrease = (minPrice, maxPrice, adjustFlags) =>
+    Math.min(maxIncrease(minPrice, adjustFlags), estimatedPrice(minPrice, maxPrice) - minPrice);
 
-function rangeSlider(minPrice, maxPrice) {
+function rangeSlider(minPrice, maxPrice, item) {
     const range = document.getElementById('adjustmentSlider');
     range.addEventListener('touchend', () => {
         range.value = Math.round(Number(range.value));
@@ -457,16 +503,16 @@ function rangeSlider(minPrice, maxPrice) {
                 maxInput.value = maxPrice;
                 break;
             case 4:
-                minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, maxPrice) * 0.33) / 10) * 10;
-                maxInput.value = Math.round((maxPrice + maxIncrease(maxPrice) * 0.33) / 10) * 10;
+                minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, maxPrice, item.mlValuation) * 0.33) / 10) * 10;
+                maxInput.value = Math.round((maxPrice + maxIncrease(maxPrice, item.mlValuation) * 0.33) / 10) * 10;
                 break;
             case 5:
-                minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, maxPrice) * 0.67) / 10) * 10;
-                maxInput.value = Math.round((maxPrice + maxIncrease(maxPrice) * 0.67) / 10) * 10;
+                minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, maxPrice, item.mlValuation) * 0.67) / 10) * 10;
+                maxInput.value = Math.round((maxPrice + maxIncrease(maxPrice, item.mlValuation) * 0.67) / 10) * 10;
                 break;
             case 6:
-                minInput.value = Math.floor((minPrice + minPriceMaxIncrease(minPrice, maxPrice)) / 10) * 10;
-                maxInput.value = Math.floor((maxPrice + maxIncrease(maxPrice)) / 10) * 10;
+                minInput.value = Math.floor((minPrice + minPriceMaxIncrease(minPrice, maxPrice, item.mlValuation)) / 10) * 10;
+                maxInput.value = Math.floor((maxPrice + maxIncrease(maxPrice, item.mlValuation)) / 10) * 10;
                 break;
         }
         minInput.dispatchEvent(new Event('input'));
