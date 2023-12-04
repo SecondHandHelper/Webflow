@@ -267,7 +267,7 @@ const showValuation = async (item) => {
     const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, newBrand,
       newBrandCategory } = item.mlValuation || {};
     const params = getParamsObject();
-    const version = params.version || item.mlValuation.modelVersion;
+    const version = params.version || item?.mlValuation?.modelVersion;
     if (!params.id && decline) { // Don't show decline screen based on mlValuation if the user come from a infoRequest on private page
         await showDeclineValuation(item);
         document.getElementById('valuationResultDiv').style.display = 'flex';
@@ -289,7 +289,7 @@ const showValuation = async (item) => {
             document.getElementById('valuationExplanationHeader').innerText = 'Motivering';
             document.getElementById('valuationExplanationHeader').style.display = 'block';
         }
-    } else if (version === '1.76') {
+    } else if (version && version === '1.76') {
       // TODO 1.76: remove the if around this code and remove the next if when version 1.76 is released
       document.getElementById('valuationExplanation').innerText = getValuationExplanation(item)
     } else if (newBrand || newBrandCategory) {
