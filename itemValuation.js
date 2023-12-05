@@ -264,8 +264,7 @@ const increasePrice = (input, origValue) => {
 
 const estimatedPrice = (minPrice, maxPrice) => Math.round((minPrice + maxPrice) / 20) * 10;
 const showValuation = async (item) => {
-    const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline, newBrand,
-      newBrandCategory } = item.mlValuation || {};
+    const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline } = item.mlValuation || {};
     const params = getParamsObject();
     const version = params.version || item?.mlValuation?.modelVersion;
     if (!params.id && decline) { // Don't show decline screen based on mlValuation if the user come from a infoRequest on private page
@@ -289,15 +288,9 @@ const showValuation = async (item) => {
             document.getElementById('valuationExplanationHeader').innerText = 'Motivering';
             document.getElementById('valuationExplanationHeader').style.display = 'block';
         }
-    } else if (version && version === '1.76') {
-      // TODO 1.76: remove the if around this code and remove the next if when version 1.76 is released
-      document.getElementById('valuationExplanation').innerText = getValuationExplanation(item)
-    } else if (newBrand || newBrandCategory) {
-        document.getElementById('valuationExplanationHeader').style.display = 'block';
-        document.getElementById('valuationExplanation').innerText = newBrand ?
-            'Vi har inte sålt så mycket av detta varumärke tidigare och har därför lite mindre data. Du får justera om du upplever att värderingen inte är rimlig. Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar.' :
-            'Vi har inte sålt så mycket av denna kategori från varumärket tidigare och har därför lite mindre data. Du får justera om du upplever att värderingen inte är rimlig. Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar.';
     }
+    document.getElementById('valuationExplanation').innerText = getValuationExplanation(item)
+
     document.getElementById('valuationText').style.display = 'block';
     if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
         document.getElementById('chatDiv').style.display = 'none';
@@ -347,32 +340,26 @@ const getValuationExplanation = (item) => {
 }
 
 const showAdjustValuation = async (item) => {
-    const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, adjustmentAllowed, version } = item.mlValuation || {};
+    const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate } = item.mlValuation || {};
     const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
     const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
-    const showAdjustPrice = version === '1.76' ||
-      adjustmentAllowed ||
-      ['1A', '1B', '1C', '2A', '3', '5A', '7', '8'].includes(item.brandSegment) ||
-      item.infoRequests?.price?.adjustmentAllowed
 
-    if (showAdjustPrice) {
-        document.getElementById('adjustIntervalButton').style.display = 'flex';
-        analytics.track("Element Viewed", { elementID: "adjustIntervalButton" });
-        document.getElementById('chatDiv').style.display = 'none';
-        document.getElementById('adjustIntervalButton').addEventListener('click', () => {
-            document.getElementById('valuationExplanation').style.display = 'none';
-            document.getElementById('valuationExplanationHeader').style.display = 'none';
-            document.getElementById('minPrice').disabled = false;
-            document.getElementById('maxPrice').disabled = false;
-            document.getElementById('adjustIntervalButton').style.display = 'none';
-            document.getElementById('noteDiv').style.display = 'block';
-            document.getElementById('origMinPrice').style.display = 'block';
-            document.getElementById('origMaxPrice').style.display = 'block';
+    document.getElementById('adjustIntervalButton').style.display = 'flex';
+    analytics.track("Element Viewed", { elementID: "adjustIntervalButton" });
+    document.getElementById('chatDiv').style.display = 'none';
+    document.getElementById('adjustIntervalButton').addEventListener('click', () => {
+        document.getElementById('valuationExplanation').style.display = 'none';
+        document.getElementById('valuationExplanationHeader').style.display = 'none';
+        document.getElementById('minPrice').disabled = false;
+        document.getElementById('maxPrice').disabled = false;
+        document.getElementById('adjustIntervalButton').style.display = 'none';
+        document.getElementById('noteDiv').style.display = 'block';
+        document.getElementById('origMinPrice').style.display = 'block';
+        document.getElementById('origMaxPrice').style.display = 'block';
 
-            document.getElementById('sliderDiv').style.display = 'block';
-            document.querySelectorAll(".field-underline").forEach(x => x.style.visibility = 'visible');
-        })
-    }
+        document.getElementById('sliderDiv').style.display = 'block';
+        document.querySelectorAll(".field-underline").forEach(x => x.style.visibility = 'visible');
+    })
     if (item.infoRequests?.price?.type === 'Final Offer') {
         document.getElementById('adjustIntervalButton').style.display = 'none';
         document.getElementById('chatDiv').style.display = 'none';
