@@ -212,8 +212,8 @@ async function addItem(event) {
   }
 }
 
-function needsHumanCheck({ humanCheckNeeded, newMinMaxLog }) {
-  return humanCheckNeeded || newMinMaxLog.match(/accept price is above max/i)
+function needsHumanCheck({ humanCheckNeeded, newMinMaxLog, lowValueSegment, lowValueCategory }) {
+  return humanCheckNeeded || (newMinMaxLog.match(/accept price is above max/i) && !lowValueSegment && !lowValueCategory)
 }
 
 async function saveItemValuation(itemId, mlValuationData, userValuationApproval) {
