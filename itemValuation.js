@@ -288,8 +288,9 @@ const showValuation = async (item) => {
             document.getElementById('valuationExplanationHeader').innerText = 'Motivering';
             document.getElementById('valuationExplanationHeader').style.display = 'block';
         }
+    } else {
+      document.getElementById('valuationExplanation').innerText = getValuationExplanation(item)
     }
-    document.getElementById('valuationExplanation').innerText = getValuationExplanation(item)
 
     document.getElementById('valuationText').style.display = 'block';
     if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
@@ -302,24 +303,13 @@ const showValuation = async (item) => {
     document.getElementById('rejectButton').addEventListener('click', () => rejectValuation(item));
 }
 
-const getParamsOrItemMlFlags = (mlValuation) => {
-  const params = getParamsObject();
-  params.valuatedBrandItems = parseInt(params.valuatedBrandItems || `${mlValuation.valuatedBrandItems}`)
-  params.brandMeanMax = parseInt(params.brandMeanMax || `${mlValuation.brandMeanMax}`)
-  params.brandAccuracy = parseFloat(params.brandAccuracy || `${mlValuation.brandAccuracy}`)
-  params.brandCategoryAccuracy = parseFloat(params.brandCategoryAccuracy || `${mlValuation.brandCategoryAccuracy}`)
-  params.fewBrand = params.fewBrand ? params.fewBrand === 'true' : mlValuation.fewBrand;
-  params.brandMeanSold = parseInt(params.brandMeanSold || `${mlValuation.brandMeanSold}`)
-  return params;
-}
-
 const getValuationExplanation = (item) => {
   const {
     mlValuation: {
       valuatedBrandItems, brandMeanMax, brandAccuracy, brandCategoryAccuracy, fewBrand,
       brandMeanSold, brandCategoryMeanSold
     }, cleanedBrand, brand
-  } = {...item, mlValuation: {...getParamsOrItemMlFlags(item.mlValuation)}};
+  } = item;
   const brandName = cleanedBrand || brand;
   const bestMeanPrice = brandAccuracy > 0.8 && brandMeanSold > 0 ? `Snittpriset för sålda plagg för varumärket är ${brandMeanSold} kr.` :
     brandCategoryAccuracy > 0.7 && brandCategoryMeanSold > 0 ? `Snittpriset för sålda plagg för varumärket i denna kategori är ${brandCategoryMeanSold} kr.` : '';
@@ -443,7 +433,7 @@ const getItem = async (itemId) => {
 }
 
 const maxIncrease = (price, adjustFlags) => {
-    const { fewBrand, newBrand, brandAccuracy, brandCategoryAccuracy, highPriceVarBrandCategory } = getParamsOrItemMlFlags(adjustFlags);
+    const { fewBrand, newBrand, brandAccuracy, brandCategoryAccuracy, highPriceVarBrandCategory } = adjustFlags;
     const uncertainValuationAdjustment = fewBrand || newBrand || highPriceVarBrandCategory ||
         brandAccuracy < 0.8 || brandCategoryAccuracy < 0.7 ? 0.1 : 0;
     if (price <= 400) {
