@@ -321,7 +321,7 @@ const getValuationExplanation = (item) => {
     return `${acceptPriceNotice}Värderingen är mer osäker då vi har sålt relativt lite av detta varumärke. Efterfrågan på mer okända och små varumärken är ofta lägre. För att öka sannolikheten att få det sålt kan du justera ner lägsta priset`;
   }
   if (brandMeanMax <= 400) {
-    return `${acceptPriceNotice}AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat, och för just denna kategori från varumärket brukar vi ha hög träffsäkerhet. ${adjustPriceLowShareSoldNotice || adjustPriceNotice} ${bestMeanPrice}`;
+    return `${acceptPriceNotice}Värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat. ${[adjustPriceLowShareSoldNotice, bestMeanPrice].join(' ')}`;
   }
   if (brandAccuracy >= 0.8 && !fewBrand) {
     return `${acceptPriceNotice}AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat, och vi brukar ha hög träffsäkerhet på detta varumärke. ${adjustPriceLowShareSoldNotice || adjustPriceNotice} ${bestMeanPrice}`;
