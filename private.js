@@ -79,7 +79,6 @@ function showAccountInfo() {
 
 async function showOrderBagsSection() {
     const maxBags = await firebase.app().functions("europe-west1").httpsCallable('maxNumBags')();
-    console.log("maxBags.data", maxBags.data);
     if (maxBags?.data?.maxOrderBags > 0) {
         document.getElementById('orderBagsSection').style.display = 'block';
     }

@@ -220,7 +220,7 @@ async function saveItemValuation(itemId, mlValuationData, userValuationApproval)
   const { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version,
     newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog, adjustmentAllowed, newBrand, newBrandCategory,
     valuatedBrandItems, brandMeanMax, brandAccuracy, brandCategoryAccuracy, fewBrand, brandMeanSold,
-    brandCategoryMeanSold, highPriceVarBrandCategory } = mlValuationData || {};
+    brandCategoryMeanSold, highPriceVarBrandCategory, brandShareSold } = mlValuationData || {};
   if (!minPrice && !decline) {
     return;
   }
@@ -233,7 +233,7 @@ async function saveItemValuation(itemId, mlValuationData, userValuationApproval)
       modelVersion: version?.toString(),
       newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog, adjustmentAllowed, newBrand, newBrandCategory,
       valuatedBrandItems, brandMeanMax, brandAccuracy, brandCategoryAccuracy, fewBrand, brandMeanSold,
-      brandCategoryMeanSold, highPriceVarBrandCategory
+      brandCategoryMeanSold, highPriceVarBrandCategory, brandShareSold
     },
     ...(decline || needsHumanCheck(mlValuationData) ? {} : {
       valuationStatus: 'Completed',
