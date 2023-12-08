@@ -32,6 +32,9 @@ function initializeFields(item) {
         document.getElementById('itemComment').innerText = item.userComment;
         document.getElementById('itemCommentDiv').style.display = 'block';
     }
+    if (item.platformsToBePublishedOn?.length) {
+      initializePlatforms(item);
+    }
 }
 
 function initializePlatforms(item) {
@@ -89,16 +92,7 @@ const main = async () => {
     }
     initializeFields(item);
     triggerShowContent.click();
-    // Show all fields except platformsToBePublishedOn, that is set in the backend so fetch the item before showing it
-    if (item.platformsToBePublishedOn?.length) {
-        initializePlatforms(item);
-    } else {
-        firebase.app().functions("europe-west1").httpsCallable('getPlatformsToBePublishedOn')({ itemId: item?.id })
-            .then(response => {
-                initializePlatforms(response.data);
-            })
-            .catch(e => console.error(e));
-    }
+
 }
 
 main();
