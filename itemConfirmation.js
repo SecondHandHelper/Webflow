@@ -32,8 +32,10 @@ function initializeFields(item) {
         document.getElementById('itemComment').innerText = item.userComment;
         document.getElementById('itemCommentDiv').style.display = 'block';
     }
-    if (item.platformsToBePublishedOn?.length) {
-      initializePlatforms(item);
+    if (item?.platformsToBePublishedOn?.length) {
+        initializePlatforms(item);
+    } else {
+        document.getElementById('platformsSection').style.display = 'none';
     }
 }
 
@@ -60,7 +62,7 @@ function itemConditionText(item) {
     let conditionText = '';
     if (item.condition === 'Använd, tecken på slitage' && (item.defects.length || item.defectDescription)) {
         let defects = [];
-        if (item.defectDescription){
+        if (item.defectDescription) {
             conditionText = item.defectDescription;
         }
         else if (item.defects && item.defects.length > 0) {
