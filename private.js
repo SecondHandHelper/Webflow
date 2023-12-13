@@ -223,6 +223,7 @@ async function privateMain() {
   userId = authUser.current.uid;
   email = authUser.current.email || sessionStorage.getItem("email");
   phone = authUser.current.phoneNumber || sessionStorage.getItem("phoneNumber");
+
   updateIC(userId, email, phone);
   askForAdditionalUserDetails(userId);
   loadSoldByOthers(userId);
@@ -230,10 +231,22 @@ async function privateMain() {
 
   //For testing purposes only - To see what a certain user sees
   if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
-    userId = "0fKpZeDiGuNL4Xe62FTwWi9FVOB3";
+    userId = "l7FL4HhwgxdjksdlLEecHoi0vwX2";
   }
-  const items = await getItems(userId);
+  //Yearly Summary
+  yearlyDataExist(userId).then((result) => {
+    if (result){
+      console.log('Yearly data exist!');
+      document.getElementById('yearlySummaryDiv').style.display = 'block';
+      document.getElementById('yearlySummaryDiv').addEventListener("click", function () {
+      location.href = `/2023withmai?id=${userId.substring(0,10)}`;
+    });
+    } else {
+      console.log('No yearly summary exist!');
+    }
+  });
 
+  const items = await getItems(userId);
   showNpsSurvey(items);
   showInviteToast(items);
   if (user.current?.referralData?.referralCode) {
@@ -258,18 +271,6 @@ async function privateMain() {
   loadInfoRequests(userId);
   showOrderBagsSection();
   showReferralSection();
-
-  //Yearly Summary
-  if (await yearlyDataExist(userId)) {
-    console.log('Yearly data exist!');
-    yearlySummaryDiv.style.display = 'block';
-    yearlySummaryDiv.addEventListener("click", function () {
-      location.href = `/2023withmai?id=${userId.substring(0,10)}`;
-    });
-  } else {
-    console.log('No yearly summary exist!');
-  }
-
   //showHolidayModeDiv(items);
 
   // Create refCode
