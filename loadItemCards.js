@@ -44,7 +44,6 @@ function getBarcodeButton(itemId) {
   return div;
 }
 
-// TODO: Show a "Boka hämtning" button when the user has pressed bagreceievd but still hasn't picked a pickup
 function getBookPickupButton(itemId) {
   const div = `<a id="bookPickupButton-${itemId}" href="#" class="link-block-39">
                             <div class="div-block-194">
@@ -424,6 +423,11 @@ export async function loadItemCards(items) {
         if (shippingMethod === 'Pickup') {
           if (!bagReceived) {
             userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
+            setTimeout(() => {
+              document.getElementById(`bagReceivedCheckbox-${itemId}`).addEventListener('click', (event) => {
+                bagReceivedAction(event.target, itemId, soldDate, shippingMethod);
+              });
+            }, 0)
           } else if (bagReceived && !pickupDate) {
             userActionDiv = getBookPickupButton(itemId);
             setTimeout(() => {
