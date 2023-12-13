@@ -460,6 +460,15 @@ if (document.readyState === "complete" && !loadHandlerHasRun) {
   onLoadHandler();
 }
 
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    console.log('This page was restored from the bfcache.');
+    if (menu.style.display !== 'none') { menu.style.display = 'none' }
+  } else {
+    console.log('This page was loaded normally.');
+  }
+});
+
 window.intercomSettings = {
   app_id: "klyy0le5"
 };
