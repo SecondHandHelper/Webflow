@@ -1,6 +1,6 @@
-import {itemCoverImage, shareCode, signOut} from "./general";
-import {loadInfoRequests} from "./infoRequestsFunctions";
-import {loadItemCards} from "./loadItemCards";
+import { itemCoverImage, shareCode, signOut } from "./general";
+import { loadInfoRequests } from "./infoRequestsFunctions";
+import { loadItemCards } from "./loadItemCards";
 
 var userId;
 var email;
@@ -59,71 +59,69 @@ export function updateIC(userId, em, ph) {
 }
 
 function showAccountInfo() {
-    let identifier;
-    if (authUser.current.phoneNumber) {
-        identifier = authUser.current.phoneNumber;
-    } else if (authUser.current.email) {
-        identifier = authUser.current.email;
-    }
-    if (identifier) {
-        accountInfoText.innerHTML = `Inloggad med ${identifier}`;
-        accountInfoText.style.display = 'block';
-        account.innerHTML = identifier;
-        account.style.display = 'block'
-    }
-    if (user.current.addressFirstName && user.current.addressLastName) {
-        accountName.innerHTML = user.current.addressFirstName + ' ' + user.current.addressLastName;
-        accountName.style.display = 'block';
-    }
+  let identifier;
+  if (authUser.current.phoneNumber) {
+    identifier = authUser.current.phoneNumber;
+  } else if (authUser.current.email) {
+    identifier = authUser.current.email;
+  }
+  if (identifier) {
+    account.innerHTML = identifier;
+    account.style.display = 'block'
+  }
+  if (user.current.addressFirstName && user.current.addressLastName) {
+    accountName.innerHTML = user.current.addressFirstName + ' ' + user.current.addressLastName;
+    accountName.style.display = 'block';
+  }
 }
 
 async function showOrderBagsSection() {
-    const maxBags = await firebase.app().functions("europe-west1").httpsCallable('maxNumBags')();
-    if (maxBags?.data?.maxOrderBags > 0) {
-        document.getElementById('orderBagsSection').style.display = 'block';
-    }
+  const maxBags = await firebase.app().functions("europe-west1").httpsCallable('maxNumBags')();
+  if (maxBags?.data?.maxOrderBags > 0) {
+    document.getElementById('orderBagsSection').style.display = 'block';
+  }
 }
 
 function showInviteToast(items) {
-    let daysSinceLatestSold = 10;
-    let soldItemsCount = 0;
-    let oneSoldNotSentItemExist = false;
-    let viewedToastBefore = user.current?.elementViews && user.current.elementViews.some(e => e.elementID === 'inviteToast') ? true : false;
+  let daysSinceLatestSold = 10;
+  let soldItemsCount = 0;
+  let oneSoldNotSentItemExist = false;
+  let viewedToastBefore = user.current?.elementViews && user.current.elementViews.some(e => e.elementID === 'inviteToast') ? true : false;
 
-    if (items) {
-        items.forEach((doc) => { // Items is a global variable that equals to querySnapshot from loadCardLists.js
-            var itemId = doc.id;
-            var i = doc.data();
-            let soldDate = i.soldDate;
-            const status = i.status;
-            const shippingStatus = i.shippingStatus;
-            const archived = i.archived;
+  if (items) {
+    items.forEach((doc) => { // Items is a global variable that equals to querySnapshot from loadCardLists.js
+      var itemId = doc.id;
+      var i = doc.data();
+      let soldDate = i.soldDate;
+      const status = i.status;
+      const shippingStatus = i.shippingStatus;
+      const archived = i.archived;
 
-            if (!archived && status === 'Sold' && soldDate) {
-                soldItemsCount++;
-                if (soldDate) {
-                    soldDate = new Date(soldDate);
-                    let nowDate = new Date();
-                    let timeDifference = nowDate.getTime() - soldDate.getTime();
-                    let daysDiff = Math.floor(timeDifference / (1000 * 3600 * 24));
-                    if (daysDiff <= daysSinceLatestSold) { daysSinceLatestSold = daysDiff; }
-                }
-                if (shippingStatus !== 'Sent') {
-                    oneSoldNotSentItemExist = true;
-                }
-            }
-        });
-    }
+      if (!archived && status === 'Sold' && soldDate) {
+        soldItemsCount++;
+        if (soldDate) {
+          soldDate = new Date(soldDate);
+          let nowDate = new Date();
+          let timeDifference = nowDate.getTime() - soldDate.getTime();
+          let daysDiff = Math.floor(timeDifference / (1000 * 3600 * 24));
+          if (daysDiff <= daysSinceLatestSold) { daysSinceLatestSold = daysDiff; }
+        }
+        if (shippingStatus !== 'Sent') {
+          oneSoldNotSentItemExist = true;
+        }
+      }
+    });
+  }
 
-    if (daysSinceLatestSold <= 3 && soldItemsCount >= 2 && oneSoldNotSentItemExist && user.current?.referralData?.referralCode && !viewedToastBefore) {
-        referralCodeText.innerHTML = user.current.referralData.referralCode;
-        triggerInviteToastOpen.click();
+  if (daysSinceLatestSold <= 3 && soldItemsCount >= 2 && oneSoldNotSentItemExist && user.current?.referralData?.referralCode && !viewedToastBefore) {
+    referralCodeText.innerHTML = user.current.referralData.referralCode;
+    triggerInviteToastOpen.click();
 
-        // Store elementViews to be able to not show it again
-        db.collection('users').doc(authUser.current.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "inviteToast", timestamp: new Date() }) });
-        // Track with segment
-        analytics.track("Element Viewed", { elementID: "inviteToast" });
-    }
+    // Store elementViews to be able to not show it again
+    db.collection('users').doc(authUser.current.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "inviteToast", timestamp: new Date() }) });
+    // Track with segment
+    analytics.track("Element Viewed", { elementID: "inviteToast" });
+  }
 }
 
 function loadSoldByOthers(userID) {
@@ -232,7 +230,7 @@ async function privateMain() {
 
   //For testing purposes only - To see what a certain user sees
   if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
-    userId = "3OkW5av20HP8ScpUDS8ip9fBEZr1";
+    userId = "0fKpZeDiGuNL4Xe62FTwWi9FVOB3";
   }
   const items = await getItems(userId);
 
@@ -242,8 +240,8 @@ async function privateMain() {
     referralCodeText.innerHTML = user.current.referralData.referralCode;
     headerInviteButton.style.display = 'flex';
     menuInviteLink.style.display = 'block';
-    document.getElementById('menuButton').style.display = 'flex';
   }
+
   const inviteCode = checkCookie("invite");
   if (inviteCode) {
     await connectReferralUsers(inviteCode);
@@ -255,11 +253,23 @@ async function privateMain() {
     bonusSection.style.display = 'block';
   }
   showBonusSection();
+  showAccountInfo();
   loadItemCards(items);
   loadInfoRequests(userId);
   showOrderBagsSection();
   showReferralSection();
-  showAccountInfo();
+
+  //Yearly Summary
+  if (await yearlyDataExist(userId)) {
+    console.log('Yearly data exist!');
+    yearlySummaryDiv.style.display = 'block';
+    yearlySummaryDiv.addEventListener("click", function () {
+      location.href = `/2023withmai?id=${userId.substring(0,10)}`;
+    });
+  } else {
+    console.log('No yearly summary exist!');
+  }
+
   //showHolidayModeDiv(items);
 
   // Create refCode
@@ -289,6 +299,23 @@ function showHolidayModeDiv(items) {
       }
     });
   }
+}
+
+async function yearlyDataExist(userId) {
+  //Get data
+  const url = 'https://europe-west3-second-hand-helper.cloudfunctions.net/yearlyData';
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ id: userId })
+  };
+  const yearlyDataResponse = await fetch(url, options);
+  if (!yearlyDataResponse.ok) { throw new Error('Network response was not ok.'); }
+  const yearlyDataJson = await yearlyDataResponse.json();
+  const yearlyData = yearlyDataJson.data;
+  return yearlyData.sold ? true : false
 }
 
 async function showNpsSurvey(items) {
@@ -323,7 +350,7 @@ async function showNpsSurvey(items) {
     location.href = "/feedback-nps";
   }
 }
-  //Disable webflow form submissions
+//Disable webflow form submissions
 Webflow.push(function () {
   $('form').submit(function () {
     return false;
@@ -386,7 +413,6 @@ let loadHandlerHasRun = false;
 
 function onLoadHandler() {
   console.log('onLoadHandler running');
-  signoutButton.addEventListener('click', signOut);
   menuSignoutButton.addEventListener('click', signOut);
   bookPickupForm.addEventListener("submit", bookPickup);
   closePickupToastIcon.addEventListener("click", closePickupToast);
@@ -415,6 +441,16 @@ function onLoadHandler() {
   shareCodeButton.addEventListener('click', shareCode);
   sharePersonalLinkButton.addEventListener('click', shareCode);
   loadHandlerHasRun = true;
+  menuButton.addEventListener("click", function () {
+    Intercom('update', {
+      "hide_default_launcher": true
+    });
+  });
+  closeMenuButton.addEventListener("click", function () {
+    Intercom('update', {
+      "hide_default_launcher": false
+    });
+  });
 }
 window.addEventListener('load', onLoadHandler);
 console.log(`document.readyState ${document.readyState}`);
@@ -422,15 +458,6 @@ if (document.readyState === "complete" && !loadHandlerHasRun) {
   console.log("Running it since event listener did not")
   onLoadHandler();
 }
-
-window.addEventListener('pageshow', (event) => {
-  if (event.persisted) {
-    console.log('This page was restored from the bfcache.');
-    if (menu.style.display !== 'none') { menu.style.display = 'none' }
-  } else {
-    console.log('This page was loaded normally.');
-  }
-});
 
 window.intercomSettings = {
   app_id: "klyy0le5"

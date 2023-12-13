@@ -478,7 +478,7 @@ export async function loadItemCards(items) {
         itemListSoldContainer.style.display = "block";
         sellButtonText.innerHTML = "Sälj ett plagg";
         youEarned = youEarned + sellerGets;
-        youEarnedDiv.innerHTML = `Du har tjänat ${Math.round(youEarned)} kr`;
+        youEarnedDiv.innerHTML = `Du har tjänat ${Math.round(youEarned).toLocaleString('en-US').replaceAll(',', ' ')} kr`;
       }
     }
   });

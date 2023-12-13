@@ -35,18 +35,20 @@ async function main() {
   }
 }
 
+
+
 function shareYearly() {
   const params = getParamsObject();
   if (navigator.share) {
     navigator.share({
-      url: `https://maiapp.se/2023withmai?id=${params.id}`
+      url: `https://maiapp.se/2023withmai?id=${userId.substring(0,10)}`
     }).then(() => { console.log('Thanks for sharing!'); }).catch((e) => {
       console.error(e);
       errorHandler.report(e);
     });
   } else {
     console.log("Browser doesn't support navigator.share => Copy to clipboard!");
-    const shareText = `https://maiapp.se/2023withmai?id=${params.id}`;
+    const shareText = `https://maiapp.se/2023withmai?id=${userId.substring(0,10)}`;
     navigator.clipboard.writeText(shareText);
     linkCopiedBanner.style.display = 'flex';
     setTimeout(function () { linkCopiedBanner.style.display = 'none'; }, 1500);
