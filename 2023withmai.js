@@ -29,7 +29,6 @@ async function main() {
     document.getElementById('topStatsLoadingIcon').style.display = 'none';
     topStatsDiv.style.visibility = 'visible';
     letterDiv.style.display = 'flex';
-    airplaneIcon.style.display = 'block';
     document.getElementById('shareYearlyHeaderButton').addEventListener('click', shareYearly);
     document.getElementById('shareYearlyButton').addEventListener('click', shareYearly);
   }
@@ -59,6 +58,8 @@ main();
 user.whenSet(async () => {
   const params = getParamsObject();
   if (authUser.current.uid.includes(params.id)) {
+    airplaneIcon.style.display = 'block';
+    shareYearlyButton.style.display = 'block';
     // Store elementViews to be able to hinder it to show automatically again
     db.collection('users').doc(authUser.current.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "2023withmai", timestamp: new Date() }) });
     // Track with segment
