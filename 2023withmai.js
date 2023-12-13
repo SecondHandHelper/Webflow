@@ -56,3 +56,12 @@ function shareYearly() {
 }
 
 main();
+user.whenSet(async () => {
+  const params = getParamsObject();
+  if (authUser.current.uid.includes(params.id)) {
+    // Store elementViews to be able to hinder it to show automatically again
+    db.collection('users').doc(authUser.current.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "2023withmai", timestamp: new Date() }) });
+    // Track with segment
+    analytics.track("Element Viewed", { elementID: "2023withmai" });
+  }
+});
