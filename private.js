@@ -231,16 +231,16 @@ async function privateMain() {
 
   //For testing purposes only - To see what a certain user sees
   if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
-    userId = "jx4Z7ocv5PQtlxGFcwn0Zq3aqke2";
+    userId = "XzGySeN2f7MIKkihP2dgtcMS4Wz1";
   }
   //Yearly Summary
   yearlyDataExist(userId).then((result) => {
-    if (result){
+    if (result) {
       console.log('Yearly data exist!');
       document.getElementById('yearlySummaryDiv').style.display = 'block';
       document.getElementById('yearlySummaryDiv').addEventListener("click", function () {
-      location.href = `/2023withmai?id=${userId.substring(0,10)}`;
-    });
+        location.href = `/2023withmai?id=${userId.substring(0, 10)}`;
+      });
     } else {
       console.log('No yearly summary exist!');
     }
@@ -271,7 +271,7 @@ async function privateMain() {
   loadInfoRequests(userId);
   showOrderBagsSection();
   showReferralSection();
-  //showHolidayModeDiv(items);
+  showHolidayModeDiv(items);
 
   // Create refCode
   if (user.current && user.current.addressFirstName && user.current.addressLastName && !user.current?.referralData?.referralCode) {
@@ -452,6 +452,7 @@ function onLoadHandler() {
       "hide_default_launcher": false
     });
   });
+  document.getElementById('christmasHolidayDiv').onclick = () => Intercom('showNewMessage', 'När reser du iväg, och när är du tillbaka?\n\n');
 }
 window.addEventListener('load', onLoadHandler);
 console.log(`document.readyState ${document.readyState}`);
