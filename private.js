@@ -271,7 +271,7 @@ async function privateMain() {
   loadInfoRequests(userId);
   showOrderBagsSection();
   showReferralSection();
-  showHolidayModeDiv(items);
+  //showHolidayModeDiv(items);
 
   // Create refCode
   if (user.current && user.current.addressFirstName && user.current.addressLastName && !user.current?.referralData?.referralCode) {
