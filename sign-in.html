@@ -137,29 +137,9 @@
 </script>
 
 <script>
-  googleSignInButton.addEventListener('click', signInWithGoogle);
-  googleSignInButton2.addEventListener('click', signInWithGoogle);
+
   signinFormsDiv.style.display = 'block';
   signinLoadingDiv.style.display = 'none';
-
-  async function signInWithGoogle() {
-    googleButtonText.style.display = 'none';
-    googleButtonLoadingIcon.style.display = 'block';
-    // [START auth_google_provider_create]
-    var provider = new firebase.auth.GoogleAuthProvider();
-    // [END auth_google_provider_create]
-
-
-    //NEW POPUP SIGNIN
-    try {
-      await firebase.auth().signInWithPopup(provider)
-      await authUser.whenSet(signedInNextStep);
-    } catch (error) {
-      errorHandler.report(error);
-      const errorText = `[webflow] Error signing in with Google: ${error.code}, ${error.message}, ${error.email}, ${error}`;
-      console.log(errorText);
-    }
-  }
 </script>
 
 <script>
@@ -279,4 +259,5 @@
   showOtherSignInMethodsButton.addEventListener('click', function () {
     triggerOtherSignInMethodsView.click();
   });
+  urlDependentLoadJs('signInHelpers.js');
 </script>
