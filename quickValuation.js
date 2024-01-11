@@ -1,6 +1,25 @@
 import {autocomplete, brands} from "./autocomplete-brands";
 import {checkBlockedOrLowShareSoldBrand, initializeCategorySelect, fieldLabelToggle} from "./sellItemHelpers";
 
+function showPlatforms(platformsToBePublishedOn) {
+  if (platformsToBePublishedOn?.length < 2) {
+    document.getElementById('platformsToPublishOn').style.display = 'none';
+    return;
+  }
+  const platformNode = document.getElementById('traderaPlatformText');
+  platformsToBePublishedOn.forEach(platform => {
+    if (platform.match(/Tradera/)) {
+      return; // Tradera is set statically in Webflow and always displayed
+    }
+    const newNode = platformNode.cloneNode(true);
+    newNode.id = platform;
+    newNode.innerText = platform;
+    platformNode.parentNode.appendChild(newNode);
+  });
+  document.getElementById('platformsLoadingDiv').style.display = 'none';
+  document.getElementById('platformsToPublishOn').style.display = 'block';
+}
+
 async function quickValuationMain() {
   Webflow.push(function () {
     $('form').submit(function () {
@@ -44,24 +63,24 @@ async function quickValuationMain() {
       const { platformsToBePublishedOn } = platformsRes.data || {};
       document.getElementById('valuationResultDiv').style.display = 'block';
       document.getElementById('brandCategoryText').innerText = `${brand}-${category}`;
-      document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
-
-      if (platformsToBePublishedOn?.length < 2) {
+      if (decline) {
+        document.getElementById('noValuationText').innerText = `Vi säljer generellt sett inte plagg från ${brand} på grund av för låg efterfråga på andrahandsmarknaden.`;
+        document.getElementById('noValuationText').style.display = 'block';
+        document.getElementById('valuationText').style.display = 'none';
+        document.getElementById('valuationExplanation').style.display = 'none';
         document.getElementById('platformsToPublishOn').style.display = 'none';
-        return;
+      } else if (minPrice && maxPrice && !humanCheckNeeded) {
+        showPlatforms(platformsToBePublishedOn)
+        document.getElementById('noValuationText').style.display = 'none';
+        document.getElementById('valuationText').style.display = 'block';
+        document.getElementById('valuationExplanation').style.display = 'block';
+        document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
+      } else {
+        document.getElementById('noValuationText').style.display = 'block';
+        document.getElementById('valuationExplanation').style.display = 'none';
+        document.getElementById('valuationText').style.display = 'none';
+        document.getElementById('platformsToPublishOn').style.display = 'none';
       }
-      const platformNode = document.getElementById('traderaPlatformText');
-      platformsToBePublishedOn.forEach(platform => {
-        if (platform.match(/Tradera/)) {
-          return; // Tradera is set statically in Webflow and always displayed
-        }
-        const newNode = platformNode.cloneNode(true);
-        newNode.id = platform;
-        newNode.innerText = platform;
-        platformNode.parentNode.appendChild(newNode);
-      });
-      document.getElementById('platformsLoadingDiv').style.display = 'none';
-      document.getElementById('platformsToPublishOn').style.display = 'block';
     } catch (e) {
       console.log(e);
     }
