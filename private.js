@@ -83,10 +83,17 @@ async function showOrderBagsSection() {
 }
 
 function showInviteToast(items) {
+  let nowDate = new Date();
   let daysSinceLatestSold = 10;
   let soldItemsCount = 0;
   let oneSoldNotSentItemExist = false;
-  let viewedToastBefore = user.current?.elementViews && user.current.elementViews.some(e => e.elementID === 'inviteToast') ? true : false;
+  //let viewedToastBefore = user.current?.elementViews && user.current.elementViews.some(e => e.elementID === 'inviteToast') ? true : false;
+
+  // Last viewed
+  const x = user.current?.elementViews ? user.current.elementViews.find(e => e.elementID === 'inviteToast') : null;
+  const toastLastViewed = x ? x.timestamp.toDate() : null;
+  const daysSinceToastLastViewed = toastLastViewed ? Math.floor((nowDate.getTime() - toastLastViewed.getTime()) / (1000 * 3600 * 24)) : null;
+  console.log('daysSinceToastLastViewed', daysSinceToastLastViewed);
 
   if (items) {
     items.forEach((doc) => { // Items is a global variable that equals to querySnapshot from loadCardLists.js
@@ -101,7 +108,6 @@ function showInviteToast(items) {
         soldItemsCount++;
         if (soldDate) {
           soldDate = new Date(soldDate);
-          let nowDate = new Date();
           let timeDifference = nowDate.getTime() - soldDate.getTime();
           let daysDiff = Math.floor(timeDifference / (1000 * 3600 * 24));
           if (daysDiff <= daysSinceLatestSold) { daysSinceLatestSold = daysDiff; }
@@ -112,8 +118,8 @@ function showInviteToast(items) {
       }
     });
   }
-
-  if (daysSinceLatestSold <= 3 && soldItemsCount >= 2 && oneSoldNotSentItemExist && user.current?.referralData?.referralCode && !viewedToastBefore) {
+  if (!user.current?.referralData?.referralCode) { return }
+  if ((!toastLastViewed || daysSinceToastLastViewed > 45) && (daysSinceLatestSold <= 7 || (soldItemsCount >= 3 && daysSinceLatestSold <= 45)) ) {
     referralCodeText.innerHTML = user.current.referralData.referralCode;
     triggerInviteToastOpen.click();
 
