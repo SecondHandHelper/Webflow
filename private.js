@@ -87,13 +87,13 @@ function showInviteToast(items) {
   let daysSinceLatestSold = 10;
   let soldItemsCount = 0;
   let oneSoldNotSentItemExist = false;
-  //let viewedToastBefore = user.current?.elementViews && user.current.elementViews.some(e => e.elementID === 'inviteToast') ? true : false;
+  
 
   // Last viewed
-  const x = user.current?.elementViews ? user.current.elementViews.find(e => e.elementID === 'inviteToast') : null;
-  const toastLastViewed = x ? x.timestamp.toDate() : null;
-  const daysSinceToastLastViewed = toastLastViewed ? Math.floor((nowDate.getTime() - toastLastViewed.getTime()) / (1000 * 3600 * 24)) : null;
-  console.log('daysSinceToastLastViewed', daysSinceToastLastViewed);
+  const inviteToastViews = user.current?.elementViews ? user.current.elementViews.filter(e => e.elementID === 'inviteToast') : null;
+  const daysSinceToastViewsArray = Array.from(inviteToastViews, (e) => parseInt(Math.floor((nowDate.getTime() - e.timestamp.toDate().getTime()) / (1000 * 3600 * 24))));
+  const daysSinceToastLastViewed = Math.min(...daysSinceToastViewsArray);
+  let viewedToastBefore = inviteToastViews.length ? true : false;
 
   if (items) {
     items.forEach((doc) => { // Items is a global variable that equals to querySnapshot from loadCardLists.js
@@ -119,7 +119,7 @@ function showInviteToast(items) {
     });
   }
   if (!user.current?.referralData?.referralCode) { return }
-  if ((!toastLastViewed || daysSinceToastLastViewed > 45) && (daysSinceLatestSold <= 7 || (soldItemsCount >= 3 && daysSinceLatestSold <= 45)) ) {
+  if ((!viewedToastBefore || daysSinceToastLastViewed > 45) && (daysSinceLatestSold <= 7 || (soldItemsCount >= 3 && daysSinceLatestSold <= 45))) {
     referralCodeText.innerHTML = user.current.referralData.referralCode;
     triggerInviteToastOpen.click();
 
@@ -237,7 +237,7 @@ async function privateMain() {
 
   //For testing purposes only - To see what a certain user sees
   if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
-    userId = "P9fYQomeZBW3jnYjnLFKurAJXYF3";
+    userId = "3OkW5av20HP8ScpUDS8ip9fBEZr1";
   }
   //Yearly Summary
   yearlyDataExist(userId).then((result) => {
