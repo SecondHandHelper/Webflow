@@ -16,6 +16,7 @@ function loadRecentlySold() {
       // Read result of the Cloud Function.
       const itemListRecentlySoldStartPage = document.getElementById('itemListRecentlySoldStartPage');
       itemListRecentlySoldStartPage.innerHTML = "";
+      itemListRecentlySoldStartPageDesktop.innerHTML = "";
 
       for (const item of result.data) {
         const brand = item.brand;
@@ -32,6 +33,7 @@ function loadRecentlySold() {
                         <div class='text-block-34'>${brand}</div>`;
           //I cut out the "Idag / Igår" during summer, since so little is sold every day. Add this last to show it again: <div class='text-block-34'>${soldTimeText}</div></div>
           itemListRecentlySoldStartPage.innerHTML += itemCardHTML;
+          itemListRecentlySoldStartPageDesktop.innerHTML += itemCardHTML;
         }
       }
     })
