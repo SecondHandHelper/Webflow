@@ -1,23 +1,6 @@
 import {autocomplete, brands} from "./autocomplete-brands";
 import {checkBlockedOrLowShareSoldBrand, initializeCategorySelect, fieldLabelToggle} from "./sellItemHelpers";
 
-function showPlatforms(platformsToBePublishedOn) {
-  if (platformsToBePublishedOn?.length < 2) {
-    document.getElementById('platformsToPublishOn').style.display = 'none';
-    return;
-  }
-  const platformContainer = document.getElementsByClassName('div-block-445').item(0);
-  const platformNode = platformContainer.children.item(0);
-  platformContainer.textContent = ''
-  platformsToBePublishedOn.forEach(platform => {
-    const newNode = platformNode.cloneNode(true);
-    newNode.id = platform;
-    newNode.innerText = platform;
-    platformContainer.appendChild(newNode);
-  });
-  document.getElementById('platformsToPublishOn').style.display = 'block';
-}
-
 async function getValuation(itemBrand, itemCategory) {
   const brand = itemBrand.value ? itemBrand.value.trim() : "";
   const category = itemCategory.value;
@@ -35,52 +18,44 @@ async function getValuation(itemBrand, itemCategory) {
   } else {
     itemCategory.setCustomValidity('');
   }
-  document.getElementById('valuateButton').style.display = 'none';
-  document.getElementById('valuationLoadingButton').style.display = 'flex';
   document.getElementById('valuationResultDiv').style.display = 'none';
+  document.getElementById('howMaiSellsDiv').style.display = 'none';
   try {
-    const [valuationRes, platformsRes] = await Promise.all([
-      firebase.app().functions("europe-west1").httpsCallable('partialMlValuation')({brand, category}),
-      firebase.app().functions('europe-west1').httpsCallable('getPlatformsToBePublishedOn')({brand})
-    ]);
+    const valuationRes = await firebase.app().functions("europe-west1").httpsCallable('partialMlValuation')({brand, category});
     const {
-      minPrice, maxPrice, decline, humanCheckNeeded, newBrand, newBrandCategory, fewBrand, highPriceVarBrandCategory,
+      minPrice, maxPrice, decline, humanCheckNeeded, newBrand, valuatedBrandItems, fewBrand, brandMeanSold,
+      brandCategoryAccuracy, brandAccuracy, highPriceVarBrandCategory, brandShareSold, brandCategoryMeanSold
     } = valuationRes.data || {};
-    const {platformsToBePublishedOn} = platformsRes.data || {};
     document.getElementById('valuationResultDiv').style.display = 'block';
-    document.getElementById('brandCategoryText').innerText = `${brand}-${category}`;
+    document.getElementById('howMaiSellsDiv').style.display = 'block';
+    document.getElementById('maiSellBrandText').innerText = `${brand}-plagg`;
+    document.getElementById('brandCategoryText').innerText = `Värdering ${brand}-${category}`;
+    document.getElementById('valuatedItemHeader').style.display = 'flex';
     if (decline) {
-      document.getElementById('noValuationText').innerText = `Vi säljer generellt sett inte plagg från ${brand} på grund av för låg efterfråga på andrahandsmarknaden.`;
-      document.getElementById('noValuationText').style.display = 'block';
-      document.getElementById('valuationText').style.display = 'none';
-      document.getElementById('valuationExplanation').style.display = 'none';
-      document.getElementById('platformsToPublishOn').style.display = 'none';
-    } else if (fewBrand || !minPrice || !maxPrice) {
-      document.getElementById('noValuationText').innerText = 'Vi kan inte ge en värdering för att vi inte har sålt från detta varumärke innan';
-      document.getElementById('noValuationText').style.display = 'block';
-      document.getElementById('valuationText').style.display = 'none';
-      document.getElementById('valuationExplanation').style.display = 'none';
-      document.getElementById('platformsToPublishOn').style.display = 'none';
+      document.getElementById('itemValuationText').innerText = `Vi säljer generellt sett inte plagg från ${brand} på grund av för låg efterfråga på andrahandsmarknaden.`;
+    } else if (newBrand || valuatedBrandItems === 0 || !minPrice || !maxPrice) {
+      document.getElementById('itemValuationText').innerText = 'Vi verkar inte ha sålt så mycket av detta varumärke innan, så detta plagg skulle vi vilja kika på manuellt för att kunna ge en värdering.';
     } else if (minPrice && maxPrice) {
-      showPlatforms(platformsToBePublishedOn)
-      document.getElementById('noValuationText').style.display = 'none';
-      document.getElementById('valuationText').style.display = 'block';
-      document.getElementById('valuationExplanation').style.display = 'block';
-      if (humanCheckNeeded) {
-        if (highPriceVarBrandCategory) {
-          document.getElementById('noValuationText').innerText = 'Värderingen är mindre säker på grund av hög variation inom varumärket.';
-          document.getElementById('noValuationText').style.display = 'block';
-        } else if (fewBrand) {
-          document.getElementById('noValuationText').innerText = 'Värderingen är mindre säker då vi inte har sålt så mycket av varumärket.';
-          document.getElementById('noValuationText').style.display = 'block';
+      if (!fewBrand) {
+        if (brandCategoryAccuracy >= 0.7 && brandShareSold >= 0.5) {
+          document.getElementById('itemValuationText').innerText = `Kategorin ${category} från ${brand} har i genomsnitt sålts för ${brandCategoryMeanSold} kr, värderingen baseras på ${valuatedBrandItems} plagg, och det är hög efterfrågan på varumärket på andrahandsmarknaden.`;
+        } else if (brandCategoryAccuracy >= 0.7 && brandShareSold < 0.5) {
+          document.getElementById('itemValuationText').innerText = `Kategorin ${category} från ${brand} har i genomsnitt sålts för ${brandCategoryMeanSold} kr, värderingen baseras på ${valuatedBrandItems} plagg. Bra att veta är att efterfrågan på varumärket på andrahandsmarknaden lägre än snittet, så det kan ta lite längre tid att sälja.`;
+        } else if (brandAccuracy >= 0.8 && brandShareSold >= 0.5) {
+          document.getElementById('itemValuationText').innerText = `Plagg från ${brand} har i genomsnitt sålts för ${brandMeanSold} kr, värderingen baseras på ${valuatedBrandItems} plagg, och det är hög efterfrågan på varumärket på andrahandsmarknaden.`;
+        } else if (brandAccuracy >= 0.8 && brandShareSold < 0.5) {
+          document.getElementById('itemValuationText').innerText = `Plagg från ${brand} har i genomsnitt sålts för ${brandMeanSold} kr, värderingen baseras på ${valuatedBrandItems} plagg. Bra att veta är att efterfrågan på varumärket på andrahandsmarknaden lägre än snittet, så det kan ta lite längre tid att sälja.`;
+        } else {
+          document.getElementById('itemValuationText').innerText = `Kategorin ${category} från ${brand} har i genomsnitt sålts för ${brandCategoryMeanSold} kr, värderingen baseras på ${valuatedBrandItems} plagg. Värderingen är lite mer osäker då det ofta är hög variation inom varumärket.`;
         }
+      } else {
+        document.getElementById('itemValuationText').innerText = `Vi har inte sålt så mycket av detta varumärke ännu, AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brand} som vi tidigare värderat.`;
       }
       document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
     } else {
       document.getElementById('noValuationText').style.display = 'block';
       document.getElementById('valuationExplanation').style.display = 'none';
       document.getElementById('valuationText').style.display = 'none';
-      document.getElementById('platformsToPublishOn').style.display = 'none';
     }
   } catch (e) {
     console.log(e);
@@ -88,11 +63,7 @@ async function getValuation(itemBrand, itemCategory) {
     document.getElementById('noValuationText').innerText = 'Något gick fel, försök igen eller kontakta oss om felet kvarstår.';
     document.getElementById('valuationExplanation').style.display = 'none';
     document.getElementById('valuationText').style.display = 'none';
-    document.getElementById('platformsToPublishOn').style.display = 'none';
   }
-  document.getElementById('valuateButton').style.display = 'block';
-  document.getElementById('valuationLoadingButton').style.display = 'none';
-  document.getElementById('clearButton').style.display = 'flex';
 }
 
 async function quickValuationMain() {
@@ -104,19 +75,67 @@ async function quickValuationMain() {
   autocomplete(document.getElementById("itemBrand"), brands);
   const itemBrand = document.getElementById("itemBrand");
   const itemCategory = document.getElementById('itemCategory');
+  const brandClearButton = document.getElementById('brandClearButton');
   itemBrand.oninput = function () {
     checkBlockedOrLowShareSoldBrand(this.value, itemCategory.value);
+    if (this.value?.trim()?.length) {
+      brandClearButton.style.display = 'block';
+    } else {
+      brandClearButton.style.display = 'none';
+      document.getElementById('brandQuickSelectDiv').style.display = 'flex';
+    }
+    if (itemCategory.value?.trim()?.length) {
+      getValuation(itemBrand, itemCategory);
+    }
   };
   initializeCategorySelect();
   itemBrand.addEventListener('input', fieldLabelToggle('itemBrandLabel'));
-  document.getElementById('valuateButton').addEventListener("click", () => getValuation(itemBrand, itemCategory))
-  document.getElementById('clearButton').addEventListener('click', () => {
+  brandClearButton.addEventListener('click', () => {
     itemBrand.value = '';
     document.getElementById('itemBrand').dispatchEvent(new Event('input'));
+    brandClearButton.style.display = 'none';
+  });
+
+  const categoryClearButton = document.getElementById('categoryClearButton');
+  itemCategory.addEventListener('change', () => {
+    if (itemCategory.value?.trim()?.length) {
+      document.getElementById('categoryQuickSelectDiv').style.display = 'none';
+      categoryClearButton.style.display = 'block';
+      if (itemBrand.value?.trim()?.length) {
+        getValuation(itemBrand, itemCategory);
+      }
+    } else {
+      document.getElementById('categoryQuickSelectDiv').style.display = 'block';
+    }
+  })
+  categoryClearButton.addEventListener('click', () => {
     itemCategory.value = '';
     document.getElementById('valuationResultDiv').style.display = 'none';
+    document.getElementById('howMaiSellsDiv').style.display = 'none';
+    document.getElementById('categoryQuickSelectDiv').style.display = 'block';
     $('#itemCategory').trigger('change');
-    document.getElementById('clearButton').style.display = 'none';
+    categoryClearButton.style.display = 'none';
+  });
+  for (const element of document.querySelectorAll('#brandQuickSelectDiv .quickselectitem')) {
+    element.addEventListener('click', (event) => {
+      itemBrand.value = event.target.innerText;
+      itemBrand.dispatchEvent(new Event('input'));
+      document.getElementById('brandQuickSelectDiv').style.display = 'none';
+    });
+  }
+  for (const element of document.querySelectorAll('#categoryQuickSelectDiv .quickselectitem')) {
+    element.addEventListener('click', (event) => {
+      itemCategory.value = event.target.innerText;
+      itemCategory.dispatchEvent(new Event('change'));
+      document.getElementById('categoryQuickSelectDiv').style.display = 'none';
+    });
+  }
+  document.getElementById('sellItemButton').addEventListener('click', () => {
+    localStorage.setItem('newItem', JSON.stringify({ brand: itemBrand.value, category: itemCategory.value }));
+    window.location.href = '/sell-item';
+  })
+  document.getElementById('refreshValuationButton').addEventListener('click', () => {
+    getValuation(itemBrand, itemCategory);
   })
 }
 
