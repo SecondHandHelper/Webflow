@@ -277,6 +277,7 @@ async function privateMain() {
   loadInfoRequests(userId);
   showOrderBagsSection();
   showReferralSection();
+  //fetchAndShowRecommendedItems(items);
   //showHolidayModeDiv(items);
 
   // Create refCode
@@ -363,6 +364,33 @@ Webflow.push(function () {
     return false;
   });
 });
+
+async function fetchAndShowRecommendedItems(items) {
+  try {
+    const ids = [];
+    items.forEach(doc => ids.push(doc.id));
+    const response = await firebase.app().functions("europe-west1").httpsCallable('itemRecommendations')({ items: ids.slice(0, 10) })
+    document.getElementById('recommendedItemsDiv').style.display = 'block';
+    const itemList = document.getElementById('recommendedItemsList')
+    itemList.innerHTML = "";
+
+    for (const item of response.data) {
+      const itemCardHTML = `<div class="div-block-14-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
+                        <div class="img-container" style="background-image: url('${item.image}')"></div></div></div>
+                        <div class="recently-added-text-block">
+                            <div class="recent-added-items-subheader">${item.brand}</div>
+                            <div class="recent-added-items-subheader-category">${item.category}</div>
+                            <div class="recently-added-price">${item.currentPrice} kr</div>
+                            <div class="recently-added-brands-link-text">Mai Shop</div>
+                        </div><a/></div>`;
+      itemList.innerHTML += itemCardHTML;
+    }
+  } catch (e) {
+    errorHandler.report(e);
+    console.log('error', e)
+  }
+}
+
 
 export function closePickupToast() {
   document.getElementById('triggerPickupToastClose').click();

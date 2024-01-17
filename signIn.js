@@ -104,6 +104,9 @@ async function signedInNextStep(fallbackRedirect) {
     location.href = './sell-item';
   } else if (fallbackRedirect && typeof fallbackRedirect === 'string') {
     location.href = fallbackRedirect;
+  } else if (document.referrer.includes('referral')) {
+    // Redirect to referral after sign-in if that's where they came from
+    location.href = '/referral';
   } else {
     location.href = './private';
   }

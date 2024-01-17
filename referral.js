@@ -1,4 +1,5 @@
 import {shareCode} from "./general";
+import QRCode from "qrcode";
 
 async function main() {
   if (!user.current?.referralData?.referralCode) {
@@ -61,4 +62,19 @@ document.getElementById('referralCode').innerText = referralCode || '';
 if (sessionUser?.referralData?.referredUsers?.length > 0){
     document.getElementById('topStatsLoadingIcon').style.display = 'block';
 }
-user.whenSet(main);
+var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+if (isMobile) {
+  user.whenSet(main);
+  if (!sessionUser) {
+    location.href = '/sign-in'
+  }
+} else {
+  const qrCanvas = document.getElementById('qrCanvas')
+  if (qrCanvas) {
+    QRCode.toCanvas(qrCanvas, window.location.href, function (error) {
+      if (error) console.error(error)
+      console.log('success!');
+    });
+  }
+}
+
