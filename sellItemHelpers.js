@@ -256,7 +256,7 @@ export function checkBlockedOrLowShareSoldBrand(brand, category) {
   }
 }
 
-export function initializeCategorySelect() {
+export function initializeCategorySelect(placeholderText = 'Kategori') {
   const itemCategories = [
     { "id": "", "text": "", },
     {
@@ -295,7 +295,7 @@ export function initializeCategorySelect() {
       ]
     }
   ];
-  $('#itemCategory').select2({ selectionCssClass: 'form-field', placeholder: 'Kategori', data: itemCategories });
+  $('#itemCategory').select2({ selectionCssClass: 'form-field', placeholder: placeholderText || 'Kategori', data: itemCategories });
   $("body").on('click', '.select2-container--open .select2-results__group', function () {
     if ($(this).parent().attr('class').match(/expanded-group/)) {
       $(this).parent().removeClass('expanded-group');
