@@ -1,5 +1,5 @@
 import {autocomplete, brands} from "./autocomplete-brands";
-import {checkBlockedOrLowShareSoldBrand, initializeCategorySelect, fieldLabelToggle} from "./sellItemHelpers";
+import {initializeCategorySelect, fieldLabelToggle} from "./sellItemHelpers";
 
 async function getValuation(itemBrand, itemCategory) {
   const brand = itemBrand.value ? itemBrand.value.trim() : "";
@@ -29,7 +29,7 @@ async function getValuation(itemBrand, itemCategory) {
     document.getElementById('valuationResultDiv').style.display = 'block';
     document.getElementById('howMaiSellsDiv').style.display = 'block';
     document.getElementById('maiSellBrandText').innerText = `${brand}-plagg`;
-    document.getElementById('brandCategoryText').innerText = `Värdering ${brand}-${category}`;
+    document.getElementById('brandCategoryText').innerText = `Värdering ${brand}-${category.toLowerCase()}`;
     document.getElementById('valuatedItemHeader').style.display = 'flex';
     if (decline) {
       document.getElementById('itemValuationText').innerText = `Vi säljer generellt sett inte plagg från ${brand} på grund av för låg efterfråga på andrahandsmarknaden.`;
@@ -40,17 +40,15 @@ async function getValuation(itemBrand, itemCategory) {
       document.getElementById('itemValuationText').innerText = 'Vi verkar inte ha sålt så mycket av detta varumärke innan, så detta plagg skulle vi vilja kika på manuellt för att kunna ge en värdering.';
       document.getElementById('valuationText').style.display = 'none';
     } else if (minPrice && maxPrice) {
+      const bestMeanPrice = brandCategoryAccuracy >= 0.7 && brandCategoryMeanSold > 0 ? `Snittpriset för sålda plagg för varumärket i denna kategori är ${brandCategoryMeanSold} kr.` :
+        brandMeanSold > 0 ? `Snittpriset för sålda plagg för varumärket är ${brandMeanSold} kr.` : '';
+      const shareSoldInfo = brandShareSold >= 0.5 ? ', och det är hög efterfrågan på varumärket på andrahandsmarknaden.' :
+        '. Bra att veta är att efterfrågan på varumärket på andrahandsmarknaden lägre än snittet, så det kan ta lite längre tid att sälja.';
       if (!fewBrand) {
-        if (brandCategoryAccuracy >= 0.7 && brandShareSold >= 0.5) {
-          document.getElementById('itemValuationText').innerText = `Kategorin ${category} från ${brand} har i genomsnitt sålts för ${brandCategoryMeanSold} kr, värderingen baseras på ${valuatedBrandItems} plagg, och det är hög efterfrågan på varumärket på andrahandsmarknaden.`;
-        } else if (brandCategoryAccuracy >= 0.7 && brandShareSold < 0.5) {
-          document.getElementById('itemValuationText').innerText = `Kategorin ${category} från ${brand} har i genomsnitt sålts för ${brandCategoryMeanSold} kr, värderingen baseras på ${valuatedBrandItems} plagg. Bra att veta är att efterfrågan på varumärket på andrahandsmarknaden lägre än snittet, så det kan ta lite längre tid att sälja.`;
-        } else if (brandAccuracy >= 0.8 && brandShareSold >= 0.5) {
-          document.getElementById('itemValuationText').innerText = `Plagg från ${brand} har i genomsnitt sålts för ${brandMeanSold} kr, värderingen baseras på ${valuatedBrandItems} plagg, och det är hög efterfrågan på varumärket på andrahandsmarknaden.`;
-        } else if (brandAccuracy >= 0.8 && brandShareSold < 0.5) {
-          document.getElementById('itemValuationText').innerText = `Plagg från ${brand} har i genomsnitt sålts för ${brandMeanSold} kr, värderingen baseras på ${valuatedBrandItems} plagg. Bra att veta är att efterfrågan på varumärket på andrahandsmarknaden lägre än snittet, så det kan ta lite längre tid att sälja.`;
+        if (brandCategoryAccuracy >= 0.7 || brandAccuracy >= 0.8) {
+          document.getElementById('itemValuationText').innerText = `${bestMeanPrice} Värderingen baseras på ${valuatedBrandItems} plagg${shareSoldInfo}`;
         } else {
-          document.getElementById('itemValuationText').innerText = `Kategorin ${category} från ${brand} har i genomsnitt sålts för ${brandCategoryMeanSold} kr, värderingen baseras på ${valuatedBrandItems} plagg. Värderingen är lite mer osäker då det ofta är hög variation inom varumärket.`;
+          document.getElementById('itemValuationText').innerText = `${bestMeanPrice} Värderingen baseras på ${valuatedBrandItems} plagg. Värderingen är lite mer osäker då det ofta är hög variation inom varumärket.`;
         }
       } else {
         document.getElementById('itemValuationText').innerText = `Vi har inte sålt så mycket av detta varumärke ännu, AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brand} som vi tidigare värderat.`;
@@ -80,12 +78,11 @@ async function quickValuationMain() {
   const itemCategory = document.getElementById('itemCategory');
   const brandClearButton = document.getElementById('brandClearButton');
   itemBrand.addEventListener('blur', () => {
-    if (this.value?.trim()?.length && itemCategory.value?.trim()?.length) {
+    if (itemBrand.value?.trim()?.length && itemCategory.value?.trim()?.length) {
       getValuation(itemBrand, itemCategory);
     }
   });
   itemBrand.oninput = function () {
-    checkBlockedOrLowShareSoldBrand(itemBrand.value, itemCategory.value);
     if (itemBrand.value?.trim()?.length) {
       brandClearButton.style.display = 'block';
       document.getElementById('brandQuickSelectDiv').style.display = 'none';
@@ -94,7 +91,7 @@ async function quickValuationMain() {
       document.getElementById('brandQuickSelectDiv').style.display = 'flex';
     }
   };
-  initializeCategorySelect('Skriv kategori här');
+  initializeCategorySelect('Skriv kategori här', () => {});
   itemBrand.addEventListener('input', fieldLabelToggle('itemBrandLabel'));
   brandClearButton.addEventListener('click', () => {
     itemBrand.value = '';

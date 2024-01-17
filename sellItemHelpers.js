@@ -256,7 +256,7 @@ export function checkBlockedOrLowShareSoldBrand(brand, category) {
   }
 }
 
-export function initializeCategorySelect(placeholderText = 'Kategori') {
+export function initializeCategorySelect(placeholderText = 'Kategori', onChangeCallback = checkBlockedOrLowShareSoldBrand) {
   const itemCategories = [
     { "id": "", "text": "", },
     {
@@ -354,7 +354,7 @@ export function initializeCategorySelect(placeholderText = 'Kategori') {
     fieldLabelToggle('itemCategoryLabel')(event);
     const category = document.getElementById('itemCategory');
     const brand = document.getElementById("itemBrand");
-    checkBlockedOrLowShareSoldBrand(brand.value, category.value);
+    onChangeCallback(brand.value, category.value);
   });
 
   // From https://github.com/select2/select2/issues/3015#issuecomment-570171720
