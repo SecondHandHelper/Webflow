@@ -164,7 +164,7 @@
         return;
       }
       if (document.referrer.includes(window.location.origin)) {
-        if (document.referrer.includes('/item-confirmation')) {
+        if (document.referrer.includes('/item-confirmation') || document.referrer.includes('/sign-in')) {
           location.href = '/private';
         } else {
           window.history.back();
