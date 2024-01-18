@@ -277,7 +277,7 @@ async function privateMain() {
   loadInfoRequests(userId);
   showOrderBagsSection();
   showReferralSection();
-  //fetchAndShowRecommendedItems(items);
+  fetchAndShowRecommendedItems(items);
   //showHolidayModeDiv(items);
 
   // Create refCode
@@ -375,12 +375,13 @@ async function fetchAndShowRecommendedItems(items) {
     itemList.innerHTML = "";
 
     for (const item of response.data) {
-      const itemCardHTML = `<div class="div-block-14-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
-                        <div class="img-container" style="background-image: url('${item.image}')"></div></div></div>
+      const image = item.images.modelImageLarge || item.images.modelImageLarge || item.images.enhancedFrontImageLarge || item.images.enhancedFrontImage;
+      const itemCardHTML = `<div class="div-block-14-big"><a href="${item.platformListings.maiShop.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
+                        <div class="img-container" style="background-image: url('${image}')"></div></div></div>
                         <div class="recently-added-text-block">
-                            <div class="recent-added-items-subheader">${item.brand}</div>
+                            <div class="recent-added-items-subheader">${item.cleanedBrand}</div>
                             <div class="recent-added-items-subheader-category">${item.category}</div>
-                            <div class="recently-added-price">${item.currentPrice} kr</div>
+                            <div class="recently-added-price">${item.platformListings.maiShop.currentPrice} kr</div>
                             <div class="recently-added-brands-link-text">Mai Shop</div>
                         </div><a/></div>`;
       itemList.innerHTML += itemCardHTML;
