@@ -240,6 +240,7 @@ async function privateMain() {
     userId = "Cc4y5YYg03TgezoLFkD7QSoKKe73";
   }
   //Yearly Summary
+  /*
   yearlyDataExist(userId).then((result) => {
     if (result) {
       console.log('Yearly data exist!');
@@ -251,6 +252,7 @@ async function privateMain() {
       console.log('No yearly summary exist!');
     }
   });
+  */
 
   const items = await getItems(userId);
   showNpsSurvey(items);
