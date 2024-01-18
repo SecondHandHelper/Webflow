@@ -32,18 +32,18 @@ async function getValuation(itemBrand, itemCategory) {
     document.getElementById('brandCategoryText').innerText = `Värdering ${brand}-${category.toLowerCase()}`;
     document.getElementById('valuatedItemHeader').style.display = 'flex';
     if (decline) {
-      document.getElementById('itemValuationText').innerText = `Vi säljer generellt sett inte plagg från ${brand} på grund av för låg efterfråga på andrahandsmarknaden.`;
+      document.getElementById('itemValuationText').innerText = `Vi säljer generellt inte plagg från ${brand} på grund av för låg efterfrågan.`;
       document.getElementById('valuationText').style.display = 'block';
       document.getElementById('valuationText').innerText = 'Säljer ej';
       document.getElementById('howMaiSellsDiv').style.display = 'none';
     } else if (newBrand || valuatedBrandItems === 0 || !minPrice || !maxPrice) {
-      document.getElementById('itemValuationText').innerText = 'Vi verkar inte ha sålt så mycket av detta varumärke innan, så detta plagg skulle vi vilja kika på manuellt för att kunna ge en värdering.';
+      document.getElementById('itemValuationText').innerText = 'Vi har inte sålt så mycket av detta varumärke, så detta plagg skulle vi vilja kika på manuellt för att kunna ge en värdering.';
       document.getElementById('valuationText').style.display = 'none';
     } else if (minPrice && maxPrice) {
-      const bestMeanPrice = brandCategoryAccuracy >= 0.7 && brandCategoryMeanSold > 0 ? `Snittpriset för sålda plagg för varumärket i denna kategori är ${brandCategoryMeanSold} kr.` :
-        brandMeanSold > 0 ? `Snittpriset för sålda plagg för varumärket är ${brandMeanSold} kr.` : '';
-      const shareSoldInfo = brandShareSold >= 0.5 ? ', och det är hög efterfrågan på varumärket på andrahandsmarknaden.' :
-        '. Bra att veta är att efterfrågan på varumärket på andrahandsmarknaden lägre än snittet, så det kan ta lite längre tid att sälja.';
+      const bestMeanPrice = brandCategoryAccuracy >= 0.7 && brandCategoryMeanSold > 0 ? `Snittpriset för sålda plagg för ${brand} i denna kategori är ${brandCategoryMeanSold} kr.` :
+        brandMeanSold > 0 ? `Snittpriset för sålda plagg för ${brand} är ${brandMeanSold} kr.` : '';
+      const shareSoldInfo = brandShareSold >= 0.5 ? ', och det är hög efterfrågan på varumärket.' :
+        `. Det kan vara bra att veta att efterfrågan på ${brand} är lägre än snittet, så det kan ta lite längre tid att sälja.`;
       if (!fewBrand) {
         if (brandCategoryAccuracy >= 0.7 || brandAccuracy >= 0.8) {
           document.getElementById('itemValuationText').innerText = `${bestMeanPrice} Värderingen baseras på ${valuatedBrandItems} plagg${shareSoldInfo}`;
