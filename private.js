@@ -369,18 +369,18 @@ async function fetchAndShowRecommendedItems(items) {
   try {
     const ids = [];
     items.forEach(doc => ids.push(doc.id));
-    const response = await firebase.app().functions("europe-west1").httpsCallable('itemRecommendations')({ items: ids.slice(0, 10) })
+    const response = await firebase.app().functions("europe-west1").httpsCallable('itemRecommendations')({ items: ids.slice(0, 10) });
     document.getElementById('recommendedItemsDiv').style.display = 'block';
-    const itemList = document.getElementById('recommendedItemsList')
+    const itemList = document.getElementById('recommendedItemsList');
     itemList.innerHTML = "";
 
     for (const item of response.data) {
-      const image = item.images.modelImageLarge || item.images.modelImageLarge || item.images.enhancedFrontImageLarge || item.images.enhancedFrontImage;
+      const image = item.images.modelImageLarge || item.images.modelImage || item.images.enhancedFrontImageLarge || item.images.enhancedFrontImage;
       const itemCardHTML = `<div class="div-block-14-big"><a href="${item.platformListings.maiShop.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
                         <div class="img-container" style="background-image: url('${image}')"></div></div></div>
                         <div class="recently-added-text-block">
                             <div class="recent-added-items-subheader">${item.cleanedBrand}</div>
-                            <div class="recent-added-items-subheader-category">${item.category}</div>
+                            <div class="recent-added-items-subheader-category">${item.category}${item.maiSize ? `, ${item.maiSize}` : ''}</div>
                             <div class="recently-added-price">${item.platformListings.maiShop.currentPrice} kr</div>
                             <div class="recently-added-brands-link-text">Mai Shop</div>
                         </div><a/></div>`;
