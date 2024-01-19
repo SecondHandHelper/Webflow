@@ -394,8 +394,9 @@ async function fetchAndShowRecommendedItems(items) {
       itemList.innerHTML += itemCardHTML;
     }
     itemList.querySelectorAll("a").forEach(link => link.addEventListener('click', linkClickTracker) );
+
     document.getElementById('goToMaiShopLinkRecommendations').setAttribute("href",
-      `https://shop.maiapp.se/collections/damklader/Woman?sort_by=created-descending&filter.p.m.global.size=${itemSizes.join('&filter.p.m.global.size=')}`);
+      `https://shop.maiapp.se/collections/damklader/${response.data[0].sex || 'Woman'}?sort_by=created-descending&filter.p.m.global.size=${itemSizes.join('&filter.p.m.global.size=')}`);
     const observer = new IntersectionObserver((entries, opts) => {
       const rect = itemList.getBoundingClientRect();
       const isVisible = rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
