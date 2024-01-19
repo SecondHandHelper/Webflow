@@ -371,7 +371,10 @@ async function fetchAndShowRecommendedItems(items) {
   try {
     const ids = [];
     items.forEach(doc => ids.push(doc.id));
-    const response = await firebase.app().functions("europe-west1").httpsCallable('itemRecommendations')({ items: ids.slice(0, 10) });
+    const response = await firebase.app().functions("europe-west1").httpsCallable('itemRecommendations')({ items: ids.slice(0, 10) })
+    if (!response.data.length) {
+      return;
+    }
     document.getElementById('recommendedItemsDiv').style.display = 'block';
     const itemList = document.getElementById('recommendedItemsList');
     itemList.innerHTML = "";
@@ -382,7 +385,7 @@ async function fetchAndShowRecommendedItems(items) {
                         <div class="img-container" style="background-image: url('${image}')"></div></div></div>
                         <div class="recently-added-text-block">
                             <div class="recent-added-items-subheader">${item.cleanedBrand}</div>
-                            <div class="recent-added-items-subheader-category">${item.category}${item.maiSize ? `, ${item.maiSize}` : ''}</div>
+                            <div class="recent-added-items-subheader-category">${item.category}, ${item.maiSize}</div>
                             <div class="recently-added-price">${item.platformListings.maiShop.currentPrice} kr</div>
                             <div class="recently-added-brands-link-text">Mai Shop</div>
                         </div><a/></div>`;
