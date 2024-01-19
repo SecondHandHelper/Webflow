@@ -1,6 +1,6 @@
-import { itemCoverImage, shareCode, signOut } from "./general";
-import { loadInfoRequests } from "./infoRequestsFunctions";
-import { loadItemCards } from "./loadItemCards";
+import {itemCoverImage, shareCode, signOut} from "./general";
+import {loadInfoRequests} from "./infoRequestsFunctions";
+import {loadItemCards} from "./loadItemCards";
 
 var userId;
 var email;
@@ -378,10 +378,12 @@ async function fetchAndShowRecommendedItems(items) {
     document.getElementById('recommendedItemsDiv').style.display = 'block';
     const itemList = document.getElementById('recommendedItemsList');
     itemList.innerHTML = "";
-
+    let itemSizes = [];
+    let idx = 0;
     for (const item of response.data) {
+      if (!itemSizes.includes(item.maiSize)) { itemSizes.push(item.maiSize) }
       const image = item.images.modelImageLarge || item.images.modelImage || item.images.enhancedFrontImageLarge || item.images.enhancedFrontImage;
-      const itemCardHTML = `<div class="div-block-14-big"><a href="${item.platformListings.maiShop.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
+      const itemCardHTML = `<div class="div-block-14-big"><a id="recommendedItemCard${idx++}" href="${item.platformListings.maiShop.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
                         <div class="img-container" style="background-image: url('${image}')"></div></div></div>
                         <div class="recently-added-text-block">
                             <div class="recent-added-items-subheader">${item.cleanedBrand}</div>
@@ -391,6 +393,19 @@ async function fetchAndShowRecommendedItems(items) {
                         </div><a/></div>`;
       itemList.innerHTML += itemCardHTML;
     }
+    itemList.querySelectorAll("a").forEach(link => link.addEventListener('click', linkClickTracker) );
+    document.getElementById('goToMaiShopLinkRecommendations').setAttribute("href",
+      `https://shop.maiapp.se/collections/damklader/Woman?sort_by=created-descending&filter.p.m.global.size=${itemSizes.join('&filter.p.m.global.size=')}`);
+    const observer = new IntersectionObserver((entries, opts) => {
+      const rect = itemList.getBoundingClientRect();
+      const isVisible = rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+      if (isVisible) {
+        console.log("Recommendations viewed");
+        analytics.track("Element Viewed", {elementID: "recommendedItems"});
+        observer.disconnect();
+      }
+    }, { threshold: 1, root: null })
+    observer.observe(itemList);
   } catch (e) {
     errorHandler.report(e);
     console.log('error', e)

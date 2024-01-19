@@ -29,7 +29,7 @@ async function getValuation(itemBrand, itemCategory) {
     document.getElementById('valuationResultDiv').style.display = 'block';
     document.getElementById('howMaiSellsDiv').style.display = 'block';
     document.getElementById('maiSellBrandText').innerText = `${brand}-plagg`;
-    document.getElementById('brandCategoryText').innerText = `Värdering ${brand}-${category.toLowerCase()}`;
+    document.getElementById('brandCategoryText').innerText = `${brand}-${category.toLowerCase()}`;
     document.getElementById('valuatedItemHeader').style.display = 'flex';
     if (decline) {
       document.getElementById('itemValuationText').innerText = `Vi säljer generellt inte plagg från ${brand} på grund av för låg efterfrågan.`;
@@ -56,6 +56,7 @@ async function getValuation(itemBrand, itemCategory) {
       }
       document.getElementById('valuationText').style.display = 'block';
       document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
+      document.getElementById('soldStatsDiv').style.display = 'block';
     } else {
       document.getElementById('itemValuationText').innerText = 'Något gick fel, försök igen eller kontakta oss om felet kvarstår.';
       document.getElementById('valuationText').style.display = 'none';
