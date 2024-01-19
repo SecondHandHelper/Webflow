@@ -371,7 +371,7 @@ async function fetchAndShowRecommendedItems(items) {
   try {
     const ids = [];
     items.forEach(doc => ids.push(doc.id));
-    const response = await firebase.app().functions("europe-west1").httpsCallable('itemRecommendations')({ items: ids.slice(0, 10) })
+    const response = await firebase.app().functions("europe-west1").httpsCallable('itemRecommendations')({ items: ids.slice(0, 10), number: 20 })
     if (!response.data.length) {
       return;
     }
