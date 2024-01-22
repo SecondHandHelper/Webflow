@@ -24,7 +24,8 @@ async function getValuation(itemBrand, itemCategory) {
     const valuationRes = await firebase.app().functions("europe-west1").httpsCallable('partialMlValuation')({brand, category});
     const {
       minPrice, maxPrice, decline, humanCheckNeeded, newBrand, valuatedBrandItems, fewBrand, brandMeanSold,
-      brandCategoryAccuracy, brandAccuracy, highPriceVarBrandCategory, brandShareSold, brandCategoryMeanSold
+      brandCategoryAccuracy, brandAccuracy, highPriceVarBrandCategory, brandShareSold, brandCategoryMeanSold,
+      brandCategoryMeanMinPrice, brandCategoryMeanMaxPrice, brandCategoryMinSoldPrice, brandCategoryMaxSoldPrice
     } = valuationRes.data || {};
     document.getElementById('valuationResultDiv').style.display = 'block';
     document.getElementById('howMaiSellsDiv').style.display = 'block';
@@ -37,25 +38,30 @@ async function getValuation(itemBrand, itemCategory) {
       document.getElementById('valuationText').innerText = 'Säljer ej';
       document.getElementById('howMaiSellsDiv').style.display = 'none';
     } else if (newBrand || valuatedBrandItems === 0 || !minPrice || !maxPrice) {
-      document.getElementById('itemValuationText').innerText = 'Vi har inte sålt så mycket av detta varumärke, så detta plagg skulle vi vilja kika på manuellt för att kunna ge en värdering.';
+      document.getElementById('itemValuationText').innerText = 'Vi har inte sålt så mycket av detta varumärke tidigare, så detta plagg skulle vi behöva kika på manuellt för att kunna ge en värdering. Lägg upp ditt plagg till Mai så får du en värdering inom 2 dagar.';
       document.getElementById('valuationText').style.display = 'none';
+      document.getElementById('soldStatsDiv').style.display = 'none';
     } else if (minPrice && maxPrice) {
-      const bestMeanPrice = brandCategoryAccuracy >= 0.7 && brandCategoryMeanSold > 0 ? `Snittpriset för sålda plagg för ${brand} i denna kategori är ${brandCategoryMeanSold} kr.` :
-        brandMeanSold > 0 ? `Snittpriset för sålda plagg för ${brand} är ${brandMeanSold} kr.` : '';
-      const shareSoldInfo = brandShareSold >= 0.5 ? ', och det är hög efterfrågan på varumärket.' :
-        `. Det kan vara bra att veta att efterfrågan på ${brand} är lägre än snittet, så det kan ta lite längre tid att sälja.`;
+      const soldBrandItems = Math.round(valuatedBrandItems * brandShareSold);
       if (!fewBrand) {
-        if (brandCategoryAccuracy >= 0.7 || brandAccuracy >= 0.8) {
-          document.getElementById('itemValuationText').innerText = `${bestMeanPrice} Värderingen baseras på ${valuatedBrandItems} plagg${shareSoldInfo}`;
-        } else {
-          document.getElementById('itemValuationText').innerText = `${bestMeanPrice} Värderingen baseras på ${valuatedBrandItems} plagg. Värderingen är lite mer osäker då det ofta är hög variation inom varumärket.`;
-        }
+        const startCopy = highPriceVarBrandCategory || (brandCategoryAccuracy < 0.7 && brandAccuracy < 0.8) ?
+          `Slutpriser för ${brand}-${category.toLowerCase()} kan variera mycket beroende på bl.a. modell och ålder. ` : '';
+        const shareSoldInfo = brandShareSold >= 0.5 ? `${brand} är eftertraktat på andrahandsmarknaden, och mycket av det som läggs upp säljs.` :
+          `Efterfrågan på ${brand} är lite lägre än snittet, så det kan ta lite längre tid att sälja.`;
+        const endCopy = highPriceVarBrandCategory && startCopy === '' ? ' Lägg upp ditt plagg till Mai för en mer exakt värdering, då tar vi också hänsyn till bl.a. material, skick och modell.' : '';
+        document.getElementById('itemValuationText').innerText = `${startCopy}${shareSoldInfo}${endCopy}`;
       } else {
-        document.getElementById('itemValuationText').innerText = `Vi har inte sålt så mycket av detta varumärke ännu, AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brand} som vi tidigare värderat.`;
+        document.getElementById('itemValuationText').innerText = `Vi har inte sålt så mycket av ${brand} ännu, värderingen baseras på ${soldBrandItems} plagg från ${brand} som vi tidigare värderat. Lägg upp ditt plagg till Mai för en mer exakt värdering. Då tar vi också hänsyn till material, skick, säsong, modell och originalpris.`;
         document.getElementById('valuationText').style.display = 'none';
       }
       document.getElementById('valuationText').style.display = 'block';
-      document.getElementById('valuationText').innerText = `${minPrice}-${maxPrice} kr`;
+      const fromPrice = round10(brandCategoryMeanMinPrice || minPrice);
+      const toPrice = round10(brandCategoryMeanMaxPrice || maxPrice);
+      document.getElementById('valuationText').innerText = `${fromPrice}-${toPrice} kr`;
+      document.getElementById('valuationSoldSpan').innerText = `${brandCategoryMinSoldPrice < 100 ? 100 : brandCategoryMinSoldPrice}-${brandCategoryMaxSoldPrice} kr`
+      document.getElementById('spanBrandCategoryText').innerText = `${brand}-${category.toLowerCase()}`;
+      document.getElementById('soldBrandItems').innerText = `${soldBrandItems} st`;
+      document.getElementById('soldBrandText').innerText = brand;
       document.getElementById('soldStatsDiv').style.display = 'block';
     } else {
       document.getElementById('itemValuationText').innerText = 'Något gick fel, försök igen eller kontakta oss om felet kvarstår.';
@@ -67,6 +73,11 @@ async function getValuation(itemBrand, itemCategory) {
     document.getElementById('valuationText').style.display = 'none';
   }
 }
+
+function round10(val) {
+  return Math.round((val || 0) / 10) * 10;
+}
+
 
 async function quickValuationMain() {
   Webflow.push(function () {
