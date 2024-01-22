@@ -18,7 +18,10 @@ async function signInWithGoogle() {
   if (isInAppBrowser()) {
     const element = document.getElementById('inAppBrowserInfo');
     if (!element.classList.contains('tooltip-show')) {
-      setTimeout(() => element.classList.add('tooltip-show'), 0);
+      setTimeout(() => {
+        element.classList.add('tooltip-show');
+        analytics.track("Element Viewed", { elementID: "googleInAppBrowserPopup" });
+      }, 0);
     }
     return;
   }
