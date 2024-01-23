@@ -38,7 +38,7 @@ async function getValuation(itemBrand, itemCategory) {
       document.getElementById('valuationText').innerText = 'Säljer ej';
       document.getElementById('howMaiSellsDiv').style.display = 'none';
     } else if (newBrand || valuatedBrandItems === 0 || !minPrice || !maxPrice) {
-      document.getElementById('itemValuationText').innerText = 'Vi har inte sålt så mycket av detta varumärke tidigare, så detta plagg skulle vi behöva kika på manuellt för att kunna ge en värdering. Lägg upp ditt plagg till Mai så får du en värdering inom 2 dagar.';
+      document.getElementById('itemValuationText').innerText = 'Vi har inte sålt så mycket av denna kategori från detta varumärke tidigare, så detta plagg skulle vi behöva kika på manuellt för att kunna ge en värdering. Lägg upp ditt plagg till Mai så får du en värdering inom 2 dagar.';
       document.getElementById('valuationText').style.display = 'none';
       document.getElementById('soldStatsDiv').style.display = 'none';
     } else if (minPrice && maxPrice) {
@@ -51,7 +51,7 @@ async function getValuation(itemBrand, itemCategory) {
         const endCopy = highPriceVarBrandCategory && startCopy === '' ? ' Lägg upp ditt plagg till Mai för en mer exakt värdering, då tar vi också hänsyn till bl.a. material, skick och modell.' : '';
         document.getElementById('itemValuationText').innerText = `${startCopy}${shareSoldInfo}${endCopy}`;
       } else {
-        document.getElementById('itemValuationText').innerText = `Vi har inte sålt så mycket av ${brand} ännu, värderingen baseras på ${soldBrandItems} plagg från ${brand} som vi tidigare värderat. Lägg upp ditt plagg till Mai för en mer exakt värdering. Då tar vi också hänsyn till material, skick, säsong, modell och originalpris.`;
+        document.getElementById('itemValuationText').innerText = `Vi har inte sålt så mycket av av denna kategori från ${brand} ännu, värderingen baseras på ${soldBrandItems} plagg från ${brand} som vi tidigare värderat. Lägg upp ditt plagg till Mai för en mer exakt värdering. Då tar vi också hänsyn till material, skick, säsong, modell och originalpris.`;
         document.getElementById('valuationText').style.display = 'none';
       }
       document.getElementById('valuationText').style.display = 'block';
@@ -146,6 +146,7 @@ async function quickValuationMain() {
     });
   }
   document.getElementById('sellItemButton').addEventListener('click', () => {
+    localStorage.removeItem('newItem');
     localStorage.setItem('newItem', JSON.stringify({ brand: itemBrand.value, category: itemCategory.value }));
     window.location.href = '/sell-item';
   })
