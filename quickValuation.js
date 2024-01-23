@@ -97,10 +97,12 @@ async function quickValuationMain() {
   itemBrand.oninput = function () {
     if (itemBrand.value?.trim()?.length) {
       brandClearButton.style.display = 'block';
-      document.getElementById('brandQuickSelectDiv').style.display = 'none';
+      //document.getElementById('brandQuickSelectDiv').style.display = 'none';
+      document.getElementById('hideBrandPills').click();
     } else {
       brandClearButton.style.display = 'none';
-      document.getElementById('brandQuickSelectDiv').style.display = 'flex';
+      //document.getElementById('brandQuickSelectDiv').style.display = 'flex';
+      document.getElementById('showBrandPills').click();
     }
   };
   initializeCategorySelect('Skriv kategori här', () => {});
@@ -114,20 +116,23 @@ async function quickValuationMain() {
   const categoryClearButton = document.getElementById('categoryClearButton');
   itemCategory.addEventListener('change', () => {
     if (itemCategory.value?.trim()?.length) {
-      document.getElementById('categoryQuickSelectDiv').style.display = 'none';
+      //document.getElementById('categoryQuickSelectDiv').style.display = 'none';
+      document.getElementById('hideCategoryPills').click();
       categoryClearButton.style.display = 'block';
       if (itemBrand.value?.trim()?.length) {
         getValuation(itemBrand, itemCategory);
       }
     } else {
-      document.getElementById('categoryQuickSelectDiv').style.display = 'flex';
+      //document.getElementById('categoryQuickSelectDiv').style.display = 'flex';
+      document.getElementById('showCategoryPills').click();
     }
   })
   categoryClearButton.addEventListener('click', () => {
     itemCategory.value = '';
     document.getElementById('valuationResultDiv').style.display = 'none';
     document.getElementById('howMaiSellsDiv').style.display = 'none';
-    document.getElementById('categoryQuickSelectDiv').style.display = 'flex';
+    //document.getElementById('categoryQuickSelectDiv').style.display = 'flex';
+    document.getElementById('showCategoryPills').click();
     $('#itemCategory').trigger('change');
     categoryClearButton.style.display = 'none';
   });
@@ -135,14 +140,16 @@ async function quickValuationMain() {
     element.addEventListener('click', (event) => {
       itemBrand.value = event.target.innerText;
       itemBrand.dispatchEvent(new Event('input'));
-      document.getElementById('brandQuickSelectDiv').style.display = 'none';
+      //document.getElementById('brandQuickSelectDiv').style.display = 'none';
+      document.getElementById('hideBrandPills').click();
     });
   }
   for (const element of document.querySelectorAll('#categoryQuickSelectDiv .quickselectitem')) {
     element.addEventListener('click', (event) => {
       itemCategory.value = event.target.innerText;
       itemCategory.dispatchEvent(new Event('change'));
-      document.getElementById('categoryQuickSelectDiv').style.display = 'none';
+      //document.getElementById('categoryQuickSelectDiv').style.display = 'none';
+      document.getElementById('hideCategoryPills').click();
     });
   }
   document.getElementById('sellItemButton').addEventListener('click', () => {
