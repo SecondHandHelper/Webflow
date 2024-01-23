@@ -23,7 +23,8 @@ firebase.auth().onAuthStateChanged(async (result) => {
     }
   } else {
     console.log('No user');
-    localStorage.removeItem('authUserId')
+    localStorage.removeItem('authUserId');
+    sessionStorage.removeItem('sessionUser');
     // Go to landing page if no user and on logged in pages
     const path = window.location.pathname;
     // Latest page view for logged out users
