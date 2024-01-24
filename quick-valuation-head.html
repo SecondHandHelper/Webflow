@@ -1,6 +1,7 @@
 <style>
     #valuationLoadingButton { display: none; }
     #valuationResultDiv { display: none; }
+    #loadingValuationDiv { display: none; }
     #itemBrandLabel{display: none;}
     #itemCategoryLabel{display:none;}
     #categoryPopUpHeader { display: none; }
@@ -177,4 +178,15 @@
         z-index: 9999;
         display: none;
     }
+</style>
+<style>
+.pills.collapsed {
+  height: 0px;
+  transition: height 0.2s ease-in;
+}
+
+.pills.unfolded {
+  height: 140px;
+  transition: height 0.2s ease-out;
+}
 </style>
