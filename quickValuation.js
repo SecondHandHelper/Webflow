@@ -1,5 +1,5 @@
-import {autocomplete, brands} from "./autocomplete-brands";
-import {initializeCategorySelect, fieldLabelToggle} from "./sellItemHelpers";
+import { autocomplete, brands } from "./autocomplete-brands";
+import { initializeCategorySelect, fieldLabelToggle } from "./sellItemHelpers";
 
 async function getValuation(itemBrand, itemCategory) {
   const brand = itemBrand.value ? itemBrand.value.trim() : "";
@@ -20,9 +20,10 @@ async function getValuation(itemBrand, itemCategory) {
   }
   document.getElementById('valuationResultDiv').style.display = 'none';
   document.getElementById('loadingValuationDiv').style.display = 'flex';
+  document.getElementById('mainDivider').style.display = 'block';
   document.getElementById('howMaiSellsDiv').style.display = 'none';
   try {
-    const valuationRes = await firebase.app().functions("europe-west1").httpsCallable('partialMlValuation')({brand, category});
+    const valuationRes = await firebase.app().functions("europe-west1").httpsCallable('partialMlValuation')({ brand, category });
     const {
       minPrice, maxPrice, decline, humanCheckNeeded, newBrand, valuatedBrandItems, fewBrand, brandMeanSold,
       brandCategoryAccuracy, brandAccuracy, highPriceVarBrandCategory, brandShareSold, brandCategoryMeanSold,
@@ -80,8 +81,29 @@ function round10(val) {
   return Math.round((val || 0) / 10) * 10;
 }
 
+function showMenu(sessionUser) {
+  let identifier = '';
+  if (sessionUser.signInMethod.includes('google') || sessionUser.signInMethod.includes('password')) {
+    identifier = sessionUser.email;
+  } else if (sessionUser.signInMethod.includes('phone')) {
+    identifier = sessionUser.phoneNumber;
+  }
+  if (identifier) {
+    account.innerHTML = identifier;
+    account.style.display = 'block'
+  }
+  if (sessionUser.addressFirstName && sessionUser.addressLastName) {
+    accountName.innerHTML = sessionUser.addressFirstName + ' ' + sessionUser.addressLastName;
+    accountName.style.display = 'block';
+  }
+  menuButton.style.display = 'flex';
+}
 
 async function quickValuationMain() {
+  const sessionUser = JSON.parse(sessionStorage.getItem('sessionUser'));
+  if (sessionUser) {
+    showMenu(sessionUser);
+  }
   Webflow.push(function () {
     $('form').submit(function () {
       return false;
@@ -92,19 +114,22 @@ async function quickValuationMain() {
   const itemCategory = document.getElementById('itemCategory');
   const brandClearButton = document.getElementById('brandClearButton');
   itemBrand.addEventListener('blur', () => {
-    if (itemBrand.value?.trim()?.length && itemCategory.value?.trim()?.length) {
-      getValuation(itemBrand, itemCategory);
-    }
+    setTimeout(function () {
+      if (itemBrand.value?.trim()?.length && itemCategory.value?.trim()?.length) {
+        getValuation(itemBrand, itemCategory);
+      }
+    }, 50);
   });
   itemBrand.oninput = function () {
     if (itemBrand.value?.trim()?.length) {
       brandClearButton.style.display = 'block';
+      collapse(document.getElementById('brandQuickSelectDiv'));
     } else {
       brandClearButton.style.display = 'none';
       unfold(document.getElementById('brandQuickSelectDiv'));
     }
   };
-  initializeCategorySelect('Skriv kategori här', () => {});
+  initializeCategorySelect('Skriv kategori här', () => { });
   itemBrand.addEventListener('input', fieldLabelToggle('itemBrandLabel'));
   brandClearButton.addEventListener('click', () => {
     itemBrand.value = '';
@@ -127,6 +152,7 @@ async function quickValuationMain() {
   categoryClearButton.addEventListener('click', () => {
     itemCategory.value = '';
     document.getElementById('valuationResultDiv').style.display = 'none';
+    document.getElementById('mainDivider').style.display = 'none';
     document.getElementById('howMaiSellsDiv').style.display = 'none';
     unfold(document.getElementById('categoryQuickSelectDiv'));
     $('#itemCategory').trigger('change');
@@ -136,6 +162,9 @@ async function quickValuationMain() {
     element.addEventListener('click', (event) => {
       itemBrand.value = event.target.innerText;
       itemBrand.dispatchEvent(new Event('input'));
+      if (itemBrand.value?.trim()?.length && itemCategory.value?.trim()?.length) {
+        getValuation(itemBrand, itemCategory);
+      }
       collapse(document.getElementById('brandQuickSelectDiv'));
     });
   }
