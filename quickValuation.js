@@ -19,10 +19,11 @@ async function getValuation(itemBrand, itemCategory) {
     itemCategory.setCustomValidity('');
   }
   document.getElementById('valuationResultDiv').style.display = 'none';
+  document.getElementById('disclaimerDiv').style.display = 'none';
   document.getElementById('loadingValuationDiv').style.display = 'flex';
   document.getElementById('mainDivider').style.display = 'block';
   document.getElementById('howItWorksDiv').style.display = 'none';
-  document.getElementById('valuationHeading').style.display = 'none';
+  document.getElementById('valuationInfoButton').style.display = 'none';
   try {
     const valuationRes = await firebase.app().functions("europe-west1").httpsCallable('partialMlValuation')({ brand, category });
     const {
@@ -31,8 +32,10 @@ async function getValuation(itemBrand, itemCategory) {
       brandCategoryMeanMinPrice, brandCategoryMeanMaxPrice, brandCategoryMinSoldPrice, brandCategoryMaxSoldPrice,
     } = valuationRes.data || {};
     document.getElementById('valuationResultDiv').style.display = 'block';
+    document.getElementById('valuationResultDiv').classList.toggle('appear-animation', true);
     document.getElementById('loadingValuationDiv').style.display = 'none';
     document.getElementById('howItWorksDiv').style.display = 'block';
+    document.getElementById('disclaimerDiv').style.display = 'none';
     document.getElementById('brandCategoryText').innerText = `${brand}-${category.toLowerCase()}`;
     document.getElementById('valuatedItemHeader').style.display = 'flex';
     if (decline) {
@@ -47,7 +50,7 @@ async function getValuation(itemBrand, itemCategory) {
       document.getElementById('valuationText').style.display = 'block';
       document.getElementById('soldStatsDiv').style.display = 'none';
     } else if (minPrice && maxPrice) {
-      document.getElementById('valuationHeading').style.display = 'block';
+      document.getElementById('valuationInfoButton').style.display = 'flex';
       const soldBrandItems = Math.round(valuatedBrandItems * brandShareSold);
       if (!fewBrand) {
         const startCopy = highPriceVarBrandCategory || (brandCategoryAccuracy < 0.7 && brandAccuracy < 0.8) ?
@@ -140,6 +143,10 @@ async function quickValuationMain() {
   itemBrand.addEventListener('input', fieldLabelToggle('itemBrandLabel'));
   brandClearButton.addEventListener('click', () => {
     itemBrand.value = '';
+    document.getElementById('valuationResultDiv').style.display = 'none';
+    document.getElementById('mainDivider').style.display = 'none';
+    document.getElementById('howItWorksDiv').style.display = 'none';
+    document.getElementById('disclaimerDiv').style.display = 'block';
     document.getElementById('itemBrand').dispatchEvent(new Event('input'));
     brandClearButton.style.display = 'none';
   });
@@ -161,6 +168,7 @@ async function quickValuationMain() {
     document.getElementById('valuationResultDiv').style.display = 'none';
     document.getElementById('mainDivider').style.display = 'none';
     document.getElementById('howItWorksDiv').style.display = 'none';
+    document.getElementById('disclaimerDiv').style.display = 'block';
     unfold(document.getElementById('categoryQuickSelectDiv'));
     $('#itemCategory').trigger('change');
     categoryClearButton.style.display = 'none';
@@ -190,6 +198,17 @@ async function quickValuationMain() {
   document.getElementById('refreshValuationButton').addEventListener('click', () => {
     getValuation(itemBrand, itemCategory);
   })
+  document.getElementById('valuationInfoButton').addEventListener('click', (e) => {
+    document.getElementById('darkOverlay').style.display = 'block';
+    document.getElementById('valuationInfoBox').style.display = 'block';
+  });
+  document.getElementById('darkOverlay').addEventListener('click', closeInfoBox);
+  document.getElementById('closeValuationInfoBox').addEventListener('click', closeInfoBox);
+}
+
+function closeInfoBox() {
+  document.getElementById('darkOverlay').style.display = 'none';
+  document.getElementById('valuationInfoBox').style.display = 'none';
 }
 
 // Function to toggle collapse animation
