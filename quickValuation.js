@@ -33,6 +33,7 @@ async function getValuation(itemBrand, itemCategory) {
     } = valuationRes.data || {};
     document.getElementById('valuationResultDiv').style.display = 'block';
     document.getElementById('valuationResultDiv').classList.toggle('appear-animation', true);
+    document.getElementById('refreshValuationButton').style.display = 'none';
     document.getElementById('loadingValuationDiv').style.display = 'none';
     document.getElementById('howItWorksDiv').style.display = 'block';
     document.getElementById('disclaimerDiv').style.display = 'none';
@@ -110,9 +111,12 @@ function showMenu(sessionUser) {
 }
 
 async function quickValuationMain() {
-  const sessionUser = JSON.parse(sessionStorage.getItem('sessionUser'));
+  const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
   if (sessionUser) {
     showMenu(sessionUser);
+    document.getElementById("sellItemButton").value = 'Sälj plagget';
+  } else {
+    document.getElementById("headerLogo").style.display = 'block';
   }
   Webflow.push(function () {
     $('form').submit(function () {
@@ -132,6 +136,7 @@ async function quickValuationMain() {
   });
   itemBrand.oninput = function () {
     if (itemBrand.value?.trim()?.length) {
+      toggleRefreshButton();
       brandClearButton.style.display = 'block';
       collapse(document.getElementById('brandQuickSelectDiv'));
     } else {
@@ -204,6 +209,19 @@ async function quickValuationMain() {
   });
   document.getElementById('darkOverlay').addEventListener('click', closeInfoBox);
   document.getElementById('closeValuationInfoBox').addEventListener('click', closeInfoBox);
+}
+
+function toggleRefreshButton() {
+    setTimeout(function () {
+      const itemBrand = document.getElementById('itemBrand');
+      const itemCategory = document.getElementById('itemCategory');
+      const loadingValuationDiv = document.getElementById('itemCategory');
+      if (itemBrand.value?.trim()?.length && itemCategory.value?.trim()?.length && loadingValuationDiv.style.display !== 'block') {
+        document.getElementById('refreshValuationButton').style.display = 'block';
+      } else {
+        document.getElementById('refreshValuationButton').style.display = 'none';
+      }
+    }, 50);
 }
 
 function closeInfoBox() {
