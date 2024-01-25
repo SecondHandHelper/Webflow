@@ -22,12 +22,13 @@ async function getValuation(itemBrand, itemCategory) {
   document.getElementById('loadingValuationDiv').style.display = 'flex';
   document.getElementById('mainDivider').style.display = 'block';
   document.getElementById('howMaiSellsDiv').style.display = 'none';
+  document.getElementById('valuationHeading').style.display = 'none';
   try {
     const valuationRes = await firebase.app().functions("europe-west1").httpsCallable('partialMlValuation')({ brand, category });
     const {
-      minPrice, maxPrice, decline, humanCheckNeeded, newBrand, valuatedBrandItems, fewBrand, brandMeanSold,
-      brandCategoryAccuracy, brandAccuracy, highPriceVarBrandCategory, brandShareSold, brandCategoryMeanSold,
-      brandCategoryMeanMinPrice, brandCategoryMeanMaxPrice, brandCategoryMinSoldPrice, brandCategoryMaxSoldPrice
+      minPrice, maxPrice, decline, newBrand, valuatedBrandItems, fewBrand, valuatedBrandCategoryItems,
+      brandCategoryAccuracy, brandAccuracy, highPriceVarBrandCategory, brandShareSold,
+      brandCategoryMeanMinPrice, brandCategoryMeanMaxPrice, brandCategoryMinSoldPrice, brandCategoryMaxSoldPrice,
     } = valuationRes.data || {};
     document.getElementById('valuationResultDiv').style.display = 'block';
     document.getElementById('loadingValuationDiv').style.display = 'none';
@@ -41,10 +42,13 @@ async function getValuation(itemBrand, itemCategory) {
       document.getElementById('valuationText').innerText = 'Säljer ej';
       document.getElementById('howMaiSellsDiv').style.display = 'none';
     } else if (newBrand || valuatedBrandItems === 0 || !minPrice || !maxPrice) {
-      document.getElementById('itemValuationText').innerText = 'Vi har inte sålt så mycket av denna kategori från detta varumärke tidigare, så detta plagg skulle vi behöva kika på manuellt för att kunna ge en värdering. Lägg upp ditt plagg till Mai så får du en värdering inom 2 dagar.';
-      document.getElementById('valuationText').style.display = 'none';
+      document.getElementById('valuationText').innerText = 'Okänt';
+      const categoryText = valuatedBrandCategoryItems === 0 && valuatedBrandItems > 0 ? 'av denna kategori ' : '';
+      document.getElementById('itemValuationText').innerText = `Vi har inte sålt så mycket ${categoryText}från detta varumärke tidigare, så detta plagg skulle vi behöva kika på manuellt för att kunna ge en värdering. Lägg upp ditt plagg till Mai så får du en värdering inom 2 dagar.`;
+      document.getElementById('valuationText').style.display = 'block';
       document.getElementById('soldStatsDiv').style.display = 'none';
     } else if (minPrice && maxPrice) {
+      document.getElementById('valuationHeading').style.display = 'block';
       const soldBrandItems = Math.round(valuatedBrandItems * brandShareSold);
       if (!fewBrand) {
         const startCopy = highPriceVarBrandCategory || (brandCategoryAccuracy < 0.7 && brandAccuracy < 0.8) ?
@@ -61,11 +65,15 @@ async function getValuation(itemBrand, itemCategory) {
       const fromPrice = round10(brandCategoryMeanMinPrice || minPrice);
       const toPrice = round10(brandCategoryMeanMaxPrice || maxPrice);
       document.getElementById('valuationText').innerText = `${fromPrice}-${toPrice} kr`;
-      document.getElementById('valuationSoldSpan').innerText = `${brandCategoryMinSoldPrice < 100 ? 100 : brandCategoryMinSoldPrice}-${brandCategoryMaxSoldPrice} kr`
       document.getElementById('spanBrandCategoryText').innerText = `${brand}-${category.toLowerCase()}`;
-      document.getElementById('soldBrandItems').innerText = `${soldBrandItems} st`;
-      document.getElementById('soldBrandText').innerText = brand;
-      document.getElementById('soldStatsDiv').style.display = 'block';
+      if (brandCategoryMinSoldPrice <= 0 || brandCategoryMaxSoldPrice <= 0) {
+        document.getElementById('soldStatsDiv').style.display = 'none';
+      } else {
+        document.getElementById('valuationSoldSpan').innerText = `${brandCategoryMinSoldPrice < 100 ? 100 : brandCategoryMinSoldPrice}-${brandCategoryMaxSoldPrice} kr`
+        document.getElementById('soldBrandItems').innerText = `${soldBrandItems} st`;
+        document.getElementById('soldBrandText').innerText = brand;
+        document.getElementById('soldStatsDiv').style.display = 'block';
+      }
     } else {
       document.getElementById('itemValuationText').innerText = 'Något gick fel, försök igen eller kontakta oss om felet kvarstår.';
       document.getElementById('valuationText').style.display = 'none';
