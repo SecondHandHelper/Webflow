@@ -107,6 +107,9 @@ function showMenu(sessionUser) {
     accountName.innerHTML = sessionUser.addressFirstName + ' ' + sessionUser.addressLastName;
     accountName.style.display = 'block';
   }
+  if(sessionUser?.referralData?.referralCode){
+    menuInviteLink.style.display = 'block';
+  }
   menuButton.style.display = 'flex';
 }
 
