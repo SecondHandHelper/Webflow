@@ -21,7 +21,7 @@ async function getValuation(itemBrand, itemCategory) {
   document.getElementById('valuationResultDiv').style.display = 'none';
   document.getElementById('loadingValuationDiv').style.display = 'flex';
   document.getElementById('mainDivider').style.display = 'block';
-  document.getElementById('howMaiSellsDiv').style.display = 'none';
+  document.getElementById('howItWorksDiv').style.display = 'none';
   document.getElementById('valuationHeading').style.display = 'none';
   try {
     const valuationRes = await firebase.app().functions("europe-west1").httpsCallable('partialMlValuation')({ brand, category });
