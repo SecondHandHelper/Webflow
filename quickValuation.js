@@ -32,15 +32,14 @@ async function getValuation(itemBrand, itemCategory) {
     } = valuationRes.data || {};
     document.getElementById('valuationResultDiv').style.display = 'block';
     document.getElementById('loadingValuationDiv').style.display = 'none';
-    document.getElementById('howMaiSellsDiv').style.display = 'block';
-    document.getElementById('maiSellBrandText').innerText = `${brand}-plagg`;
+    document.getElementById('howItWorksDiv').style.display = 'block';
     document.getElementById('brandCategoryText').innerText = `${brand}-${category.toLowerCase()}`;
     document.getElementById('valuatedItemHeader').style.display = 'flex';
     if (decline) {
       document.getElementById('itemValuationText').innerText = `Vi säljer generellt inte plagg från ${brand} på grund av för låg efterfrågan.`;
       document.getElementById('valuationText').style.display = 'block';
       document.getElementById('valuationText').innerText = 'Säljer ej';
-      document.getElementById('howMaiSellsDiv').style.display = 'none';
+      document.getElementById('howItWorksDiv').style.display = 'none';
     } else if (newBrand || valuatedBrandItems === 0 || !minPrice || !maxPrice) {
       document.getElementById('valuationText').innerText = 'Okänt';
       const categoryText = valuatedBrandCategoryItems === 0 && valuatedBrandItems > 0 ? 'av denna kategori ' : '';
@@ -161,7 +160,7 @@ async function quickValuationMain() {
     itemCategory.value = '';
     document.getElementById('valuationResultDiv').style.display = 'none';
     document.getElementById('mainDivider').style.display = 'none';
-    document.getElementById('howMaiSellsDiv').style.display = 'none';
+    document.getElementById('howItWorksDiv').style.display = 'none';
     unfold(document.getElementById('categoryQuickSelectDiv'));
     $('#itemCategory').trigger('change');
     categoryClearButton.style.display = 'none';
