@@ -7,11 +7,17 @@
     #categoryPopUpHeader { display: none; }
     #noValuationText { display: none; }
     #clearButton { display: none; }
-    #howMaiSellsDiv { display: none; }
+    #howItWorksDiv { display: none; }
     #brandClearButton { display: none; }
     #categoryClearButton { display: none; }
     #soldStatsDiv { display: none; }
     #mainDivider { display: none; }
+    #refreshValuationButton { display: none; }
+    #headerLogo { display: none; }
+    
+    /*Info box*/
+    #valuationInfoBox { display: none; }
+    #darkOverlay { display: none; }
 
 		/*Menu elements*/
     #menuButton { display: none; }
@@ -189,7 +195,24 @@
 }
 
 .pills.unfolded {
-  height: 130px;
+  height: 140px;
   transition: height 0.2s ease-out;
 }
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.appear-animation {
+  animation: fadeInUp 0.4s ease;
+}
+
 </style>
