@@ -198,7 +198,9 @@ async function quickValuationMain() {
   }
   for (const element of document.querySelectorAll('#categoryQuickSelectDiv .quickselectitem')) {
     element.addEventListener('click', (event) => {
-      itemCategory.value = event.target.classList.contains('quickselectitem') ? event.target.innerText : event.currentTarget.innerText;
+      itemCategory.value = event.target.classList.contains('quickselectitem') ? event.target.innerText.trim() : event.currentTarget.innerText.trim();
+      console.log(event.target.innerText)
+      console.log(event.currentTarget.innerText)
       if (itemCategory.value?.length) {
         itemCategory.dispatchEvent(new Event('change'));
         collapse(document.getElementById('categoryQuickSelectDiv'));
