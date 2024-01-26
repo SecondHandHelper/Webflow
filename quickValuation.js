@@ -69,10 +69,10 @@ async function getValuation(itemBrand, itemCategory) {
       const toPrice = round10(brandCategoryMeanMaxPrice || maxPrice);
       document.getElementById('valuationText').innerText = `${fromPrice}-${toPrice} kr`;
       document.getElementById('spanBrandCategoryText').innerText = `${brand}-${category.toLowerCase()}`;
-      if (brandCategoryMinSoldPrice <= 0 || brandCategoryMaxSoldPrice <= 0) {
+      if (brandCategoryMinSoldPrice <= 0 || brandCategoryMaxSoldPrice <= 0 || brandCategoryMinSoldPrice > brandCategoryMaxSoldPrice) {
         document.getElementById('soldStatsDiv').style.display = 'none';
       } else {
-        document.getElementById('valuationSoldSpan').innerText = `${brandCategoryMinSoldPrice < 100 ? 100 : brandCategoryMinSoldPrice}-${brandCategoryMaxSoldPrice} kr`
+        document.getElementById('valuationSoldSpan').innerText = `${brandCategoryMinSoldPrice}-${brandCategoryMaxSoldPrice} kr`
         document.getElementById('soldBrandItems').innerText = `${soldBrandItems} st`;
         document.getElementById('soldBrandText').innerText = brand;
         document.getElementById('soldStatsDiv').style.display = 'block';
