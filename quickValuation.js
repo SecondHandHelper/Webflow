@@ -1,5 +1,5 @@
-import { autocomplete, brands } from "./autocomplete-brands";
-import { initializeCategorySelect, fieldLabelToggle } from "./sellItemHelpers";
+import {autocomplete, brands} from "./autocomplete-brands";
+import {fieldLabelToggle, initializeCategorySelect} from "./sellItemHelpers";
 
 async function getValuation(itemBrand, itemCategory) {
   const brand = itemBrand.value ? itemBrand.value.trim() : "";
@@ -45,7 +45,6 @@ async function getValuation(itemBrand, itemCategory) {
       } else {
         document.getElementById('itemValuationText').innerText = `Vi säljer generellt inte ${category.toLowerCase()} från ${brand} på grund av för låg efterfrågan.`;
       }
-      document.getElementById('itemValuationText').innerText = `Vi säljer generellt inte plagg från ${brand} på grund av för låg efterfrågan.`;
       document.getElementById('valuationText').style.display = 'block';
       document.getElementById('valuationText').innerText = 'Säljer ej';
       document.getElementById('howItWorksDiv').style.display = 'none';
@@ -199,9 +198,11 @@ async function quickValuationMain() {
   }
   for (const element of document.querySelectorAll('#categoryQuickSelectDiv .quickselectitem')) {
     element.addEventListener('click', (event) => {
-      itemCategory.value = event.target.innerText;
-      itemCategory.dispatchEvent(new Event('change'));
-      collapse(document.getElementById('categoryQuickSelectDiv'));
+      itemCategory.value = event.target.classList.contains('quickselectitem') ? event.target.innerText : event.currentTarget.innerText;
+      if (itemCategory.value?.length) {
+        itemCategory.dispatchEvent(new Event('change'));
+        collapse(document.getElementById('categoryQuickSelectDiv'));
+      }
     });
   }
   document.getElementById('sellItemButton').addEventListener('click', () => {
