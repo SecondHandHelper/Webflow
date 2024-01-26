@@ -33,6 +33,7 @@ async function getValuation(itemBrand, itemCategory) {
     } = valuationRes.data || {};
     document.getElementById('valuationResultDiv').style.display = 'block';
     document.getElementById('valuationResultDiv').classList.toggle('appear-animation', true);
+    analytics.track("Element Viewed", { elementID: "valuationResultDiv", brand, category });
     document.getElementById('refreshValuationButton').style.display = 'none';
     document.getElementById('loadingValuationDiv').style.display = 'none';
     document.getElementById('howItWorksDiv').style.display = 'block';
@@ -190,6 +191,7 @@ async function quickValuationMain() {
     element.addEventListener('click', (event) => {
       itemBrand.value = event.target.innerText;
       itemBrand.dispatchEvent(new Event('input'));
+      analytics.track("Click", { elementID: "quickSelectItemBrand", brand: event.target.innerText });
       if (itemBrand.value?.trim()?.length && itemCategory.value?.trim()?.length) {
         getValuation(itemBrand, itemCategory);
       }
@@ -201,6 +203,7 @@ async function quickValuationMain() {
       itemCategory.value = event.target.classList.contains('quickselectitem') ? event.target.innerText.trim() : event.currentTarget.innerText.trim();
       console.log(event.target.innerText)
       console.log(event.currentTarget.innerText)
+      analytics.track("Click", { elementID: "quickSelectItemCategory", category: event.target.innerText });
       if (itemCategory.value?.length) {
         itemCategory.dispatchEvent(new Event('change'));
         collapse(document.getElementById('categoryQuickSelectDiv'));
