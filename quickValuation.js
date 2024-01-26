@@ -28,7 +28,7 @@ async function getValuation(itemBrand, itemCategory) {
     const valuationRes = await firebase.app().functions("europe-west1").httpsCallable('partialMlValuation')({ brand, category });
     const {
       minPrice, maxPrice, decline, newBrand, valuatedBrandItems, fewBrand, valuatedBrandCategoryItems,
-      brandCategoryAccuracy, brandAccuracy, highPriceVarBrandCategory, brandShareSold,
+      brandCategoryAccuracy, brandAccuracy, highPriceVarBrandCategory, brandShareSold, humanCheckExplanation,
       brandCategoryMeanMinPrice, brandCategoryMeanMaxPrice, brandCategoryMinSoldPrice, brandCategoryMaxSoldPrice,
     } = valuationRes.data || {};
     document.getElementById('valuationResultDiv').style.display = 'block';
@@ -40,10 +40,16 @@ async function getValuation(itemBrand, itemCategory) {
     document.getElementById('brandCategoryText').innerText = `${brand}-${category.toLowerCase()}`;
     document.getElementById('valuatedItemHeader').style.display = 'flex';
     if (decline) {
+      if (humanCheckExplanation?.match(/decline_blocked_brand/)) {
+        document.getElementById('itemValuationText').innerText = `Vi säljer generellt inte plagg från ${brand} på grund av för låg efterfrågan.`;
+      } else {
+        document.getElementById('itemValuationText').innerText = `Vi säljer generellt inte ${category.toLowerCase()} från ${brand} på grund av för låg efterfrågan.`;
+      }
       document.getElementById('itemValuationText').innerText = `Vi säljer generellt inte plagg från ${brand} på grund av för låg efterfrågan.`;
       document.getElementById('valuationText').style.display = 'block';
       document.getElementById('valuationText').innerText = 'Säljer ej';
       document.getElementById('howItWorksDiv').style.display = 'none';
+      document.getElementById('soldStatsDiv').style.display = 'none';
     } else if (newBrand || valuatedBrandItems === 0 || !minPrice || !maxPrice) {
       document.getElementById('valuationText').innerText = 'Okänt';
       const categoryText = valuatedBrandCategoryItems === 0 && valuatedBrandItems > 0 ? 'av denna kategori ' : '';
@@ -69,10 +75,10 @@ async function getValuation(itemBrand, itemCategory) {
       const toPrice = round10(brandCategoryMeanMaxPrice || maxPrice);
       document.getElementById('valuationText').innerText = `${fromPrice}-${toPrice} kr`;
       document.getElementById('spanBrandCategoryText').innerText = `${brand}-${category.toLowerCase()}`;
-      if (brandCategoryMinSoldPrice <= 100 || brandCategoryMaxSoldPrice <= 100 || brandCategoryMinSoldPrice > brandCategoryMaxSoldPrice) {
+      if (brandCategoryMinSoldPrice <= 0 || brandCategoryMaxSoldPrice <= 100 || brandCategoryMinSoldPrice > brandCategoryMaxSoldPrice) {
         document.getElementById('soldStatsDiv').style.display = 'none';
       } else {
-        document.getElementById('valuationSoldSpan').innerText = `${brandCategoryMinSoldPrice}-${brandCategoryMaxSoldPrice} kr`
+        document.getElementById('valuationSoldSpan').innerText = `${Math.max(100, brandCategoryMinSoldPrice)}-${brandCategoryMaxSoldPrice} kr`
         document.getElementById('soldBrandItems').innerText = `${soldBrandItems} st`;
         document.getElementById('soldBrandText').innerText = brand;
         document.getElementById('soldStatsDiv').style.display = 'block';
