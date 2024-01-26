@@ -69,7 +69,7 @@ async function getValuation(itemBrand, itemCategory) {
       const toPrice = round10(brandCategoryMeanMaxPrice || maxPrice);
       document.getElementById('valuationText').innerText = `${fromPrice}-${toPrice} kr`;
       document.getElementById('spanBrandCategoryText').innerText = `${brand}-${category.toLowerCase()}`;
-      if (brandCategoryMinSoldPrice <= 0 || brandCategoryMaxSoldPrice <= 0 || brandCategoryMinSoldPrice > brandCategoryMaxSoldPrice) {
+      if (brandCategoryMinSoldPrice <= 100 || brandCategoryMaxSoldPrice <= 100 || brandCategoryMinSoldPrice > brandCategoryMaxSoldPrice) {
         document.getElementById('soldStatsDiv').style.display = 'none';
       } else {
         document.getElementById('valuationSoldSpan').innerText = `${brandCategoryMinSoldPrice}-${brandCategoryMaxSoldPrice} kr`
