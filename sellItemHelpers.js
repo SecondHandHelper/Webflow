@@ -332,7 +332,6 @@ export function initializeCategorySelect(placeholderText = 'Kategori', onChangeC
     document.querySelector('html').style.overflow = 'fixed';
     const searchField = document.querySelector('.select2-search__field');
     searchField.placeholder = 'Sök... (t.ex. Klänning/Sneakers/Blus)';
-    focusAndOpenKeyboard(searchField, 100);
     $('.select2-search__field').on('input', (e) => {
       if (e.target.value.length > 0) {
         $('.select2-results__option[role=group]').each((idx, elm) => $(elm).addClass('expanded-group'));

@@ -180,6 +180,9 @@ async function quickValuationMain() {
       unfold(document.getElementById('categoryQuickSelectDiv'));
     }
   })
+  document.querySelector('.select2.select2-container').addEventListener('click', () => {
+    focusAndOpenKeyboard(document.querySelector('.select2-search__field'), 100);
+  });
   categoryClearButton.addEventListener('click', () => {
     itemCategory.value = '';
     document.getElementById('valuationResultDiv').style.display = 'none';
