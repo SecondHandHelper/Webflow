@@ -368,7 +368,7 @@ export function initializeCategorySelect(placeholderText = 'Kategori', onChangeC
   });
 }
 
-export function focusAndOpenKeyboard(el, timeout) {
+export function focusAndOpenKeyboard(querySelector, timeout) {
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   if (!isMobile) {
     el.focus();
@@ -377,7 +377,7 @@ export function focusAndOpenKeyboard(el, timeout) {
   if(!timeout) {
     timeout = 100;
   }
-  if(el) {
+  if(querySelector) {
     // Align temp input element approximately where the input element is
     // so the cursor doesn't jump around
     var __tempEl__ = document.createElement('input');
@@ -392,6 +392,7 @@ export function focusAndOpenKeyboard(el, timeout) {
 
     // The keyboard is open. Now do a delayed focus on the target element
     setTimeout(function() {
+      const el = document.querySelector(querySelector);
       el.focus();
       el.click();
       // Remove the temp element

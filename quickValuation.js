@@ -163,9 +163,8 @@ async function quickValuationMain() {
     document.getElementById('howItWorksDiv').style.display = 'none';
     document.getElementById('disclaimerDiv').style.display = 'block';
     itemBrand.dispatchEvent(new Event('input'));
-    setTimeout(() => { $('#itemBrand').focus(); }, 10)
     brandClearButton.style.display = 'none';
-    focusAndOpenKeyboard(itemBrand, 100);
+    focusAndOpenKeyboard('#itemBrand', 100);
   });
 
   const categoryClearButton = document.getElementById('categoryClearButton');
@@ -181,7 +180,7 @@ async function quickValuationMain() {
     }
   })
   document.querySelector('.select2.select2-container').addEventListener('click', () => {
-    focusAndOpenKeyboard(document.querySelector('.select2-search__field'), 100);
+    focusAndOpenKeyboard('.select2-search__field', 300);
   });
   categoryClearButton.addEventListener('click', () => {
     itemCategory.value = '';
