@@ -195,7 +195,7 @@ async function quickValuationMain() {
     document.getElementById('howItWorksDiv').style.display = 'none';
     document.getElementById('disclaimerDiv').style.display = 'block';
     itemBrand.dispatchEvent(new Event('input'));
-    setTiemout(() => { $('#itemBrand').focus(); }, 10)
+    setTimeout(() => { $('#itemBrand').focus(); }, 10)
     brandClearButton.style.display = 'none';
     focusAndOpenKeyboard(itemBrand, 100);
   });
