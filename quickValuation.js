@@ -132,8 +132,10 @@ async function quickValuationMain() {
       return false;
     });
   });
-  autocomplete(document.getElementById("itemBrand"), brands);
-  const itemBrand = document.getElementById("itemBrand");
+  document.getElementById('itemBrandNew').style.display = 'block';
+  document.getElementById('itemBrand').style.display = 'none';
+  const itemBrand = document.getElementById("itemBrandNew");
+  autocomplete(itemBrand, brands);
   const itemCategory = document.getElementById('itemCategory');
   const brandClearButton = document.getElementById('brandClearButton');
   itemBrand.addEventListener('blur', () => {
@@ -161,7 +163,7 @@ async function quickValuationMain() {
     document.getElementById('mainDivider').style.display = 'none';
     document.getElementById('howItWorksDiv').style.display = 'none';
     document.getElementById('disclaimerDiv').style.display = 'block';
-    document.getElementById('itemBrand').dispatchEvent(new Event('input'));
+    itemBrand.dispatchEvent(new Event('input'));
     brandClearButton.style.display = 'none';
   });
 
@@ -201,8 +203,6 @@ async function quickValuationMain() {
   for (const element of document.querySelectorAll('#categoryQuickSelectDiv .quickselectitem')) {
     element.addEventListener('click', (event) => {
       itemCategory.value = event.target.classList.contains('quickselectitem') ? event.target.innerText.trim() : event.currentTarget.innerText.trim();
-      console.log(event.target.innerText)
-      console.log(event.currentTarget.innerText)
       analytics.track("Click", { elementID: "quickSelectItemCategory", value: event.target.innerText });
       if (itemCategory.value?.length) {
         itemCategory.dispatchEvent(new Event('change'));
@@ -228,7 +228,7 @@ async function quickValuationMain() {
 
 function toggleRefreshButton() {
     setTimeout(function () {
-      const itemBrand = document.getElementById('itemBrand');
+      const itemBrand = document.getElementById('itemBrandNew');
       const itemCategory = document.getElementById('itemCategory');
       const loadingValuationDiv = document.getElementById('itemCategory');
       if (itemBrand.value?.trim()?.length && itemCategory.value?.trim()?.length && loadingValuationDiv.style.display !== 'block') {
