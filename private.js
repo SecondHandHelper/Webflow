@@ -237,7 +237,7 @@ async function privateMain() {
 
   //For testing purposes only - To see what a certain user sees
   if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
-    userId = "Cc4y5YYg03TgezoLFkD7QSoKKe73";
+    userId = "e79qkG0VuugQxQLx7BOZWkBLYaY2";
   }
   //Yearly Summary
   /*

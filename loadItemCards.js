@@ -377,7 +377,7 @@ export async function loadItemCards(items) {
         sellButtonText.innerHTML = "Sälj ett plagg";
 
         // SOLD - NOT SENT
-      } else if (status == "Sold" && shippingStatus != "Sent") {
+      } else if (status == "Sold" && (shippingStatus == "Not sent" || !shippingStatus)) {
         // Prepare card
         var buyerInfoTextHTML = '';
         if (buyerFirstName != null && buyerAddressCity != null && soldPrice) {
