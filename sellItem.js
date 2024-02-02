@@ -210,7 +210,7 @@ function needsHumanCheck({ humanCheckNeeded, newMinMaxLog, lowValueSegment, lowV
   return humanCheckNeeded || (newMinMaxLog.match(/accept price is above max/i) && !lowValueSegment && !lowValueCategory)
 }
 
-async function saveItemValuation(itemId, mlValuationData, userValuationApproval) {
+async function saveItemValuation(itemId, mlValuationData) {
   const { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version,
     newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog, adjustmentAllowed, newBrand, newBrandCategory,
     valuatedBrandItems, brandMeanMax, brandAccuracy, brandCategoryAccuracy, fewBrand, brandMeanSold,
@@ -232,11 +232,10 @@ async function saveItemValuation(itemId, mlValuationData, userValuationApproval)
     ...(decline || needsHumanCheck(mlValuationData) ? {} : {
       valuationStatus: 'Completed',
       valuationDate: new Date().toISOString(),
-      ...(userValuationApproval ? {} : { minPriceEstimate: newMinPriceEstimate || minPrice, maxPriceEstimate: newMaxPriceEstimate || maxPrice }),
       infoRequests: {
         price: {
-          status: userValuationApproval ? 'Active' : 'Resolved',
-          response: userValuationApproval ? '' : 'Accepted',
+          status: 'Active',
+          response: '',
           description: 'Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar. Värderingen utgår från vad liknande sålts för.',
           minPrice: newMinPriceEstimate || minPrice,
           maxPrice: newMaxPriceEstimate || maxPrice,
@@ -287,7 +286,6 @@ async function setValuationFromResellItem(resellItem, item, itemId) {
 }
 
 async function getAndSaveValuation(itemId, item) {
-  const userValuationApproval = item.preferences.userValuationApproval
   if (!itemId && !item) {
     console.error('No item and no itemId, unexpected!!');
     return '/item-confirmation';
@@ -304,16 +302,16 @@ async function getAndSaveValuation(itemId, item) {
   try {
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({ itemId, item });
     const { minPrice, maxPrice, decline } = res.data || {};
-    await saveItemValuation(itemId, res.data, userValuationApproval);
-    return nextStepAfterValuation(minPrice && maxPrice, decline, needsHumanCheck(res.data), userValuationApproval);
+    await saveItemValuation(itemId, res.data);
+    return nextStepAfterValuation(minPrice && maxPrice, decline, needsHumanCheck(res.data));
   } catch (e) {
     console.error('Failed to get ml valuation', e);
   }
   return nextStepAfterValuation();
 }
 
-function nextStepAfterValuation(mlValuationPresent, decline, valuationNeedsChecking, userValuationApproval) {
-  if (!mlValuationPresent || valuationNeedsChecking || !userValuationApproval) {
+function nextStepAfterValuation(mlValuationPresent, decline, valuationNeedsChecking) {
+  if (!mlValuationPresent || valuationNeedsChecking) {
     if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
       return '/sign-in';
     }
@@ -359,7 +357,6 @@ function collect() {
   const defectDescription = itemDefectDescription.value ? itemDefectDescription.value.trim() : "";
   const userComment = itemUserComment.value ? itemUserComment.value.trim() : "";
   const acceptPrice = Number(itemLowestAcceptPrice.value);
-  const userValuationApproval = itemUserValuationApproval.checked;
 
   // Get defects list
   let defectElements = new Map().set("hole", hole.checked).set("stain", stain.checked).set("lostFit", lostFit.checked).set("nopprig", nopprig.checked).set("threadUp", threadUp.checked).set("colorChange", colorChange.checked).set("otherDefect", otherDefect.checked);
@@ -414,7 +411,7 @@ function collect() {
     defectDescription,
     userComment,
     acceptPrice,
-    preferences: { userValuationApproval },
+    preferences: { userValuationApproval: true },
     ...modelVariantFields,
     images,
   };
@@ -529,7 +526,7 @@ function rememberUnsavedChanges() {
     return acc;
   }, {});
   item.defects = item.defects ? item.defects : [];
-  item.userValuationApproval = item.preferences.userValuationApproval;
+  item.userValuationApproval = true;
   delete item.preferences;
   item.acceptPrice = item.acceptPrice && item.acceptPrice > 0 ? item.acceptPrice : null;
   item.originalPrice = item.originalPrice && item.originalPrice > 0 ? item.originalPrice : null;
@@ -684,10 +681,6 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
           document.getElementById(key).checked = true;
         }
       });
-      if ('userValuationApproval' in data && !data.userValuationApproval) {
-        document.getElementById('itemUserValuationApproval').click();
-        document.getElementById('itemUserValuationApproval').previousElementSibling.classList.remove("w--redirected-checked");
-      }
     }
   } catch (error) {
     console.error("Error getting item document:", error);
@@ -1069,10 +1062,6 @@ function clearFormFields() {
     document.getElementById(key).previousElementSibling.classList.remove("w--redirected-checked");
     document.getElementById(key).checked = false;
   });
-  if (document.getElementById('itemUserValuationApproval').checked === false) {
-    document.getElementById('itemUserValuationApproval').click();
-    document.getElementById('itemUserValuationApproval').previousElementSibling.classList.add("w--redirected-checked");
-  }
   sessionStorage.removeItem('newItemId');
   localStorage.removeItem('newItem');
 }
