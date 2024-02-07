@@ -49,5 +49,5 @@ Om du registrerar dig med min kod (f\xf6lj l\xe4nken) och provar s\xe4lja ett pl
                       ${L}
                       ${P}
                       ${t}
-                  </div></div></div></div>`,itemListSoldNotSent.innerHTML+=M,soldNotSentDiv.style.display="block",noItemsDiv.style.display="none",headerSellItemButton.style.display="block",sellButtonText.innerHTML="Sälj ett plagg"}}()}),loadingDiv.style.display="none",sectionsDiv.style.display="block",quickInfoDiv.style.display="block"}},{"./general":"1tOWF","./private":"flS2m","@parcel/transformer-js/src/esmodule-helpers.js":"bNgzC"}]},["flS2m"],"flS2m","parcelRequire81ca");
+                  </div></div></div></div>`,itemListSoldNotSent.innerHTML+=M,soldNotSentDiv.style.display="block",noItemsDiv.style.display="none",headerSellItemButton.style.display="block",sellButtonText.innerHTML="Sälj ett plagg"}}()}),loadingDiv.style.display="none",sectionsDiv.style.display="block",analytics.track("Element Viewed",{elementID:"sectionsDiv"}),quickInfoDiv.style.display="block"}},{"./general":"1tOWF","./private":"flS2m","@parcel/transformer-js/src/esmodule-helpers.js":"bNgzC"}]},["flS2m"],"flS2m","parcelRequire81ca");
 //# sourceMappingURL=private.js.map
