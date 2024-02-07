@@ -327,7 +327,9 @@ async function findBoughtItems(userId){
     newItemCard.querySelector('.img-container').style.backgroundImage = `url("${item.images.modelImageLarge || item.images.modelImage ||
       item.images.enhancedFrontImageLarge || item.images.enhancedFrontImage || item.images.frontImageLarge || item.images.frontImage}")`;
     newItemCard.querySelector('.resell-button').href = `/sell-item?id=${item.id}`;
-    newItemCard.querySelector('.resell-item-title').innerText = `${item.cleanedBrand}`;
+    newItemCard.querySelector('.resell-item-title').innerText = `${item.cleanedBrand || item.brand.trim()}`;
+    newItemCard.querySelector('.resell-subtext').innerText = `${item.cleanedModel ? `${item.cleanedModel}, ` : ``}` + `${item.category}, ${item.size.trim()}`;
+    newItemCard.querySelector('.resell-sub-subtext').innerText = item.soldPlatform ? `Via ${item.soldPlatform}`: '';
     itemList.appendChild(newItemCard);
   }
 }
