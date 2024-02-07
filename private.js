@@ -232,6 +232,7 @@ async function privateMain() {
 
   updateIC(userId, email, phone);
   askForAdditionalUserDetails(userId);
+  findBoughtItems(userId);
   loadSoldByOthers(userId);
   setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
 
@@ -308,6 +309,26 @@ function showHolidayModeDiv(items) {
         }
       }
     });
+  }
+}
+
+async function findBoughtItems(userId){
+  const boughtItems = await firebase.app().functions("europe-west3").httpsCallable('findUserResellCandidates')();
+  if (!boughtItems.data?.length) {
+    return;
+  }
+  document.getElementById('boughtItemsDiv').style.display = 'block'
+  const itemCard = document.getElementById('boughtItemCard');
+  const itemList = document.getElementById('itemListBought');
+  itemList.innerHTML = '';
+  for (const item of boughtItems.data) {
+    const newItemCard = itemCard.cloneNode(true);
+    newItemCard.id = item.id;
+    newItemCard.querySelector('.img-container').style.backgroundImage = `url("${item.images.modelImageLarge || item.images.modelImage ||
+      item.images.enhancedFrontImageLarge || item.images.enhancedFrontImage || item.images.frontImageLarge || item.images.frontImage}")`;
+    newItemCard.querySelector('.resell-button').href = `/sell-item?id=${item.id}`;
+    newItemCard.querySelector('.resell-item-title').innerText = `${item.cleanedBrand}`;
+    itemList.appendChild(newItemCard);
   }
 }
 
