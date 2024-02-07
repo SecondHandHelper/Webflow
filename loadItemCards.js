@@ -489,5 +489,6 @@ export async function loadItemCards(items) {
 
   loadingDiv.style.display = "none";
   sectionsDiv.style.display = "block";
+  analytics.track("Element Viewed", { elementID: "sectionsDiv" });
   quickInfoDiv.style.display = "block";
 }
