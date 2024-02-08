@@ -232,7 +232,7 @@ async function privateMain() {
 
   updateIC(userId, email, phone);
   askForAdditionalUserDetails(userId);
-  findBoughtItems(userId);
+  findBoughtItems();
   loadSoldByOthers(userId);
   setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
 
@@ -312,7 +312,7 @@ function showHolidayModeDiv(items) {
   }
 }
 
-async function findBoughtItems(userId){
+async function findBoughtItems(){
   const boughtItems = await firebase.app().functions("europe-west3").httpsCallable('findUserResellCandidates')();
   if (!boughtItems.data?.length) {
     return;
@@ -324,12 +324,12 @@ async function findBoughtItems(userId){
   for (const item of boughtItems.data) {
     const newItemCard = itemCard.cloneNode(true);
     newItemCard.id = item.id;
-    newItemCard.querySelector('.img-container').style.backgroundImage = `url("${item.images.modelImageLarge || item.images.modelImage ||
-      item.images.enhancedFrontImageLarge || item.images.enhancedFrontImage || item.images.frontImageLarge || item.images.frontImage}")`;
+    newItemCard.querySelector('.img-container').style.backgroundImage = `url("${item.data.images.modelImageLarge || item.data.images.modelImage ||
+      item.data.images.enhancedFrontImageLarge || item.data.images.enhancedFrontImage || item.data.images.frontImageLarge || item.data.images.frontImage}")`;
     newItemCard.querySelector('.resell-button').href = `/sell-item?id=${item.id}`;
-    newItemCard.querySelector('.resell-item-title').innerText = `${item.cleanedBrand || item.brand?.trim()}`;
-    newItemCard.querySelector('.resell-subtext').innerText = `${[item.cleanedModel, item.category, item.maiSize].filter(i=>i).join(', ')}`;
-    newItemCard.querySelector('.resell-sub-subtext').innerText = item.soldPlatform ? `Via ${item.soldPlatform}`: '';
+    newItemCard.querySelector('.resell-item-title').innerText = `${item.data.cleanedBrand || item.data.brand?.trim()}`;
+    newItemCard.querySelector('.resell-subtext').innerText = `${[item.data.cleanedModel, item.data.category, item.data.maiSize].filter(i=>i).join(', ')}`;
+    newItemCard.querySelector('.resell-sub-subtext').innerText = item.data.soldPlatform ? `Via ${item.data.soldPlatform}`: '';
     itemList.appendChild(newItemCard);
   }
 }
