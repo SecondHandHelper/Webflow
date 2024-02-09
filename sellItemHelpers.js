@@ -87,7 +87,7 @@ export async function enhanceFrontImage(imageUrl, saveState = true) {
         if (saveState) {
             rememberNewItemImageField('enhancedFrontImage', enhancedImageUrls.url, enhancedImageUrls.urlSmall);
         }
-        showImagePreview('frontImage', window.innerWidth <= 400 ? enhancedImageUrls.urlSmall : enhancedImageUrls.url);
+        showImagePreview('frontImage', window.innerWidth <= 370 ? enhancedImageUrls.urlSmall : enhancedImageUrls.url);
     }
     showDeleteImageIcon('frontImage');
     return enhancedImageUrls;

@@ -1,6 +1,6 @@
-import {itemCoverImage, shareCode, signOut} from "./general";
-import {loadInfoRequests} from "./infoRequestsFunctions";
-import {loadItemCards} from "./loadItemCards";
+import { itemCoverImage, shareCode, signOut } from "./general";
+import { loadInfoRequests } from "./infoRequestsFunctions";
+import { loadItemCards } from "./loadItemCards";
 
 var userId;
 var email;
@@ -87,12 +87,12 @@ function showInviteToast(items) {
   let daysSinceLatestSold = 10;
   let soldItemsCount = 0;
   let oneSoldNotSentItemExist = false;
-  
+
 
   // Last viewed
   let inviteToastViews = user.current?.elementViews ? user.current.elementViews.filter(e => e.elementID === 'inviteToast') : [];
-  const daysSinceToastViewsArray = inviteToastViews.length ? Array.from(inviteToastViews, (e) => parseInt(Math.floor((nowDate.getTime() - e.timestamp.toDate().getTime()) / (1000 * 3600 * 24)))) : [] ;
-  const daysSinceToastLastViewed = daysSinceToastViewsArray.length ? Math.min(...daysSinceToastViewsArray) : null ;
+  const daysSinceToastViewsArray = inviteToastViews.length ? Array.from(inviteToastViews, (e) => parseInt(Math.floor((nowDate.getTime() - e.timestamp.toDate().getTime()) / (1000 * 3600 * 24)))) : [];
+  const daysSinceToastLastViewed = daysSinceToastViewsArray.length ? Math.min(...daysSinceToastViewsArray) : null;
   let viewedToastBefore = inviteToastViews.length ? true : false;
 
   if (items) {
@@ -312,7 +312,7 @@ function showHolidayModeDiv(items) {
   }
 }
 
-async function findBoughtItems(){
+async function findBoughtItems() {
   const boughtItems = await firebase.app().functions("europe-west3").httpsCallable('findUserResellCandidates')();
   if (!boughtItems.data?.length) {
     return;
@@ -328,10 +328,23 @@ async function findBoughtItems(){
       item.data.images.enhancedFrontImageLarge || item.data.images.enhancedFrontImage || item.data.images.frontImageLarge || item.data.images.frontImage}")`;
     newItemCard.querySelector('.resell-button').href = `/sell-item?id=${item.id}`;
     newItemCard.querySelector('.resell-item-title').innerText = `${item.data.cleanedBrand || item.data.brand?.trim()}`;
-    newItemCard.querySelector('.resell-subtext').innerText = `${[item.data.cleanedModel, item.data.category, item.data.maiSize].filter(i=>i).join(', ')}`;
-    newItemCard.querySelector('.resell-sub-subtext').innerText = item.data.soldPlatform ? `Via ${item.data.soldPlatform}`: '';
+    newItemCard.querySelector('.resell-subtext').innerText = `${[item.data.cleanedModel, item.data.category, item.data.maiSize].filter(i => i).join(', ')}`;
+    newItemCard.querySelector('.resell-sub-subtext').innerText = item.data.soldPlatform ? `Via ${item.data.soldPlatform}` : '';
     itemList.appendChild(newItemCard);
   }
+
+  //Tracking
+  itemList.querySelectorAll("a").forEach(link => link.addEventListener('click', linkClickTracker));
+  const observer = new IntersectionObserver((entries, opts) => {
+    const rect = itemList.getBoundingClientRect();
+    const isVisible = rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+    if (isVisible) {
+      console.log("Purchases viewed");
+      analytics.track("Element Viewed", { elementID: "boughtItemsDiv" });
+      observer.disconnect();
+    }
+  }, { threshold: 1, root: null })
+  observer.observe(itemList);
 }
 
 async function yearlyDataExist(userId) {
@@ -416,7 +429,7 @@ async function fetchAndShowRecommendedItems(items) {
                         </div><a/></div>`;
       itemList.innerHTML += itemCardHTML;
     }
-    itemList.querySelectorAll("a").forEach(link => link.addEventListener('click', linkClickTracker) );
+    itemList.querySelectorAll("a").forEach(link => link.addEventListener('click', linkClickTracker));
 
     document.getElementById('goToMaiShopLinkRecommendations').setAttribute("href",
       `https://shop.maiapp.se/collections/damklader/${response.data[0].sex || 'Woman'}?sort_by=created-descending&filter.p.m.global.size=${itemSizes.join('&filter.p.m.global.size=')}`);
@@ -425,7 +438,7 @@ async function fetchAndShowRecommendedItems(items) {
       const isVisible = rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
       if (isVisible) {
         console.log("Recommendations viewed");
-        analytics.track("Element Viewed", {elementID: "recommendedItems"});
+        analytics.track("Element Viewed", { elementID: "recommendedItems" });
         observer.disconnect();
       }
     }, { threshold: 1, root: null })
