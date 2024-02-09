@@ -72,9 +72,25 @@ async function fetchAndLoadRecentlyAddedItems() {
   }
 }
 
+const trackHowItWorksInteractions = () => {
+  const howItWorksDiv = document.getElementById('howItWorksDiv');
+  new IntersectionObserver((entries, observer) => {
+    if (!entries[0].isIntersecting) return;
+    analytics.track("Element Viewed", { elementID: "howItWorksSlide1" });
+    observer.disconnect();
+  }, {rootMargin: '0px 0px -600px 0px'}).observe(howItWorksDiv);
+  new MutationObserver((mutationList) => {
+    const mutatedElement = mutationList.find(rec => rec.type === 'attributes' &&  rec.attributeName === 'aria-hidden');
+    if (mutatedElement && mutatedElement.oldValue && !mutatedElement.target['aria-hidden']) {
+      analytics.track("Element Viewed", { elementID: `howItWorksSlide${mutatedElement.target.ariaLabel.slice(0,1)}` });
+    }
+  }).observe(howItWorksDiv, { attributeFilter: ['aria-hidden'], attributeOldValue: true, subtree: true });
+}
+
 authUser.whenSet(signedInNextStep);
 loadRecentlySold();
-fetchAndLoadRecentlyAddedItems()
+fetchAndLoadRecentlyAddedItems();
+trackHowItWorksInteractions();
 
 // Set attribution cookies (could be put on any campaign page)
 checkCookie("utm_campaign");
