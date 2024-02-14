@@ -304,6 +304,9 @@ const showValuation = async (item) => {
 }
 
 const getValuationExplanation = (item) => {
+  if (!item || !item.mlValuation) {
+    return 'Värderingen baseras på plagg från liknande varumärken som vi värderat tidigare. För att öka sannolikheten att få det sålt kan du justera ner lägsta priset.';
+  }
   const {
     mlValuation: {
       valuatedBrandItems, brandMeanMax, brandAccuracy, brandCategoryAccuracy, fewBrand,
