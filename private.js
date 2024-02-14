@@ -404,6 +404,9 @@ Webflow.push(function () {
 });
 
 async function fetchAndShowRecommendedItems(items) {
+  if (!items || !items.length) {
+    return;
+  }
   try {
     const ids = [];
     items.forEach(doc => ids.push(doc.id));

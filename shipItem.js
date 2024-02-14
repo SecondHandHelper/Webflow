@@ -6,7 +6,7 @@ function loadItem(itemId) {
     .get().then((doc) => {
     if (doc.exists) {
       console.log("Item data:", doc.data());
-      data = doc.data();
+      const data = doc.data();
       const brand = data.brand;
       let imgUrl = itemCoverImage(data);
       const category = data.category ? data.category : "";

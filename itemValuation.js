@@ -312,7 +312,7 @@ const getValuationExplanation = (item) => {
   } = item;
   const brandName = cleanedBrand || brand;
   const bestMeanPrice = brandAccuracy > 0.8 && brandMeanSold > 0 ? `Snittpriset för sålda plagg för varumärket är ${brandMeanSold} kr.` :
-    brandCategoryAccuracy > 0.7 && brandCategoryMeanSold > 0 ? `Snittpriset för sålda plagg för varumärket i denna kategori är ${brandCategoryMeanSold} kr.` : '';
+    (brandCategoryAccuracy > 0.7 && brandCategoryMeanSold > 0 ? `Snittpriset för sålda plagg för varumärket i denna kategori är ${brandCategoryMeanSold} kr.` : '');
   const acceptPriceNotice = newMinMaxLog.match(/accept price is above max/i) ? 'Plagget har värderat till under ditt lägsta accepterade pris. ' : '';
   const adjustPriceLowShareSoldNotice = brandShareSold < 0.5 ? `Notera att efterfrågan på ${brandName} på andrahandsmarknaden är lägre än snittet, så vill du öka sannolikheten att få det sålt kan du sänka det lägsta priset.` : '';
   const adjustPriceNotice = 'Om du mot förmodan ändå vill justera kan du göra det, men tänk på att det påverkar sannolikheten att få det sålt.'

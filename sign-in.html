@@ -230,7 +230,7 @@
     firebase.auth().fetchSignInMethodsForEmail(email)
       .then((signInMethods) => {
         if (signInMethods.indexOf(
-          firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD) != -1) {
+          firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD) !== -1) {
           // User can sign in with email/password.
           console.log("Account exists -> Login with email");
           chooseEmailDiv.style.display = 'none';
