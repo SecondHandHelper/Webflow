@@ -145,14 +145,14 @@
   checkCookie("utm_content");
 
   // GET ITEMS
-  // This function returns all the users items from DB in the form of a firestore "querySnapshot"
+  // This function returns all the users items from DB in the form of a firestore QueryDocumentSnapshot[]
   async function getItems(userId) {
-    return await db.collection("items")
+    const items = await db.collection("items")
       .where("user", "==", userId)
       .where("createdAt", "!=", false)
-      .where("status", '!=', 'Draft')
       .orderBy('createdAt', 'desc')
       .get();
+    return items.docs.filter(i => i.data().status !== 'Draft');
   }
 
 </script>
