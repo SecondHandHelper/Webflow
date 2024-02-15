@@ -56,7 +56,7 @@ function statusText(status) {
 
 shareReferralLinkButton.addEventListener('click', shareCode);
 document.getElementById('referralCode').innerText = '';
-const sessionUser = JSON.parse(sessionStorage.getItem('sessionUser'));
+const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
 const referralCode = sessionUser?.referralData?.referralCode;
 document.getElementById('referralCode').innerText = referralCode || '';
 if (sessionUser?.referralData?.referredUsers?.length > 0){

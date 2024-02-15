@@ -15,7 +15,6 @@ firebase.auth().onAuthStateChanged(async (result) => {
         identify(authenticated, doc.data());
         console.log("user:", doc.data());
         user.current = doc.data();
-        sessionStorage.setItem('sessionUser', JSON.stringify(user.current));
         localStorage.setItem('sessionUser', JSON.stringify(user.current));
       }
     } catch (error) {
@@ -25,7 +24,6 @@ firebase.auth().onAuthStateChanged(async (result) => {
   } else {
     console.log('No user');
     localStorage.removeItem('authUserId');
-    sessionStorage.removeItem('sessionUser');
     localStorage.removeItem('sessionUser');
     // Go to landing page if no user and on logged in pages
     const path = window.location.pathname;
