@@ -98,7 +98,7 @@ async function sellItemMainAuthenticated() {
 
   // Get user's item count to be able to send 'User Activated' event
   const items = await getItems(authUser.current.uid);
-  userItemsCount = items.size;
+  userItemsCount = items.docs.filter(i => i.data()?.status !== 'Draft').length;
 }
 
 async function sellItemMain() {
@@ -159,13 +159,15 @@ async function sellItemMain() {
   document.getElementById('clearItemForm').addEventListener('click', clearFormFields);
   const params = getParamsObject();
   if (params.id) {
-    // Fill form if the user comes from a prefill link (re-sell item)
+    // Fill form if the user comes from a prefill link (re-sell item or continue with draft item)
     sessionStorage.removeItem('newItemId');
     localStorage.removeItem('newItem');
     auth.onAuthStateChanged(function (user) {
       if (!user) { document.getElementById('maiIntro').style.display = 'block'; }
     });
-    document.getElementById('resellIntro').style.display = 'block';
+    if (params.type !== 'draft') {
+      document.getElementById('resellIntro').style.display = 'block';
+    }
     await fillForm(params.id);
     document.getElementById("triggerShowSellItemContent").click();
   } else if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
@@ -187,7 +189,7 @@ async function sellItemMain() {
   initializeRestoreOnNavigation();
 }
 
-async function addItem(event) {
+async function addItem() {
   const id = sessionStorage.getItem('newItemId') || await requestUniqueId();
   try {
     document.getElementById('addItemFormDiv').style.display = 'none';
@@ -345,7 +347,6 @@ function defaultFormState() {
 function collect() {
   let sex = "";
   const now = new Date();
-  let status = "New";
   let shippingStatus = "Not sent";
   const size = itemSize.value;
   const material = itemMaterial.value ? itemMaterial.value.trim() : "";
@@ -432,15 +433,15 @@ async function getShippingMethod() {
   return shippingMethod;
 }
 
-async function addItemInner(id) {
+async function addItemInner(id, status = 'New') {
   const { modelCoverImageUrl, images, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
   if (modelCoverImageUrl) {
     images['modelImage'] = modelCoverImageUrl;
   }
   const params = getParamsObject();
-  const createdFromItem = params.id ? { createdFromItem: params.id } : {};
-  const item = { ...pageData, shippingMethod, images, ...createdFromItem, version: "2" };
+  const createdFromItem = (params.id && params.type !== 'draft') ? { createdFromItem: params.id } : {};
+  const item = { ...pageData, status, shippingMethod, images, ...createdFromItem, version: "2" };
 
   if (!authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
@@ -468,6 +469,16 @@ function initializeInputEventListeners() {
   itemColor.addEventListener('input', clearConfirmButtonValidity);
   itemUserComment.addEventListener('input', fieldLabelToggle('userCommentLabel'));
 
+  document.getElementById('saveItemDraftButton').addEventListener('click', async () => {
+    const id = sessionStorage.getItem('newItemId') || await requestUniqueId();
+    await addItemInner(id);
+    document.getElementById('itemDraftSavedPopup').style.display = 'block';
+    document.body.addEventListener('click', function closeItemSavedPopupHandler() {
+      document.getElementById('itemDraftSavedPopup').style.display = 'none';
+      document.body.removeEventListener('click', closeItemSavedPopupHandler);
+    });
+  })
+
   document.getElementById('addItemButton').addEventListener('click', () => {
     document.getElementById('wf-form-Add-Item').reportValidity();
     const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
@@ -485,7 +496,7 @@ function initializeInputEventListeners() {
       }
     }, 300);
   });
-  addItemForm.addEventListener("submit", addItem);
+  addItemForm.addEventListener("submit", () => addItem());
   userAddressForm.addEventListener("submit", addUserDetails);
 
 }

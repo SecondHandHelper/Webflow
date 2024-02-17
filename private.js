@@ -96,13 +96,11 @@ function showInviteToast(items) {
   let viewedToastBefore = inviteToastViews.length ? true : false;
 
   if (items) {
-    items.forEach((doc) => { // Items is a global variable that equals to querySnapshot from loadCardLists.js
-      var itemId = doc.id;
-      var i = doc.data();
-      let soldDate = i.soldDate;
-      const status = i.status;
-      const shippingStatus = i.shippingStatus;
-      const archived = i.archived;
+    items.forEach(item => {
+      let soldDate = item.soldDate;
+      const status = item.status;
+      const shippingStatus = item.shippingStatus;
+      const archived = item.archived;
 
       if (!archived && status === 'Sold' && soldDate) {
         soldItemsCount++;
@@ -232,7 +230,7 @@ async function privateMain() {
 
   updateIC(userId, email, phone);
   askForAdditionalUserDetails(userId);
-  findBoughtItems();
+  showInYourWardrobeSection();
   loadSoldByOthers(userId);
   setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
 
@@ -255,7 +253,7 @@ async function privateMain() {
   });
   */
 
-  const items = await getItems(userId);
+  const items = (await firebase.app().functions("europe-west1").httpsCallable('getUserItems')())?.data;
   showNpsSurvey(items);
   showInviteToast(items);
   if (user.current?.referralData?.referralCode) {
@@ -312,24 +310,38 @@ function showHolidayModeDiv(items) {
   }
 }
 
-async function findBoughtItems() {
-  const boughtItems = await firebase.app().functions("europe-west3").httpsCallable('findUserResellCandidates')();
-  if (!boughtItems.data?.length) {
+async function showInYourWardrobeSection() {
+  const wardrobeItems = await firebase.app().functions("europe-west1").httpsCallable('getUserWardrobeItems')();
+  if (!wardrobeItems.data?.length) {
     return;
   }
-  document.getElementById('boughtItemsDiv').style.display = 'block'
-  const itemCard = document.getElementById('boughtItemCard');
-  const itemList = document.getElementById('itemListBought');
+  document.getElementById('wardrobeItemsDiv').style.display = 'block'
+  const itemCard = document.getElementById('wardrobeItemCard');
+  const itemList = document.getElementById('wardrobeItemList');
   itemList.innerHTML = '';
-  for (const item of boughtItems.data) {
+  for (const item of wardrobeItems.data) {
     const newItemCard = itemCard.cloneNode(true);
     newItemCard.id = item.id;
-    newItemCard.querySelector('.img-container').style.backgroundImage = `url("${item.data.images.modelImageLarge || item.data.images.modelImage ||
-      item.data.images.enhancedFrontImageLarge || item.data.images.enhancedFrontImage || item.data.images.frontImageLarge || item.data.images.frontImage}")`;
-    newItemCard.querySelector('.resell-button').href = `/sell-item?id=${item.id}`;
-    newItemCard.querySelector('.resell-item-title').innerText = `${item.data.cleanedBrand || item.data.brand?.trim()}`;
-    newItemCard.querySelector('.resell-subtext').innerText = `${[item.data.cleanedModel, item.data.category, item.data.maiSize].filter(i => i).join(', ')}`;
-    newItemCard.querySelector('.resell-sub-subtext').innerText = item.data.soldPlatform ? `Via ${item.data.soldPlatform}` : '';
+    const frontImage = item.images?.modelImageLarge || item.images?.modelImage ||
+      item.images?.enhancedFrontImageLarge || item.images?.enhancedFrontImage || item.images?.frontImageLarge || item.images?.frontImage;
+    if (frontImage) {
+      newItemCard.querySelector('.img-container').style.backgroundImage = `url("${frontImage}")`;
+      newItemCard.querySelector('.no-image-text').style.display = 'none';
+    } else {
+      newItemCard.querySelector('.img-container').style.display = 'none';
+    }
+    newItemCard.querySelector('.resell-button').href = `/sell-item?id=${item.id}type=${item.status === 'Draft' ? 'draft' : 'resell'}`;
+    newItemCard.querySelector('.resell-item-title').innerText = `${item.cleanedBrand || item.brand?.trim()}`;
+    newItemCard.querySelector('.resell-subtext').innerText = `${[item.cleanedModel, item.category, item.maiSize].filter(i => i).join(', ')}`;
+    newItemCard.querySelector('.resell-sub-subtext').innerText = item.soldPlatform ? `Köpt via Mai` : `Från ${item.draftSource}`;
+    newItemCard.querySelector('#wardrobeDotsButton').addEventListener('click', async () => {
+      newItemCard.style.display = 'none';
+      const visibleChidlren = Array.from(itemList.children).find(it => it.style.display === 'block')
+      if (visibleChidlren) {
+        document.getElementById('wardrobeItemsDiv').style.display = 'none';
+      }
+      await firebase.app().functions("europe-west1").httpsCallable('hideUserWardrobeItem')({ itemId: item.id });
+    });
     itemList.appendChild(newItemCard);
   }
 
@@ -376,10 +388,9 @@ async function showNpsSurvey(items) {
   const daysSinceSurveyLastViewed = surveyLastViewed ? Math.floor((nowDate.getTime() - surveyLastViewed.getTime()) / (1000 * 3600 * 24)) : null;
 
   if (items) {
-    items.forEach((doc) => {
-      const i = doc.data();
-      if (i.publishedDate && !i.archived) {
-        const publishedDate = new Date(i.publishedDate);
+    items.forEach(item => {
+      if (item.publishedDate && !item.archived) {
+        const publishedDate = new Date(item.publishedDate);
         const daysDiff = Math.floor((nowDate.getTime() - publishedDate.getTime()) / (1000 * 3600 * 24));
         if (daysDiff > daysSinceFirstPublished) {
           daysSinceFirstPublished = daysDiff;
@@ -409,7 +420,7 @@ async function fetchAndShowRecommendedItems(items) {
   }
   try {
     const ids = [];
-    items.forEach(doc => ids.push(doc.id));
+    items.forEach(item => ids.push(item.id));
     const response = await firebase.app().functions("europe-west1").httpsCallable('itemRecommendations')({ items: ids.slice(0, 10), number: 20 })
     if (!response.data.length) {
       return;
