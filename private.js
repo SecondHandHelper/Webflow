@@ -359,8 +359,8 @@ async function showInYourWardrobeSection() {
   document.getElementById('stickyBottomDelete').addEventListener('click', async () => {
     itemMoreMenu.classList.remove('sticky-bottom-show');
     document.getElementById(itemMoreMenu.dataset.itemId).style.display = 'none';
-    const visibleChidlren = Array.from(itemList.children).find(it => it.style.display === 'block')
-    if (!visibleChidlren) {
+    const visibleChildren = Array.from(itemList.children).find(it => it.style.display !== 'none')
+    if (!visibleChildren) {
       document.getElementById('wardrobeItemsDiv').style.display = 'none';
     }
     await firebase.app().functions("europe-west1").httpsCallable('hideUserWardrobeItem')({ itemId: itemMoreMenu.dataset.itemId });
