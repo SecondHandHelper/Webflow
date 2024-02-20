@@ -6,7 +6,6 @@
   #shippingMethodDiv{display: none;}
   #addressFormDiv{display: none;}
   #itemConfirmationScreen{display: none;}
-  #brandWarningBanner{display: none;}
   #hardToSellDiv{display: none;}
   #fotoGuideDiv{display: none;}
   #shareSoldDiv{display: none;}
@@ -38,15 +37,21 @@
   #darkOverlay{display:none;}
   #moreInfoFields{display:none;}
   #hideFieldsText{display:none;}
-  #deleteFrontImageIcon{display:none;}
-  #clearItemForm{display:none;}
+	#deleteFrontImageIcon{display:none;}
+	#clearItemForm{display:none;}
   #enhancedAnimationDiv {display:none;}
   #warningIcon {display: none;}
   #itemDraftSavedPopup { display: none; }
-
+  #saveItemDraftDiv { display: none; }
+  #photoroomDiv { display: none; }
+  
   #closePricingInfoBox{
     -webkit-tap-highlight-color: transparent !important;
   }
+  
+  #itemListSelling::-webkit-scrollbar {
+  	display: none;
+	}
 
   #blurryOverlay {
     display: block;
@@ -241,6 +246,18 @@ bottom: 0;
 background-color: rgba(255,255,255,1);
 z-index: 9999;
 display: none;
+}
+.saving #saveItemDraft {
+    display: none;
+}
+.saved #saveItemDraft {
+    display: none;
+}
+.saving div#saveLoadingSpinner {
+    display: block;
+}
+.saved div#savedCheckIcon {
+    display: block;
 }
 </style>
 <script defer src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>

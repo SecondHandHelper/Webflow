@@ -186,6 +186,10 @@ export function showImageState(imageName, state) {
 export function showLoadingIcon(imageName) {
     if (imageName === 'frontImage'){
         document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
+        document.getElementById(`loading${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
+        if(!localStorage.getItem('sessionUser')){
+          document.getElementById('photoroomDiv').style.display = 'flex';
+        };
         document.getElementById('enhancedAnimationDiv').style.display = 'block';
         triggerEnhancingAnimation.click();
         return
