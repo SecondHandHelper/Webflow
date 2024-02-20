@@ -293,39 +293,38 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived, s
   return div;
 }
 
-export async function loadItemCards(items) {
+export function loadItemCards(items) {
   itemListSelling.innerHTML = "";
   itemListSoldNotSent.innerHTML = "";
   itemListSold.innerHTML = "";
   var youEarned = 0;
 
-  items.forEach((doc) => {
-    var itemId = doc.id;
-    var createdDate = doc.data().createdAt;
-    var soldDate = doc.data().soldDate;
-    var status = doc.data().status;
-    var shippingStatus = doc.data().shippingStatus;
-    var brand = doc.data().brand;
-    var soldPrice = doc.data().soldPrice;
-    var sellerGets = doc.data().sellerGets ? Math.ceil(doc.data().sellerGets) : doc.data().sellerGets;
-    var buyerFirstName = doc.data().buyer?.FirstName || doc.data().buyerFirstName;
-    var buyerAddressCity = doc.data().buyer?.City || doc.data().buyerAddressCity;
-    var minPriceEstimate = doc.data().minPriceEstimate;
-    var maxPriceEstimate = doc.data().maxPriceEstimate;
-    var infoRequests = doc.data().infoRequests;
-    var pickupDate = doc.data().pickupDate;
-    var shippingMethod = doc.data().shippingMethod;
-    var postnordQrCode = doc.data().postnordQrCode;
-    var dhlBarcode = doc.data().dhlLicensePlateBarcodeSrc;
-    var bagReceived = doc.data().bagReceived;
-    var soldPlatform = doc.data().soldPlatform;
-    var archived = doc.data().archived;
-    var holidayMode = doc.data().holidayMode;
-    var longerPeriodAcceptedDate = doc.data().longerPeriodAcceptedDate;
-    const images = doc.data().images;
-    var frontImageUrl = itemCoverImage(doc.data());
+  items.forEach((item) => {
+    var itemId = item.id;
+    var soldDate = item.soldDate;
+    var status = item.status;
+    var shippingStatus = item.shippingStatus;
+    var brand = item.brand;
+    var soldPrice = item.soldPrice;
+    var sellerGets = item.sellerGets ? Math.ceil(item.sellerGets) : item.sellerGets;
+    var buyerFirstName = item.buyer?.FirstName || item.buyerFirstName;
+    var buyerAddressCity = item.buyer?.City || item.buyerAddressCity;
+    var minPriceEstimate = item.minPriceEstimate;
+    var maxPriceEstimate = item.maxPriceEstimate;
+    var infoRequests = item.infoRequests;
+    var pickupDate = item.pickupDate;
+    var shippingMethod = item.shippingMethod;
+    var postnordQrCode = item.postnordQrCode;
+    var dhlBarcode = item.dhlLicensePlateBarcodeSrc;
+    var bagReceived = item.bagReceived;
+    var soldPlatform = item.soldPlatform;
+    var archived = item.archived;
+    var holidayMode = item.holidayMode;
+    var longerPeriodAcceptedDate = item.longerPeriodAcceptedDate;
+    const images = item.images;
+    var frontImageUrl = itemCoverImage(item);
     let daysLeftText = "";
-    let publishedDate = doc.data().publishedDate;
+    let publishedDate = item.publishedDate;
     if (publishedDate) {
       publishedDate = new Date(publishedDate);
       let nowDate = new Date();
@@ -339,14 +338,14 @@ export async function loadItemCards(items) {
         daysLeftText = `${daysLeft} dagar kvar`;
       }
     }
-    if (archived == undefined && status != "Unsold") { displayItemCard(); }
+    if (!archived && status !== "Unsold") { displayItemCard(); }
 
     function displayItemCard() {
       //Putting the items in the right list
       let itemPageUrl = window.location.origin + `/item?id=${itemId}`;
 
       // WE SELL RIGHT NOW
-      if (status != "Sold") {
+      if (status !== "Sold") {
         let textDiv1 = "";
         let textDiv2 = "";
 
