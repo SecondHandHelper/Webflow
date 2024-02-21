@@ -15,6 +15,9 @@ import { formatPersonalId, getFormAddressFields, isValidSwedishSsn } from "./gen
 import { autocomplete, brands } from "./autocomplete-brands";
 import { setFieldValue, setupModelSearchEventListeners } from "./sellItemModelSearch";
 
+
+let itemDraftSaved = false;
+
 async function addUserDetails() {
   // Grab values from form
   const addressFields = getFormAddressFields();
@@ -73,7 +76,10 @@ function imageUploadHandlers() {
 
 async function sellItemMainAuthenticated() {
   console.log("sellItemMainAuthenticated " + new Date());
-
+  const params = getParamsObject();
+  if (params.type !== 'draft') {
+    document.getElementById('saveItemDraftButton').style.display = 'flex';
+  }
   // Visa alla "viktiga" fält om man är inloggad
   toggleMoreInfoFields.click();
 
@@ -176,7 +182,6 @@ async function sellItemMain() {
     document.getElementById('clearItemForm').style.display = 'none';
     if (params.type === 'draft') {
       document.querySelector('#resellIntro .text-block-176').innerText = 'Fyll i de sista detaljerna för att sälja ditt plagg och kontrollera skickbeskrivningen.';
-      document.getElementById('saveItemDraftButton').style.display = 'none';
       const saveItemDraftDiv = document.getElementById('saveItemDraftDiv')
       saveItemDraftDiv.style.display = 'block';
       document.getElementById('saveItemDraft').addEventListener('click', async () => {
@@ -186,8 +191,10 @@ async function sellItemMain() {
         saveItemDraftDiv.classList.add('saved');
         setTimeout(() => { saveItemDraftDiv.classList.remove('saved'); }, 1500);
       });
+    } else {
+      document.getElementById('saveItemDraftButton').style.display = 'flex';
     }
-    await fillForm(params.id);
+    await fillForm(params.id, null, params.type==='draft');
     document.getElementById("triggerShowSellItemContent").click();
   } else if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
     // A new item will be created in sellItemMainAuthenticated
@@ -494,6 +501,8 @@ function initializeInputEventListeners() {
     document.getElementById('saveDraftSpinner').style.display = 'flex';
     const id = sessionStorage.getItem('newItemId') || await requestUniqueId();
     const item = await addItemInner(id, 'Draft');
+    itemDraftSaved = true;
+    localStorage.removeItem('newItem');
     document.getElementById('clearItemForm').style.display = 'none';
     document.getElementById('saveItemDraft').style.display = 'block';
     document.getElementById('saveDraftSpinner').style.display = 'none';
@@ -571,7 +580,8 @@ async function createItemAfterSignIn() {
 }
 
 function rememberUnsavedChanges() {
-  if (localStorage.getItem('latestItemCreated')) {
+  const params = getParamsObject();
+  if (localStorage.getItem('latestItemCreated') || itemDraftSaved || params.id) {
     return;
   }
   const {
