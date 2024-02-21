@@ -346,18 +346,20 @@ async function showInYourWardrobeSection() {
     newItemCard.querySelector('.resell-subtext').innerText = `${[item.cleanedModel, item.category, item.maiSize].filter(i => i).join(', ')}`;
     newItemCard.querySelector('.resell-sub-subtext').innerText = item.soldPlatform ? `Köpt via Mai` : (item.draftSource === 'Digital receipt' ? 'Från digitalt kvitto' : '');
     newItemCard.querySelector('#wardrobeDotsButton').addEventListener('click', async () => {
-      itemMoreMenu.classList.add('sticky-bottom-show');
+      itemMoreMenu.style.display = 'block';
+      setTimeout(() => itemMoreMenu.classList.add('sticky-bottom-show'), 0);
       itemMoreMenu.dataset.itemId = item.id;
     });
     itemList.appendChild(newItemCard);
   }
-  setTimeout(() => { itemMoreMenu.style.display = 'block'; }, 1000);
 
   document.getElementById('stickyBottomClose').addEventListener('click', () => {
     itemMoreMenu.classList.remove('sticky-bottom-show');
+    setTimeout(() => itemMoreMenu.style.display = 'none', 500);
   });
   document.getElementById('stickyBottomDelete').addEventListener('click', async () => {
     itemMoreMenu.classList.remove('sticky-bottom-show');
+    setTimeout(() => itemMoreMenu.style.display = 'none', 500);
     document.getElementById(itemMoreMenu.dataset.itemId).style.display = 'none';
     const visibleChildren = Array.from(itemList.children).find(it => it.style.display !== 'none')
     if (!visibleChildren) {

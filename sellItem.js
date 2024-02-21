@@ -77,9 +77,14 @@ function imageUploadHandlers() {
 
 async function sellItemMainAuthenticated() {
   console.log("sellItemMainAuthenticated " + new Date());
-  if (params.type !== 'draft') {
+  if (params.type !== 'draft' && params.type !== 'resell') {
     document.getElementById('saveItemDraftButton').style.display = 'flex';
   }
+  window.addEventListener('beforeunload', () => {
+    if (params.id) {
+      localStorage.removeItem('newItem');
+    }
+  });
   // Visa alla "viktiga" fält om man är inloggad
   toggleMoreInfoFields.click();
 
@@ -657,16 +662,16 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
       let urlSmall = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName] || images[`${imageName}Large`];
       let urlLarge = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
       if (imageElements().includes(imageName)) {
-        rememberUnsavedChanges() && rememberNewItemImageField(imageName, urlLarge, urlSmall);
+        rememberNewItemImageField(imageName, urlLarge, urlSmall);
         if (imageName === 'frontImage') {
           if (images.enhancedFrontImage) {
             urlSmall = images['enhancedFrontImageSmall'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImage'] || images['enhancedFrontImageLarge'];
             urlLarge = images['enhancedFrontImage'] || images['enhancedFrontImageLarge'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImageSmall'];
-            rememberUnsavedChanges() && rememberNewItemImageField('enhancedFrontImage', urlLarge, urlSmall);
+            rememberNewItemImageField('enhancedFrontImage', urlLarge, urlSmall);
           } else {
             whenLoadingDivHidden(() => showLoadingIcon(imageName))
             // Don't await here to don't block the form from showing with the front image
-            enhanceFrontImage(urlLarge, shouldSaveState()).then(() => console.log('Image enhanced'));
+            enhanceFrontImage(urlLarge).then(() => console.log('Image enhanced'));
           }
         }
         showImagePreview(imageName, urlSmall);
@@ -1184,7 +1189,7 @@ export const isNoBgImage = async (source) => {
     }
     const img = await getImageMeta(source);
     const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
     ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
