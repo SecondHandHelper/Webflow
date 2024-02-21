@@ -158,6 +158,12 @@ async function sellItemMain() {
   initializeDeleteImageListeners();
   document.getElementById('clearItemForm').addEventListener('click', clearFormFields);
   const params = getParamsObject();
+  window.addEventListener('scroll', function scrolledToBottom() {
+    if ((window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 100) {
+      document.getElementById('bottomBarContainer').classList.add('sticky-bottom-bar');
+      window.removeEventListener('scroll', scrolledToBottom);
+    }
+  });
   if (params.id) {
     // Fill form if the user comes from a prefill link (re-sell item or continue with draft item)
     sessionStorage.removeItem('newItemId');
@@ -165,8 +171,21 @@ async function sellItemMain() {
     auth.onAuthStateChanged(function (user) {
       if (!user) { document.getElementById('maiIntro').style.display = 'block'; }
     });
-    if (params.type !== 'draft') {
-      document.getElementById('resellIntro').style.display = 'block';
+    document.getElementById('resellIntro').style.display = 'block';
+    document.getElementById('bottomBarContainer').classList.add('sticky-bottom-bar');
+    document.getElementById('clearItemForm').style.display = 'none';
+    if (params.type === 'draft') {
+      document.querySelector('#resellIntro .text-block-176').innerText = 'Fyll i de sista detaljerna för att sälja ditt plagg och kontrollera skickbeskrivningen.';
+      document.getElementById('saveItemDraftButton').style.display = 'none';
+      const saveItemDraftDiv = document.getElementById('saveItemDraftDiv')
+      saveItemDraftDiv.style.display = 'block';
+      document.getElementById('saveItemDraft').addEventListener('click', async () => {
+        saveItemDraftDiv.classList.add('saving');
+        await addItemInner(params.id, 'Draft');
+        saveItemDraftDiv.classList.remove('saving');
+        saveItemDraftDiv.classList.add('saved');
+        setTimeout(() => { saveItemDraftDiv.classList.remove('saved'); }, 1500);
+      });
     }
     await fillForm(params.id);
     document.getElementById("triggerShowSellItemContent").click();
@@ -441,7 +460,7 @@ async function addItemInner(id, status = 'New') {
   }
   const params = getParamsObject();
   const createdFromItem = (params.id && params.type !== 'draft') ? { createdFromItem: params.id } : {};
-  const draftSource = status === 'Draft' ? { draftSource: 'Säljsidan' } : {};
+  const draftSource = status === 'Draft' ? { draftSource: 'Sell item' } : {};
   const item = { ...pageData, status, ...draftSource, shippingMethod, images, ...createdFromItem, version: "2" };
 
   if (!authUser.current) {
@@ -471,18 +490,40 @@ function initializeInputEventListeners() {
   itemUserComment.addEventListener('input', fieldLabelToggle('userCommentLabel'));
 
   document.getElementById('saveItemDraftButton').addEventListener('click', async () => {
+    document.getElementById('saveItemDraftButton').style.display = 'none';
+    document.getElementById('saveDraftSpinner').style.display = 'flex';
     const id = sessionStorage.getItem('newItemId') || await requestUniqueId();
-    await addItemInner(id, 'Draft');
+    const item = await addItemInner(id, 'Draft');
+    document.getElementById('clearItemForm').style.display = 'none';
+    document.getElementById('saveItemDraft').style.display = 'block';
+    document.getElementById('saveDraftSpinner').style.display = 'none';
+    document.getElementById('darkOverlay').style.display = 'block';
+    const image = item.images.enhancedFrontImageSmall || item.images.enhancedFrontImage || item.images.frontImage;
+    if (image) {
+      document.getElementById('popUpImage').src = image;
+      document.getElementById('popUpImageDiv').style.display = 'block';
+      document.getElementById('popUpCheckmark').style.display = 'none';
+    } else {
+      document.getElementById('popUpImage').src = '';
+      document.getElementById('popUpImageDiv').style.display = 'none';
+      document.getElementById('popUpCheckmark').style.display = 'block';
+    }
     document.getElementById('itemDraftSavedPopup').style.display = 'block';
-    document.body.addEventListener('click', function closeItemSavedPopupHandler() {
-      document.getElementById('itemDraftSavedPopup').style.display = 'none';
-      document.body.removeEventListener('click', closeItemSavedPopupHandler);
-    });
-  })
-
+  });
+  document.getElementById('closeItemSavedPopup').addEventListener('click', () => {
+    document.getElementById('itemDraftSavedPopup').style.display = 'none';
+    document.getElementById('darkOverlay').style.display = 'none';
+  });
+  document.getElementById('popUpNewItem').addEventListener('click', () => {
+    clearFormFields();
+    document.getElementById('itemDraftSavedPopup').style.display = 'none';
+    document.getElementById('darkOverlay').style.display = 'none';
+    window.scrollTo(0, 0);
+    document.getElementById('bottomBarContainer').classList.remove('sticky-bottom-bar');
+  });
   document.getElementById('goToMyWardrobe').addEventListener('click', () => {
     window.location.href = '/private#wardrobe';
-  })
+  });
 
   document.getElementById('addItemButton').addEventListener('click', () => {
     document.getElementById('wf-form-Add-Item').reportValidity();
@@ -967,8 +1008,11 @@ function initializeClearFormButton() {
       }
     }
   }
-  document.getElementById('wf-form-Add-Item').addEventListener('input', showButtonIfFormChanged);
-  document.querySelector('#wf-form-Add-Item select').addEventListener('change', showButtonIfFormChanged);
+  const params = getParamsObject();
+  if (!params.id) {
+    document.getElementById('wf-form-Add-Item').addEventListener('input', showButtonIfFormChanged);
+    document.querySelector('#wf-form-Add-Item select').addEventListener('change', showButtonIfFormChanged);
+  }
 }
 
 function initializeSaveStateListeners() {

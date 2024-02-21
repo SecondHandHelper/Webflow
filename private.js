@@ -344,7 +344,7 @@ async function showInYourWardrobeSection() {
     newItemCard.querySelector('.resell-button').href = `/sell-item?id=${item.id}&type=${item.status === 'Draft' ? 'draft' : 'resell'}`;
     newItemCard.querySelector('.resell-item-title').innerText = `${item.cleanedBrand || item.brand?.trim()}`;
     newItemCard.querySelector('.resell-subtext').innerText = `${[item.cleanedModel, item.category, item.maiSize].filter(i => i).join(', ')}`;
-    newItemCard.querySelector('.resell-sub-subtext').innerText = item.soldPlatform ? `Köpt via Mai` : `Från ${item.draftSource || 'säljsidan'}`;
+    newItemCard.querySelector('.resell-sub-subtext').innerText = item.soldPlatform ? `Köpt via Mai` : (item.draftSource === 'Digital receipt' ? 'Från digitalt kvitto' : '');
     newItemCard.querySelector('#wardrobeDotsButton').addEventListener('click', async () => {
       itemMoreMenu.classList.add('sticky-bottom-show');
       itemMoreMenu.dataset.itemId = item.id;
