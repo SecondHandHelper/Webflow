@@ -242,7 +242,7 @@ export function checkBlockedOrLowShareSoldBrand(brand, category) {
     (LOW_VALUE_CATEGORY.includes(category?.toLowerCase()) && BLOCK_ONLY_LOW_VALUE_CATEGORY.includes(brand.toLowerCase()))) {
     hardToSellText.innerHTML = BLOCKED_BRANDS.includes(brand.toLowerCase()) ?
       `Vi säljer tyvärr inte ${brand}-plagg på grund av för låg efterfrågan.` :
-      `Vi säljer tyvärr inte kategorin '${category}' från ${brand} på grund av för låg efterfrågan.`;
+      `Vi säljer tyvärr inte kategorin ${category} från ${brand} på grund av för låg efterfrågan.`;
     stopIcon.style.display = 'flex';
     warningIcon.style.display = 'none';
     hardToSellDiv.style.display = 'block';

@@ -169,7 +169,7 @@ async function sellItemMain() {
   initializeDeleteImageListeners();
   document.getElementById('clearItemForm').addEventListener('click', clearFormFields);
   window.addEventListener('scroll', function scrolledToBottom() {
-    if ((window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 100) {
+    if ((window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 40) {
       document.getElementById('bottomBarContainer').classList.add('sticky-bottom-bar');
       window.removeEventListener('scroll', scrolledToBottom);
     }
@@ -519,7 +519,7 @@ function initializeInputEventListeners() {
       document.getElementById('popUpImageDiv').style.display = 'none';
       document.getElementById('popUpCheckmark').style.display = 'block';
     }
-    document.getElementById('itemDraftSavedPopup').style.display = 'block';
+    document.getElementById('itemDraftSavedPopup').style.display = 'flex';
   });
   document.getElementById('closeItemSavedPopup').addEventListener('click', () => {
     document.getElementById('itemDraftSavedPopup').style.display = 'none';

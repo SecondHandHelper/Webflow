@@ -45,7 +45,7 @@ function loadItem(itemId) {
                     text1 = "På huvudsidan kan du se plaggets värdering och<br>välja om du vill sälja till värderingen eller inte.";
                 } else if (min && max) {
                     statusText = `Förbereds`;
-                    text1 = "Förbereder det sista inför publicering.<br>Du får ett SMS när försäljningen påbörjas.";
+                    text1 = "Förbereder det sista inför publicering.<br>Försäljningen påbörjas inom kort.";
                     text2 = valuationText;
                 } else {
                     statusText = `Värdering pågår`;

@@ -235,7 +235,7 @@ async function privateMain() {
 
   //For testing purposes only - To see what a certain user sees
   if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
-    userId = "e79qkG0VuugQxQLx7BOZWkBLYaY2";
+    userId = "3OkW5av20HP8ScpUDS8ip9fBEZr1";
   }
   //Yearly Summary
   /*
@@ -343,7 +343,7 @@ async function showInYourWardrobeSection() {
     }
     newItemCard.querySelector('.resell-button').href = `/sell-item?id=${item.id}&type=${item.status === 'Draft' ? 'draft' : 'resell'}`;
     newItemCard.querySelector('.resell-item-title').innerText = `${item.cleanedBrand || item.brand?.trim()}`;
-    newItemCard.querySelector('.resell-subtext').innerText = `${[item.cleanedModel, item.category, item.maiSize].filter(i => i).join(', ')}`;
+    newItemCard.querySelector('.resell-subtext').innerText = `${[item.category, item.maiSize].filter(i => i).join(', ')}`;
     newItemCard.querySelector('.resell-sub-subtext').innerText = item.soldPlatform ? `Köpt via Mai` : (item.draftSource === 'Digital receipt' ? 'Från digitalt kvitto' : '');
     newItemCard.querySelector('#wardrobeDotsButton').addEventListener('click', async () => {
       itemMoreMenu.style.display = 'block';
