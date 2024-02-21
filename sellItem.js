@@ -17,6 +17,7 @@ import { setFieldValue, setupModelSearchEventListeners } from "./sellItemModelSe
 
 
 let itemDraftSaved = false;
+const params = getParamsObject();
 
 async function addUserDetails() {
   // Grab values from form
@@ -76,7 +77,6 @@ function imageUploadHandlers() {
 
 async function sellItemMainAuthenticated() {
   console.log("sellItemMainAuthenticated " + new Date());
-  const params = getParamsObject();
   if (params.type !== 'draft') {
     document.getElementById('saveItemDraftButton').style.display = 'flex';
   }
@@ -163,7 +163,6 @@ async function sellItemMain() {
 
   initializeDeleteImageListeners();
   document.getElementById('clearItemForm').addEventListener('click', clearFormFields);
-  const params = getParamsObject();
   window.addEventListener('scroll', function scrolledToBottom() {
     if ((window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 100) {
       document.getElementById('bottomBarContainer').classList.add('sticky-bottom-bar');
@@ -191,8 +190,8 @@ async function sellItemMain() {
         saveItemDraftDiv.classList.add('saved');
         setTimeout(() => { saveItemDraftDiv.classList.remove('saved'); }, 1500);
       });
-    } else {
-      document.getElementById('saveItemDraftButton').style.display = 'flex';
+      document.getElementById("frontImage").required = true;
+      document.getElementById("brandTagImage").required = true;
     }
     await fillForm(params.id, null, params.type==='draft');
     document.getElementById("triggerShowSellItemContent").click();
@@ -216,7 +215,7 @@ async function sellItemMain() {
 }
 
 async function addItem() {
-  const id = sessionStorage.getItem('newItemId') || await requestUniqueId();
+  const id = params.type === 'draft' ? params.id : (sessionStorage.getItem('newItemId') || await requestUniqueId());
   try {
     document.getElementById('addItemFormDiv').style.display = 'none';
     document.getElementById('loadingDiv').style.display = 'flex';
@@ -318,7 +317,6 @@ async function getAndSaveValuation(itemId, item) {
     console.error('No item and no itemId, unexpected!!');
     return '/item-confirmation';
   }
-  const params = getParamsObject();
   if (params.id) {
     const getItemResponse = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: params.id });
     const resellItem = getItemResponse.data;
@@ -465,7 +463,6 @@ async function addItemInner(id, status = 'New') {
   if (modelCoverImageUrl) {
     images['modelImage'] = modelCoverImageUrl;
   }
-  const params = getParamsObject();
   const createdFromItem = (params.id && params.type !== 'draft') ? { createdFromItem: params.id } : {};
   const draftSource = status === 'Draft' ? { draftSource: 'Sell item' } : {};
   const item = { ...pageData, status, ...draftSource, shippingMethod, images, ...createdFromItem, version: "2" };
@@ -507,7 +504,7 @@ function initializeInputEventListeners() {
     document.getElementById('saveItemDraft').style.display = 'block';
     document.getElementById('saveDraftSpinner').style.display = 'none';
     document.getElementById('darkOverlay').style.display = 'block';
-    const image = item.images.enhancedFrontImageSmall || item.images.enhancedFrontImage || item.images.frontImage;
+    const image = item.images?.enhancedFrontImageSmall || item.images?.enhancedFrontImage || item.images?.frontImage;
     if (image) {
       document.getElementById('popUpImage').src = image;
       document.getElementById('popUpImageDiv').style.display = 'block';
@@ -525,10 +522,7 @@ function initializeInputEventListeners() {
   });
   document.getElementById('popUpNewItem').addEventListener('click', () => {
     clearFormFields();
-    document.getElementById('itemDraftSavedPopup').style.display = 'none';
-    document.getElementById('darkOverlay').style.display = 'none';
-    window.scrollTo(0, 0);
-    document.getElementById('bottomBarContainer').classList.remove('sticky-bottom-bar');
+    location.href = '/sell-item';
   });
   document.getElementById('goToMyWardrobe').addEventListener('click', () => {
     window.location.href = '/private#wardrobe';
@@ -579,9 +573,10 @@ async function createItemAfterSignIn() {
   localStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
 }
 
+const shouldSaveState = () => !(localStorage.getItem('latestItemCreated') || itemDraftSaved || params.id);
+
 function rememberUnsavedChanges() {
-  const params = getParamsObject();
-  if (localStorage.getItem('latestItemCreated') || itemDraftSaved || params.id) {
+  if (!shouldSaveState()) {
     return;
   }
   const {
@@ -662,16 +657,16 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
       let urlSmall = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[imageName] || images[`${imageName}Large`];
       let urlLarge = images[imageName] || images[`${imageName}Large`] || images[`${imageName}Medium`] || images[`${imageName}Small`];
       if (imageElements().includes(imageName)) {
-        rememberNewItemImageField(imageName, urlLarge, urlSmall);
+        rememberUnsavedChanges() && rememberNewItemImageField(imageName, urlLarge, urlSmall);
         if (imageName === 'frontImage') {
           if (images.enhancedFrontImage) {
             urlSmall = images['enhancedFrontImageSmall'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImage'] || images['enhancedFrontImageLarge'];
             urlLarge = images['enhancedFrontImage'] || images['enhancedFrontImageLarge'] || images['enhancedFrontImageMedium'] || images['enhancedFrontImageSmall'];
-            rememberNewItemImageField('enhancedFrontImage', urlLarge, urlSmall);
+            rememberUnsavedChanges() && rememberNewItemImageField('enhancedFrontImage', urlLarge, urlSmall);
           } else {
             whenLoadingDivHidden(() => showLoadingIcon(imageName))
             // Don't await here to don't block the form from showing with the front image
-            enhanceFrontImage(urlLarge).then(() => console.log('Image enhanced'));
+            enhanceFrontImage(urlLarge, shouldSaveState()).then(() => console.log('Image enhanced'));
           }
         }
         showImagePreview(imageName, urlSmall);
@@ -713,7 +708,6 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
       setFieldValue('itemLowestAcceptPrice', data.acceptPrice <= 0 ? null : data.acceptPrice);
       selectFieldValue(itemCondition, data.condition);
     }
-    const params = getParamsObject();
     if (params.id && data.status === 'Sold') {
       document.getElementById('priceSettings').style.display = 'none';
     }
@@ -1018,7 +1012,6 @@ function initializeClearFormButton() {
       }
     }
   }
-  const params = getParamsObject();
   if (!params.id) {
     document.getElementById('wf-form-Add-Item').addEventListener('input', showButtonIfFormChanged);
     document.querySelector('#wf-form-Add-Item select').addEventListener('change', showButtonIfFormChanged);
