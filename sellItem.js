@@ -1018,7 +1018,7 @@ async function initializeBrandConfirm() {
 function initializeSaveFormButton() {
   const saveItemDraftDiv = document.getElementById('saveItemDraftDiv');
   function showButtonIfFormChanged(event) {
-    if ((!params.id && !itemDraftSaved) || (params.id && params.type !== 'resell')) {
+    if ((!params.id && !itemDraftSaved) || (params.id && params.type !== 'resell' && params.type !== 'draft')) {
       return;
     }
     let field = event.target;
