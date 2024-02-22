@@ -187,7 +187,7 @@ async function sellItemMain() {
     document.getElementById('resellIntro').style.display = 'block';
     document.getElementById('bottomBarContainer').classList.add('sticky-bottom-bar');
     document.getElementById('clearItemForm').style.display = 'none';
-    if (params.type === 'draft') {
+    if (params.type === 'draft' || params.type === 'resell') {
       document.querySelector('#resellIntro .text-block-176').innerText = 'Fyll i de sista detaljerna för att sälja ditt plagg och kontrollera skickbeskrivningen.';
       document.getElementById("frontImage").required = true;
       document.getElementById("brandTagImage").required = true;
@@ -219,6 +219,7 @@ async function addItem() {
     document.getElementById('addItemFormDiv').style.display = 'none';
     document.getElementById('loadingDiv').style.display = 'flex';
     document.getElementById('clearItemForm').style.display = 'none';
+    document.getElementById('saveItemDraftDiv').style.display = 'none';
     const item = await addItemInner(id);
     const nextStep = await getAndSaveValuation(id, item);
     // Track with segment 'User Activated'
@@ -463,7 +464,7 @@ async function addItemInner(id, status = 'New') {
     images['modelImage'] = modelCoverImageUrl;
   }
   const createdFromItem = (params.id && params.type !== 'draft') ? { createdFromItem: params.id } : {};
-  const draftSource = status === 'Draft' ? { draftSource: 'Sell item' } : {};
+  const draftSource = status === 'Draft' ? { draftSource: Object.keys(createdFromItem).length ? 'Mai purchase' : 'Sell item' } : {};
   const item = { ...pageData, status, ...draftSource, shippingMethod, images, ...createdFromItem, version: "2" };
 
   if (!authUser.current) {
@@ -1015,9 +1016,9 @@ async function initializeBrandConfirm() {
 }
 
 function initializeSaveFormButton() {
-  const saveItemDraftDiv = document.getElementById('saveItemDraftDiv')
+  const saveItemDraftDiv = document.getElementById('saveItemDraftDiv');
   function showButtonIfFormChanged(event) {
-    if (!params.id && !itemDraftSaved) {
+    if ((!params.id && !itemDraftSaved) || (params.id && params.type !== 'resell')) {
       return;
     }
     let field = event.target;
@@ -1033,7 +1034,7 @@ function initializeSaveFormButton() {
 
   document.getElementById('saveItemDraft').addEventListener('click', async () => {
     saveItemDraftDiv.classList.add('saving');
-    const id = params.type === 'draft' ? params.id : (params.type === 'resell' ? await requestUniqueId() : itemDraft.id);
+    const id = params.type === 'resell' ? await requestUniqueId() : (params.type === 'draft' ? params.id : itemDraft.id);
     await addItemInner(id, 'Draft');
     saveItemDraftDiv.classList.remove('saving');
     saveItemDraftDiv.classList.add('saved');
