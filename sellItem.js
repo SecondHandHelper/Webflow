@@ -18,6 +18,8 @@ import { setFieldValue, setupModelSearchEventListeners } from "./sellItemModelSe
 
 let itemDraftSaved = false;
 const params = getParamsObject();
+let itemDraft;
+let atItemFromParam;
 
 async function addUserDetails() {
   // Grab values from form
@@ -81,7 +83,7 @@ async function sellItemMainAuthenticated() {
     document.getElementById('saveItemDraftButton').style.display = 'flex';
   }
   window.addEventListener('beforeunload', () => {
-    if (params.id) {
+    if (params.id || itemDraftSaved) {
       localStorage.removeItem('newItem');
     }
   });
@@ -165,6 +167,7 @@ async function sellItemMain() {
   await initializeSizeConfirm();
   initializeSuggestButtonsSaveState();
   initializeClearFormButton();
+  initializeSaveFormButton();
 
   initializeDeleteImageListeners();
   document.getElementById('clearItemForm').addEventListener('click', clearFormFields);
@@ -186,15 +189,6 @@ async function sellItemMain() {
     document.getElementById('clearItemForm').style.display = 'none';
     if (params.type === 'draft') {
       document.querySelector('#resellIntro .text-block-176').innerText = 'Fyll i de sista detaljerna för att sälja ditt plagg och kontrollera skickbeskrivningen.';
-      const saveItemDraftDiv = document.getElementById('saveItemDraftDiv')
-      saveItemDraftDiv.style.display = 'block';
-      document.getElementById('saveItemDraft').addEventListener('click', async () => {
-        saveItemDraftDiv.classList.add('saving');
-        await addItemInner(params.id, 'Draft');
-        saveItemDraftDiv.classList.remove('saving');
-        saveItemDraftDiv.classList.add('saved');
-        setTimeout(() => { saveItemDraftDiv.classList.remove('saved'); }, 1500);
-      });
       document.getElementById("frontImage").required = true;
       document.getElementById("brandTagImage").required = true;
     }
@@ -480,7 +474,7 @@ async function addItemInner(id, status = 'New') {
     sessionStorage.removeItem('newItemId');
     localStorage.setItem('latestItemCreated', JSON.stringify(createItemResponse.data));
   }
-  return item;
+  return { ...item, id };
 }
 
 function initializeInputEventListeners() {
@@ -504,9 +498,8 @@ function initializeInputEventListeners() {
     const id = sessionStorage.getItem('newItemId') || await requestUniqueId();
     const item = await addItemInner(id, 'Draft');
     itemDraftSaved = true;
-    localStorage.removeItem('newItem');
+    itemDraft = item;
     document.getElementById('clearItemForm').style.display = 'none';
-    document.getElementById('saveItemDraft').style.display = 'block';
     document.getElementById('saveDraftSpinner').style.display = 'none';
     document.getElementById('darkOverlay').style.display = 'block';
     const image = item.images?.enhancedFrontImageSmall || item.images?.enhancedFrontImage || item.images?.frontImage;
@@ -611,8 +604,14 @@ function rememberUnsavedChanges() {
   }
 }
 
-function isDefaultFormState(itemState) {
-  const defaultState = defaultFormState();
+function isDraftItemChanged(itemState) {
+  if (!itemDraft) {
+    return false;
+  }
+  return itemStateDiffers(itemState, itemDraft);
+}
+
+function itemStateDiffers(itemState, defaultState) {
   for (const field in defaultState) {
     if (!(field in itemState)) {
       continue;
@@ -628,6 +627,10 @@ function isDefaultFormState(itemState) {
     }
   }
   return true;
+}
+
+function isDefaultFormState(itemState) {
+  return itemStateDiffers(itemState, defaultFormState());
 }
 
 function showSuggestButtons(fieldName, restoreSavedState, showConfirmation) {
@@ -648,8 +651,9 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
         firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId }),
         fetch(`https://getatitem-heypmjzjfq-ew.a.run.app?itemId=${itemId}`)
       ]);
+      itemDraft = item;
     }
-    const atItem = (await atItemResponse?.json()) || {};
+    const atItem = atItemFromParam = (await atItemResponse?.json()) || {};
     const data = item.data;
     const images = data.images || {};
     let originalPrice = data.originalPrice;
@@ -958,6 +962,9 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
 }
 
 async function detectAndFillColor(imageUrl) {
+  if (document.querySelector('#itemColor').value !== '') {
+    return;
+  }
   try {
     const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ imageUrl });
     if (!response.data?.colors || !response.data.colors.length) {
@@ -1007,8 +1014,40 @@ async function initializeBrandConfirm() {
   })
 }
 
+function initializeSaveFormButton() {
+  const saveItemDraftDiv = document.getElementById('saveItemDraftDiv')
+  function showButtonIfFormChanged(event) {
+    if (!params.id && !itemDraftSaved) {
+      return;
+    }
+    let field = event.target;
+    if (field instanceof Element) {
+      const defaultValue = itemDraft[field.name];
+      if (defaultValue !== field.value && field.value !== '') {
+        saveItemDraftDiv.style.display = 'block';
+      }
+    }
+  }
+  document.getElementById('wf-form-Add-Item').addEventListener('input', showButtonIfFormChanged);
+  document.querySelector('#wf-form-Add-Item select').addEventListener('change', showButtonIfFormChanged);
+
+  document.getElementById('saveItemDraft').addEventListener('click', async () => {
+    saveItemDraftDiv.classList.add('saving');
+    await addItemInner(params.id || itemDraft.id, 'Draft');
+    saveItemDraftDiv.classList.remove('saving');
+    saveItemDraftDiv.classList.add('saved');
+    setTimeout(() => {
+      saveItemDraftDiv.classList.remove('saved');
+      saveItemDraftDiv.style.display = 'none';
+    }, 1500);
+  });
+}
+
 function initializeClearFormButton() {
   function showButtonIfFormChanged(event) {
+    if (itemDraftSaved) {
+      return;
+    }
     let field = event.target;
     if (field instanceof Element) {
       const defaultValue = defaultFormState()[field.name];
