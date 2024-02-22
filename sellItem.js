@@ -1033,7 +1033,8 @@ function initializeSaveFormButton() {
 
   document.getElementById('saveItemDraft').addEventListener('click', async () => {
     saveItemDraftDiv.classList.add('saving');
-    await addItemInner(params.id || itemDraft.id, 'Draft');
+    const id = params.type === 'draft' ? params.id : (params.type === 'resell' ? await requestUniqueId() : itemDraft.id);
+    await addItemInner(id, 'Draft');
     saveItemDraftDiv.classList.remove('saving');
     saveItemDraftDiv.classList.add('saved');
     setTimeout(() => {
