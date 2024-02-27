@@ -206,7 +206,7 @@ function getEventComponent(event, style) {
             time);
     }
     if (event.type === 'bagSentToSeller') {
-        return eventComponentHtml(displayLine, icon, className, `Fraktpåse skickades till dig`, time);
+        return eventComponentHtml(displayLine, icon, className, `Fraktetikett skickades till dig`, time);
     }
     if (event.type === 'itemSent') {
         return eventComponentHtml(displayLine, icon, className, `Plagget skickades iväg`, time);
