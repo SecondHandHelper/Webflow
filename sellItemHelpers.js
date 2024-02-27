@@ -235,7 +235,8 @@ export function checkBlockedOrLowShareSoldBrand(brand, category) {
     'tights', 'topp', 'träningsbyxor', 'träningströja', 'underställ', 'vantar']
 
   let hardToSellDiv = document.getElementById("hardToSellDiv");
-  let wordsToWarnOn = ["H&M", "HM", "Zara", "ASOS", "Nelly", "Gina Tricot", "BikBok", "Bik Bok", "Lindex", "Kappahl", "Cubus", "NA-KD", "NAKD", "Mango", "Ellos", "Primark", "Shein", "Vila", "Forever 21", "Pull & Bear", "Bershka", "Stradivarius", "Okänt", "Unknown", "Vet ej", "...", "Vet inte", "Okänd", "-", "Se bild"];
+  let wordsToWarnOn = ["H&M", "HM", "Zara", "ASOS", "Nelly", "Gina Tricot", "BikBok", "Bik Bok", "Lindex", "Kappahl", "Cubus", "NA-KD", "NAKD", "Mango", "Ellos", "Primark", "Shein", "Vila", "Forever 21", "Pull & Bear", "Bershka", "Stradivarius"];
+  let unknownBrandWords = ["Okänt", "Unknown", "Vet ej", "Vet inte", "Okänd", "Se bild"]
   document.getElementById("itemBrand").setCustomValidity('');
   if (BLOCKED_BRANDS.includes(brand.toLowerCase()) ||
     (!HIGH_VALUE_CATEGORY.includes(category?.toLowerCase()) && BLOCK_NON_HIGH_VALUE_CATEGORY.includes(brand.toLowerCase())) ||
@@ -249,6 +250,11 @@ export function checkBlockedOrLowShareSoldBrand(brand, category) {
     document.getElementById("itemBrand").setCustomValidity(BLOCKED_BRANDS.includes(brand.toLowerCase()) ?
       `Vi säljer inte plagg från ${brand}` : `Vi säljer inte kategorin '${category}' från ${brand}`);
     return true;
+  } else if (unknownBrandWords.some(words => brand.toLowerCase().includes(words.toLowerCase())) || (brand.length && !brand.match(/(\w|\d)/))) {
+    hardToSellText.innerHTML = `Vi känner inte till märket "${brand}", och säljer i regel inte okända varumärken.`;
+    stopIcon.style.display = 'none';
+    warningIcon.style.display = 'block';
+    hardToSellDiv.style.display = 'block';
   } else if (wordsToWarnOn.some(words => brand.toLowerCase().includes(words.toLowerCase()))) {
     hardToSellText.innerHTML = `Vi säljer i regel inte ${brand}-plagg på grund av för lågt andrahandsvärde. Undantag kan finnas.`;
     stopIcon.style.display = 'none';

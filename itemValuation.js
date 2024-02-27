@@ -310,24 +310,25 @@ const getValuationExplanation = (item) => {
   const {
     mlValuation: {
       valuatedBrandItems, brandMeanMax, brandAccuracy, brandCategoryAccuracy, fewBrand,
-      brandMeanSold, brandCategoryMeanSold, newMinMaxLog, brandShareSold
+      brandMeanSold, brandCategoryMeanSold, newMinMaxLog, brandShareSold, lowValueSegment
     }, cleanedBrand, brand
   } = item;
+  const soldBrandItems = Math.round(valuatedBrandItems * brandShareSold);
   const brandName = cleanedBrand || brand;
-  const bestMeanPrice = brandAccuracy > 0.8 && brandMeanSold > 0 ? `Snittpriset för sålda plagg för varumärket är ${brandMeanSold} kr.` :
-    (brandCategoryAccuracy > 0.7 && brandCategoryMeanSold > 0 ? `Snittpriset för sålda plagg för varumärket i denna kategori är ${brandCategoryMeanSold} kr.` : '');
+  const bestMeanPrice = brandAccuracy > 0.8 && brandMeanSold > 0 ? `Plagg från ${brandName} har i genomsnitt sålts för ${brandMeanSold} kr baserat på ${soldBrandItems} sålda plagg. ` :
+    (brandCategoryAccuracy > 0.7 && brandCategoryMeanSold > 0 ? `Snittpriset för sålda plagg för varumärket i denna kategori är ${brandCategoryMeanSold} kr. ` : '');
   const acceptPriceNotice = newMinMaxLog.match(/accept price is above max/i) ? 'Plagget har värderat till under ditt lägsta accepterade pris. ' : '';
-  const adjustPriceLowShareSoldNotice = brandShareSold < 0.5 ? `Notera att efterfrågan på ${brandName} på andrahandsmarknaden är lägre än snittet, så vill du öka sannolikheten att få det sålt kan du sänka det lägsta priset.` : '';
-  const adjustPriceNotice = 'Om du mot förmodan ändå vill justera kan du göra det, men tänk på att det påverkar sannolikheten att få det sålt.'
+  const adjustPriceLowShareSoldNotice = brandShareSold < 0.5 && !lowValueSegment ? `Notera att efterfrågan på ${brandName} på andrahandsmarknaden är lägre än snittet, så vill du öka sannolikheten att få det sålt kan du sänka det lägsta priset.` : '';
+  const adjustPriceNotice = 'Ibland träffar den dock inte rätt, så känn dig fri att justera priset om du tycker värderingen verkar konstig.'
 
   if (fewBrand || valuatedBrandItems === 0) {
     return `${acceptPriceNotice}Värderingen är mer osäker då vi har sålt relativt lite av detta varumärke. Efterfrågan på mer okända och små varumärken är ofta lägre. För att öka sannolikheten att få det sålt kan du justera ner lägsta priset`;
   }
   if (brandAccuracy >= 0.8 && !fewBrand) {
-    return `${acceptPriceNotice}AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat, och vi brukar ha hög träffsäkerhet på detta varumärke. ${adjustPriceLowShareSoldNotice || adjustPriceNotice} ${bestMeanPrice}`;
+    return `${acceptPriceNotice}${bestMeanPrice}AI-värderingen tar hänsyn till material, modell, skick och originalpris och brukar ha hög träffsäkerhet för detta varumärke. ${adjustPriceLowShareSoldNotice || adjustPriceNotice}`;
   }
   if (brandAccuracy < 0.8 && brandCategoryAccuracy >= 0.7 && !fewBrand) {
-    return `${acceptPriceNotice}AI-värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat, och för just denna kategori från varumärket brukar vi ha hög träffsäkerhet. ${adjustPriceLowShareSoldNotice || adjustPriceNotice} ${bestMeanPrice}`;
+    return `${acceptPriceNotice}${bestMeanPrice}AI-värderingen tar hänsyn till material, modell, skick och originalpris och brukar ha hög träffsäkerhet för denna kategori och varumärke. ${adjustPriceLowShareSoldNotice || adjustPriceNotice}`;
   }
   if (brandMeanMax <= 400) {
     return `${acceptPriceNotice}Värderingen baseras på ${valuatedBrandItems} plagg från ${brandName} som vi tidigare värderat. ${[adjustPriceLowShareSoldNotice, bestMeanPrice].join(' ')}`;
