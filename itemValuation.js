@@ -155,8 +155,8 @@ async function saveValuationStatus(itemId, minPrice, maxPrice) {
             savedItem.item.infoRequests.price.userAdjustedMin = adjustedMin;
             savedItem.item.infoRequests.price.userAdjustedMax = adjustedMax;
             if (adjustmentOk(minPrice, maxPrice)) {
-                savedItem.item.minPriceEstimate = minPrice;
-                savedItem.item.maxPriceEstimate = maxPrice;
+                savedItem.item.minPriceEstimate = adjustedMin;
+                savedItem.item.maxPriceEstimate = adjustedMax;
             } else {
                 savedItem.item.infoRequests.price.response = 'User proposal';
                 savedItem.item.infoRequests.price.userProposalMotivation = document.getElementById('userProposalMotivation').value;
