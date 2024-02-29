@@ -88,19 +88,24 @@ const trackHowItWorksInteractions = () => {
 }
 
 function showNoCommissionCampaign() {
+  const noCommissionCampaignDiv = document.getElementById('noCommissionCampaign');
+  analytics.track("Element Viewed", { elementID: "noCommissionCampaign" });
+  noCommissionCampaignDiv.style.display = 'block';
+  new IntersectionObserver((entries, observer) => {
+    if (entries.at(0).isIntersecting) {
+      noCommissionCampaignDiv.style.top = noCommissionCampaignDiv.style.top === '0px' ? '-80px' : '0px';
+    }
+  }, {rootMargin: '0px 0px -100%'}).observe(document.getElementById('sellItemCtaButton'));
+}
+
+function noCommissionCampaign() {
   const cookieName = 'noCommissionCampaignCookie';
   const cookie = getCookie(cookieName);
-  if (cookie === 'noCommission' || Math.random() > 0.5) {
-    const noCommissionCampaignDiv = document.getElementById('noCommissionCampaign');
-    analytics.track("Element Viewed", { elementID: "noCommissionCampaign" });
+  const random = Math.random();
+  if (cookie === 'noCommission' || (!cookie.length && random > 0.5)) {
+    showNoCommissionCampaign();
     setCookie(cookieName, 'noCommission', 7);
-    noCommissionCampaignDiv.style.display = 'block';
-    new IntersectionObserver((entries, observer) => {
-      if (entries.at(0).isIntersecting) {
-        noCommissionCampaignDiv.style.top = noCommissionCampaignDiv.style.top === '0px' ? '-80px' : '0px';
-      }
-    }, {rootMargin: '0px 0px -100%'}).observe(document.getElementById('sellItemCtaButton'));
-  } else {
+  } else if (!cookie.length && random <= 0.5) {
     setCookie(cookieName, 'commission', 7);
   }
 }
@@ -110,7 +115,7 @@ loadRecentlySold();
 fetchAndLoadRecentlyAddedItems();
 trackHowItWorksInteractions();
 
-showNoCommissionCampaign()
+noCommissionCampaign()
 
 // Set attribution cookies (could be put on any campaign page)
 checkCookie("utm_campaign");
