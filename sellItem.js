@@ -471,6 +471,7 @@ async function addItemInner(id, status = 'New') {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
     const createItemResponse = await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
+    setCampaignCoupon();
     localStorage.removeItem('newItem');
     sessionStorage.removeItem('newItemId');
     localStorage.setItem('latestItemCreated', JSON.stringify(createItemResponse.data));
@@ -562,11 +563,18 @@ function isElementInView(el) {
   );
 }
 
+function setCampaignCoupon() {
+  if (userItemsCount === 0 && getCookie('noCommissionCampaignCookie') === 'noCommission') {
+    db.collection('users').doc(authUser.current.uid).update({ 'oneTimeCommissionFreeCoupon': true });
+  }
+}
+
 async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
   sessionStorage.removeItem('newItemId');
   await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
+  setCampaignCoupon()
   localStorage.removeItem('newItem');
   itemFromStorage.item.id = itemFromStorage.id;
   localStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));

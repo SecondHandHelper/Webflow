@@ -87,10 +87,28 @@ const trackHowItWorksInteractions = () => {
   }).observe(howItWorksDiv, { attributeFilter: ['aria-hidden'], attributeOldValue: true, subtree: true });
 }
 
+function showNoCommissionCampaign() {
+  const cookieName = 'noCommissionCampaignCookie';
+  const cookie = getCookie(cookieName);
+  if (cookie === 'noCommission' || Math.random() > 0.5) {
+    const noCommissionCampaignDiv = document.getElementById('noCommissionCampaign');
+    analytics.track("Element Viewed", { elementID: "noCommissionCampaign" });
+    setCookie(cookieName, 'noCommission', 7);
+    noCommissionCampaignDiv.style.display = 'block';
+    new IntersectionObserver((entries, observer) => {
+      if (entries.at(0).isIntersecting) {
+        noCommissionCampaignDiv.style.top = noCommissionCampaignDiv.style.top === '0px' ? '-80px' : '0px';
+      }
+    }, {rootMargin: '0px 0px -100%'}).observe(document.getElementById('sellItemCtaButton'));
+  }
+}
+
 authUser.whenSet(signedInNextStep);
 loadRecentlySold();
 fetchAndLoadRecentlyAddedItems();
 trackHowItWorksInteractions();
+
+showNoCommissionCampaign()
 
 // Set attribution cookies (could be put on any campaign page)
 checkCookie("utm_campaign");
