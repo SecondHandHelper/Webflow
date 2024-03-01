@@ -97,8 +97,8 @@ function showNoCommissionCampaign() {
     noCommissionCampaignDiv.style.top = '0px';
   }
   new IntersectionObserver((entries, observer) => {
-    noCommissionCampaignDiv.style.top = sellItemCtaButton.getBoundingClientRect().y > -47 ? '-80px' : '0px';
-  }, {rootMargin: '0px 0px -400px 0px'}).observe(document.querySelector('.section-39'));
+    noCommissionCampaignDiv.style.top = document.getElementById('sellItemCtaButton').getBoundingClientRect().y > -47 ? '-80px' : '0px';
+  }, {rootMargin: '0px 0px -400px 0px', root: document.body}).observe(document.querySelector('.section-39'));
   new IntersectionObserver((entries, observer) => {
     if (!entries[0].isIntersecting) return;
     analytics.track("Element Viewed", { elementID: "noCommissionCampaignAd" });
