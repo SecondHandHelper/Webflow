@@ -92,11 +92,19 @@ function showNoCommissionCampaign() {
   analytics.track("Element Viewed", { elementID: "noCommissionCampaign" });
   noCommissionCampaignDiv.style.display = 'block';
   document.getElementById('noCommissionAd').style.display = 'block';
+  if (document.getElementById('sellItemCtaButton').getBoundingClientRect().y < 0) {
+    noCommissionCampaignDiv.style.top = '0px';
+  }
   new IntersectionObserver((entries, observer) => {
     if (entries.at(0).isIntersecting) {
       noCommissionCampaignDiv.style.top = noCommissionCampaignDiv.style.top === '0px' ? '-80px' : '0px';
     }
   }, {rootMargin: '0px 0px -100%'}).observe(document.getElementById('sellItemCtaButton'));
+  new IntersectionObserver((entries, observer) => {
+    if (!entries[0].isIntersecting) return;
+    analytics.track("Element Viewed", { elementID: "noCommissionCampaignAd" });
+    observer.disconnect();
+  }, {rootMargin: '0px 0px -370px 0px'}).observe(document.getElementById('noCommissionAd'));
 }
 
 function noCommissionCampaign() {
@@ -115,7 +123,6 @@ authUser.whenSet(signedInNextStep);
 loadRecentlySold();
 fetchAndLoadRecentlyAddedItems();
 trackHowItWorksInteractions();
-
 noCommissionCampaign()
 
 // Set attribution cookies (could be put on any campaign page)
