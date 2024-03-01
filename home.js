@@ -1,13 +1,5 @@
 import {itemCoverImage} from "./general";
 
-var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-var domain = window.location.origin;
-// Show desktop DIV if on desktop
-if (!isMobile && !domain.includes("shh-test.page")) {
-  desktopDiv.style.display = 'block';
-  mobileContainer.style.display = 'none';
-}
-
 function loadRecentlySold() {
   const recentlySoldItems = firebase.app().functions('europe-west1').httpsCallable('recentlySoldItems');
 
@@ -91,21 +83,31 @@ function showNoCommissionCampaign() {
   const noCommissionCampaignDiv = document.getElementById('noCommissionCampaign');
   analytics.track("Element Viewed", { elementID: "noCommissionCampaign" });
   noCommissionCampaignDiv.style.display = 'block';
+  document.getElementById('noCommissionAd').style.display = 'block';
+  let sellItemCtaButton = document.getElementById('sellItemCtaButton');
+  if (sellItemCtaButton.getBoundingClientRect().y < -47) {
+    noCommissionCampaignDiv.style.top = '0px';
+  }
   new IntersectionObserver((entries, observer) => {
-    if (entries.at(0).isIntersecting) {
-      noCommissionCampaignDiv.style.top = noCommissionCampaignDiv.style.top === '0px' ? '-80px' : '0px';
-    }
-  }, {rootMargin: '0px 0px -100%'}).observe(document.getElementById('sellItemCtaButton'));
+    noCommissionCampaignDiv.style.top = document.getElementById('sellItemCtaButton').getBoundingClientRect().y > -47 ? '-80px' : '0px';
+  }, {rootMargin: '0px 0px -100%', root: null }).observe(document.getElementById('ctaSection'));
+  new IntersectionObserver((entries, observer) => {
+    if (!entries[0].isIntersecting) return;
+    analytics.track("Element Viewed", { elementID: "noCommissionCampaignAd" });
+    observer.disconnect();
+  }, {rootMargin: '0px 0px -370px 0px'}).observe(document.getElementById('noCommissionAd'));
 }
 
 function noCommissionCampaign() {
   const cookieName = 'noCommissionCampaignCookie';
   const cookie = getCookie(cookieName);
   const random = Math.random();
-  if (cookie === 'noCommission' || (!cookie.length && random > 0.5)) {
+  const dateNow = new Intl.DateTimeFormat('se-SV').format(new Date());
+  const campaignDateOk = dateNow >= '2024-03-04' && dateNow <= '2024-03-10';
+  if (campaignDateOk && cookie === 'noCommission' || (!cookie.length && random > 0.5)) {
     showNoCommissionCampaign();
     setCookie(cookieName, 'noCommission', 7);
-  } else if (!cookie.length && random <= 0.5) {
+  } else if (campaignDateOk && !cookie.length && random <= 0.5) {
     setCookie(cookieName, 'commission', 7);
   }
 }
@@ -114,7 +116,6 @@ authUser.whenSet(signedInNextStep);
 loadRecentlySold();
 fetchAndLoadRecentlyAddedItems();
 trackHowItWorksInteractions();
-
 noCommissionCampaign()
 
 // Set attribution cookies (could be put on any campaign page)

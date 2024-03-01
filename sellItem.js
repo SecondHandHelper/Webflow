@@ -52,7 +52,17 @@ function imageElements() {
   return ["frontImage", "brandTagImage", "defectImage", "materialTagImage", "extraImage"];
 }
 
-var userItemsCount;
+async function trackUserActivated() {
+  // Track with segment 'User Activated'
+  if ((await userItemsCount()) === 1) {
+    analytics.track('User Activated');
+  }
+}
+
+async function userItemsCount() {
+  const items = await getItems(authUser.current.uid);
+  return items.docs.filter(i => i.data()?.status !== 'Draft').length;
+}
 
 function imageUploadHandlers() {
   let frontImageUpload = document.getElementById("frontImage");
@@ -108,10 +118,6 @@ async function sellItemMainAuthenticated() {
       sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
     }
   }
-
-  // Get user's item count to be able to send 'User Activated' event
-  const items = await getItems(authUser.current.uid);
-  userItemsCount = items.docs.filter(i => i.data()?.status !== 'Draft').length;
 }
 
 async function sellItemMain() {
@@ -139,14 +145,24 @@ async function sellItemMain() {
     shareSoldDiv.style.display = 'none';
     checkBlockedOrLowShareSoldBrand(this.value, category.value);
   };
+  brand.onblur = function () {
+    const hardToSellDiv = document.getElementById('hardToSellDiv');
+    const unknownBrandWords = ['Okänt', 'Unknown', 'Vet ej', 'Vet inte', 'Okänd', 'Se bild'];
+    if (unknownBrandWords.some(words => this.value.toLowerCase().includes(words.toLowerCase())) || (this.value.length && !this.value.match(/(\w|\d)/))) {
+      hardToSellText.innerHTML = `Vi känner inte till märket '${this.value}', och säljer i regel inte okända varumärken.`;
+      stopIcon.style.display = 'none';
+      warningIcon.style.display = 'block';
+      hardToSellDiv.style.display = 'block';
+    }
+  }
 
   // Hide/Show extra fields for defects
   itemCondition.onchange = function () {
     let input = this.value;
-    if (input == "Använd, tecken på slitage") {
+    if (input === "Använd, tecken på slitage") {
       defectInfoDiv.style.display = 'block';
       itemCondition.style.color = "#333";
-    } else if (input == "") {
+    } else if (input === "") {
       defectInfoDiv.style.display = 'none';
       itemCondition.style.color = "#929292";
     } else {
@@ -222,10 +238,6 @@ async function addItem() {
     document.getElementById('saveItemDraftDiv').style.display = 'none';
     const item = await addItemInner(id);
     const nextStep = await getAndSaveValuation(id, item);
-    // Track with segment 'User Activated'
-    if (userItemsCount === 0) {
-      analytics.track('User Activated');
-    }
     location.href = nextStep;
   } catch (e) {
     errorHandler.report(e);
@@ -471,7 +483,8 @@ async function addItemInner(id, status = 'New') {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
     const createItemResponse = await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
-    setCampaignCoupon();
+    await trackUserActivated();
+    await setCampaignCoupon();
     localStorage.removeItem('newItem');
     sessionStorage.removeItem('newItemId');
     localStorage.setItem('latestItemCreated', JSON.stringify(createItemResponse.data));
@@ -563,9 +576,10 @@ function isElementInView(el) {
   );
 }
 
-function setCampaignCoupon() {
-  if (userItemsCount === 0 && getCookie('noCommissionCampaignCookie') === 'noCommission') {
-    db.collection('users').doc(authUser.current.uid).update({ 'oneTimeCommissionFreeCoupon': true });
+async function setCampaignCoupon() {
+  const campaignDateOk = new Intl.DateTimeFormat('se-SV').format(new Date()) <= '2024-03-10';
+  if (campaignDateOk && getCookie('noCommissionCampaignCookie') === 'noCommission' && (await userItemsCount()) === 1) {
+    await firebase.app().functions("europe-west1").httpsCallable('setNoCommissionCoupon')();
   }
 }
 
@@ -574,7 +588,8 @@ async function createItemAfterSignIn() {
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
   sessionStorage.removeItem('newItemId');
   await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
-  setCampaignCoupon()
+  await trackUserActivated();
+  await setCampaignCoupon()
   localStorage.removeItem('newItem');
   itemFromStorage.item.id = itemFromStorage.id;
   localStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
