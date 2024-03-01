@@ -233,10 +233,6 @@ async function addItem() {
     document.getElementById('saveItemDraftDiv').style.display = 'none';
     const item = await addItemInner(id);
     const nextStep = await getAndSaveValuation(id, item);
-    // Track with segment 'User Activated'
-    if ((await userItemsCount()) === 0) {
-      analytics.track('User Activated');
-    }
     location.href = nextStep;
   } catch (e) {
     errorHandler.report(e);
@@ -483,7 +479,7 @@ async function addItemInner(id, status = 'New') {
   } else {
     const createItemResponse = await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
     await trackUserActivated();
-    setCampaignCoupon();
+    await setCampaignCoupon();
     localStorage.removeItem('newItem');
     sessionStorage.removeItem('newItemId');
     localStorage.setItem('latestItemCreated', JSON.stringify(createItemResponse.data));
