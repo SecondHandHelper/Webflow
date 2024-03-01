@@ -1,13 +1,5 @@
 import {itemCoverImage} from "./general";
 
-var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-var domain = window.location.origin;
-// Show desktop DIV if on desktop
-if (!isMobile && !domain.includes("shh-test.page")) {
-  desktopDiv.style.display = 'block';
-  mobileContainer.style.display = 'none';
-}
-
 function loadRecentlySold() {
   const recentlySoldItems = firebase.app().functions('europe-west1').httpsCallable('recentlySoldItems');
 
