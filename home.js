@@ -91,6 +91,7 @@ function showNoCommissionCampaign() {
   const noCommissionCampaignDiv = document.getElementById('noCommissionCampaign');
   analytics.track("Element Viewed", { elementID: "noCommissionCampaign" });
   noCommissionCampaignDiv.style.display = 'block';
+  document.getElementById('noCommissionAd').style.display = 'block';
   new IntersectionObserver((entries, observer) => {
     if (entries.at(0).isIntersecting) {
       noCommissionCampaignDiv.style.top = noCommissionCampaignDiv.style.top === '0px' ? '-80px' : '0px';
