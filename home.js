@@ -98,7 +98,7 @@ function showNoCommissionCampaign() {
   }
   new IntersectionObserver((entries, observer) => {
     noCommissionCampaignDiv.style.top = document.getElementById('sellItemCtaButton').getBoundingClientRect().y > -47 ? '-80px' : '0px';
-  }, {rootMargin: '0px 0px -400px 0px', root: document.body}).observe(document.querySelector('.section-39'));
+  }, {rootMargin: '0px 0px -400px 0px', root: null}).observe(document.querySelector('.section-39'));
   new IntersectionObserver((entries, observer) => {
     if (!entries[0].isIntersecting) return;
     analytics.track("Element Viewed", { elementID: "noCommissionCampaignAd" });
