@@ -54,19 +54,14 @@ function imageElements() {
 
 async function trackUserActivated() {
   // Track with segment 'User Activated'
-  if ((await userItemsCount()) === 0) {
+  if ((await userItemsCount()) === 1) {
     analytics.track('User Activated');
   }
 }
 
-let numUserItems;
-
 async function userItemsCount() {
-  if (!numUserItems) {
-    const items = await getItems(authUser.current.uid);
-    numUserItems = items.docs.filter(i => i.data()?.status !== 'Draft').length;
-  }
-  return numUserItems;
+  const items = await getItems(authUser.current.uid);
+  return items.docs.filter(i => i.data()?.status !== 'Draft').length;
 }
 
 function imageUploadHandlers() {
@@ -572,8 +567,8 @@ function isElementInView(el) {
 }
 
 async function setCampaignCoupon() {
-  if ((await userItemsCount()) === 0 && getCookie('noCommissionCampaignCookie') === 'noCommission') {
-    db.collection('users').doc(authUser.current.uid).update({ 'oneTimeCommissionFreeCoupon': true });
+  if ((await userItemsCount()) === 1 && getCookie('noCommissionCampaignCookie') === 'noCommission') {
+    await db.collection('users').doc(authUser.current.uid).update({ 'oneTimeCommissionFreeCoupon': true });
   }
 }
 
