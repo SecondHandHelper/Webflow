@@ -111,10 +111,13 @@ function noCommissionCampaign() {
   const cookieName = 'noCommissionCampaignCookie';
   const cookie = getCookie(cookieName);
   const random = Math.random();
-  if (cookie === 'noCommission' || (!cookie.length && random > 0.5)) {
+  const dateNow = new Intl.DateTimeFormat('se-SV').format(new Date());
+  // TODO: Change date to 2024-03-04
+  const campaignDateOk = dateNow >= '2024-03-01' && dateNow <= '2024-03-10';
+  if (campaignDateOk && cookie === 'noCommission' || (!cookie.length && random > 0.5)) {
     showNoCommissionCampaign();
     setCookie(cookieName, 'noCommission', 7);
-  } else if (!cookie.length && random <= 0.5) {
+  } else if (campaignDateOk && !cookie.length && random <= 0.5) {
     setCookie(cookieName, 'commission', 7);
   }
 }

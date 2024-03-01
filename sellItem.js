@@ -145,14 +145,24 @@ async function sellItemMain() {
     shareSoldDiv.style.display = 'none';
     checkBlockedOrLowShareSoldBrand(this.value, category.value);
   };
+  brand.onblur = function () {
+    const hardToSellDiv = document.getElementById('hardToSellDiv');
+    const unknownBrandWords = ['Okänt', 'Unknown', 'Vet ej', 'Vet inte', 'Okänd', 'Se bild'];
+    if (unknownBrandWords.some(words => this.value.toLowerCase().includes(words.toLowerCase())) || (this.value.length && !this.value.match(/(\w|\d)/))) {
+      hardToSellText.innerHTML = `Vi känner inte till märket '${this.value}', och säljer i regel inte okända varumärken.`;
+      stopIcon.style.display = 'none';
+      warningIcon.style.display = 'block';
+      hardToSellDiv.style.display = 'block';
+    }
+  }
 
   // Hide/Show extra fields for defects
   itemCondition.onchange = function () {
     let input = this.value;
-    if (input == "Använd, tecken på slitage") {
+    if (input === "Använd, tecken på slitage") {
       defectInfoDiv.style.display = 'block';
       itemCondition.style.color = "#333";
-    } else if (input == "") {
+    } else if (input === "") {
       defectInfoDiv.style.display = 'none';
       itemCondition.style.color = "#929292";
     } else {
@@ -567,8 +577,9 @@ function isElementInView(el) {
 }
 
 async function setCampaignCoupon() {
-  if ((await userItemsCount()) === 1 && getCookie('noCommissionCampaignCookie') === 'noCommission') {
-    await db.collection('users').doc(authUser.current.uid).update({ 'oneTimeCommissionFreeCoupon': true });
+  const campaignDateOk = new Intl.DateTimeFormat('se-SV').format(new Date()) <= '2024-03-10';
+  if (campaignDateOk && getCookie('noCommissionCampaignCookie') === 'noCommission' && (await userItemsCount()) === 1) {
+    await firebase.app().functions("europe-west1").httpsCallable('setNoCommissionCoupon')();
   }
 }
 
