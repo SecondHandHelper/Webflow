@@ -103,8 +103,7 @@ function noCommissionCampaign() {
   const cookie = getCookie(cookieName);
   const random = Math.random();
   const dateNow = new Intl.DateTimeFormat('se-SV').format(new Date());
-  // TODO: Change date to 2024-03-04
-  const campaignDateOk = dateNow >= '2024-03-01' && dateNow <= '2024-03-10';
+  const campaignDateOk = dateNow >= '2024-03-04' && dateNow <= '2024-03-10';
   if (campaignDateOk && cookie === 'noCommission' || (!cookie.length && random > 0.5)) {
     showNoCommissionCampaign();
     setCookie(cookieName, 'noCommission', 7);
