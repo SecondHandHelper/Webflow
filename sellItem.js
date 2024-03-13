@@ -298,9 +298,13 @@ async function saveItemValuation(itemId, mlValuationData) {
   await saveValuationInStorageOrBackend(valuationData, itemId);
 }
 
+function round10(val) {
+  return Math.round((val || 0) / 10) * 10;
+}
+
 async function setValuationFromResellItem(resellItem, item, itemId) {
   const maxPrice = resellItem.status === 'sold' ? resellItem.maxPriceEstimate :
-    Math.min(resellItem.maxPriceEstimate, resellItem.minPriceEstimate * 1.3);
+    round10(Math.min(resellItem.maxPriceEstimate, resellItem.minPriceEstimate * 1.3));
   const valuationData = {
     valuationStatus: 'Completed',
     valuationDate: new Date().toISOString(),
