@@ -303,7 +303,7 @@ function round10(val) {
 }
 
 async function setValuationFromResellItem(resellItem, item, itemId) {
-  const maxPrice = resellItem.status === 'sold' ? resellItem.maxPriceEstimate :
+  const maxPrice = resellItem.status === 'Sold' ? resellItem.maxPriceEstimate :
     Math.min(resellItem.maxPriceEstimate,
       Math.max(resellItem.minPriceEstimate + 150, round10(resellItem.minPriceEstimate * 1.3)));
   const valuationData = {
