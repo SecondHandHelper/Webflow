@@ -304,7 +304,8 @@ function round10(val) {
 
 async function setValuationFromResellItem(resellItem, item, itemId) {
   const maxPrice = resellItem.status === 'sold' ? resellItem.maxPriceEstimate :
-    round10(Math.min(resellItem.maxPriceEstimate, resellItem.minPriceEstimate * 1.3));
+    Math.min(resellItem.maxPriceEstimate,
+      Math.max(resellItem.minPriceEstimate + 150, round10(resellItem.minPriceEstimate * 1.3)));
   const valuationData = {
     valuationStatus: 'Completed',
     valuationDate: new Date().toISOString(),
@@ -314,7 +315,7 @@ async function setValuationFromResellItem(resellItem, item, itemId) {
         response: '',
         description: 'Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar. Värderingen utgår från vad liknande sålts för.',
         minPrice: resellItem.minPriceEstimate,
-        maxPrice: Math.max(maxPrice, resellItem.minPriceEstimate + 150),
+        maxPrice: maxPrice,
         type: 'Valuation',
         source: 'createdFromItem',
         adjustmentAllowed: true,
