@@ -19,7 +19,9 @@ document.getElementById('doneButton').addEventListener('click', () => {
     if (message.status.match(/done/i)) {
       webSocket.close();
       document.getElementById('scrapeProgress').innerText = 'Skapar plagg i Mai med data hämtade från LWL';
-      const draftItemResponse = await firebase.app().functions("europe-west3").httpsCallable('createItemDraftsFromLwl')({itemData: message.data});
+      const draftItemResponse = await firebase.app().functions("europe-west3").httpsCallable('createItemDraftsFromLwl')( {
+        itemData: { ...message.data, url: lwlThreadUrl }
+      });
       document.getElementById('scrapeProgressDiv').style.display = 'none';
       if (draftItemResponse.data.length) {
         showLwLDraftItems(draftItemResponse.data);

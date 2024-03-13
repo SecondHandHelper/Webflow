@@ -19,7 +19,6 @@ import { setFieldValue, setupModelSearchEventListeners } from "./sellItemModelSe
 let itemDraftSaved = false;
 const params = getParamsObject();
 let itemDraft;
-let atItemFromParam;
 
 async function addUserDetails() {
   // Grab values from form
@@ -249,6 +248,20 @@ function needsHumanCheck({ humanCheckNeeded, newMinMaxLog, lowValueSegment, lowV
   return humanCheckNeeded || (newMinMaxLog.match(/accept price is above max/i) && !lowValueSegment && !lowValueCategory)
 }
 
+async function saveValuationInStorageOrBackend(valuationData, itemId) {
+  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+    const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
+    sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
+      id: item.id,
+      item: {...item.item, ...valuationData}
+    }));
+  } else {
+    await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({itemId, ...valuationData});
+    const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
+    localStorage.setItem('latestItemCreated', JSON.stringify({...latestItemCreated, ...valuationData}));
+  }
+}
+
 async function saveItemValuation(itemId, mlValuationData) {
   const { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version,
     newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog, adjustmentAllowed, newBrand, newBrandCategory,
@@ -282,20 +295,11 @@ async function saveItemValuation(itemId, mlValuationData) {
       }
     })
   }
-  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-    const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
-    sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
-      id: item.id,
-      item: { ...item.item, ...valuationData }
-    }));
-  } else {
-    await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
-    const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
-    localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData }));
-  }
+  await saveValuationInStorageOrBackend(valuationData, itemId);
 }
 
 async function setValuationFromResellItem(resellItem, item, itemId) {
+  const maxPrice = Math.min(resellItem.maxPriceEstimate, resellItem.minPriceEstimate * 1.3);
   const valuationData = {
     valuationStatus: 'Completed',
     valuationDate: new Date().toISOString(),
@@ -305,23 +309,14 @@ async function setValuationFromResellItem(resellItem, item, itemId) {
         response: '',
         description: 'Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar. Värderingen utgår från vad liknande sålts för.',
         minPrice: resellItem.minPriceEstimate,
-        maxPrice: resellItem.maxPriceEstimate,
+        maxPrice: Math.max(maxPrice, resellItem.minPriceEstimate + 150),
         type: 'Valuation',
         source: 'createdFromItem',
         adjustmentAllowed: true,
       }
     }
   }
-  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-    sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
-      id: item.id,
-      item: { ...item.item, ...valuationData }
-    }));
-  } else {
-    await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
-    const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
-    localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData }));
-  }
+  await saveValuationInStorageOrBackend(valuationData, itemId);
 }
 
 async function getAndSaveValuation(itemId, item) {
@@ -329,13 +324,11 @@ async function getAndSaveValuation(itemId, item) {
     console.error('No item and no itemId, unexpected!!');
     return '/item-confirmation';
   }
-  if (params.id) {
+  if (params.id && params.type !== 'draft') {
     const getItemResponse = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: params.id });
     const resellItem = getItemResponse.data;
-    if (resellItem.status === 'Sold') {
-      await setValuationFromResellItem(resellItem, item, itemId);
-      return '/item-valuation';
-    }
+    await setValuationFromResellItem(resellItem, item, itemId);
+    return '/item-valuation';
   }
   try {
     const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({ itemId, item });
@@ -677,7 +670,7 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
       ]);
       itemDraft = item;
     }
-    const atItem = atItemFromParam = (await atItemResponse?.json()) || {};
+    const atItem = (await atItemResponse?.json()) || {};
     const data = item.data;
     const images = data.images || {};
     let originalPrice = data.originalPrice;
