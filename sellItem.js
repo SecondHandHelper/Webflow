@@ -299,7 +299,8 @@ async function saveItemValuation(itemId, mlValuationData) {
 }
 
 async function setValuationFromResellItem(resellItem, item, itemId) {
-  const maxPrice = Math.min(resellItem.maxPriceEstimate, resellItem.minPriceEstimate * 1.3);
+  const maxPrice = resellItem.status === 'sold' ? resellItem.maxPriceEstimate :
+    Math.min(resellItem.maxPriceEstimate, resellItem.minPriceEstimate * 1.3);
   const valuationData = {
     valuationStatus: 'Completed',
     valuationDate: new Date().toISOString(),
