@@ -1,6 +1,7 @@
 import {autocomplete, brands} from "./autocomplete-brands";
 import {fieldLabelToggle, initializeCategorySelect} from "./sellItemHelpers";
 
+
 async function getValuation(itemBrand, itemCategory) {
   const brand = itemBrand.value ? itemBrand.value.trim() : "";
   const category = itemCategory.value;
@@ -18,7 +19,7 @@ async function getValuation(itemBrand, itemCategory) {
   } else {
     itemCategory.setCustomValidity('');
   }
-  document.getElementById('valuationResultDiv').style.display = 'none';
+  document.getElementById('itemsSoldDiv').style.display = 'none';
   document.getElementById('disclaimerDiv').style.display = 'none';
   document.getElementById('loadingValuationDiv').style.display = 'flex';
   document.getElementById('mainDivider').style.display = 'block';
@@ -30,11 +31,12 @@ async function getValuation(itemBrand, itemCategory) {
       minPrice, maxPrice, decline, newBrand, valuatedBrandItems, fewBrand, valuatedBrandCategoryItems,
       brandCategoryAccuracy, brandAccuracy, highPriceVarBrandCategory, brandShareSold, humanCheckExplanation,
       brandCategoryMeanMinPrice, brandCategoryMeanMaxPrice, brandCategoryMinSoldPrice, brandCategoryMaxSoldPrice,
-      lowValueSegment
+      lowValueSegment, latestSales
     } = valuationRes.data || {};
-    document.getElementById('valuationResultDiv').style.display = 'block';
-    document.getElementById('valuationResultDiv').classList.toggle('appear-animation', true);
-    analytics.track("Element Viewed", { elementID: "valuationResultDiv", brand, category });
+    document.getElementById('soldItemsDiv').style.display = 'none';
+    document.getElementById('itemsSoldDiv').style.display = 'block';
+    document.getElementById('itemsSoldDiv').classList.toggle('appear-animation', true);
+    analytics.track("Element Viewed", { elementID: "itemsSoldDiv", brand, category });
     document.getElementById('refreshValuationButton').style.display = 'none';
     document.getElementById('loadingValuationDiv').style.display = 'none';
     document.getElementById('howItWorksDiv').style.display = 'block';
@@ -50,14 +52,13 @@ async function getValuation(itemBrand, itemCategory) {
       document.getElementById('valuationText').style.display = 'block';
       document.getElementById('valuationText').innerText = 'Säljer ej';
       document.getElementById('howItWorksDiv').style.display = 'none';
-      document.getElementById('soldStatsDiv').style.display = 'none';
-    } else if (newBrand || valuatedBrandItems === 0 || !minPrice || !maxPrice) {
+    } else if (newBrand || valuatedBrandItems === 0 || !minPrice || !maxPrice || latestSales.length < 3) {
       document.getElementById('valuationText').innerText = 'Okänt';
-      const categoryText = valuatedBrandCategoryItems === 0 && valuatedBrandItems > 0 ? 'av denna kategori ' : '';
+      const categoryText = (latestSales.length < 3 || (valuatedBrandCategoryItems === 0 && valuatedBrandItems > 0)) ? 'av denna kategori ' : '';
       document.getElementById('itemValuationText').innerText = `Vi har inte sålt så mycket ${categoryText}från detta varumärke tidigare, så detta plagg skulle vi behöva kika på manuellt för att kunna ge en värdering. Lägg upp ditt plagg till Mai så får du en värdering inom 2 dagar.`;
       document.getElementById('valuationText').style.display = 'block';
-      document.getElementById('soldStatsDiv').style.display = 'none';
     } else if (minPrice && maxPrice) {
+      showLatestItemsSold(latestSales);
       document.getElementById('valuationInfoButton').style.display = 'flex';
       const soldBrandItems = Math.round(valuatedBrandItems * brandShareSold);
       if (!fewBrand) {
@@ -74,16 +75,7 @@ async function getValuation(itemBrand, itemCategory) {
       document.getElementById('valuationText').style.display = 'block';
       const fromPrice = round10(brandCategoryMeanMinPrice || minPrice);
       const toPrice = round10(brandCategoryMeanMaxPrice || maxPrice);
-      document.getElementById('valuationText').innerText = `${fromPrice}-${toPrice} kr`;
-      document.getElementById('spanBrandCategoryText').innerText = `${brand}-${category.toLowerCase()}`;
-      if (brandCategoryMinSoldPrice <= 0 || brandCategoryMaxSoldPrice <= 100 || brandCategoryMinSoldPrice > brandCategoryMaxSoldPrice) {
-        document.getElementById('soldStatsDiv').style.display = 'none';
-      } else {
-        document.getElementById('valuationSoldSpan').innerText = `${Math.max(100, brandCategoryMinSoldPrice)}-${brandCategoryMaxSoldPrice} kr`
-        document.getElementById('soldBrandItems').innerText = `${soldBrandItems} st`;
-        document.getElementById('soldBrandText').innerText = brand;
-        document.getElementById('soldStatsDiv').style.display = 'block';
-      }
+      document.getElementById('valuationText').innerText = `~${round10((fromPrice+toPrice)/2)} kr`;
     } else {
       document.getElementById('itemValuationText').innerText = 'Något gick fel, försök igen eller kontakta oss om felet kvarstår.';
       document.getElementById('valuationText').style.display = 'none';
@@ -95,6 +87,33 @@ async function getValuation(itemBrand, itemCategory) {
   }
 }
 
+function showLatestItemsSold(latestSales) {
+  document.getElementById('soldItemsDiv').style.display = 'block'
+  const itemCard = document.querySelector('#soldItemsDiv .div-block-item');
+  const itemList = document.getElementById('soldItemList');
+  itemList.innerHTML = '';
+  for (const item of latestSales) {
+    const newItemCard = itemCard.cloneNode(true);
+    newItemCard.id = '';
+    const frontImage = item.images?.enhancedFrontImageLarge || item.images?.enhancedFrontImage || item.images?.frontImageLarge || item.images?.frontImage;
+    if (!frontImage) {
+      continue;
+    }
+    const condition = {
+      'Helt ny, med prislapp kvar': 'Helt ny',
+      'Helt ny, men utan prislapp': 'Helt ny',
+      'Använd, men utan anmärkning': 'Bra skick',
+      'Använd, tecken på slitage': 'Defekter'
+    }[item.condition];
+    const soldDate = new Date(item.soldDate).toLocaleDateString('sv-SE',{day: 'numeric', month:'short', year: 'numeric'})
+      .replace('.', '').replace(/ (\d{4})$/, ', $1');
+    newItemCard.querySelector('.img-container').style.backgroundImage = `url("${frontImage}")`;
+    newItemCard.querySelector('.sold-item-title').innerText = `${item.soldPrice}`;
+    newItemCard.querySelector('.sold-item-subtext').innerText = `${condition}`;
+    newItemCard.querySelector('.sold-item-date').innerText = `${soldDate}`;
+    itemList.appendChild(newItemCard);
+  }
+}
 function round10(val) {
   return Math.round((val || 0) / 10) * 10;
 }
@@ -158,7 +177,7 @@ async function quickValuationMain() {
   itemBrand.addEventListener('input', fieldLabelToggle('itemBrandLabel'));
   brandClearButton.addEventListener('click', () => {
     itemBrand.value = '';
-    document.getElementById('valuationResultDiv').style.display = 'none';
+    document.getElementById('itemsSoldDiv').style.display = 'none';
     document.getElementById('mainDivider').style.display = 'none';
     document.getElementById('howItWorksDiv').style.display = 'none';
     document.getElementById('disclaimerDiv').style.display = 'block';
@@ -180,7 +199,7 @@ async function quickValuationMain() {
   })
   categoryClearButton.addEventListener('click', () => {
     itemCategory.value = '';
-    document.getElementById('valuationResultDiv').style.display = 'none';
+    document.getElementById('itemsSoldDiv').style.display = 'none';
     document.getElementById('mainDivider').style.display = 'none';
     document.getElementById('howItWorksDiv').style.display = 'none';
     document.getElementById('disclaimerDiv').style.display = 'block';
