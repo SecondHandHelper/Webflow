@@ -53,7 +53,7 @@ async function getValuation(itemBrand, itemCategory) {
       document.getElementById('valuationText').innerText = 'Säljer ej';
       document.getElementById('howItWorksDiv').style.display = 'none';
     } else if (newBrand || valuatedBrandItems === 0 || !minPrice || !maxPrice || latestSales.length < 3) {
-      document.getElementById('valuationText').innerText = 'Okänt';
+      document.getElementById('valuationText').innerText = 'För får träffar';
       const categoryText = (latestSales.length < 3 || (valuatedBrandCategoryItems === 0 && valuatedBrandItems > 0)) ? 'av denna kategori ' : '';
       document.getElementById('itemValuationText').innerText = `Vi har inte sålt så mycket ${categoryText}från detta varumärke tidigare, så detta plagg skulle vi behöva kika på manuellt för att kunna ge en värdering. Lägg upp ditt plagg till Mai så får du en värdering inom 2 dagar.`;
       document.getElementById('valuationText').style.display = 'block';
@@ -108,7 +108,7 @@ function showLatestItemsSold(latestSales) {
     const soldDate = new Date(item.soldDate).toLocaleDateString('sv-SE',{day: 'numeric', month:'short', year: 'numeric'})
       .replace('.', '').replace(/ (\d{4})$/, ', $1');
     newItemCard.querySelector('.img-container').style.backgroundImage = `url("${frontImage}")`;
-    newItemCard.querySelector('.sold-item-title').innerText = `${item.soldPrice}`;
+    newItemCard.querySelector('.sold-item-title').innerText = `${item.soldPrice} kr`;
     newItemCard.querySelector('.sold-item-subtext').innerText = `${condition}`;
     newItemCard.querySelector('.sold-item-date').innerText = `${soldDate}`;
     itemList.appendChild(newItemCard);
