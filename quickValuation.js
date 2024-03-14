@@ -39,7 +39,7 @@ async function getValuation(itemBrand, itemCategory) {
     analytics.track("Element Viewed", { elementID: "itemsSoldDiv", brand, category });
     document.getElementById('refreshValuationButton').style.display = 'none';
     document.getElementById('loadingValuationDiv').style.display = 'none';
-    document.getElementById('howItWorksDiv').style.display = 'block';
+    document.getElementById('howItWorksDiv').style.display = 'none';
     document.getElementById('disclaimerDiv').style.display = 'none';
     document.getElementById('brandCategoryText').innerText = `${brand}-${category.toLowerCase()}`;
     document.getElementById('valuatedItemHeader').style.display = 'flex';
@@ -51,14 +51,15 @@ async function getValuation(itemBrand, itemCategory) {
       }
       document.getElementById('valuationText').style.display = 'block';
       document.getElementById('valuationText').innerText = 'Säljer ej';
-      document.getElementById('howItWorksDiv').style.display = 'none';
     } else if (newBrand || valuatedBrandItems === 0 || !minPrice || !maxPrice || latestSales.length < 3) {
-      document.getElementById('valuationText').innerText = 'För får träffar';
+      document.getElementById('valuationText').innerText = 'För få träffar';
       const categoryText = (latestSales.length < 3 || (valuatedBrandCategoryItems === 0 && valuatedBrandItems > 0)) ? 'av denna kategori ' : '';
       document.getElementById('itemValuationText').innerText = `Vi har inte sålt så mycket ${categoryText}från detta varumärke tidigare, så detta plagg skulle vi behöva kika på manuellt för att kunna ge en värdering. Lägg upp ditt plagg till Mai så får du en värdering inom 2 dagar.`;
       document.getElementById('valuationText').style.display = 'block';
+      document.getElementById('howItWorksDiv').style.display = 'block';
     } else if (minPrice && maxPrice) {
       showLatestItemsSold(latestSales);
+      document.getElementById('disclaimerDiv').style.display = 'block';
       document.getElementById('valuationInfoButton').style.display = 'flex';
       const soldBrandItems = Math.round(valuatedBrandItems * brandShareSold);
       if (!fewBrand) {
@@ -76,9 +77,12 @@ async function getValuation(itemBrand, itemCategory) {
       const fromPrice = round10(brandCategoryMeanMinPrice || minPrice);
       const toPrice = round10(brandCategoryMeanMaxPrice || maxPrice);
       document.getElementById('valuationText').innerText = `~${round10((fromPrice+toPrice)/2)} kr`;
+      document.getElementById('howItWorksDiv').style.display = 'block';
     } else {
       document.getElementById('itemValuationText').innerText = 'Något gick fel, försök igen eller kontakta oss om felet kvarstår.';
       document.getElementById('valuationText').style.display = 'none';
+      document.getElementById('howItWorksDiv').style.display = 'none';
+      document.getElementById('disclaimerDiv').style.display = 'block';
     }
   } catch (e) {
     console.log(e);
@@ -101,7 +105,7 @@ function showLatestItemsSold(latestSales) {
     }
     const condition = {
       'Helt ny, med prislapp kvar': 'Helt ny',
-      'Helt ny, men utan prislapp': 'Helt ny',
+      'Helt ny, men utan prislapp': 'Nyskick',
       'Använd, men utan anmärkning': 'Bra skick',
       'Använd, tecken på slitage': 'Defekter'
     }[item.condition];
@@ -182,6 +186,7 @@ async function quickValuationMain() {
     document.getElementById('howItWorksDiv').style.display = 'none';
     document.getElementById('disclaimerDiv').style.display = 'block';
     document.getElementById('itemBrand').dispatchEvent(new Event('input'));
+    document.getElementById('disclaimerDiv').style.display = 'none';
     brandClearButton.style.display = 'none';
   });
 
@@ -203,6 +208,7 @@ async function quickValuationMain() {
     document.getElementById('mainDivider').style.display = 'none';
     document.getElementById('howItWorksDiv').style.display = 'none';
     document.getElementById('disclaimerDiv').style.display = 'block';
+    document.getElementById('disclaimerDiv').style.display = 'none';
     unfold(document.getElementById('categoryQuickSelectDiv'));
     $('#itemCategory').trigger('change');
     categoryClearButton.style.display = 'none';
