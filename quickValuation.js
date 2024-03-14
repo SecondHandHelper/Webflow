@@ -40,7 +40,6 @@ async function getValuation(itemBrand, itemCategory) {
     document.getElementById('refreshValuationButton').style.display = 'none';
     document.getElementById('loadingValuationDiv').style.display = 'none';
     document.getElementById('howItWorksDiv').style.display = 'none';
-    document.getElementById('disclaimerDiv').style.display = 'none';
     document.getElementById('brandCategoryText').innerText = `${brand}-${category.toLowerCase()}`;
     document.getElementById('valuatedItemHeader').style.display = 'flex';
     if (decline) {
@@ -59,7 +58,6 @@ async function getValuation(itemBrand, itemCategory) {
       document.getElementById('howItWorksDiv').style.display = 'block';
     } else if (minPrice && maxPrice) {
       showLatestItemsSold(latestSales);
-      document.getElementById('disclaimerDiv').style.display = 'block';
       document.getElementById('valuationInfoButton').style.display = 'flex';
       const soldBrandItems = Math.round(valuatedBrandItems * brandShareSold);
       if (!fewBrand) {
@@ -82,7 +80,6 @@ async function getValuation(itemBrand, itemCategory) {
       document.getElementById('itemValuationText').innerText = 'Något gick fel, försök igen eller kontakta oss om felet kvarstår.';
       document.getElementById('valuationText').style.display = 'none';
       document.getElementById('howItWorksDiv').style.display = 'none';
-      document.getElementById('disclaimerDiv').style.display = 'block';
     }
   } catch (e) {
     console.log(e);
@@ -186,7 +183,6 @@ async function quickValuationMain() {
     document.getElementById('howItWorksDiv').style.display = 'none';
     document.getElementById('disclaimerDiv').style.display = 'block';
     document.getElementById('itemBrand').dispatchEvent(new Event('input'));
-    document.getElementById('disclaimerDiv').style.display = 'none';
     brandClearButton.style.display = 'none';
   });
 
@@ -208,7 +204,6 @@ async function quickValuationMain() {
     document.getElementById('mainDivider').style.display = 'none';
     document.getElementById('howItWorksDiv').style.display = 'none';
     document.getElementById('disclaimerDiv').style.display = 'block';
-    document.getElementById('disclaimerDiv').style.display = 'none';
     unfold(document.getElementById('categoryQuickSelectDiv'));
     $('#itemCategory').trigger('change');
     categoryClearButton.style.display = 'none';
