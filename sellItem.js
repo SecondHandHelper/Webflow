@@ -45,7 +45,7 @@ async function addUserDetails() {
 }
 
 function defectsChoicesInSwedish() {
-  return new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("nopprig", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
+  return new Map().set("hole", "Hål").set("stain", "Fläck").set("lostFit", "Tappad passform").set("pilling", "Nopprig").set("threadUp", "Trådsläpp").set("colorChange", "Färgändring").set("otherDefect", "Annat");
 }
 function imageElements() {
   return ["frontImage", "brandTagImage", "defectImage", "materialTagImage", "extraImage"];
@@ -395,7 +395,7 @@ function collect() {
   const acceptPrice = Number(itemLowestAcceptPrice.value);
 
   // Get defects list
-  let defectElements = new Map().set("hole", hole.checked).set("stain", stain.checked).set("lostFit", lostFit.checked).set("nopprig", nopprig.checked).set("threadUp", threadUp.checked).set("colorChange", colorChange.checked).set("otherDefect", otherDefect.checked);
+  let defectElements = new Map().set("hole", hole.checked).set("stain", stain.checked).set("lostFit", lostFit.checked).set("pilling", pilling.checked).set("threadUp", threadUp.checked).set("colorChange", colorChange.checked).set("otherDefect", otherDefect.checked);
   let defects = [];
   if (condition === 'Använd, tecken på slitage') {
     defectElements.forEach((value, key) => {
