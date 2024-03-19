@@ -25,7 +25,8 @@ function loadRecentlySold() {
                         <div class='text-block-34'>${brand}</div>`;
           //I cut out the "Idag / Igår" during summer, since so little is sold every day. Add this last to show it again: <div class='text-block-34'>${soldTimeText}</div></div>
           itemListRecentlySoldStartPage.innerHTML += itemCardHTML;
-          itemListRecentlySoldStartPageDesktop.innerHTML += itemCardHTML;
+          const desktopCardHTML = itemCardHTML.replace("14-big", "14-big-desktop");
+          itemListRecentlySoldStartPageDesktop.innerHTML += desktopCardHTML;
         }
       }
     })
@@ -44,7 +45,8 @@ async function fetchAndLoadRecentlyAddedItems() {
     const response = await firebase.app().functions("europe-west1").httpsCallable(
       'fetchMaiShopRecentlyAddedItems',
     )()
-    const itemList = document.getElementById('ItemListRecentlyAddedItems')
+    const itemList = document.getElementById('ItemListRecentlyAddedItems');
+    const itemListDesktop = document.getElementById('ItemListRecentlyAddedItemsDesktop');
     itemList.innerHTML = "";
 
     for (const item of response.data) {
@@ -57,6 +59,8 @@ async function fetchAndLoadRecentlyAddedItems() {
                             <div class="recently-added-brands-link-text">Mai Shop</div>
                         </div><a/></div>`;
       itemList.innerHTML += itemCardHTML;
+      const desktopCardHTML = itemCardHTML.replace("14-big", "14-big-desktop");
+      itemListDesktop.innerHTML += desktopCardHTML;
     }
   } catch (e) {
     errorHandler.report(e);
