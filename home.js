@@ -48,6 +48,7 @@ async function fetchAndLoadRecentlyAddedItems() {
     const itemList = document.getElementById('ItemListRecentlyAddedItems');
     const itemListDesktop = document.getElementById('ItemListRecentlyAddedItemsDesktop');
     itemList.innerHTML = "";
+    itemListDesktop.innerHTML = "";
 
     for (const item of response.data) {
       const itemCardHTML = `<div class="div-block-14-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
