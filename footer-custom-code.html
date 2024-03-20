@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.2.69';
+  const JS_VERSION = 'v1.2.70';
   var errorHandler = new StackdriverErrorReporter();
   const environment = location.href.includes('shh-test') ? 'web-test' : 'web-prod';
   $(document).ready(function () {
@@ -246,9 +246,9 @@
 </script>
 <style>
   div.intercom-lightweight-app {
-    z-index: 2;
+    z-index: 4;
   }
   .intercom-lightweight-app .intercom-lightweight-app-launcher {
-    z-index: 2;
+    z-index: 4;
   }
 </style>
