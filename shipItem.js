@@ -13,6 +13,7 @@ function loadItem(itemId) {
       const postnordQrCode = data.postnordQrCode;
       const dhlBarcode = data.dhlLicensePlateBarcodeSrc;
       const dhlLicensePlate = data.dhlLicensePlate;
+      const upsShipmentId = data.upsShipmentId;
       const fn = data.buyer?.FirstName || data.buyerFirstName || '';
       const ln = data.buyer?.LastName || data.buyerLastName || '';
       const street = data.buyer?.StreetAddress || data.buyerAddressStreetAddress || '';
@@ -31,7 +32,7 @@ function loadItem(itemId) {
           if (postnordQrCode && !(soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed')) {
             qrCodeImage.style.backgroundImage = `url('${postnordQrCode}')`;
             postnordQrCodeDiv.style.display = 'flex';
-            scanCodeDiv.style.display = 'block';
+            mainInstructionDiv.style.display = 'block';
             howToShipQrDiv.style.display = 'block';
           } else if (dhlBarcode && soldPlatform === 'Vestiaire Collective') {
             barcodeImageContainer.innerHTML = `<img src="${dhlBarcode}" alt="barcode" class="image-98">`;
@@ -42,8 +43,15 @@ function loadItem(itemId) {
             }
             mainInstructionText.innerText = 'Lämna påsen till ett ombud och\nbe dem scanna streckkoden';
             findDhlServicePointLink.style.display = "flex";
-            scanCodeDiv.style.display = "block";
+            mainInstructionDiv.style.display = "block";
             howToShipDhlBarcodeDiv.style.display = "block";
+          } else if (upsShipmentId && soldPlatform === 'Vestiaire Collective') {
+            upsIconDiv.style.display = 'block';
+            findUpsServicePointLink.style.display = "flex";
+            mainInstructionText.innerText = 'Sätt på fraktsedeln vi skickat dig på påsen och lämna till ombud';
+            bullet3TitleNoQr.innerText = 'Lämna till UPS-ombud';
+            howToShipNoQrDiv.style.display = "block";
+            mainInstructionDiv.style.display = "block";
           } else {
             howToShipNoQrDiv.style.display = "block";
             dividerTop.style.display = "none";

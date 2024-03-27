@@ -259,6 +259,9 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived, s
     if (shipper === 'dhl'){
       shipperIcon = '6297d3d527db5dd4cf02e924/655d1830f259c0bc084c2937_dhl-square-icon%20(1).svg';
     }
+    if (shipper === 'ups'){
+      shipperIcon = '6297d3d527db5dd4cf02e924/6603eaef0d5af57f5cce2e40_ups-squared-icon.jpg';
+    }
     shippingInfo += `
                         <img src="https://global-uploads.webflow.com/${shipperIcon}" class="shipper-icon">
                         <div class="next-step-text-small">Lämnas till ombud</div>
@@ -316,6 +319,7 @@ export function loadItemCards(items) {
     var shippingMethod = item.shippingMethod;
     var postnordQrCode = item.postnordQrCode;
     var dhlBarcode = item.dhlLicensePlateBarcodeSrc;
+    var upsShipmentId = item.upsShipmentId;
     var bagReceived = item.bagReceived;
     var soldPlatform = item.soldPlatform;
     var archived = item.archived;
@@ -407,6 +411,7 @@ export function loadItemCards(items) {
           } else if (soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') {
             if (!bagReceived) {
               userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
+              if (upsShipmentId){ shipper = 'ups' };
               setTimeout(() => {
                 document.getElementById(`bagReceivedCheckbox-${itemId}`).addEventListener('click', (event) => {
                   bagReceivedAction(event.target, itemId, soldDate, shippingMethod);
@@ -418,6 +423,7 @@ export function loadItemCards(items) {
             shipper = 'postnord';
             userActionDiv = getQrCodeButton(itemId);
           }
+          
         }
         if (shippingMethod === 'Pickup') {
           if (!bagReceived) {
