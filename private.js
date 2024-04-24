@@ -583,6 +583,9 @@ function onLoadHandler() {
   });
   document.getElementById('christmasHolidayDiv').onclick = () => Intercom('showNewMessage', 'När reser du iväg, och när är du tillbaka?\n\n');
 }
+if (localStorage.getItem('lwlItemDrafts')) {
+  location.href = '/lwl';
+}
 window.addEventListener('load', onLoadHandler);
 console.log(`document.readyState ${document.readyState}`);
 if (document.readyState === "complete" && !loadHandlerHasRun) {
