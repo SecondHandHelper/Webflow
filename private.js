@@ -341,14 +341,21 @@ async function showInYourWardrobeSection() {
     } else {
       newItemCard.querySelector('.img-container').style.display = 'none';
     }
+    newItemCard.addEventListener('click', () => {
+      location.href = `/sell-item?id=${item.id}&type=${item.status === 'Draft' ? 'draft' : 'resell'}`;
+    });
     newItemCard.querySelector('.resell-button').href = `/sell-item?id=${item.id}&type=${item.status === 'Draft' ? 'draft' : 'resell'}`;
     newItemCard.querySelector('.resell-item-title').innerText = `${item.cleanedBrand || item.brand?.trim()}`;
     newItemCard.querySelector('.resell-subtext').innerText = `${[item.category, item.maiSize].filter(i => i).join(', ')}`;
-    newItemCard.querySelector('.resell-sub-subtext').innerText = (item.soldPlatform || item.draftSource === 'Mai purchase') ? `Köpt via Mai` : (item.draftSource === 'Digital receipt' ? 'Från digitalt kvitto' : '');
-    newItemCard.querySelector('#wardrobeDotsButton').addEventListener('click', async () => {
+    const draftSource = (item.soldPlatform || item.draftSource === 'Mai purchase') ? `Köpt via Mai` :
+      (item.draftSource === 'Digital receipt' ? 'Från digitalt kvitto' : (item.draftSource === 'lwl' ? 'Från LWL' : ''));
+    newItemCard.querySelector('.resell-sub-subtext').innerText = draftSource;
+    newItemCard.querySelector('#wardrobeDotsButton').addEventListener('click', async (e) => {
       itemMoreMenu.style.display = 'block';
       setTimeout(() => itemMoreMenu.classList.add('sticky-bottom-show'), 0);
       itemMoreMenu.dataset.itemId = item.id;
+      e.preventDefault();
+      e.stopPropagation();
     });
     itemList.appendChild(newItemCard);
   }
@@ -584,7 +591,7 @@ function onLoadHandler() {
   document.getElementById('christmasHolidayDiv').onclick = () => Intercom('showNewMessage', 'När reser du iväg, och när är du tillbaka?\n\n');
 }
 if (localStorage.getItem('lwlItemDrafts')) {
-  location.href = '/lwl';
+  location.href = '/lwl?createDrafts=true';
 }
 window.addEventListener('load', onLoadHandler);
 console.log(`document.readyState ${document.readyState}`);

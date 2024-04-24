@@ -104,7 +104,7 @@ async function signedInNextStep(fallbackRedirect) {
   if (userIsSellingNewItem()) {
     location.href = './sell-item';
   } else if (localStorage.getItem('lwlItemDrafts')) {
-    location.href = '/lwl';
+    location.href = '/lwl?createDrafts=true';
   } else if (fallbackRedirect && typeof fallbackRedirect === 'string') {
     location.href = fallbackRedirect;
   } else if (document.referrer.includes('referral')) {

@@ -1,18 +1,22 @@
 const WS_SERVER = 'wss://lwl-to-mai-heypmjzjfq-ey.a.run.app';
-authUser.whenSet(async () => {
+const params = getParamsObject();
+
+if (params.createDrafts === 'true') {
   if (localStorage.getItem('lwlItemDrafts') && (document.referrer.includes('sign-in') || document.referrer.includes('private'))) {
     document.getElementById('headerImage').style.display = 'none';
     document.getElementById('threadInputDiv').style.display = 'none';
     document.getElementById('lwlItemsDiv').style.display = 'none';
     document.getElementById('loadingDiv').style.display = 'flex';
     const draftItems = JSON.parse(localStorage.getItem('lwlItemDrafts'));
-    await Promise.all(draftItems.map(item =>
-      firebase.app().functions("europe-west1").httpsCallable('createItem')({id: item.id, item})
-    ));
-    localStorage.removeItem('lwlItemDrafts');
-    location.href = '/private#wardrobe';
+    authUser.whenSet(async () => {
+        await Promise.all(draftItems.map(item =>
+          firebase.app().functions("europe-west1").httpsCallable('createItem')({id: item.id, item})
+        ));
+        localStorage.removeItem('lwlItemDrafts');
+        location.href = '/private#wardrobe';
+    });
   }
-});
+}
 
 let scrapingStarted = false;
 document.getElementById('doneButton').addEventListener('click', () => {
@@ -25,6 +29,11 @@ document.getElementById('doneButton').addEventListener('click', () => {
     return;
   }
   scrapingStarted = true;
+  document.getElementById('lwlThreadUrl').style.display = 'none';
+  document.getElementById('buttonsDiv').style.display = 'none';
+  document.getElementById('doneButton').style.display = 'none';
+  document.getElementById('introHeading').style.display = 'none';
+
   document.getElementById('scrapeProgressDiv').style.display = 'flex';
   document.getElementById('scrapeProgress').innerText = 'Startar...'
   const webSocket = new WebSocket(WS_SERVER);
@@ -40,10 +49,12 @@ document.getElementById('doneButton').addEventListener('click', () => {
     } catch (e) {
       message = { status: 'Startar...' };
     }
+    if (message.status === '' && message.data) {
+      // addLwLItemPreview(message.data);
+    }
     document.getElementById('scrapeProgress').innerText = message.status;
     if (message.status.match(/klar/i)) {
       webSocket.close();
-      // showLwLDraftItemsPreview(message.data);
       document.getElementById('scrapeProgress').innerText = 'Skapar plagg i Mai med data hämtade från LWL';
       const draftItemResponse = await firebase.app().functions("europe-west3").httpsCallable('createItemDraftsFromLwl', { timeout: 240*1000})({
         itemData: message.data,
@@ -53,12 +64,12 @@ document.getElementById('doneButton').addEventListener('click', () => {
         location.href = '/private#wardrobe';
       } else {
         document.getElementById('scrapeProgressDiv').style.display = 'none';
+        document.getElementById('introHeading').innerText = 'Plaggen från din tråd. Logga in för att låta Mai sälja dem.';
+        document.getElementById('introHeading').style.display = 'block';
+
         // showLwLDraftItemsFromPreview(draftItemResponse.data);
         showLwLDraftItems(draftItemResponse.data);
-        document.getElementById('introHeading').innerText = 'Plaggen från din tråd. Logga in för att låta Mai sälja dem.';
-        document.getElementById('lwlThreadUrl').style.display = 'none';
-        document.getElementById('doneButton').disabled = false;
-        document.getElementById('doneButton').style.display = 'none';
+        document.getElementById('buttonsDiv').style.display = 'block';
         document.getElementById('signInButton').style.display = 'flex';
         document.getElementById('signInButton').addEventListener('click', async () => {
           localStorage.setItem('lwlItemDrafts', JSON.stringify(draftItemResponse.data));
@@ -69,26 +80,28 @@ document.getElementById('doneButton').addEventListener('click', () => {
   });
 })
 
-const showLwLDraftItemsPreview = (data) => {
-  document.getElementById('lwlItemsDiv').style.display = 'block'
-  const itemCard = document.getElementById('lwlItemCard') || document.getElementsByClassName('lwlItemCard')[0];
+let firstPreviewShown = false;
+const addLwLItemPreview = (itemData) => {
+  const itemCard = document.getElementsByClassName('lwlitemcard')[0];
   const itemList = document.getElementById('lwlItemList');
-  itemList.innerHTML = '';
-  for (const item of data) {
-    const newItemCard = itemCard.cloneNode(true);
-    newItemCard.classList.add('lwlItemCard');
-    const frontImage = item.images?.[0];
-    if (frontImage) {
-      newItemCard.querySelector('.img-container').style.backgroundImage = `url("${frontImage}")`;
-      newItemCard.querySelector('.no-image-text').style.display = 'none';
-      newItemCard.style.opacity = '0.5';
-    } else {
-      newItemCard.querySelector('.img-container').style.display = 'none';
-    }
-    newItemCard.querySelector('.lwl-item-title').innerText = '';
-    newItemCard.querySelector('.lwl-item-subtext').innerText = '';
-    itemList.appendChild(newItemCard);
+  if (!firstPreviewShown) {
+    document.getElementById('lwlItemsDiv').style.display = 'block'
+    itemList.innerHTML = '';
+    firstPreviewShown = true;
   }
+  const newItemCard = itemCard.cloneNode(true);
+  newItemCard.classList.add('lwlItemCard');
+  const frontImage = itemData.images?.[0];
+  if (frontImage) {
+    newItemCard.querySelector('.img-container').style.backgroundImage = `url("${frontImage}")`;
+    newItemCard.querySelector('.no-image-text').style.display = 'none';
+    newItemCard.style.opacity = '0.5';
+  } else {
+    newItemCard.querySelector('.img-container').style.display = 'none';
+  }
+  newItemCard.querySelector('.lwl-item-title').innerText = '';
+  newItemCard.querySelector('.lwl-item-subtext').innerText = '';
+  itemList.appendChild(newItemCard);
 }
 
 const showLwLDraftItemsFromPreview = (draftItems) => {
