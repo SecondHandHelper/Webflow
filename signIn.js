@@ -103,6 +103,8 @@ async function signedInNextStep(fallbackRedirect) {
   // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item
   if (userIsSellingNewItem()) {
     location.href = './sell-item';
+  } else if (localStorage.getItem('lwlItemDrafts')) {
+    location.href = '/lwl';
   } else if (fallbackRedirect && typeof fallbackRedirect === 'string') {
     location.href = fallbackRedirect;
   } else if (document.referrer.includes('referral')) {
