@@ -18,14 +18,51 @@ if (params.createDrafts === 'true') {
   }
 }
 
+if (getCookie('lwlIntroSeen') !== 'true') {
+  document.getElementById('introSection').style.display='flex';
+  document.getElementById('introNext').addEventListener('click', function introNextHandler() {
+    if (document.getElementById('introNext').innerText === 'Sätt igång') {
+      setCookie('lwlIntroSeen', 'true');
+      document.getElementById('introSection').style.display = 'none';
+    }
+    document.getElementById('introRightArrow').click();
+    if (document.querySelector('.w-slider-nav div:last-child').classList.contains('w-active')) {
+      document.getElementById('introNext').innerText = 'Sätt igång';
+    }
+  });
+
+  document.getElementById('skipIntro').addEventListener('click', () => {
+    setCookie('lwlIntroSeen', 'true');
+    document.getElementById('introSection').style.display = 'none';
+  });
+}
+
 let scrapingStarted = false;
+
+const showParseError = (error) => {
+  const message = error || 'Hittade inga plagg i tråden, kontrollera att du skrivit in en giltig LWL tråd. Eller kontakta oss om problemet kvarstår.';
+  document.getElementById('errorMessage').innerText = message;
+  document.getElementsByClassName('w-form-fail')[0].style.display = 'block';
+  document.getElementById('lwlThreadUrl').style.display = 'block';
+  document.getElementById('buttonsDiv').style.display = 'block';
+  document.getElementById('doneButton').style.display = 'flex';
+  document.getElementById('introHeading').style.display = 'block';
+  document.getElementById('scrapeProgressDiv').style.display = 'none';
+  scrapingStarted = false;
+}
+
 document.getElementById('doneButton').addEventListener('click', () => {
   if (scrapingStarted) {
     return;
   }
+  document.getElementsByClassName('w-form-fail')[0].style.display = 'none';
   const lwlThreadUrl = document.getElementById('lwlThreadUrl');
   if (!lwlThreadUrl.value.length) {
     console.log('No url thread given');
+    return;
+  }
+  if (!lwlThreadUrl.value.match(/^https:\/\/www.facebook.com\/groups\/982264948455365\/permalink\/\d+/)) {
+    showParseError('Ogilitg LWL url angiven.');
     return;
   }
   scrapingStarted = true;
@@ -41,6 +78,10 @@ document.getElementById('doneButton').addEventListener('click', () => {
     console.log('connected to lwl thread scraping server');
     webSocket.send(JSON.stringify({ url: lwlThreadUrl.value }));
   });
+  webSocket.addEventListener('error', (event) => {
+    showParseError();
+    webSocket.close();
+  });
   webSocket.addEventListener('message', async (event) => {
     console.log('received message from server', event.data);
     let message = event.data;
@@ -49,14 +90,24 @@ document.getElementById('doneButton').addEventListener('click', () => {
     } catch (e) {
       message = { status: 'Startar...' };
     }
-    if (message.status === '' && message.data) {
+    if (message.status === 'Error') {
+      showParseError();
+      webSocket.close();
+      return;
+    }
+    if (message.status === 'Item' && message.data) {
       // addLwLItemPreview(message.data);
     }
     document.getElementById('scrapeProgress').innerText = message.status;
     if (message.status.match(/klar/i)) {
       webSocket.close();
       document.getElementById('scrapeProgress').innerText = 'Skapar plagg i Mai med data hämtade från LWL';
-      const draftItemResponse = await firebase.app().functions("europe-west3").httpsCallable('createItemDraftsFromLwl', { timeout: 240*1000})({
+      if (!message.data.length) {
+        showParseError();
+        webSocket.close();
+        return;
+      }
+      const draftItemResponse = await firebase.app().functions("europe-west3").httpsCallable('createItemDraftsFromLwl', {timeout: 240 * 1000})({
         itemData: message.data,
         url: lwlThreadUrl
       });

@@ -272,9 +272,9 @@ async function privateMain() {
   }
   await Promise.all([
     showInYourWardrobeSection(),
-    loadItemCards(items),
     showOrderBagsSection(),
   ]);
+  loadItemCards(items);
 
   if (window.location.href.endsWith('#wardrobe')) {
     setTimeout(() => {
@@ -282,7 +282,7 @@ async function privateMain() {
     }, 600);
   }
 
-  showNpsSurvey(items),
+  showNpsSurvey(items);
   fetchAndShowRecommendedItems(items);
   showReferralSection();
   showBonusSection();
