@@ -18,25 +18,6 @@ if (params.createDrafts === 'true') {
   }
 }
 
-if (getCookie('lwlIntroSeen') !== 'true') {
-  document.getElementById('introSection').style.display='flex';
-  document.getElementById('introNext').addEventListener('click', function introNextHandler() {
-    if (document.getElementById('introNext').innerText === 'Sätt igång') {
-      setCookie('lwlIntroSeen', 'true');
-      document.getElementById('introSection').style.display = 'none';
-    }
-    document.getElementById('introRightArrow').click();
-    if (document.querySelector('.w-slider-nav div:last-child').classList.contains('w-active')) {
-      document.getElementById('introNext').innerText = 'Sätt igång';
-    }
-  });
-
-  document.getElementById('skipIntro').addEventListener('click', () => {
-    setCookie('lwlIntroSeen', 'true');
-    document.getElementById('introSection').style.display = 'none';
-  });
-}
-
 let scrapingStarted = false;
 
 const showParseError = (error) => {
