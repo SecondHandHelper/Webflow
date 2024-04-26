@@ -28,9 +28,10 @@ async function showBonusSection() {
     return;
   }
   
-  if ((user.current?.referralData?.referredBy ? false : true) && daysDiff <= 2000) { //Ändra tillbaks till 30 på måndag 29 april 2024
+  if ((user.current?.referralData?.referredBy ? false : true) && (daysDiff <= 30 || daysDiff >= 60)) { //Ändra tillbaks till <=30 på måndag 29 april 2024
     console.log('IS THIS HAPPENING?!');
-    if (bonusActivatedState.style.display === 'none') {
+    if (bonusActivatedState.style.display === 'none' || '') {
+      console.log('IS THIS HAPPENING?!2');
       enterCodeState.style.display = 'block';
       bonusSection.style.display = 'block';
     }
