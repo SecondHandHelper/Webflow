@@ -85,7 +85,7 @@ document.getElementById('doneButton').addEventListener('click', () => {
     document.getElementById('scrapeProgress').innerText = message.status;
     if (message.status.match(/klar/i)) {
       webSocket.close();
-      document.getElementById('scrapeProgress').innerText = 'Skapar plagg i Mai med data hämtade från LWL';
+      document.getElementById('scrapeProgress').innerText = 'Skapar plaggen i Mai...';
       if (!message.data.length) {
         showParseError();
         webSocket.close();
@@ -99,7 +99,7 @@ document.getElementById('doneButton').addEventListener('click', () => {
         location.href = '/private#wardrobe';
       } else {
         document.getElementById('scrapeProgressDiv').style.display = 'none';
-        document.getElementById('introHeading').innerText = 'Plaggen från din tråd. Logga in för att låta Mai sälja dem.';
+        document.getElementById('introHeading').innerText = 'Osålda plagg från din tråd. Logga in för att justera och sälja.';
         document.getElementById('introHeading').style.display = 'block';
 
         showLwLDraftItemsFromPreview(draftItemResponse.data);
