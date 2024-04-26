@@ -77,7 +77,7 @@ document.getElementById('doneButton').addEventListener('click', () => {
       return;
     }
     if (message.status === 'Item' && message.data) {
-      // addLwLItemPreview(message.data);
+      addLwLItemPreview(message.data);
     }
     document.getElementById('scrapeProgress').innerText = message.status;
     if (message.status.match(/klar/i)) {
@@ -99,8 +99,9 @@ document.getElementById('doneButton').addEventListener('click', () => {
         document.getElementById('introHeading').innerText = 'Plaggen från din tråd. Logga in för att låta Mai sälja dem.';
         document.getElementById('introHeading').style.display = 'block';
 
-        // showLwLDraftItemsFromPreview(draftItemResponse.data);
-        showLwLDraftItems(draftItemResponse.data);
+        showLwLDraftItemsFromPreview(draftItemResponse.data);
+        // TODO: remove this comment and the function when we are happy with addLwLItemPreview + showLwLDraftItemsFromPreview
+        // showLwLDraftItems(draftItemResponse.data);
         document.getElementById('buttonsDiv').style.display = 'block';
         document.getElementById('signInButton').style.display = 'flex';
         document.getElementById('signInButton').addEventListener('click', async () => {
