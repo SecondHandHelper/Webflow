@@ -51,6 +51,7 @@ document.getElementById('doneButton').addEventListener('click', () => {
   document.getElementById('buttonsDiv').style.display = 'none';
   document.getElementById('doneButton').style.display = 'none';
   document.getElementById('introHeading').style.display = 'none';
+  document.getElementById('openIntroDiv').style.display = 'none';
 
   document.getElementById('scrapeProgressDiv').style.display = 'flex';
   document.getElementById('scrapeProgress').innerText = 'Startar...'
