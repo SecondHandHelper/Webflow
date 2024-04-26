@@ -1,3 +1,23 @@
 <script>
+  const params = getParamsObject();
+
+  if (params.createDrafts === 'true') {
+    if (localStorage.getItem('lwlItemDrafts') && (document.referrer.includes('sign-in') || document.referrer.includes('private'))) {
+      document.getElementById('loadingDiv').style.display = 'flex';
+      const draftItems = JSON.parse(localStorage.getItem('lwlItemDrafts'));
+      authUser.whenSet(async () => {
+        await Promise.all(draftItems.map(item =>
+          firebase.app().functions("europe-west1").httpsCallable('createItem')({id: item.id, item})
+        ));
+        localStorage.removeItem('lwlItemDrafts');
+        location.href = '/private#wardrobe';
+      });
+    }
+  } else {
+    document.getElementsByClassName('div-block-230')[0].style.display = 'block';
+    document.getElementById('header').style.display = 'flex'
+    document.getElementById('formDiv').style.display = 'block';
+  }
+
   urlDependentLoadJs('lwl.js');
 </script>
