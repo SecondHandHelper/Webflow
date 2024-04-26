@@ -3,7 +3,9 @@ const params = getParamsObject();
 
 if (params.createDrafts === 'true') {
   if (localStorage.getItem('lwlItemDrafts') && (document.referrer.includes('sign-in') || document.referrer.includes('private'))) {
-    document.getElementById('headerImage').style.display = 'none';
+    document.getElementsByClassName('div-block-230')[0].style.display = 'none';
+    document.getElementById('header').style.display = 'none'
+    document.getElementById('formDiv').style.display = 'none';
     document.getElementById('threadInputDiv').style.display = 'none';
     document.getElementById('lwlItemsDiv').style.display = 'none';
     document.getElementById('loadingDiv').style.display = 'flex';
