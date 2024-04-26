@@ -28,7 +28,7 @@ async function showBonusSection() {
     return;
   }
   
-  if ((user.current?.referralData?.referredBy ? false : true) && daysDiff <= 30) {
+  if ((user.current?.referralData?.referredBy ? false : true) && daysDiff <= 1000) { //Ändra tillbaks till 30 på måndag 29 april 2024
     if (bonusActivatedState.style.display === 'none') {
       enterCodeState.style.display = 'block';
       bonusSection.style.display = 'block';
