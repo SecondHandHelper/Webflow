@@ -156,7 +156,9 @@ async function saveValuationStatus(itemId, minPrice, maxPrice) {
             savedItem.item.infoRequests.price.userAdjustedMax = adjustedMax;
             if (adjustmentOk(minPrice, maxPrice)) {
                 savedItem.item.minPriceEstimate = adjustedMin;
+                savedItem.item.newMinPriceEstimate = adjustedMin;
                 savedItem.item.maxPriceEstimate = adjustedMax;
+                savedItem.item.newMaxPriceEstimate = adjustedMax
             } else {
                 savedItem.item.infoRequests.price.response = 'User proposal';
                 savedItem.item.infoRequests.price.userProposalMotivation = document.getElementById('userProposalMotivation').value;
