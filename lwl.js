@@ -23,8 +23,8 @@ if (params.createDrafts === 'true') {
 let scrapingStarted = false;
 
 const showParseError = (error) => {
-  const message = error || 'Något gick fel, kontrollera att du skrivit in en giltig LWL tråd och försök igen. Eller kontakta oss om problemet kvarstår.';
-  document.getElementById('errorMessage').innerText = message;
+  const message = error || 'Något gick fel, kontrollera att du skrivit in en giltig LWL tråd och försök igen.';
+  document.getElementById('errorMessage').innerHTML = message;
   document.getElementsByClassName('w-form-fail')[0].style.display = 'block';
   document.getElementById('lwlThreadUrl').style.display = 'block';
   document.getElementById('buttonsDiv').style.display = 'block';
@@ -76,7 +76,7 @@ document.getElementById('doneButton').addEventListener('click', () => {
       message = { status: 'Startar...' };
     }
     if (message.status === 'Error') {
-      showParseError();
+      showParseError(message.data?.threadIsValid ? 'Något gick fel, försök gärna igen.' : null);
       webSocket.close();
       return;
     }
@@ -197,3 +197,13 @@ if (getCookie('lwlIntroSeen') !== 'true') {
 document.getElementById('openIntroButton').addEventListener('click', () => {
   document.getElementById('introSection').style.display = 'flex';
 });
+
+document.getElementById('chatLink').addEventListener('click', () => {
+  Intercom('showNewMessage', 'Klistra in en länk till LWL tråden du försökte läsa in?\n\n');
+})
+
+
+window.intercomSettings = {
+  app_id: "klyy0le5"
+};
+(function () { var w = window; var ic = w.Intercom; if (typeof ic === "function") { ic('reattach_activator'); ic('update', w.intercomSettings); } else { var d = document; var i = function () { i.c(arguments); }; i.q = []; i.c = function (args) { i.q.push(args); }; w.Intercom = i; var l = function () { var s = d.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = 'https://widget.intercom.io/widget/klyy0le5'; var x = d.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x); }; if (w.attachEvent) { w.attachEvent('onload', l); } else { w.addEventListener('load', l, false); } } })();
