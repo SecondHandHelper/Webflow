@@ -196,6 +196,8 @@ if (getCookie('lwlIntroSeen') !== 'true') {
 
 document.getElementById('openIntroButton').addEventListener('click', () => {
   document.getElementById('introSection').style.display = 'flex';
+  document.querySelector('.slide-nav-lwl div.w-slider-dot').click();
+  document.getElementById('introNext').innerText = 'Nästa';
 });
 
 document.getElementById('chatLink').addEventListener('click', () => {
