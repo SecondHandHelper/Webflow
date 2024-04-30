@@ -23,12 +23,13 @@ if (params.createDrafts === 'true') {
 let scrapingStarted = false;
 
 const showParseError = (error) => {
-  const message = error || 'Hittade inga plagg i tråden, kontrollera att du skrivit in en giltig LWL tråd. Eller kontakta oss om problemet kvarstår.';
+  const message = error || 'Något gick fel, kontrollera att du skrivit in en giltig LWL tråd och försök igen. Eller kontakta oss om problemet kvarstår.';
   document.getElementById('errorMessage').innerText = message;
   document.getElementsByClassName('w-form-fail')[0].style.display = 'block';
   document.getElementById('lwlThreadUrl').style.display = 'block';
   document.getElementById('buttonsDiv').style.display = 'block';
   document.getElementById('doneButton').style.display = 'flex';
+  document.getElementById('doneButton').innerText = 'Starta om';
   document.getElementById('introHeading').style.display = 'block';
   document.getElementById('scrapeProgressDiv').style.display = 'none';
   scrapingStarted = false;
