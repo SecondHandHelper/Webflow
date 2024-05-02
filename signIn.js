@@ -92,21 +92,21 @@ async function updateFirestoreUserDocument(userId, email, phone, ssn) {
   }
 }
 
-function displayIntroDivText() {
+function displayIntroDivText(introId) {
   if (document.referrer.includes('/ship-item?id=')) {
-    document.getElementById('logInIntroText').innerText = 'Du behöver logga in för att se hur du skickar ditt sålda plagg';
+    document.getElementById(introId).innerText = 'Du behöver logga in för att se hur du skickar ditt sålda plagg';
   }
   if (document.referrer.includes('/order-bags')) {
-    document.getElementById('logInIntroText').innerText = 'Du behöver logga in för att beställa påsar';
+    document.getElementById(introId).innerText = 'Du behöver logga in för att beställa påsar';
   }
   if (document.referrer.includes('/item?id=')) {
-    document.getElementById('logInIntroText').innerText = 'Du behöver logga in för att se ditt plagg';
+    document.getElementById(introId).innerText = 'Du behöver logga in för att se ditt plagg';
   }
   if (document.referrer.includes('/settings')) {
-    document.getElementById('logInIntroText').innerText = 'Du behöver logga in för att ändra inställningar';
+    document.getElementById(introId).innerText = 'Du behöver logga in för att ändra inställningar';
   }
   if (new URL(document.referrer).pathname === '/') {
-    document.getElementById('logInIntroText').innerText = 'Du behöver logga in för att se dina plagg';
+    document.getElementById(introId).innerText = 'Du behöver logga in för att se dina plagg';
   }
 }
 

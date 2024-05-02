@@ -24,20 +24,32 @@
     showOtherSignInMethodsButton.style.display = 'flex';
     otherSignInMethodsDiv.style.display = 'none';
   }
-
+  const params = getParamsObject();
   //Get preferred sign in method
-  if (params['s'].length >= 3) {
-    displayIntroDivText();
+  if (params['s']?.length >= 3) {
     getSignInInfo().then(res => {
       if (!(res.email || res.phone || res.method)) {
         return;
       }
+      // TODO: behövs displayPreferredSignInMethod här?
       displayPreferredSignInMethod(res.method);
+      if (res.method === 'google.com') {
+        signInWithGoogle();
+      }
       if (res.email) {
-        document.getElementById('emailAddress').value = res.email;
+        chooseEmailDiv.style.display = 'block';
+        loginAlternativesDiv.style.display = 'none';
+        displayIntroDivText('introEmailText');
+        document.getElementById('prefilledEmail').innerText = res.email;
+        emailAddress.value = res.email;
+        checkEmail();
       }
       if (res.phone) {
+        displayIntroDivText('introPhoneText');
         document.getElementById('signinPhoneNumber').value = res.phone;
+        mobileNumberDiv.style.display = 'block';
+        orLoginOtherWayDiv.style.display = 'block';
+        loginAlternativesDiv.style.display = 'none';
       }
     });
   } else {
