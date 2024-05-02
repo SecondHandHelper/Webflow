@@ -1,4 +1,6 @@
 <script>
+  urlDependentLoadJs('signInHelpers.js');
+
   window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sendCodeButton', {
     'size': 'invisible',
     'callback': (response) => {
@@ -9,9 +11,14 @@
 </script>
 
 <script>
-  function displayPerferredSignInMethod(buttonId) {
-    var outerDiv = document.getElementById(buttonId).parentElement;
-    var innerDiv = document.getElementById(buttonId);
+  function displayPreferredSignInMethod(signInMethod) {
+    if (!signInMethod.length) {
+      return;
+    }
+    console.log("preferredSignInMethod exist", signInMethod);
+    const buttonId = signInMethod === 'google.com' ? 'googleSignInButton' : (signInMethod === 'phone' ? 'smsCodeButton' : 'emailAndPasswordButton');
+    const innerDiv = document.getElementById(buttonId);
+    const outerDiv = innerDiv.parentElement;
     preferredSignInMethodDiv.appendChild(outerDiv.removeChild(innerDiv));
     preferredSignInMethodDiv.style.display = 'block';
     showOtherSignInMethodsButton.style.display = 'flex';
@@ -19,19 +26,22 @@
   }
 
   //Get preferred sign in method
-  const preferredSignInMethod = getPreferredLogInMethod();
-
-  if (preferredSignInMethod) {
-    console.log("preferredSignInMethod exist", preferredSignInMethod);
-    if (preferredSignInMethod === 'google.com') {
-      displayPerferredSignInMethod('googleSignInButton');
-    }
-    if (preferredSignInMethod === 'phone') {
-      displayPerferredSignInMethod('smsCodeButton');
-    }
-    if (preferredSignInMethod === 'password') {
-      displayPerferredSignInMethod('emailAndPasswordButton');
-    }
+  if (params['s'].length >= 3) {
+    displayIntroDivText();
+    getSignInInfo().then(res => {
+      if (!(res.email || res.phone || res.method)) {
+        return;
+      }
+      displayPreferredSignInMethod(res.method);
+      if (res.email) {
+        document.getElementById('emailAddress').value = res.email;
+      }
+      if (res.phone) {
+        document.getElementById('signinPhoneNumber').value = res.phone;
+      }
+    });
+  } else {
+    displayPreferredSignInMethod(getPreferredLogInMethodCookie());
   }
 
   if (userIsSellingNewItem()) {
@@ -259,5 +269,4 @@
   showOtherSignInMethodsButton.addEventListener('click', function () {
     triggerOtherSignInMethodsView.click();
   });
-  urlDependentLoadJs('signInHelpers.js');
 </script>

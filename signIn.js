@@ -31,7 +31,7 @@ firebase.auth().onAuthStateChanged(async (result) => {
     analytics.identify({ latestPageView: now });
 
     if (path === "/private" || path === "/personal-id-form" || path === "/address-form" || path === "/item" || path === "/ship-item" || path === "/edit-item" || path === "/order-bags") {
-      location.href = './';
+      location.href = './sign-in' + window.location.search;
     }
     if (path === "/"){
       headerLoginLoading.style.display = 'none';
@@ -92,6 +92,34 @@ async function updateFirestoreUserDocument(userId, email, phone, ssn) {
   }
 }
 
+function displayIntroDivText() {
+  if (document.referrer.includes('/ship-item?id=')) {
+    document.getElementById('logInIntroText').innerText = 'Du behöver logga in för att se hur du skickar ditt sålda plagg';
+  }
+  if (document.referrer.includes('/order-bags')) {
+    document.getElementById('logInIntroText').innerText = 'Du behöver logga in för att beställa påsar';
+  }
+  if (document.referrer.includes('/item?id=')) {
+    document.getElementById('logInIntroText').innerText = 'Du behöver logga in för att se ditt plagg';
+  }
+  if (document.referrer.includes('/settings')) {
+    document.getElementById('logInIntroText').innerText = 'Du behöver logga in för att ändra inställningar';
+  }
+  if (new URL(document.referrer).pathname === '/') {
+    document.getElementById('logInIntroText').innerText = 'Du behöver logga in för att se dina plagg';
+  }
+}
+
+async function getSignInInfo() {
+  const params = getParamsObject();
+  if (params['s'].length >= 3) {
+    // response data: {"method":"google.com","email":"user@maiapp.se","phone":"+46734433221"}
+    const response = await fetch(`https://usersignininfo-heypmjzjfq-ew.a.run.app?signInInfoKey=${params['s']}`);
+    return await response.json();
+  }
+  return null;
+}
+
 async function signedInNextStep(fallbackRedirect) {
   // User is signed in
   if (authUser.current) {
@@ -100,8 +128,11 @@ async function signedInNextStep(fallbackRedirect) {
     const ssn = authUser.current.personalId || sessionStorage.getItem("personalId");
     await updateFirestoreUserDocument(authUser.current.uid, email, phone, ssn); //Important that this happens first, since many other functions depend on an existing user document
   }
-  // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item
-  if (userIsSellingNewItem()) {
+  const hostname = window.location.protocol + "//" + window.location.host;
+  if (getParamsObject()['s'].length >= 3 && document.referrer.startsWith(hostname)) {
+    location.href = new URL(document.referrer).pathname;
+  } else if (userIsSellingNewItem()) {
+    // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item
     location.href = './sell-item';
   } else if (localStorage.getItem('lwlItemDrafts')) {
     location.href = '/lwl?createDrafts=true';

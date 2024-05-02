@@ -56,7 +56,7 @@ function checkCookie(cname) {
 
 const preferredLoginMethodCookieName = 'preferredLoginMethod';
 
-const getPreferredLogInMethod = () => getCookie(preferredLoginMethodCookieName);
+const getPreferredLogInMethodCookie = () => getCookie(preferredLoginMethodCookieName);
 
 function setPreferredLogInMethodCookie(providerId) {
     setCookie(preferredLoginMethodCookieName, providerId, 6000);
