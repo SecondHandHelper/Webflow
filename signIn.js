@@ -134,7 +134,7 @@ async function signedInNextStep(fallbackRedirect) {
   }
   const hostname = window.location.protocol + "//" + window.location.host;
   const params = getParamsObject();
-  if (params && params.length >= 3 && document.referrer.startsWith(hostname)) {
+  if (params['s'] && params['s'].length >= 3 && document.referrer.startsWith(hostname)) {
     const url = new URL(document.referrer);
     url.search = document.location.search;
     url.searchParams.delete('s');
