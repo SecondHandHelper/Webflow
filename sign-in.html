@@ -36,10 +36,10 @@
         displayPreferredSignInMethod('google.com');
       } else if (res.method === 'password') {
         loginAlternativesDiv.style.display = 'none';
-        displayIntroDivText('introEmailText');
+        displayIntroDivText('logInIntroText');
         checkEmail();
       } else if (res.method === 'phone') {
-        displayIntroDivText('introPhoneText');
+        displayIntroDivText('logInIntroText');
         phoneLoginDiv.style.display = 'block';
         mobileNumberDiv.style.display = 'block';
         orLoginOtherWayDiv.style.display = 'block';
@@ -86,7 +86,7 @@
         errorMessageDiv.innerText = error.message;
         console.log('Error message: ' + error.message);
         errorHandler.report(error);
-    });
+      });
   }
 
   signinButton.addEventListener('click', verifyCode);

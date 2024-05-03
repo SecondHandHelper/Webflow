@@ -91,18 +91,18 @@ async function updateFirestoreUserDocument(userId, email, phone, ssn) {
 function displayIntroDivText(introId, email) {
   const element = document.getElementById(introId)
   if (!document.referrer || new URL(document.referrer).pathname === '/') {
-    element.innerText = email ? `Logga in med ${email} för att se dina plagg` : 'Du behöver logga in för att se dina plagg';
+    element.innerHTML = email ? `Logga in för att se dina plagg. Använd<br><strong>${email}</strong>.` : 'Du behöver logga in för att<br><strong>se dina plagg</strong>';
   } else if (document.referrer.includes('/ship-item?id=')) {
-    element.innerText = email ? `Logga in med ${email} för att se hur du skickar ditt sålda plagg` : 'Du behöver logga in för att se hur du skickar ditt sålda plagg';
+    element.innerHTML = email ? `Logga in för att se dina plagg. Använd<br><strong>${email}</strong>.` : 'Du behöver logga in för att <br><strong>se hur du skickar ditt sålda plagg</strong>';
   } else if (document.referrer.includes('/order-bags')) {
-    element.innerText = email ? `Logga in med ${email} för att beställa påsar` : 'Du behöver logga in för att beställa påsar';
+    element.innerHTML = email ? `Logga in för att se dina plagg. Använd<br><strong>${email}</strong>.` : 'Du behöver logga in för att <br><strong>beställa påsar</strong>';
   } else if (document.referrer.includes('/item?id=')) {
-    element.innerText = email ? `Logga in med ${email} för att se ditt plagg` : 'Du behöver logga in för att se ditt plagg';
+    element.innerHTML = email ? `Logga in för att se dina plagg. Använd<br><strong>${email}</strong>.` : 'Du behöver logga in för att <br><strong>se ditt plagg</strong>';
   } else if (document.referrer.includes('/settings')) {
-    element.innerText = email ? `Logga in med ${email} för att ändra inställningar` : 'Du behöver logga in för att ändra inställningar';
+    element.innerHTML = email ? `Logga in för att se dina plagg. Använd<br><strong>${email}</strong>.` : 'Du behöver logga in för att <br><strong>ändra inställningar</strong>';
   }
-  if (element.innerText.length) {
-    element.style.display = 'block';
+  if (element.innerHTML.length) {
+    document.getElementById(introId).style.display = 'block';
   }
 }
 
