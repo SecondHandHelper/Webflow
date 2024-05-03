@@ -92,21 +92,25 @@ async function updateFirestoreUserDocument(userId, email, phone, ssn) {
   }
 }
 
-function displayIntroDivText(introId) {
+function displayIntroDivText(introId, email) {
+  const element = document.getElementById(introId)
   if (document.referrer.includes('/ship-item?id=')) {
-    document.getElementById(introId).innerText = 'Du behöver logga in för att se hur du skickar ditt sålda plagg';
+    element.innerText = email ? `Logga in med ${email} för att se hur du skickar ditt sålda plagg` : 'Du behöver logga in för att se hur du skickar ditt sålda plagg';
   }
   if (document.referrer.includes('/order-bags')) {
-    document.getElementById(introId).innerText = 'Du behöver logga in för att beställa påsar';
+    element.innerText = email ? `Logga in med ${email} för att beställa påsar` : 'Du behöver logga in för att beställa påsar';
   }
   if (document.referrer.includes('/item?id=')) {
-    document.getElementById(introId).innerText = 'Du behöver logga in för att se ditt plagg';
+    element.innerText = email ? `Logga in med ${email} för att se ditt plagg` : 'Du behöver logga in för att se ditt plagg';
   }
   if (document.referrer.includes('/settings')) {
-    document.getElementById(introId).innerText = 'Du behöver logga in för att ändra inställningar';
+    element.innerText = email ? `Logga in med ${email} för att ändra inställningar` : 'Du behöver logga in för att ändra inställningar';
   }
   if (new URL(document.referrer).pathname === '/') {
-    document.getElementById(introId).innerText = 'Du behöver logga in för att se dina plagg';
+    element.innerText = email ? `Logga in med ${email} för att se dina plagg` : 'Du behöver logga in för att se dina plagg';
+  }
+  if (element.innerText.length) {
+    element.style.display = 'block';
   }
 }
 

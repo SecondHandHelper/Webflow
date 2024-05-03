@@ -31,19 +31,17 @@
         return;
       }
       if (res.method === 'google.com') {
-        signInWithGoogle();
-      }
-      if (res.email) {
+        displayIntroDivText('logInIntroText', res.email);
+        displayPreferredSignInMethod('google.com');
+      } else if (res.email) {
         loginAlternativesDiv.style.display = 'none';
         displayIntroDivText('introEmailText');
         document.getElementById('prefillIntro').style.display = 'block';
         document.getElementById('prefilledEmail').innerText = res.email;
         emailAddress.value = res.email;
         checkEmail();
-      }
-      if (res.phone) {
+      } else if (res.phone) {
         displayIntroDivText('introPhoneText');
-        document.getElementById('introPhoneText').style.display = 'block';
         document.getElementById('signinPhoneNumber').value = res.phone;
         mobileNumberDiv.style.display = 'block';
         orLoginOtherWayDiv.style.display = 'block';
