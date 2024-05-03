@@ -12,7 +12,7 @@ function setCookie(cname, cvalue, exdays) {
     //console.log("Cookie set: ", cname + "=" + cvalue);
 }
 
-function deleteCookie(cname) {
+export function deleteCookie(cname) {
   document.cookie = cname + '=; Max-Age=-99999999;';
 }
 
