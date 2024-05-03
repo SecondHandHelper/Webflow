@@ -22,10 +22,10 @@
     showOtherSignInMethodsButton.style.display = 'flex';
     otherSignInMethodsDiv.style.display = 'none';
   }
-  const params = getParamsObject();
+  const params = new URL(window.location).searchParams;
   //Get preferred sign in method
-  if (params['s']?.length >= 3) {
-    getSignInInfo().then(res => {
+  if (params.has('s') && params.get('s').length >= 3) {
+    getSignInInfo(params.get('s')).then(res => {
       if (!(res.email || res.phone || res.method)) {
         return;
       }

@@ -110,14 +110,15 @@ function displayIntroDivText(introId, email) {
   }
 }
 
-async function getSignInInfo() {
-  const params = getParamsObject();
-  if (params['s'].length >= 3) {
+async function getSignInInfo(signInInfoKey) {
+  try {
     // response data: {"method":"google.com","email":"user@maiapp.se","phone":"+46734433221"}
-    const response = await fetch(`https://usersignininfo-heypmjzjfq-ew.a.run.app?signInInfoKey=${params['s']}`);
+    const response = await fetch(`https://usersignininfo-heypmjzjfq-ew.a.run.app?signInInfoKey=${signInInfoKey}`);
     return await response.json();
+  } catch(e) {
+    console.error(e);
+    return null;
   }
-  return null;
 }
 
 async function signedInNextStep(fallbackRedirect) {
@@ -129,8 +130,8 @@ async function signedInNextStep(fallbackRedirect) {
     await updateFirestoreUserDocument(authUser.current.uid, email, phone, ssn); //Important that this happens first, since many other functions depend on an existing user document
   }
   const hostname = window.location.protocol + "//" + window.location.host;
-  const params = getParamsObject();
-  if (params['s'] && params['s'].length >= 3 && document.referrer.startsWith(hostname)) {
+  const params = new URL(window.location).searchParams;
+  if (params.has('s') && params.get('s').length >= 3 && document.referrer.startsWith(hostname)) {
     if (!document.referrer) {
       location.href = '/private';
     } else {
