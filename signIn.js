@@ -130,7 +130,10 @@ async function signedInNextStep(fallbackRedirect) {
   }
   const hostname = window.location.protocol + "//" + window.location.host;
   if (getParamsObject()['s'].length >= 3 && document.referrer.startsWith(hostname)) {
-    location.href = new URL(document.referrer).pathname;
+    const url = new URL(document.referrer);
+    url.search = document.location.search;
+    url.searchParams.delete('s');
+    location.href = url.pathname + url.search;
   } else if (userIsSellingNewItem()) {
     // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item
     location.href = './sell-item';
