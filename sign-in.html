@@ -40,6 +40,7 @@
         checkEmail();
       } else if (res.method === 'phone') {
         displayIntroDivText('introPhoneText');
+        phoneLoginDiv.style.display = 'block';
         mobileNumberDiv.style.display = 'block';
         orLoginOtherWayDiv.style.display = 'block';
         loginAlternativesDiv.style.display = 'none';
@@ -78,10 +79,8 @@
     firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
       .then((confirmationResult) => {
         window.confirmationResult = confirmationResult;
-        console.log('V Code' + window.confirmationResult.verificationId);
         mobileNumberDiv.style.display = 'none';
         verifyDiv.style.display = 'block';
-
       }).catch((error) => {
         submitLoadIcon.style.display = 'none';
         errorMessageDiv.innerText = error.message;
@@ -92,6 +91,7 @@
 
   signinButton.addEventListener('click', verifyCode);
   smsCodeButton.addEventListener('click', function () {
+    phoneLoginDiv.style.display = 'block';
     mobileNumberDiv.style.display = 'block';
     orLoginOtherWayDiv.style.display = 'block';
     loginAlternativesDiv.style.display = 'none';
@@ -114,6 +114,7 @@
       if (result.additionalUserInfo.isNewUser) {
         emailForTipsDiv.style.display = 'block';
         verifyDiv.style.display = 'none';
+        phoneLoginDiv.style.display = 'none';
       } else {
         authUser.whenSet(signedInNextStep);
       }
@@ -189,6 +190,7 @@
     const email = emailAddress.value;
     const password = newPassword.value;
     signUpWithEmailButton.style.display = 'none';
+    passwordGoBack.style.display = 'none';
     newPasswordLoadIcon.style.display = 'block';
     // [START auth_signup_password]
     firebase.auth().createUserWithEmailAndPassword(email, password)
@@ -208,6 +210,7 @@
         console.log("Error message:", errorCode, errorMessage);
         newPasswordFeedback.innerText = errorMessage;
         signUpWithEmailButton.style.display = 'block';
+        passwordGoBack.style.display = 'block';
         newPasswordLoadIcon.style.display = 'none';
       });
     // [END auth_signup_password]
