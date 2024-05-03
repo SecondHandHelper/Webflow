@@ -1,13 +1,5 @@
 function getParamsObject() {
-  // Get params
-  const queryStr = window.location.search;
-  const paramPairs = queryStr.substring(1).split('&');
-  const params = {};
-  for (let i = 0; i < paramPairs.length; i++) {
-    const parts = paramPairs[i].split('=');
-    params[parts[0]] = decodeURIComponent(parts[1]);
-  }
-  return params;
+  return Object.fromEntries(new URL(window.location).searchParams);
 }
 
 function setCookie(cname, cvalue, exdays) {

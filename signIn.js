@@ -131,10 +131,14 @@ async function signedInNextStep(fallbackRedirect) {
   const hostname = window.location.protocol + "//" + window.location.host;
   const params = getParamsObject();
   if (params['s'] && params['s'].length >= 3 && document.referrer.startsWith(hostname)) {
-    const url = new URL(document.referrer);
-    url.search = document.location.search;
-    url.searchParams.delete('s');
-    location.href = url.pathname + url.search;
+    if (!document.referrer) {
+      location.href = '/private';
+    } else {
+      const url = new URL(document.referrer);
+      url.search = document.location.search;
+      url.searchParams.delete('s');
+      location.href = url.pathname + url.search;
+    }
   } else if (userIsSellingNewItem()) {
     // If itemCreatedFromAnotherItem in sessionStorage => Back to sell-item
     location.href = './sell-item';
