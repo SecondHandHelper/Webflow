@@ -15,7 +15,6 @@
     if (!signInMethod.length) {
       return;
     }
-    console.log("preferredSignInMethod exist", signInMethod);
     const buttonId = signInMethod === 'google.com' ? 'googleSignInButton' : (signInMethod === 'phone' ? 'smsCodeButton' : 'emailAndPasswordButton');
     const innerDiv = document.getElementById(buttonId);
     const outerDiv = innerDiv.parentElement;
@@ -80,8 +79,6 @@
     sendCodeButton.style.display = 'none';
     const formPhoneNumber = signinPhoneNumber.value;
     const phoneNumber = `+46${formPhoneNumber}`;
-
-    console.log(formPhoneNumber, phoneNumber);
 
     const appVerifier = window.recaptchaVerifier;
 
