@@ -93,13 +93,13 @@ function displayIntroDivText(introId, email) {
   if (!document.referrer || new URL(document.referrer).pathname === '/') {
     element.innerHTML = email ? `Logga in för att se dina plagg. Använd<br><strong>${email}</strong>.` : 'Du behöver logga in för att<br><strong>se dina plagg</strong>';
   } else if (document.referrer.includes('/ship-item?id=')) {
-    element.innerHTML = email ? `Logga in för att se dina plagg. Använd<br><strong>${email}</strong>.` : 'Du behöver logga in för att <br><strong>se hur du skickar ditt sålda plagg</strong>';
+    element.innerHTML = email ? `Logga in för att se hur du skickar plagget. Använd<br><strong>${email}</strong>.` : 'Du behöver logga in för att <br><strong>se hur du skickar plagget</strong>';
   } else if (document.referrer.includes('/order-bags')) {
-    element.innerHTML = email ? `Logga in för att se dina plagg. Använd<br><strong>${email}</strong>.` : 'Du behöver logga in för att <br><strong>beställa påsar</strong>';
+    element.innerHTML = email ? `Logga in för att beställa påsar. Använd<br><strong>${email}</strong>.` : 'Du behöver logga in för att <br><strong>beställa påsar</strong>';
   } else if (document.referrer.includes('/item?id=')) {
-    element.innerHTML = email ? `Logga in för att se dina plagg. Använd<br><strong>${email}</strong>.` : 'Du behöver logga in för att <br><strong>se ditt plagg</strong>';
+    element.innerHTML = email ? `Logga in för att se ditt plagg. Använd<br><strong>${email}</strong>.` : 'Du behöver logga in för att <br><strong>se ditt plagg</strong>';
   } else if (document.referrer.includes('/settings')) {
-    element.innerHTML = email ? `Logga in för att se dina plagg. Använd<br><strong>${email}</strong>.` : 'Du behöver logga in för att <br><strong>ändra inställningar</strong>';
+    element.innerHTML = email ? `Logga in för att ändra inställningar. Använd<br><strong>${email}</strong>.` : 'Du behöver logga in för att <br><strong>ändra inställningar</strong>';
   }
   if (element.innerHTML.length) {
     document.getElementById('notificationBanner').style.display = 'flex';
