@@ -29,17 +29,17 @@
       if (!(res.email || res.phone || res.method)) {
         return;
       }
+      emailAddress.value = res.email;
+      document.getElementById('signinPhoneNumber').value = res.phone?.replace('+46', '');
       if (res.method === 'google.com') {
         displayIntroDivText('logInIntroText', res.email);
         displayPreferredSignInMethod('google.com');
-      } else if (res.email) {
+      } else if (res.method === 'password') {
         loginAlternativesDiv.style.display = 'none';
         displayIntroDivText('introEmailText');
-        emailAddress.value = res.email;
         checkEmail();
-      } else if (res.phone) {
+      } else if (res.method === 'phone') {
         displayIntroDivText('introPhoneText');
-        document.getElementById('signinPhoneNumber').value = res.phone.replace('+46', '');
         mobileNumberDiv.style.display = 'block';
         orLoginOtherWayDiv.style.display = 'block';
         loginAlternativesDiv.style.display = 'none';
