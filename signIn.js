@@ -102,7 +102,7 @@ function displayIntroDivText(introId, email) {
     element.innerHTML = email ? `Logga in för att se dina plagg. Använd<br><strong>${email}</strong>.` : 'Du behöver logga in för att <br><strong>ändra inställningar</strong>';
   }
   if (element.innerHTML.length) {
-    document.getElementById(introId).style.display = 'block';
+    document.getElementById('notificationBanner').style.display = 'flex';
   }
 }
 
