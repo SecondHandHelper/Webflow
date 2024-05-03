@@ -3,8 +3,7 @@
 
   window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sendCodeButton', {
     'size': 'invisible',
-    'callback': (response) => {
-      // reCAPTCHA solved, allow signInWithPhoneNumber.
+    'callback': (r) => {
       onSignInSubmit();
     }
   });
@@ -36,13 +35,11 @@
       } else if (res.email) {
         loginAlternativesDiv.style.display = 'none';
         displayIntroDivText('introEmailText');
-        document.getElementById('prefillIntro').style.display = 'block';
-        document.getElementById('prefilledEmail').innerText = res.email;
         emailAddress.value = res.email;
         checkEmail();
       } else if (res.phone) {
         displayIntroDivText('introPhoneText');
-        document.getElementById('signinPhoneNumber').value = res.phone;
+        document.getElementById('signinPhoneNumber').value = res.phone.replace('+46', '');
         mobileNumberDiv.style.display = 'block';
         orLoginOtherWayDiv.style.display = 'block';
         loginAlternativesDiv.style.display = 'none';
@@ -76,10 +73,8 @@
     submitLoadIcon.style.display = 'block';
     sendCodeButton.style.display = 'none';
     const formPhoneNumber = signinPhoneNumber.value;
-    const phoneNumber = `+46${formPhoneNumber}`;
-
+    const phoneNumber = formPhoneNumber.startsWith('+46') ? formPhoneNumber : `+46${formPhoneNumber}`;
     const appVerifier = window.recaptchaVerifier;
-
     firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
       .then((confirmationResult) => {
         window.confirmationResult = confirmationResult;
@@ -88,13 +83,10 @@
         verifyDiv.style.display = 'block';
 
       }).catch((error) => {
-      // Error; SMS not sent
-      // ...
-      //errorMessageDiv.style.display = 'block';
-      submitLoadIcon.style.display = 'none';
-      errorMessageDiv.innerText = error.message;
-      console.log('Error message: ' + error.message);
-      errorHandler.report(error);
+        submitLoadIcon.style.display = 'none';
+        errorMessageDiv.innerText = error.message;
+        console.log('Error message: ' + error.message);
+        errorHandler.report(error);
     });
   }
 
@@ -141,7 +133,6 @@
       } else {
         console.log("Sorry, your browser does not support Web Storage...");
       }
-
       authUser.whenSet(signedInNextStep);
     } catch (e) {
       console.log('failed to add email', e)
@@ -242,19 +233,18 @@
 
   function checkEmail() {
     const email = emailAddress.value;
-    console.log("emailAddress: ", email);
     firebase.auth().fetchSignInMethodsForEmail(email)
       .then((signInMethods) => {
+        chooseEmailDiv.style.display = 'none';
         if (signInMethods.indexOf(
           firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD) !== -1) {
-          // User can sign in with email/password.
-          console.log("Account exists -> Login with email");
-          chooseEmailDiv.style.display = 'none';
+          // Account exists
           signinWithEmailDiv.style.display = 'block';
+          document.getElementById('prefilledEmail').innerText = `Ange lösenord för ${email}`;
         } else {
-          console.log("Account doesn't exist -> Create new account");
-          chooseEmailDiv.style.display = 'none';
+          // New account
           choosePasswordDiv.style.display = 'block';
+          document.getElementById('createAccountEmail').innerText = `Välj ett lösenord för ${email}`;
         }
       })
       .catch((error) => {

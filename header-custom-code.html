@@ -1,6 +1,17 @@
 <script>
-  if (localStorage.getItem('authUserId') && (window.location.pathname === '/' || window.location.pathname === '/sign-in')) {
-    location.href = '/private';
+  if (localStorage.getItem('authUserId')) {
+    if (window.location.pathname === '/' || window.location.pathname === '/sign-in') {
+      location.href = '/private';
+    }
+  } else {
+    const protectedPages = ['/private', '/personal-id-form', '/address-form', '/item', '/ship-item', '/edit-item',
+      '/order-bags', '/settings'];
+    const params = getParamsObject();
+    const hasSParam = params['s'] && params['s'].length >= 3;
+    const path = window.location.pathname;
+    if (protectedPages.includes(path) || (hasSParam && path === '/')) {
+      location.href = './sign-in' + window.location.search;
+    }
   }
 </script>
 

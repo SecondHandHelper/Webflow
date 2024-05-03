@@ -26,14 +26,10 @@ firebase.auth().onAuthStateChanged(async (result) => {
     localStorage.removeItem('authUserId');
     localStorage.removeItem('sessionUser');
     // Go to landing page if no user and on logged in pages
-    const path = window.location.pathname;
     // Latest page view for logged out users
     analytics.identify({ latestPageView: now });
 
-    if (path === "/private" || path === "/personal-id-form" || path === "/address-form" || path === "/item" || path === "/ship-item" || path === "/edit-item" || path === "/order-bags") {
-      location.href = './sign-in' + window.location.search;
-    }
-    if (path === "/"){
+    if (window.location.pathname === "/"){
       headerLoginLoading.style.display = 'none';
       headerLoginButton.style.display = 'flex';
     }

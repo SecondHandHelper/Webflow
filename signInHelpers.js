@@ -49,5 +49,14 @@ document.addEventListener('click', event => {
     tooltip.classList.remove('tooltip-show');
   }
 });
+
+document.getElementById('passwordGoBack').addEventListener('click', () => {
+  chooseEmailDiv.style.display = 'block';
+  choosePasswordDiv.style.display = 'none';
+  document.getElementById('Choose-email-form').style.display = 'block';
+  document.querySelector('.success-message').style.display = 'none';
+
+
+})
 googleSignInButton.addEventListener('click', signInWithGoogle);
 googleSignInButton2.addEventListener('click', signInWithGoogle);
