@@ -133,7 +133,8 @@ async function signedInNextStep(fallbackRedirect) {
     await updateFirestoreUserDocument(authUser.current.uid, email, phone, ssn); //Important that this happens first, since many other functions depend on an existing user document
   }
   const hostname = window.location.protocol + "//" + window.location.host;
-  if (getParamsObject()['s'].length >= 3 && document.referrer.startsWith(hostname)) {
+  const params = getParamsObject();
+  if (params && params.length >= 3 && document.referrer.startsWith(hostname)) {
     const url = new URL(document.referrer);
     url.search = document.location.search;
     url.searchParams.delete('s');
