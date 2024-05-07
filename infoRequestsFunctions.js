@@ -161,13 +161,97 @@ async function openNewPriceToast(itemId, status, max, min, brand, description, c
     triggerNewPriceToastOpen.click();
 }
 
-export function loadInfoRequests(userId) {
+export function loadInfoRequests(items) {
     const measurementsClone = document.getElementById('infoRequestMeasurementsTemplate').cloneNode(true);
     const longerPeriodClone = document.getElementById('infoRequestLongerPeriodTemplate').cloneNode(true);
     const updateImagesClone = document.getElementById('infoRequestImagesTemplate').cloneNode(true);
     const valuationClone = document.getElementById('infoRequestValuationTemplate').cloneNode(true);
-    const infoRequestsList = document.getElementById('infoRequestsList')
+    const infoRequestsList = document.getElementById('infoRequestsList');
     infoRequestsList.replaceChildren();
+
+    items.forEach((item) => {
+        const itemId = item.id;
+        const infoRequests = item.infoRequests;
+            const status = item.status;
+            const brand = item.brand.replace(/'/g, '');
+            const currentMinPrice = item.minPriceEstimate;
+            const currentMaxPrice = item.maxPriceEstimate;
+            const deniedBefore = item?.infoRequests?.price?.response === "Denied" ? true : false;
+            const archived = item.archived;
+            const category = item.category;
+            const frontImageUrl = itemCoverImage(item);
+            if (archived == undefined && status !== "Unsold" && status !== "Sold" && infoRequests) {
+                displayRequests();
+            }
+
+            function displayRequests() {
+                for (const req in infoRequests) {
+                    if (infoRequests[req]?.status === "Active") {
+                        let description = infoRequests[req].description;
+                        
+                        if (description) { description = description.replace(/'/g, ''); }
+                        // PRICE REQUEST
+                        if (req === "price") {
+                            const type = infoRequests[req].type;
+                            const newRequest = valuationClone.cloneNode(true);
+                            newRequest.id = `infoRequestPrice-${itemId}`;
+                            newRequest.querySelector('.img-container').style.backgroundImage = `url('${frontImageUrl}')`;
+                            newRequest.querySelector('a .pricebuttontext').innerText = 'Se prisförslag';
+                            newRequest.querySelector('.text-block-72').innerText = "Vill du sänka priset och få det sålt?";
+                            infoRequestsList.appendChild(newRequest);
+                            if (status === "New" && type !== 'Adjusted ML Valuation') {
+                                newRequest.querySelector('a .pricebuttontext').innerText = 'Se värdering';
+                                newRequest.querySelector('.text-block-72').innerText = 'Vill du sälja till vår värdering?'
+                                newRequest.querySelector('a').href = `/item-valuation?id=${itemId}`;
+                            } else {
+                                setTimeout(() => {
+                                    const max = infoRequests[req].maxPrice;
+                                    const min = infoRequests[req].minPrice;
+                                    document.querySelector(`#infoRequestPrice-${itemId} a`).addEventListener('click', async () => {
+                                        await openNewPriceToast(itemId, status, max, min, brand, description, category, type, currentMaxPrice, currentMinPrice);
+                                    })
+                                }, 0);
+                            }
+                        }
+                        // MEASUREMENTS REQUEST
+                        if (req === "measurements") {
+                            const newRequest = measurementsClone.cloneNode(true);
+                            newRequest.id = `infoRequestMeasurements-${itemId}`;
+                            newRequest.querySelector('.img-container').style.backgroundImage = `url('${frontImageUrl}')`;
+                            infoRequestsList.appendChild(newRequest);
+                            setTimeout(() => {
+                              document.querySelector(`#infoRequestMeasurements-${itemId} a`).addEventListener('click', async () => {
+                                await openMeasurementsToast(itemId, description);
+                              })
+                            }, 0);
+                        }
+                        // IMAGES REQUEST
+                        if (req === "images") {
+                            const newRequest = updateImagesClone.cloneNode(true);
+                            newRequest.id = `infoRequestImages-${itemId}`;
+                            newRequest.querySelector('.img-container').style.backgroundImage = `url('${frontImageUrl}')`;
+                            newRequest.querySelector('a').href = `/edit-item?id=${itemId}`;
+                            infoRequestsList.appendChild(newRequest);
+                        }
+                        // LONGER PERIOD REQUEST
+                        if (req === "longerPeriod") {
+                            const newRequest = longerPeriodClone.cloneNode(true);
+                            newRequest.id = `infoRequestLongerPeriod-${itemId}`;
+                            newRequest.querySelector('.img-container').style.backgroundImage = `url('${frontImageUrl}')`;
+                            infoRequestsList.appendChild(newRequest);
+                            setTimeout(() => {
+                              document.querySelector(`#infoRequestLongerPeriod-${itemId} a`).addEventListener('click', async () => {
+                                await openLongerPeriodToast(itemId, brand, currentMinPrice, deniedBefore);
+                              })
+                            }, 0);
+                        }
+                        infoRequestsDiv.style.display = "block";
+                    }
+                }
+            }
+    });
+    
+/*
     db.collection("items").where("user", "==", userId).get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
             const itemId = doc.id;
@@ -252,4 +336,6 @@ export function loadInfoRequests(userId) {
             }
         });
     });
+*/
+
 }

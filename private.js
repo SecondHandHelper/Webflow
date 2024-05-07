@@ -288,7 +288,7 @@ async function privateMain() {
   showBonusSection();
 
   showAccountInfo();
-  loadInfoRequests(userId);
+  loadInfoRequests(items);
   //showHolidayModeDiv(items);
 
   // Create refCode
