@@ -233,10 +233,6 @@ async function privateMain() {
   loadSoldByOthers(userId);
   setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
 
-  //For testing purposes only - To see what a certain user sees
-  if (userId === "3OkW5av20HP8ScpUDS8ip9fBEZr1" && window.location.origin.includes("shh-test")) {
-    userId = "3OkW5av20HP8ScpUDS8ip9fBEZr1";
-  }
   //Yearly Summary
   /*
   yearlyDataExist(userId).then((result) => {
