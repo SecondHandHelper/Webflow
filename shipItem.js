@@ -11,6 +11,7 @@ function loadItem(itemId) {
       let imgUrl = itemCoverImage(data);
       const category = data.category ? data.category : "";
       const postnordQrCode = data.postnordQrCode;
+      const postnordQrCodePage = data.postnordQrCodePage;
       const dhlBarcode = data.dhlLicensePlateBarcodeSrc;
       const dhlLicensePlate = data.dhlLicensePlate;
       const upsShipmentId = data.upsShipmentId;
@@ -31,6 +32,7 @@ function loadItem(itemId) {
         if (shippingMethod === 'Service point') {
           if (postnordQrCode && !(soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed')) {
             qrCodeImage.style.backgroundImage = `url('${postnordQrCode}')`;
+            postnordQrCodeDiv.href = postnordQrCodePage;
             postnordQrCodeDiv.style.display = 'flex';
             mainInstructionDiv.style.display = 'block';
             howToShipQrDiv.style.display = 'block';
