@@ -94,7 +94,7 @@ document.getElementById('doneButton').addEventListener('click', () => {
       }
       const draftItemResponse = await firebase.app().functions("europe-west3").httpsCallable('createItemDraftsFromLwl', {timeout: 240 * 1000})({
         itemData: message.data,
-        url: lwlThreadUrl
+        url: lwlThreadUrl.value,
       });
       if (authUser.current) {
         location.href = '/private#wardrobe';
