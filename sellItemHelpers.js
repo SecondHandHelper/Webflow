@@ -237,9 +237,13 @@ export function checkBlockedOrLowShareSoldBrand(brand, category) {
   let hardToSellDiv = document.getElementById("hardToSellDiv");
   let wordsToWarnOn = ["H&M", "HM", "Zara", "ASOS", "Nelly", "Gina Tricot", "BikBok", "Bik Bok", "Lindex", "Kappahl", "Cubus", "NA-KD", "NAKD", "Mango", "Ellos", "Primark", "Shein", "Vila", "Forever 21", "Pull & Bear", "Bershka", "Stradivarius"];
   document.getElementById("itemBrand").setCustomValidity('');
-  if (BLOCKED_BRANDS.includes(brand.toLowerCase()) ||
-    (!HIGH_VALUE_CATEGORY.includes(category?.toLowerCase()) && BLOCK_NON_HIGH_VALUE_CATEGORY.includes(brand.toLowerCase())) ||
-    (LOW_VALUE_CATEGORY.includes(category?.toLowerCase()) && BLOCK_ONLY_LOW_VALUE_CATEGORY.includes(brand.toLowerCase()))) {
+  const params = getParamsObject();;
+  if ( !(params.id && params.s) && (
+      BLOCKED_BRANDS.includes(brand.toLowerCase()) ||
+      (!HIGH_VALUE_CATEGORY.includes(category?.toLowerCase()) && BLOCK_NON_HIGH_VALUE_CATEGORY.includes(brand.toLowerCase())) ||
+      (LOW_VALUE_CATEGORY.includes(category?.toLowerCase()) && BLOCK_ONLY_LOW_VALUE_CATEGORY.includes(brand.toLowerCase()))
+    )
+  ) {
     hardToSellText.innerHTML = BLOCKED_BRANDS.includes(brand.toLowerCase()) ?
       `Vi säljer tyvärr inte ${brand}-plagg på grund av för låg efterfrågan.` :
       `Vi säljer tyvärr inte kategorin ${category} från ${brand} på grund av för låg efterfrågan.`;
