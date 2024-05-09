@@ -238,7 +238,7 @@ export function checkBlockedOrLowShareSoldBrand(brand, category) {
   let wordsToWarnOn = ["H&M", "HM", "Zara", "ASOS", "Nelly", "Gina Tricot", "BikBok", "Bik Bok", "Lindex", "Kappahl", "Cubus", "NA-KD", "NAKD", "Mango", "Ellos", "Primark", "Shein", "Vila", "Forever 21", "Pull & Bear", "Bershka", "Stradivarius"];
   document.getElementById("itemBrand").setCustomValidity('');
   const params = getParamsObject();;
-  if ( !(params.id && params.s) && (
+  if ( !params.id && (
       BLOCKED_BRANDS.includes(brand.toLowerCase()) ||
       (!HIGH_VALUE_CATEGORY.includes(category?.toLowerCase()) && BLOCK_NON_HIGH_VALUE_CATEGORY.includes(brand.toLowerCase())) ||
       (LOW_VALUE_CATEGORY.includes(category?.toLowerCase()) && BLOCK_ONLY_LOW_VALUE_CATEGORY.includes(brand.toLowerCase()))
