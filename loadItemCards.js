@@ -1,5 +1,5 @@
-import {itemCoverImage} from "./general";
-import {closePickupToast} from "./private";
+import { itemCoverImage } from "./general";
+import { closePickupToast } from "./private";
 
 /**
  * @param {String} HTML representing a single element.
@@ -39,6 +39,16 @@ function getBarcodeButton(itemId) {
                             <div class="div-block-194">
                                             <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/65418186f29682eaff3f74be_barcode-icon%20(1).svg" class="image-100">
                                             <div class="text-block-113">Visa streckkod</div>
+                            </div>
+                    </a>`;
+  return div;
+}
+
+function getResellButton(itemId) {
+  let itemPageUrl = window.location.origin + `/sell-item?id=${itemId}`;
+  const div = `<a id="resellButton" href="${itemPageUrl}" class="link-block-39">
+                            <div class="div-block-194">
+                                            <div class="text-block-113">Lägg upp på nytt</div>
                             </div>
                     </a>`;
   return div;
@@ -253,13 +263,13 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived, s
 
   if (method == "Service point") {
     let shipperIcon = '6297d3d527db5dd4cf02e924/6399ac2a3505ee6071fbc18a_Vector%20(1).svg';
-    if (shipper === 'postnord'){
+    if (shipper === 'postnord') {
       shipperIcon = '6297d3d527db5dd4cf02e924/655d182c37fc30df71b078cd_postnord-square-icon%20(1).svg';
     }
-    if (shipper === 'dhl'){
+    if (shipper === 'dhl') {
       shipperIcon = '6297d3d527db5dd4cf02e924/655d1830f259c0bc084c2937_dhl-square-icon%20(1).svg';
     }
-    if (shipper === 'ups'){
+    if (shipper === 'ups') {
       shipperIcon = '6297d3d527db5dd4cf02e924/6603eaef0d5af57f5cce2e40_ups-squared-icon.jpg';
     }
     shippingInfo += `
@@ -342,6 +352,15 @@ export function loadItemCards(items) {
         daysLeftText = `${daysLeft} dagar kvar`;
       }
     }
+    let daysSinceSold;
+    if (soldDate) {
+      specificDate = new Date(soldDate);
+      let nowDate = new Date();
+      specificDate.setHours(0, 0, 0, 0);
+      nowDate.setHours(0, 0, 0, 0);
+      let timeDifference = nowDate - specificDate;
+      daysSinceSold = Math.round(timeDifference / (1000 * 3600 * 24));
+    }
     if (!archived && status !== "Unsold") { displayItemCard(); }
 
     function displayItemCard() {
@@ -382,88 +401,96 @@ export function loadItemCards(items) {
         // SOLD - NOT SENT
       } else if (status == "Sold" && (shippingStatus == "Not sent" || !shippingStatus)) {
         // Prepare card
-        var buyerInfoTextHTML = '';
-        if (buyerFirstName != null && buyerAddressCity != null && soldPrice) {
-          const str = `Såld till ${buyerFirstName} i ${buyerAddressCity} för ${soldPrice} kr`;
-
-          // Split sentence into two equally long rows
-          let output = '';
-          const words = str.split(' ');
-          words.forEach(function (word) {
-            if (output.trim().length > str.length / 2 && !output.includes('<br>')) {
-              output += '<br>';
-            }
-            output += word + ' ';
-          });
-          output = output.trim();
-          buyerInfoTextHTML = `<div class="text-block-44">${output}</div>`;
-        }
+        const isCanceled = soldPlatform === 'Vestiaire Collective' && daysSinceSold > 7 ? true : false;
         var userActionDiv = '';
         var shippingInfoDiv = '';
         let changeShippingMethod = '';
         let shipper = '';
+        var text1 = `Du får ${sellerGets}`;
+        var text2 = '';
 
-        // Add a user action, such as 'show QR button', 'show barcode' or 'bag received checkbox'
-        if (shippingMethod === 'Service point') {
-          if (dhlBarcode) {
-            userActionDiv = getBarcodeButton(itemId);
-            shipper = 'dhl';
-          } else if (soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') {
+        if (!isCanceled) {          
+          if (buyerFirstName != null && buyerAddressCity != null && soldPrice) {
+            const str = `Såld till ${buyerFirstName} i ${buyerAddressCity} för ${soldPrice} kr`;
+
+            // Split sentence into two equally long rows
+            let output = '';
+            const words = str.split(' ');
+            words.forEach(function (word) {
+              if (output.trim().length > str.length / 2 && !output.includes('<br>')) {
+                output += '<br>';
+              }
+              output += word + ' ';
+            });
+            text2 = output.trim();
+          }
+
+          // Add a user action, such as 'show QR button', 'show barcode' or 'bag received checkbox'
+          if (shippingMethod === 'Service point') {
+            if (dhlBarcode) {
+              userActionDiv = getBarcodeButton(itemId);
+              shipper = 'dhl';
+            } else if (soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed') {
+              if (!bagReceived) {
+                userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
+                if (upsShipmentId) { shipper = 'ups' };
+                setTimeout(() => {
+                  document.getElementById(`bagReceivedCheckbox-${itemId}`).addEventListener('click', (event) => {
+                    bagReceivedAction(event.target, itemId, soldDate, shippingMethod);
+                  });
+                }, 0)
+              }
+            }
+            else if (postnordQrCode) {
+              shipper = 'postnord';
+              userActionDiv = getQrCodeButton(itemId);
+            }
+
+          }
+          if (shippingMethod === 'Pickup') {
             if (!bagReceived) {
               userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
-              if (upsShipmentId){ shipper = 'ups' };
               setTimeout(() => {
                 document.getElementById(`bagReceivedCheckbox-${itemId}`).addEventListener('click', (event) => {
                   bagReceivedAction(event.target, itemId, soldDate, shippingMethod);
                 });
               }, 0)
+            } else if (bagReceived && !pickupDate) {
+              userActionDiv = getBookPickupButton(itemId);
+              setTimeout(() => {
+                document.getElementById(`bookPickUpButton-${itemId}`).addEventListener('click', () => {
+                  openPickupToast(itemId, soldDate);
+                });
+              }, 0)
             }
           }
-          else if (postnordQrCode) {
-            shipper = 'postnord';
-            userActionDiv = getQrCodeButton(itemId);
-          }
-          
-        }
-        if (shippingMethod === 'Pickup') {
-          if (!bagReceived) {
-            userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
-            setTimeout(() => {
-              document.getElementById(`bagReceivedCheckbox-${itemId}`).addEventListener('click', (event) => {
-                bagReceivedAction(event.target, itemId, soldDate, shippingMethod);
-              });
-            }, 0)
-          } else if (bagReceived && !pickupDate) {
-            userActionDiv = getBookPickupButton(itemId);
-            setTimeout(() => {
-              document.getElementById(`bookPickUpButton-${itemId}`).addEventListener('click', () => {
-                openPickupToast(itemId, soldDate);
-              });
-            }, 0)
-          }
-        }
 
-        // Always show the 'shippingInfoDiv' - Styling depending on state is set in the function
-        shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate, bagReceived, shipper);
+          // Always show the 'shippingInfoDiv' - Styling depending on state is set in the function
+          shippingInfoDiv = getShippingInfoDiv(itemId, shippingMethod, soldDate, pickupDate, bagReceived, shipper);
 
-        // Add "change shipping method" when applicable and some spacing
-        if (bagReceived && (shippingMethod === "Service point" || (shippingMethod === "Pickup" && pickupDate))) {
-          shippingInfoDiv = '<div class="spacing-15-px"></div>' + shippingInfoDiv;
-          changeShippingMethod += `
+          // Add "change shipping method" when applicable and some spacing
+          if (bagReceived && (shippingMethod === "Service point" || (shippingMethod === "Pickup" && pickupDate))) {
+            shippingInfoDiv = '<div class="spacing-15-px"></div>' + shippingInfoDiv;
+            changeShippingMethod += `
           <a id="changeShippingMethodA-${itemId}" href="#">
               <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
           </a>`;
-          setTimeout(() => {
-            document.getElementById(`changeShippingMethodA-${itemId}`).addEventListener('click', () => {
-              openShippingToast(itemId, soldDate);
-            })
-          }, 0)
+            setTimeout(() => {
+              document.getElementById(`changeShippingMethodA-${itemId}`).addEventListener('click', () => {
+                openShippingToast(itemId, soldDate);
+              })
+            }, 0)
+          }
+        } else {
+          userActionDiv = getResellButton(itemId);
+          text1 = 'Köparen avbröt köpet';
+          text2 = 'Skickades ej inom 7 dagar';
         }
 
         //Create card
         var soldNotSentCardHTML = ``;
         soldNotSentCardHTML =
-          `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><a id="itemLinkFromSoldNotSentSection" href="${itemPageUrl}"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></a></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">Du får ${sellerGets} kr</div>${buyerInfoTextHTML}
+          `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><a id="itemLinkFromSoldNotSentSection" href="${itemPageUrl}"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></a></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">${text1}</div><div class="text-block-44">${text2}</div>
                       ${userActionDiv}
                       ${shippingInfoDiv}
                       ${changeShippingMethod}

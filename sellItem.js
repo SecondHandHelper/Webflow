@@ -207,7 +207,7 @@ async function sellItemMain() {
       document.getElementById("frontImage").required = true;
       document.getElementById("brandTagImage").required = true;
     }
-    await fillForm(params.id, null, params.type==='draft');
+    await fillForm(params.id, null, params.type === 'draft');
     document.getElementById("triggerShowSellItemContent").click();
   } else if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
     // A new item will be created in sellItemMainAuthenticated
@@ -253,12 +253,12 @@ async function saveValuationInStorageOrBackend(valuationData, itemId) {
     const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({
       id: item.id,
-      item: {...item.item, ...valuationData}
+      item: { ...item.item, ...valuationData }
     }));
   } else {
-    await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({itemId, ...valuationData});
+    await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
     const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
-    localStorage.setItem('latestItemCreated', JSON.stringify({...latestItemCreated, ...valuationData}));
+    localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData }));
   }
 }
 
@@ -475,20 +475,37 @@ async function addItemInner(id, status = 'New') {
     images['modelImage'] = modelCoverImageUrl;
   }
   const createdFromItem = (params.id && params.type !== 'draft') ? { createdFromItem: params.id } : {};
-  const draftSource = status === 'Draft' ? { draftSource: Object.keys(createdFromItem).length ? 'Mai purchase' : 'Sell item' } : {};
+  const isCreatedFromItem = Object.keys(createdFromItem).length ? true : false;
+  const draftSource = status === 'Draft' ? { draftSource: isCreatedFromItem ? 'Mai purchase' : 'Sell item' } : {};
   const item = { ...pageData, status, ...draftSource, shippingMethod, images, ...createdFromItem, version: "2" };
 
   if (!authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
     const createItemResponse = await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
+
     await trackUserActivated();
     await setCampaignCoupon();
     localStorage.removeItem('newItem');
     sessionStorage.removeItem('newItemId');
     localStorage.setItem('latestItemCreated', JSON.stringify(createItemResponse.data));
+
+    //Archive if "createdFromItem" is same seller
+    if (isCreatedFromItem) {
+      const createdFromItemUserId = await getCreatedFromItemUserId(params.id);
+      if (createdFromItemUserId === authUser.current.uid){
+        await db.collection('items').doc(params.id).update( {'archived': true} );
+      }
+    }
   }
   return { ...item, id };
+}
+
+async function getCreatedFromItemUserId(itemId) {
+  console.log('getCreatedFromItemUserId()');
+  const item = await db.collection("items").doc(itemId).get();
+  if (!item.exists) return null;
+  return item.data().user;
 }
 
 function initializeInputEventListeners() {
