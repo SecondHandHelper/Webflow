@@ -1,6 +1,6 @@
-import { itemCoverImage, shareCode, signOut } from "./general";
-import { loadInfoRequests } from "./infoRequestsFunctions";
-import { loadItemCards } from "./loadItemCards";
+import {itemCoverImage, shareCode, signOut} from "./general";
+import {loadInfoRequests} from "./infoRequestsFunctions";
+import {loadItemCards} from "./loadItemCards";
 
 var userId;
 var email;
@@ -266,9 +266,11 @@ async function privateMain() {
     photoShootOffer.style.display = 'block';
     bonusSection.style.display = 'block';
   }
+  setupBottomMenuPopupListeners();
   await Promise.all([
     showInYourWardrobeSection(),
     showOrderBagsSection(),
+    showInactiveItemsSection(),
   ]);
   loadItemCards(items);
 
@@ -316,6 +318,94 @@ function showHolidayModeDiv(items) {
   }
 }
 
+function inSeason(category) {
+  if (!category) {
+    return true;
+  }
+  const alwaysInSeason = [
+    "Tröja", "Blus", "Topp", "Skjorta", "Linneskjorta", "T-shirt", "Kavaj", "Sweatshirt", "Hoodie", "Polotröja",
+    "Tunika", "Väst", "Kofta", "Linne", "Träningströja", "Poncho", "Piké", "Långärmad T-shirt", "Kostymväst",
+    "Kjol", "Byxor", "Jeans", "Chinos", "Fritidsbyxor", "Träningsbyxor", "Tights", "Strumpbyxor", "Mjukisbyxor",
+    "Kostymbyxor", "Sarong", "Klänning", "Kaftan", "Kostym", "Set", "Jumpsuit", "Baddräkt", "Bikini",
+    "Pyjamas", "Morgonrock", "Bröllopsklänning", "Balklänning", "Bodysuit", "Jacka", "Kappa", "Rock",
+    "Fritidsjacka", "Trenchcoat", "Skinnjacka", "Regnjacka", "Sneakers", "Klackar",
+    "Ballerinaskor", "Loafers", "Boots", "Kängor", "Skor", "Axelremsväska", "Handväska",
+    "Kuvertväska", "Ryggsäck", "Träningsväska", "Resväska", "Datorväska", "Väska", "Solglasögon", "Glasögon", "Örhänge",
+    "Halsband", "Armband", "Ring", "Brosch", "Keps", "Sjal", "Krage", "Bälte", "Plånbok", "Hatt",
+    "Necessär", "Slips", "Handduk", "Klocka"];
+  const winterCategories = ["Underställ", "Dunjacka", "Pälsjacka", "Vinterskor", "Halsduk", "Mössa", "Vantar"];
+  const summerCategories = ["Shorts", "Sandaler", "Flip-flops"]
+  if (alwaysInSeason.includes(category)) {
+    return true;
+  }
+  const today = new Date();
+  const winterStart = new Date(today.getFullYear(), 7, 15)
+  const winterEnd = new Date(today.getFullYear(), 3, 15)
+  if (winterCategories.includes(category) && (today <= winterEnd || today >= winterStart)) {
+    return true;
+  }
+  return summerCategories.includes(category) && today >= winterEnd && today <= winterStart;
+}
+
+async function showInactiveItemsSection() {
+  const unsoldItems = await firebase.app().functions("europe-west1").httpsCallable('getUserUnsoldItems')();
+  if (!unsoldItems.data?.length) {
+    return;
+  }
+  unsoldItems.data.sort((a, b) => {
+    const aInSeason = inSeason(a.category);
+    const bInSeason = inSeason(b.category);
+    if (aInSeason && !bInSeason) {
+      return -1;
+    }
+    if (bInSeason && !aInSeason) {
+      return 1;
+    }
+    if (a.minPriceEstimate >= 100 && b.minPriceEstimate <= 100) {
+      return -1
+    }
+    if (a.minPriceEstimate <= 100 && b.minPriceEstimate >= 100) {
+      return 1
+    }
+    return 0;
+  });
+  const inactiveItemsDiv = document.querySelector('#inactiveItemsDiv');
+  inactiveItemsDiv.style.display = 'block'
+  const itemCard = inactiveItemsDiv.querySelector('#inactiveItemCard');
+  const itemList = inactiveItemsDiv.querySelector('#inactiveItemList');
+  itemList.innerHTML = '';
+  const itemMoreMenu = document.querySelector('#itemMoreMenu');
+  for (const item of unsoldItems.data) {
+    const newItemCard = itemCard.cloneNode(true);
+    newItemCard.id = item.id;
+    const frontImage = item.images?.modelImageLarge || item.images?.modelImage ||
+      item.images?.enhancedFrontImageLarge || item.images?.enhancedFrontImage || item.images?.frontImageLarge || item.images?.frontImage;
+    newItemCard.querySelector('.img-container').style.backgroundImage = `url("${frontImage}")`;
+    newItemCard.querySelector('.inactive-card-brand').innerText = `${item.cleanedBrand || item.brand?.trim()}`;
+    newItemCard.querySelector('.inactive-card-category').innerText = `${item.category || ''}`;
+    newItemCard.querySelector('.inactive-card-reason').innerText = 'Avslutad';
+    if (inSeason(item.category)) {
+      newItemCard.querySelector('.in-season-label').style.display = 'block';
+      if (item.minPriceEstimate > 100) {
+        newItemCard.querySelector('.restart-button').href = `/sell-item?id=${item.id}&type=${item.status === 'Draft' ? 'draft' : 'resell'}`;
+        newItemCard.querySelector('.restart-button').style.display = 'inline-block';
+      }
+    }
+    newItemCard.querySelector('.inactive-dots-button').style.display = 'block';
+    newItemCard.querySelector('.inactive-dots-button').addEventListener('click', async (e) => {
+      itemMoreMenu.style.display = 'block';
+      setTimeout(() => itemMoreMenu.classList.add('sticky-bottom-show'), 0);
+      itemMoreMenu.dataset.itemId = item.id;
+      itemMoreMenu.dataset.section = 'inactive';
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    itemList.appendChild(newItemCard);
+  }
+  //Tracking
+  itemList.querySelectorAll("a").forEach(link => link.addEventListener('click', linkClickTracker));
+}
+
 async function showInYourWardrobeSection() {
   const wardrobeItems = await firebase.app().functions("europe-west1").httpsCallable('getUserWardrobeItems')();
   if (!wardrobeItems.data?.length) {
@@ -350,26 +440,12 @@ async function showInYourWardrobeSection() {
       itemMoreMenu.style.display = 'block';
       setTimeout(() => itemMoreMenu.classList.add('sticky-bottom-show'), 0);
       itemMoreMenu.dataset.itemId = item.id;
+      itemMoreMenu.dataset.section = 'inactive';
       e.preventDefault();
       e.stopPropagation();
     });
     itemList.appendChild(newItemCard);
   }
-
-  document.getElementById('stickyBottomClose').addEventListener('click', () => {
-    itemMoreMenu.classList.remove('sticky-bottom-show');
-    setTimeout(() => itemMoreMenu.style.display = 'none', 500);
-  });
-  document.getElementById('stickyBottomDelete').addEventListener('click', async () => {
-    itemMoreMenu.classList.remove('sticky-bottom-show');
-    setTimeout(() => itemMoreMenu.style.display = 'none', 500);
-    document.getElementById(itemMoreMenu.dataset.itemId).style.display = 'none';
-    const visibleChildren = Array.from(itemList.children).find(it => it.style.display !== 'none')
-    if (!visibleChildren) {
-      document.getElementById('wardrobeItemsDiv').style.display = 'none';
-    }
-    await firebase.app().functions("europe-west1").httpsCallable('hideUserWardrobeItem')({ itemId: itemMoreMenu.dataset.itemId });
-  });
 
   //Tracking
   itemList.querySelectorAll("a").forEach(link => link.addEventListener('click', linkClickTracker));
@@ -383,6 +459,33 @@ async function showInYourWardrobeSection() {
     }
   }, { threshold: 1, root: null })
   observer.observe(itemList);
+}
+
+function setupBottomMenuPopupListeners() {
+  document.getElementById('stickyBottomClose').addEventListener('click', () => {
+    itemMoreMenu.classList.remove('sticky-bottom-show');
+    setTimeout(() => itemMoreMenu.style.display = 'none', 500);
+  });
+  document.getElementById('stickyBottomDelete').addEventListener('click', async () => {
+    itemMoreMenu.classList.remove('sticky-bottom-show');
+    setTimeout(() => itemMoreMenu.style.display = 'none', 500);
+    document.getElementById(itemMoreMenu.dataset.itemId).style.display = 'none';
+    if (itemMoreMenu.dataset.section === 'inactive') {
+      const itemList = document.getElementById('inactiveItemList');
+      const visibleChildren = Array.from(itemList.children).find(it => it.style.display !== 'none')
+      if (!visibleChildren) {
+        document.getElementById('inactiveItemsDiv').style.display = 'none';
+      }
+      await firebase.app().functions("europe-west1").httpsCallable('hideUserUnsoldItem')({ itemId: itemMoreMenu.dataset.itemId });
+    } else {
+      const itemList = document.getElementById('wardrobeItemList');
+      const visibleChildren = Array.from(itemList.children).find(it => it.style.display !== 'none')
+      if (!visibleChildren) {
+        document.getElementById('wardrobeItemsDiv').style.display = 'none';
+      }
+      await firebase.app().functions("europe-west1").httpsCallable('hideUserWardrobeItem')({ itemId: itemMoreMenu.dataset.itemId });
+    }
+  });
 }
 
 async function yearlyDataExist(userId) {
