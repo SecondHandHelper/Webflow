@@ -45,7 +45,8 @@ document.getElementById('doneButton').addEventListener('click', () => {
     console.log('No url thread given');
     return;
   }
-  if (!lwlThreadUrl.value.match(/^https:\/\/www.facebook.com\/groups\/982264948455365\/permalink\/\d+/)) {
+  if (!lwlThreadUrl.value.match(/^https:\/\/www.facebook.com\/groups\/982264948455365\/permalink\/\d+/)
+    && !lwlThreadUrl.value.match(/^https:\/\/www.facebook.com\/share\/p\/\w+/)) {
     showParseError('Ogilitg LWL url angiven.');
     return;
   }

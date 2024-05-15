@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'test791';
+  const JS_VERSION = 'v1.2.88';
   var errorHandler = new StackdriverErrorReporter();
   const environment = location.href.includes('shh-test') ? 'web-test' : 'web-prod';
   $(document).ready(function () {
@@ -44,6 +44,9 @@
       return this.value;
     },
     set current(newVal) {
+      if (newVal === this.value) {
+        return;
+      }
       this.value = newVal;
       this.callbacks.forEach((cb) => {
         typeof cb === 'function' && cb(newVal)
@@ -65,6 +68,9 @@
       return this.value;
     },
     set current(newVal) {
+      if (newVal === this.value) {
+        return;
+      }
       this.value = newVal;
       errorHandler.setUser(newVal?.uid);
       this.callbacks.forEach((cb) => {
