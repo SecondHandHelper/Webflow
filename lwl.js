@@ -1,3 +1,5 @@
+import QRCode from "qrcode";
+
 const WS_SERVER = 'wss://lwl-to-mai-heypmjzjfq-ey.a.run.app';
 const params = getParamsObject();
 
@@ -173,6 +175,14 @@ const showLwLDraftItems = (draftItems) => {
     newItemCard.querySelector('.lwl-item-subtext').innerText = `${[item.category, item.maiSize].filter(i => i).join(', ')}`;
     itemList.appendChild(newItemCard);
   }
+}
+
+// Only on mobile
+const qrCanvas = document.getElementById('qrCanvas')
+if (qrCanvas) {
+  QRCode.toCanvas(qrCanvas, window.location.href, function (error) {
+    if (error) console.error(error)
+  });
 }
 
 //INTRO STUFF
