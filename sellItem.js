@@ -281,6 +281,8 @@ async function saveItemValuation(itemId, mlValuationData) {
       valuatedBrandItems, brandMeanMax, brandAccuracy, brandCategoryAccuracy, fewBrand, brandMeanSold,
       brandCategoryMeanSold, highPriceVarBrandCategory, brandShareSold
     },
+    newMinPriceEstimate: newMinPriceEstimate || minPrice,
+    newMaxPriceEstimate: newMaxPriceEstimate || maxPrice,
     ...(decline || needsHumanCheck(mlValuationData) ? {} : {
       valuationStatus: 'Completed',
       valuationDate: new Date().toISOString(),
@@ -309,6 +311,8 @@ async function setValuationFromResellItem(resellItem, item, itemId) {
   const valuationData = {
     valuationStatus: 'Completed',
     valuationDate: new Date().toISOString(),
+    newMinPriceEstimate: resellItem.minPriceEstimate,
+    newMaxPriceEstimate: maxPrice,
     infoRequests: {
       price: {
         status: 'Active',
