@@ -36,6 +36,26 @@ firebase.auth().onAuthStateChanged(async (result) => {
   }
 });
 
+// If onAuthStateChanged has not run in 1000ms we try this backup for getting the current user
+setTimeout(() => {
+  console.log('fallback for onAuthStateChanged running');
+  if (!authUser.current && !firebase.auth().currentUser) {
+    errorHandler.report('firebase.auth().currentUser is not set in fallback for onAuthStateChanged');
+  }
+  if (!authUser.current && localStorage.getItem('authUserId') && firebase.auth().currentUser) {
+    errorHandler.report('firebase.auth().currentUser is set in fallback for onAuthStateChanged');
+    if (firebase.auth().currentUser.uid === localStorage.getItem('authUserId')) {
+      console.log('Setting authUser.current from localStorage')
+      authUser.current = firebase.auth().currentUser;
+    }
+    if (localStorage.getItem('sessionUser') !== null) {
+      console.log('Setting user.current from localStorage')
+      user.current = JSON.parse(localStorage.getItem('sessionUser'));
+    }
+  }
+}, 1000);
+
+
 function userIsSellingNewItem() {
   return sessionStorage.getItem('itemToBeCreatedAfterSignIn') &&
     (document.referrer.includes('/sell-item') || document.referrer.includes('/item-valuation'));
