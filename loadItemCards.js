@@ -354,7 +354,7 @@ export function loadItemCards(items) {
     }
     let daysSinceSold;
     if (soldDate) {
-      specificDate = new Date(soldDate);
+      let specificDate = new Date(soldDate);
       let nowDate = new Date();
       specificDate.setHours(0, 0, 0, 0);
       nowDate.setHours(0, 0, 0, 0);
