@@ -170,6 +170,31 @@ async function sellItemMain() {
     }
   };
 
+  // Show intro info about the importance to accurately describe the items condition
+  itemCondition.addEventListener("input", () => {
+    if (itemCondition.value === "Använd, men utan anmärkning") {
+      if (authUser.current) {
+        console.log("Inloggad");
+        if (getCookie('conditionUsedInfoBoxSeen') !== 'true') {
+          let conditionUsedInfoBoxViews = user.current?.elementViews ? user.current.elementViews.filter((e) => e.elementID === "conditionUsedInfoBox") : [];
+          if (!conditionUsedInfoBoxViews.length) {
+            document.getElementById("triggerOpenConditionUsedInfo").click();
+            // Store elementViews to be able to hinder it to show automatically again
+            db.collection('users').doc(authUser.current.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "conditionUsedInfoBox", timestamp: new Date() }) });
+            setCookie('conditionUsedInfoBoxSeen', 'true', 100);
+          }
+        } else { // Store on user because cookie says they've seen it
+          db.collection('users').doc(authUser.current.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "conditionUsedInfoBox", timestamp: new Date() }) });
+        }
+      } else {
+        if (getCookie('conditionUsedInfoBoxSeen') !== 'true') {
+          document.getElementById("triggerOpenConditionUsedInfo").click();
+          setCookie('conditionUsedInfoBoxSeen', 'true', 100);
+        }
+      }
+    }
+  })
+
   personalId.addEventListener("input", () => {
     const error = isValidSwedishSsn(personalId.value) ? '' : 'Ogiltigt personnummer';
     personalId.setCustomValidity(error);
@@ -497,8 +522,8 @@ async function addItemInner(id, status = 'New') {
     //Archive if "createdFromItem" is same seller
     if (isCreatedFromItem) {
       const createdFromItemUserId = await getCreatedFromItemUserId(params.id);
-      if (createdFromItemUserId === authUser.current.uid){
-        await db.collection('items').doc(params.id).update( {'archived': true} );
+      if (createdFromItemUserId === authUser.current.uid) {
+        await db.collection('items').doc(params.id).update({ 'archived': true });
       }
     }
   }
