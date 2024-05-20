@@ -11,7 +11,7 @@
 <script>
   const JS_VERSION = 'v1.2.94';
   var errorHandler = new StackdriverErrorReporter();
-  const environment = location.href.includes('shh-test') ? 'web-test' : 'web-prod';
+  const environment = location.href.includes('maiapp.se') ? 'web-prod' : 'web-test';
   $(document).ready(function () {
     errorHandler.start({
       key: 'AIzaSyA1XebVWrZ_WlhKtlqqaRE8omzzn50zd-U',
@@ -243,10 +243,10 @@
       appendJsScript(`https://rawcdn.githack.com/SecondHandHelper/Webflow/${version}/dist/${jsFile}`);
     }
 
-    if (location.href.match(/shh-test.page/)) {
-      appendJsScript(`http://localhost:1234/${jsFile}`, loadFromGitHack);
-    } else {
+    if (location.href.match(/maiapp.se/)) {
       loadFromGitHack();
+    } else {
+      appendJsScript(`http://localhost:1234/${jsFile}`, loadFromGitHack);
     }
   }
 </script>
