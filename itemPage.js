@@ -1,92 +1,78 @@
 import {itemCoverImage} from "./general";
 
-function loadItem(itemId) {
-    db.collection("items").doc(itemId)
-        .get().then((doc) => {
-        if (doc.exists) {
-            console.log("Item data:", doc.data());
-            data = doc.data();
-            const itemId = doc.id;
-            const brand = data.brand;
-            const infoRequests = data.infoRequests;
-            let imgUrl = itemCoverImage(data);
-            const status = data.status;
-            const category = data.category ? data.category : "";
-            const longerPeriodAcceptedDate = data.longerPeriodAcceptedDate;
-            let statusText = ""
-            let publishedDate = data.publishedDate;
-            let daysLeftText = "";
-            if (data.publishedDate) {
-                publishedDate = new Date(publishedDate);
-                let nowDate = new Date();
-                let timeDifference = nowDate.getTime() - publishedDate.getTime();
-                let daysDifference = timeDifference / (1000 * 3600 * 24);
-                let sellingPeriodLength = longerPeriodAcceptedDate ? 60 : 30;
-                let daysLeft = Math.round(sellingPeriodLength - daysDifference);
-                if (daysLeft <= 0) {
-                    daysLeftText = `0 dagar kvar`;
-                } else {
-                    daysLeftText = `${daysLeft} dagar kvar`;
-                }
-            }
-            let min = data.minPriceEstimate;
-            let max = data.maxPriceEstimate;
-            const valuationText = min && max ? `${min}-${max} kr` : "";
-            const soldPrice = data.soldPrice;
-            const sellerGets = data.sellerGets;
-            const payoutStatus = data.payoutStatus;
-            const shippingStatus = data.shippingStatus;
-            let text1 = "";
-            let text2 = "";
+async function loadItem(itemId) {
+  const item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId})
+  if (!item.data) {
+    return;
+  }
+  const data = item.data;
+  console.log("Item data:", data);
+  const infoRequests = data.infoRequests;
+  const category = data.category ? data.category : "";
+  let statusText = ""
+  let publishedDate = data.publishedDate;
+  let daysLeftText = "";
+  if (data.publishedDate) {
+    publishedDate = new Date(publishedDate);
+    const nowDate = new Date();
+    const timeDifference = nowDate.getTime() - publishedDate.getTime();
+    const daysDifference = timeDifference / (1000 * 3600 * 24);
+    const sellingPeriodLength = data.longerPeriodAcceptedDate ? 60 : 30;
+    const daysLeft = Math.max(0, Math.round(sellingPeriodLength - daysDifference));
+    daysLeftText = `${daysLeft} ${daysLeft === 1 ? 'dag' : 'dagar'} kvar`;
+  }
+  const min = data.minPriceEstimate;
+  const max = data.maxPriceEstimate;
+  const valuationText = min && max ? `${min}-${max} kr` : "";
+  let text1 = "";
+  let text2 = "";
 
-            if (status === "New") {
-                if (infoRequests?.price?.status === "Active") {
-                    statusText = `Inväntar ditt svar`;
-                    text1 = "På huvudsidan kan du se plaggets värdering och<br>välja om du vill sälja till värderingen eller inte.";
-                } else if (min && max) {
-                    statusText = `Förbereds`;
-                    text1 = "Förbereder det sista inför publicering.<br>Försäljningen påbörjas inom kort.";
-                    text2 = valuationText;
-                } else {
-                    statusText = `Värdering pågår`;
-                    text1 = "Du får ett SMS när värderingen är klar.<br>Värderingen tar normalt 2 vardagar.";
-                }
-            }
-            if (status === "Published" && min && max) {
-                statusText = `Försäljning pågår`;
-                text1 = daysLeftText;
-                text2 = valuationText;
-            }
-            if (status === "Sold") {
-                statusText = `Såld!`;
-                itemStatusText.style.fontSize = "18px";
-                itemStatusText.style.fontWeight = "500";
-                text1 = payoutStatus === "Payed" ? "" : "Utbetalning kommer via Swish inom en dag";
-                if (shippingStatus === "Not sent") {
-                    text1 = "Utbetalning sker när du skickat plagget"
-                    toShipItemLink.href = window.location.origin + `/ship-item?id=${itemId}`;
-                    toShipItemLink.style.display = "flex";
-                }
-                sellerGetsTitle.innerHTML = payoutStatus === "Payed" ? "Du fick" : "Du får";
-                sellerGetsText.innerHTML = `${sellerGets} kr`
-                sellerGetsDiv.style.display = "flex";
-            }
+  if (data.status === "New") {
+    if (infoRequests?.price?.status === "Active") {
+      statusText = `Inväntar ditt svar`;
+      text1 = "På huvudsidan kan du se plaggets värdering och<br>välja om du vill sälja till värderingen eller inte.";
+    } else if (min && max) {
+      statusText = `Förbereds`;
+      text1 = "Förbereder det sista inför publicering.<br>Försäljningen påbörjas inom kort.";
+      text2 = valuationText;
+    } else {
+      statusText = `Värdering pågår`;
+      text1 = "Du får ett SMS när värderingen är klar.<br>Värderingen tar normalt 2 vardagar.";
+    }
+  }
+  if (data.status === "Published" && min && max) {
+    statusText = `Försäljning pågår`;
+    text1 = daysLeftText;
+    text2 = valuationText;
+    document.getElementById('itemCurrentPrice').innerText = data.platformListings?.maiShop?.currentPrice;
+    document.getElementById('itemCurrentPriceDiv').style.display = 'flex';
+  }
+  if (data.status === "Sold") {
+    statusText = `Såld!`;
+    itemStatusText.style.fontSize = "18px";
+    itemStatusText.style.fontWeight = "500";
+    text1 = data.payoutStatus === "Payed" ? "" : "Utbetalning kommer via Swish inom en dag";
+    if (data.shippingStatus === "Not sent") {
+      text1 = "Utbetalning sker när du skickat plagget"
+      toShipItemLink.href = window.location.origin + `/ship-item?id=${itemId}`;
+      toShipItemLink.style.display = "flex";
+    }
+    sellerGetsTitle.innerHTML = data.payoutStatus === "Payed" ? "Du fick" : "Du får";
+    sellerGetsText.innerHTML = `${(data.sellerGets)} kr`
+    sellerGetsDiv.style.display = "flex";
+  }
 
-            itemBrandText.innerHTML = brand;
-            itemCategoryText.innerHTML = category;
-            pageTitleDiv.style.display = "flex";
-            coverImageDiv.style.backgroundImage = `url('${imgUrl}')`;
-            itemStatusText.innerHTML = statusText;
-            itemText1.innerHTML = text1;
-            itemText2.innerHTML = text2;
+  itemBrandText.innerHTML = data.brand;
+  itemCategoryText.innerHTML = category;
+  pageTitleDiv.style.display = "flex";
+  coverImageDiv.style.backgroundImage = `url('${(itemCoverImage(data))}')`;
+  itemStatusText.innerHTML = statusText;
+  itemText1.innerHTML = text1;
+  itemText2.innerHTML = text2;
 
-            itemDiv.style.display = "block";
-            loadingDiv.style.display = "none";
-        }
-    }).catch((e) => {
-        console.log("Error getting item document:", e);
-        errorHandler.report(e);
-    });
+  itemDiv.style.display = "block";
+  loadingDiv.style.display = "none";
+  document.getElementById('')
 }
 
 async function loadItemEvents(itemId) {
@@ -97,7 +83,7 @@ async function loadItemEvents(itemId) {
     });
     const events = await response.json();
     console.log(events);
-    itemAddedEventExists = false;
+    let itemAddedEventExists = false;
 
     if (events) {
         for (let i = 0; i < events.length; i++) {
