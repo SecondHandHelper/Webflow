@@ -53,7 +53,7 @@ setTimeout(() => {
       user.current = JSON.parse(localStorage.getItem('sessionUser'));
     }
   }
-}, 1000);
+}, 3000);
 
 
 function userIsSellingNewItem() {
