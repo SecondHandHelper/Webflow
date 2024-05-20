@@ -1,6 +1,6 @@
 import QRCode from "qrcode";
 
-const WS_SERVER = 'wss://lwl-to-mai-22-heypmjzjfq-ey.a.run.app';
+const WS_SERVER = 'wss://lwl-to-mai-22-heypmjzjfq-lz.a.run.app';
 const params = getParamsObject();
 
 if (params.createDrafts === 'true') {
