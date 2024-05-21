@@ -44,8 +44,11 @@ async function loadItem(itemId) {
     statusText = `Försäljning pågår`;
     text1 = daysLeftText;
     text2 = valuationText;
-    document.getElementById('itemCurrentPrice').innerText = data.platformListings?.maiShop?.currentPrice;
-    document.getElementById('itemCurrentPriceDiv').style.display = 'flex';
+    const currentPrice = data.platformListings?.maiShop?.currentPrice;
+    if (currentPrice) {
+      document.getElementById('itemCurrentPrice').innerText = currentPrice;
+      document.getElementById('itemCurrentPriceDiv').style.display = 'flex';
+    }
   }
   if (data.status === "Sold") {
     statusText = `Såld!`;
@@ -72,7 +75,6 @@ async function loadItem(itemId) {
 
   itemDiv.style.display = "block";
   loadingDiv.style.display = "none";
-  document.getElementById('')
 }
 
 async function loadItemEvents(itemId) {
