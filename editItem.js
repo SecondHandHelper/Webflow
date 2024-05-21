@@ -7,22 +7,42 @@ function isNumeric(str) {
     !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
 }
 
-function validateInput() {
-  const initialCurrentPrice = Number(document.getElementById('currentPrice').dataset.currentPrice);
-  if (initialCurrentPrice > 0) {
-    if (!isNumeric(currentPrice.value) || Number(currentPrice.value) > initialCurrentPrice) {
-      document.getElementById('currentPrice').setCustomValidity('Ange ett prise mindre än det nuvarande priset');
-      document.getElementById('wf-form-Add-Item').reportValidity();
-      return false;
+async function validateInput() {
+  new Promise((resolve, reject) => {
+    const initialCurrentPrice = Number(document.getElementById('currentPrice').dataset.currentPrice);
+    if (initialCurrentPrice > 0) {
+      if (!isNumeric(currentPrice.value) || Number(currentPrice.value) > initialCurrentPrice) {
+        document.getElementById('currentPrice').setCustomValidity('Ange ett prise mindre än det nuvarande priset');
+        document.getElementById('wf-form-Add-Item').reportValidity();
+        resolve(false);
+      }
+      const lowestPrice = Number(document.getElementById('lowestPrice').dataset.lowestPrice);
+      const startPrice = Number(document.getElementById('startPrice').dataset.startPrice);
+      if (Number(currentPrice.value) < lowestPrice) {
+        document.getElementById('lowPriceInfoBox').style.display = 'block';
+        document.getElementById('darkOverlay').style.display = 'block';
+        document.getElementById('lowerPriceConfirm').innerText = `Priset går under intervallet på ${lowestPrice}-${startPrice} kr. Vill du sänka priset ändå?`
+        document.getElementById('confirmLowerPrice').innerText = `Ja, sänk priset till ${currentPrice.value} kr`;
+        document.getElementById('confirmLowerPrice').addEventListener('click', () => {
+          document.getElementById('lowPriceInfoBox').style.display = 'none';
+          document.getElementById('darkOverlay').style.display = 'none';
+          resolve(true);
+        });
+        document.getElementById('closePricingInfoBox').addEventListener('click', () => {
+          document.getElementById('lowPriceInfoBox').style.display = 'none';
+          document.getElementById('darkOverlay').style.display = 'none';
+          resolve(false);
+        });
+      }
     }
-  }
-  return true;
+    resolve(true);
+  })
 }
 
 async function updateItem(itemId, changedImages) {
   console.log("updateItem()");
   $('.goback').data('disabled', true);
-  if (!validateInput()) {
+  if (!(await validateInput())) {
     return;
   }
   const now = new Date();
@@ -36,7 +56,7 @@ async function updateItem(itemId, changedImages) {
   const defectDescription = itemDefectDescription.value;
   const userComment = itemUserComment.value;
   const initialCurrentPrice = Number(document.getElementById('currentPrice').dataset.currentPrice);
-  const lowestPrice = document.getElementById('lowestPrice').innerText
+  const lowestPrice = Number(document.getElementById('lowestPrice').dataset.lowestPrice);
   let changes = {
     updatedAt: now,
     size: size,
@@ -165,7 +185,9 @@ async function fillForm(itemId) {
     });
     if (data.publishedDate) {
       document.getElementById('lowestPrice').innerText = `${data.minPriceEstimate} kr`;
+      document.getElementById('lowestPrice').dataset.lowestPrice = `${data.minPriceEstimate}`;
       document.getElementById('startPrice').innerText = `${data.maxPriceEstimate} kr`;
+      document.getElementById('startPrice').dataset.startPrice = `${data.maxPriceEstimate} kr`;
       const publishedDate = new Date(data.publishedDate);
       const nowDate = new Date();
       const timeDifference = nowDate.getTime() - publishedDate.getTime();
@@ -257,7 +279,7 @@ async function fillForm(itemId) {
       }
     }
 
-    // Populate checkboxes and readio-buttons is harder to do with Webflow, so not allowing users to change defects right now
+    // Populate checkboxes and radio-buttons is harder to do with Webflow, so not allowing users to change defects right now
 
     // If "info request" for images exist, show the directions
     if (infoRequests?.images?.status === "Active" && infoRequests?.images?.description) {
