@@ -12,7 +12,7 @@ async function validateInput() {
     const initialCurrentPrice = Number(document.getElementById('currentPrice').dataset.currentPrice);
     if (initialCurrentPrice > 0) {
       if (!isNumeric(currentPrice.value) || Number(currentPrice.value) > initialCurrentPrice) {
-        document.getElementById('currentPrice').setCustomValidity('Ange ett prise mindre än det nuvarande priset');
+        document.getElementById('currentPrice').setCustomValidity(`Ange ett pris som är lägre än det nuvarande priset på ${initialCurrentPrice}`);
         document.getElementById('wf-form-Add-Item').reportValidity();
         resolve(false);
       }
