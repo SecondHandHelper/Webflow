@@ -51,6 +51,7 @@ async function updateItem(itemId, changedImages) {
   $('.goback').data('disabled', true);
   if (!(await validateInput())) {
     showSaveButton();
+    $('.goback').data('disabled', false);
     return;
   }
   const now = new Date();
