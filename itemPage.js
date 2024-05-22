@@ -44,9 +44,8 @@ async function loadItem(itemId) {
     statusText = `Försäljning pågår`;
     text1 = daysLeftText;
     text2 = valuationText;
-    const currentPrice = data.platformListings?.maiShop?.currentPrice;
-    if (currentPrice) {
-      document.getElementById('itemCurrentPrice').innerText = currentPrice;
+    if (data.currentPrice) {
+      document.getElementById('itemCurrentPrice').innerText = data.currentPrice;
       document.getElementById('itemCurrentPriceDiv').style.display = 'flex';
     }
   }
@@ -208,10 +207,15 @@ function getEventComponent(event, style) {
     return false;
 }
 
-editItemLink.addEventListener('click', function () {
+function toEditItem () {
   const params = getParamsObject();
   location.href = `/edit-item?id=${params.id}`;
-});
+}
+
+editItemLink.addEventListener('click', toEditItem);
+coverImageDiv.addEventListener('click', toEditItem);
+itemText2.addEventListener('click', toEditItem);
+itemCurrentPrice.addEventListener('click', toEditItem);
 
 // Load item
 const params = getParamsObject();

@@ -8,13 +8,18 @@ function isNumeric(str) {
 }
 
 async function validateInput() {
-  new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const initialCurrentPrice = Number(document.getElementById('currentPrice').dataset.currentPrice);
     if (initialCurrentPrice > 0) {
       if (!isNumeric(currentPrice.value) || Number(currentPrice.value) > initialCurrentPrice) {
         document.getElementById('currentPrice').setCustomValidity(`Ange ett pris som är lägre än nuvarande pris på ${initialCurrentPrice} kr`);
         document.getElementById('wf-form-Add-Item').reportValidity();
-        resolve(false);
+        return resolve(false);
+      }
+      if (Number(currentPrice.value) <= 100) {
+        document.getElementById('currentPrice').setCustomValidity('Ange ett pris större än 100 kr');
+        document.getElementById('wf-form-Add-Item').reportValidity();
+        return resolve(false);
       }
       const lowestPrice = Number(document.getElementById('lowestPrice').dataset.lowestPrice);
       const startPrice = Number(document.getElementById('startPrice').dataset.startPrice);
@@ -145,6 +150,13 @@ async function updateItem(itemId, changedImages) {
 }
 
 function showSaveButton() {
+  if (!saveChangesButton.style.display || saveChangesButton.style.display === 'none') {
+    if (window.scrollY >= 50) {
+      document.getElementById('header').classList.add('header-sticky-animated');
+    } else {
+      document.getElementById('header').style.position = 'sticky';
+    }
+  }
   saveChangesButton.style.display = 'block'
   savedCheckIcon.style.display = 'none'
   saveLoadingSpinner.style.display = 'none'
@@ -195,7 +207,7 @@ async function fillForm(itemId) {
       const sellingPeriodLength = data.longerPeriodAcceptedDate ? 60 : 30;
       const daysLeft = Math.max(0, Math.round(sellingPeriodLength - daysDifference));
       document.getElementById('daysLeft').innerText = `${daysLeft} ${daysLeft === 1 ? 'dag' : 'dagar'} kvar`;
-      const currentPrice = Math.min(data.userSetCurrentPrice || data.platformListings?.maiShop?.currentPrice, data.platformListings?.maiShop?.currentPrice);
+      const currentPrice = Math.min(data.userSetCurrentPrice || data.currentPrice, data.currentPrice);
       document.getElementById('currentPrice').value = currentPrice;
       document.getElementById('currentPrice').dataset.currentPrice = `${currentPrice}`;
       document.getElementById('currentPriceDiv').style.display = 'flex';
@@ -332,7 +344,8 @@ function setUpEventListeners() {
     }
   });
 
-  let elementsArray = document.querySelectorAll("input");
+  let elementsArray = [...document.querySelectorAll("input").values(),
+    ...document.querySelectorAll("textarea").values(), ...document.querySelectorAll("select").values()];
   elementsArray.forEach(function (elem) {
     elem.addEventListener("input", function () {
       showSaveButton();
