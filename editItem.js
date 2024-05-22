@@ -50,6 +50,7 @@ async function updateItem(itemId, changedImages) {
   console.log("updateItem()");
   $('.goback').data('disabled', true);
   if (!(await validateInput())) {
+    showSaveButton();
     return;
   }
   const now = new Date();
@@ -158,6 +159,7 @@ function showSaveButton() {
     } else {
       document.getElementById('header').style.position = 'sticky';
     }
+    document.getElementById('header').style.zIndex = '2';
   }
   saveChangesButton.style.display = 'block'
   savedCheckIcon.style.display = 'none'
@@ -349,8 +351,9 @@ function setUpEventListeners() {
   let elementsArray = [...document.querySelectorAll("input").values(),
     ...document.querySelectorAll("textarea").values(), ...document.querySelectorAll("select").values()];
   elementsArray.forEach(function (elem) {
-    elem.addEventListener("input", function () {
+    elem.addEventListener("input", function (event) {
       showSaveButton();
+      event.currentTarget.setCustomValidity('');
       if (elem.id.includes("Image")) {
         changedImages.push(elem.id);
       }
