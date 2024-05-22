@@ -14,11 +14,13 @@ async function validateInput() {
       if (!isNumeric(currentPrice.value) || Number(currentPrice.value) > initialCurrentPrice) {
         document.getElementById('currentPrice').setCustomValidity(`Ange ett pris som är lägre än nuvarande pris på ${initialCurrentPrice} kr`);
         document.getElementById('wf-form-Add-Item').reportValidity();
+        showSaveButton();
         return resolve(false);
       }
       if (Number(currentPrice.value) <= 100) {
-        document.getElementById('currentPrice').setCustomValidity('Ange ett pris större än 100 kr');
+        document.getElementById('currentPrice').setCustomValidity('Priset måste vara minst 100 kr');
         document.getElementById('wf-form-Add-Item').reportValidity();
+        showSaveButton();
         return resolve(false);
       }
       const lowestPrice = Number(document.getElementById('lowestPrice').dataset.lowestPrice);
