@@ -62,6 +62,7 @@ async function loadItem(itemId) {
     sellerGetsTitle.innerHTML = data.payoutStatus === "Payed" ? "Du fick" : "Du får";
     sellerGetsText.innerHTML = `${(data.sellerGets)} kr`
     sellerGetsDiv.style.display = "flex";
+    editItemLink.style.display = 'none';
   }
 
   itemBrandText.innerHTML = data.brand;

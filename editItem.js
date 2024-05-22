@@ -200,7 +200,7 @@ async function fillForm(itemId) {
         itemDetailsCollapsed.innerText = 'Dölj';
       }
     });
-    if (data.publishedDate) {
+    if (data.publishedDate && data.status === 'Published') {
       document.getElementById('lowestPrice').innerText = `${data.minPriceEstimate} kr`;
       document.getElementById('lowestPrice').dataset.lowestPrice = `${data.minPriceEstimate}`;
       document.getElementById('startPrice').innerText = `${data.maxPriceEstimate} kr`;
