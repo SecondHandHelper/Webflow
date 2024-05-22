@@ -17,7 +17,7 @@ async function validateInput() {
         showSaveButton();
         return resolve(false);
       }
-      if (Number(currentPrice.value) <= 100) {
+      if (Number(currentPrice.value) < 100) {
         document.getElementById('currentPrice').setCustomValidity('Priset måste vara minst 100 kr');
         document.getElementById('wf-form-Add-Item').reportValidity();
         showSaveButton();
