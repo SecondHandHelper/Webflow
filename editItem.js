@@ -12,7 +12,7 @@ async function validateInput() {
     const initialCurrentPrice = Number(document.getElementById('currentPrice').dataset.currentPrice);
     if (initialCurrentPrice > 0) {
       if (!isNumeric(currentPrice.value) || Number(currentPrice.value) > initialCurrentPrice) {
-        document.getElementById('currentPrice').setCustomValidity(`Ange ett pris som är lägre än det nuvarande priset på ${initialCurrentPrice}`);
+        document.getElementById('currentPrice').setCustomValidity(`Ange ett pris som är lägre än nuvarande pris på ${initialCurrentPrice} kr`);
         document.getElementById('wf-form-Add-Item').reportValidity();
         resolve(false);
       }
@@ -145,7 +145,7 @@ async function updateItem(itemId, changedImages) {
 }
 
 function showSaveButton() {
-  saveChangesButton.style.display = 'flex'
+  saveChangesButton.style.display = 'block'
   savedCheckIcon.style.display = 'none'
   saveLoadingSpinner.style.display = 'none'
 }
@@ -187,7 +187,7 @@ async function fillForm(itemId) {
       document.getElementById('lowestPrice').innerText = `${data.minPriceEstimate} kr`;
       document.getElementById('lowestPrice').dataset.lowestPrice = `${data.minPriceEstimate}`;
       document.getElementById('startPrice').innerText = `${data.maxPriceEstimate} kr`;
-      document.getElementById('startPrice').dataset.startPrice = `${data.maxPriceEstimate} kr`;
+      document.getElementById('startPrice').dataset.startPrice = `${data.maxPriceEstimate}`;
       const publishedDate = new Date(data.publishedDate);
       const nowDate = new Date();
       const timeDifference = nowDate.getTime() - publishedDate.getTime();
@@ -366,6 +366,12 @@ function setUpEventListeners() {
   };
 
   saveChangesButton.addEventListener('click', saveChanges);
+  currentPrice.addEventListener('focus', () => {
+    lowerPriceButton.style.display = 'none';
+  });
+  currentPrice.addEventListener('blur', () => {
+    lowerPriceButton.style.display = 'block';
+  });
 }
 
 let changedImages = [];
