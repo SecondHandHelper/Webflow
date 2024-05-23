@@ -99,7 +99,7 @@ async function updateItem(itemId, changedImages) {
     defectDescription: defectDescription,
     userComment: userComment,
     ...(userSetCurrentPrice >= 100 && userSetCurrentPrice !== initialCurrentPrice ? { userSetCurrentPrice } : {}),
-    ...(initialCurrentPrice > 0 && userSetCurrentPrice !== 0 && userSetCurrentPrice < lowestPrice  ? { minPriceEstimate: userSetCurrentPrice } : {}),
+    ...(userSetCurrentPrice >= 100 && userSetCurrentPrice < lowestPrice ? { minPriceEstimate: userSetCurrentPrice } : {}),
   }
 
   async function uploadImages(itemId) {
