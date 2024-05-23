@@ -9,9 +9,22 @@ function isNumeric(str) {
 
 async function validateInput() {
   return new Promise((resolve, reject) => {
+    document.getElementById('wf-form-Add-Item').reportValidity();
+    const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
+    const element = invalidElements?.[0];
+    if (element && element.getBoundingClientRect().height <= 1) {
+      element.style.cssText = 'width:100% !important;height:100% !important;'
+      setTimeout(() => {
+        if (!isElementInView(element)) {
+          const y = element.getBoundingClientRect().top + window.scrollY - 40;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+        document.getElementById('wf-form-Add-Item').reportValidity();
+      }, 300);
+    }
     const initialCurrentPrice = Number(document.getElementById('currentPrice').dataset.currentPrice);
-    if (initialCurrentPrice <= 0) {
-      return resolve(false);
+    if (isNaN(initialCurrentPrice) || initialCurrentPrice <= 0) {
+      return resolve(true);
     }
     if (!isNumeric(currentPrice.value) || Number(currentPrice.value) > initialCurrentPrice) {
       document.getElementById('currentPrice').setCustomValidity(`Ange ett pris som är lägre än nuvarande pris på ${initialCurrentPrice} kr`);
@@ -68,6 +81,7 @@ async function updateItem(itemId, changedImages) {
   const userComment = itemUserComment.value;
   const initialCurrentPrice = Number(document.getElementById('currentPrice').dataset.currentPrice);
   const lowestPrice = Number(document.getElementById('lowestPrice').dataset.lowestPrice);
+  const userSetCurrentPrice = Number(currentPrice.value);
   let changes = {
     updatedAt: now,
     size: size,
@@ -79,8 +93,8 @@ async function updateItem(itemId, changedImages) {
     condition: condition,
     defectDescription: defectDescription,
     userComment: userComment,
-    userSetCurrentPrice: Number(currentPrice.value),
-    ...(initialCurrentPrice > 0 && Number(currentPrice.value) < lowestPrice  ? { minPriceEstimate: Number(currentPrice.value) } : {}),
+    ...(userSetCurrentPrice >= 100 ? { userSetCurrentPrice } : {}),
+    ...(initialCurrentPrice > 0 && userSetCurrentPrice !== 0 && userSetCurrentPrice < lowestPrice  ? { minPriceEstimate: userSetCurrentPrice } : {}),
   }
 
   async function uploadImages(itemId) {
@@ -104,7 +118,7 @@ async function updateItem(itemId, changedImages) {
       await Promise.all(Array.from(images).map(async ([imageName, value]) => {
         console.log(`${imageName}: ${value}`);
         // If images was changed, set photo directions to default, since an 'info request' of images could have been shown
-        photoDirectionsText.style.display = 'block';
+        infoRequestImagesText.style.display = 'block';
         infoRequestImagesDiv.style.display = 'none';
         const {url: imageUrl} = await uploadTempImage(value, imageName);
         await firebase.app().functions("europe-west1").httpsCallable('saveItemImage')({
@@ -296,7 +310,7 @@ async function fillForm(itemId) {
 
     // If "info request" for images exist, show the directions
     if (infoRequests?.images?.status === "Active" && infoRequests?.images?.description) {
-      photoDirectionsText.style.display = 'none';
+      infoRequestImagesText.style.display = 'none';
       infoRequestImagesText.innerHTML = infoRequests.images.description;
       infoRequestImagesDiv.style.display = 'flex';
     }
@@ -331,6 +345,7 @@ function setUpEventListeners() {
         let src = URL.createObjectURL(input);
         elemPreviewUploading.style.backgroundImage = `url('${src}')`;
         elemPreview.style.backgroundImage = `url('${src}')`;
+        document.getElementById(id).required = false;
       }
     });
   });
