@@ -12,15 +12,20 @@ async function validateInput() {
     document.getElementById('wf-form-Add-Item').reportValidity();
     const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
     const element = invalidElements?.[0];
-    if (element && element.getBoundingClientRect().height <= 1) {
+    if (element) {
       element.style.cssText = 'width:100% !important;height:100% !important;'
-      setTimeout(() => {
-        if (!isElementInView(element)) {
-          const y = element.getBoundingClientRect().top + window.scrollY - 40;
-          window.scrollTo({ top: y, behavior: 'smooth' });
-        }
+      if (element.getBoundingClientRect().height <= 1) {
+        setTimeout(() => {
+          if (!isElementInView(element)) {
+            const y = element.getBoundingClientRect().top + window.scrollY - 40;
+            window.scrollTo({top: y, behavior: 'smooth'});
+          }
+          document.getElementById('wf-form-Add-Item').reportValidity();
+        }, 300);
+      } else {
         document.getElementById('wf-form-Add-Item').reportValidity();
-      }, 300);
+      }
+      return resolve(false);
     }
     const initialCurrentPrice = Number(document.getElementById('currentPrice').dataset.currentPrice);
     if (isNaN(initialCurrentPrice) || initialCurrentPrice <= 0) {
