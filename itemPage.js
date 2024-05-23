@@ -39,6 +39,7 @@ async function loadItem(itemId) {
       statusText = `Värdering pågår`;
       text1 = "Du får ett SMS när värderingen är klar.<br>Värderingen tar normalt 2 vardagar.";
     }
+    editItemLink.style.display = 'block';
   }
   if (data.status === "Published" && min && max) {
     statusText = `Försäljning pågår`;
@@ -48,6 +49,7 @@ async function loadItem(itemId) {
       document.getElementById('itemCurrentPrice').innerText = data.currentPrice;
       document.getElementById('itemCurrentPriceDiv').style.display = 'flex';
     }
+    editItemLink.style.display = 'block';
   }
   if (data.status === "Sold") {
     statusText = `Såld!`;
@@ -62,7 +64,6 @@ async function loadItem(itemId) {
     sellerGetsTitle.innerHTML = data.payoutStatus === "Payed" ? "Du fick" : "Du får";
     sellerGetsText.innerHTML = `${(data.sellerGets)} kr`
     sellerGetsDiv.style.display = "flex";
-    editItemLink.style.display = 'none';
   }
 
   itemBrandText.innerHTML = data.brand;
