@@ -33,6 +33,7 @@ async function validateInput() {
         document.getElementById('confirmLowerPrice').addEventListener('click', () => {
           document.getElementById('lowPriceInfoBox').style.display = 'none';
           document.getElementById('darkOverlay').style.display = 'none';
+          document.getElementById('lowestPrice').innerText = currentPrice.value;
           resolve(true);
         });
         document.getElementById('closePricingInfoBox').addEventListener('click', () => {
