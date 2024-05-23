@@ -98,7 +98,7 @@ async function updateItem(itemId, changedImages) {
     condition: condition,
     defectDescription: defectDescription,
     userComment: userComment,
-    ...(userSetCurrentPrice >= 100 ? { userSetCurrentPrice } : {}),
+    ...(userSetCurrentPrice >= 100 && userSetCurrentPrice !== initialCurrentPrice ? { userSetCurrentPrice } : {}),
     ...(initialCurrentPrice > 0 && userSetCurrentPrice !== 0 && userSetCurrentPrice < lowestPrice  ? { minPriceEstimate: userSetCurrentPrice } : {}),
   }
 
