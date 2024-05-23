@@ -1,4 +1,4 @@
-import {enhanceFrontImage, uploadImageAndShowPreview, uploadTempImage} from "./sellItemHelpers";
+import {enhanceFrontImage, showImageState, uploadImageAndShowPreview, uploadTempImage} from "./sellItemHelpers";
 import {autocomplete, brands} from "./autocomplete-brands";
 
 function isNumeric(str) {
@@ -10,40 +10,41 @@ function isNumeric(str) {
 async function validateInput() {
   return new Promise((resolve, reject) => {
     const initialCurrentPrice = Number(document.getElementById('currentPrice').dataset.currentPrice);
-    if (initialCurrentPrice > 0) {
-      if (!isNumeric(currentPrice.value) || Number(currentPrice.value) > initialCurrentPrice) {
-        document.getElementById('currentPrice').setCustomValidity(`Ange ett pris som är lägre än nuvarande pris på ${initialCurrentPrice} kr`);
-        document.getElementById('wf-form-Add-Item').reportValidity();
-        showSaveButton();
-        return resolve(false);
-      }
-      if (Number(currentPrice.value) < 100) {
-        document.getElementById('currentPrice').setCustomValidity('Priset måste vara minst 100 kr');
-        document.getElementById('wf-form-Add-Item').reportValidity();
-        showSaveButton();
-        return resolve(false);
-      }
-      const lowestPrice = Number(document.getElementById('lowestPrice').dataset.lowestPrice);
-      const startPrice = Number(document.getElementById('startPrice').dataset.startPrice);
-      if (Number(currentPrice.value) < lowestPrice) {
-        document.getElementById('lowPriceInfoBox').style.display = 'block';
-        document.getElementById('darkOverlay').style.display = 'block';
-        document.getElementById('lowerPriceConfirm').innerText = `Priset går under intervallet på ${lowestPrice}-${startPrice} kr. Vill du sänka priset ändå?`
-        document.getElementById('confirmLowerPrice').innerText = `Ja, sänk priset till ${currentPrice.value} kr`;
-        document.getElementById('confirmLowerPrice').addEventListener('click', () => {
-          document.getElementById('lowPriceInfoBox').style.display = 'none';
-          document.getElementById('darkOverlay').style.display = 'none';
-          document.getElementById('lowestPrice').innerText = currentPrice.value;
-          resolve(true);
-        });
-        document.getElementById('closePricingInfoBox').addEventListener('click', () => {
-          document.getElementById('lowPriceInfoBox').style.display = 'none';
-          document.getElementById('darkOverlay').style.display = 'none';
-          resolve(false);
-        });
-      }
+    if (initialCurrentPrice <= 0) {
+      return resolve(false);
     }
-    resolve(true);
+    if (!isNumeric(currentPrice.value) || Number(currentPrice.value) > initialCurrentPrice) {
+      document.getElementById('currentPrice').setCustomValidity(`Ange ett pris som är lägre än nuvarande pris på ${initialCurrentPrice} kr`);
+      document.getElementById('wf-form-Add-Item').reportValidity();
+      showSaveButton();
+      return resolve(false);
+    }
+    if (Number(currentPrice.value) < 100) {
+      document.getElementById('currentPrice').setCustomValidity('Priset måste vara minst 100 kr');
+      document.getElementById('wf-form-Add-Item').reportValidity();
+      showSaveButton();
+      return resolve(false);
+    }
+    const lowestPrice = Number(document.getElementById('lowestPrice').dataset.lowestPrice);
+    const startPrice = Number(document.getElementById('startPrice').dataset.startPrice);
+    if (Number(currentPrice.value) >= lowestPrice) {
+      return resolve(true);
+    }
+    document.getElementById('lowPriceInfoBox').style.display = 'block';
+    document.getElementById('darkOverlay').style.display = 'block';
+    document.getElementById('lowerPriceConfirm').innerText = `Priset går under intervallet på ${lowestPrice}-${startPrice} kr. Vill du sänka priset ändå?`
+    document.getElementById('confirmLowerPrice').innerText = `Ja, sänk priset till ${currentPrice.value} kr`;
+    document.getElementById('confirmLowerPrice').addEventListener('click', () => {
+      document.getElementById('lowPriceInfoBox').style.display = 'none';
+      document.getElementById('darkOverlay').style.display = 'none';
+      document.getElementById('lowestPrice').innerText = currentPrice.value;
+      resolve(true);
+    });
+    document.getElementById('closePricingInfoBox').addEventListener('click', () => {
+      document.getElementById('lowPriceInfoBox').style.display = 'none';
+      document.getElementById('darkOverlay').style.display = 'none';
+      resolve(false);
+    });
   })
 }
 
@@ -239,23 +240,17 @@ async function fillForm(itemId) {
     }
 
     // Populate images
-    function showImageAndHideSiblings(x, url) {
-      document.getElementById(`${x}Preview`).style.backgroundImage = `url('${url}')`;
-      const siblings = document.getElementById(x).parentNode.parentNode.childNodes;
-      for (let i = 0; i < siblings.length; i++) {
-        if (siblings[i].className.includes("success-state")) {
-          siblings[i].style.display = 'block';
-        } else {
-          siblings[i].style.display = 'none';
-        }
-      }
+    function showImageAndHideSiblings(imageName, url) {
+      document.getElementById(`${imageName}Preview`).style.backgroundImage = `url('${url}')`;
+      showImageState(imageName, 'success-state');
+      document.getElementById(imageName).required = false;
     }
 
-    for (const x in images) {
+    for (const imageName in images) {
       const possibleElmts = ["brandTagImage", "materialTagImage", "defectImage", "productImage", "extraImage"];
-      const url = images[`${x}Small`] || images[`${x}Medium`] || images[`${x}Large`] || images[x];
-      if (possibleElmts.includes(x)) {
-        showImageAndHideSiblings(x, url);
+      const url = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[`${imageName}Large`] || images[imageName];
+      if (possibleElmts.includes(imageName)) {
+        showImageAndHideSiblings(imageName, url);
       }
     }
     // Special case for frontImage where we want to show the enhancedFrontImage
@@ -364,10 +359,10 @@ function setUpEventListeners() {
 
   itemCondition.onchange = function () {
     let input = this.value;
-    if (input == "Använd, tecken på slitage") {
+    if (input === "Använd, tecken på slitage") {
       defectInfoDiv.style.display = 'block';
       itemCondition.style.color = "#333";
-    } else if (input == "") {
+    } else if (input === "") {
       defectInfoDiv.style.display = 'none';
       itemCondition.style.color = "#929292";
     } else {
@@ -391,6 +386,12 @@ function setUpEventListeners() {
   });
   currentPrice.addEventListener('blur', () => {
     lowerPriceButton.style.display = 'block';
+  });
+  document.getElementById("deleteFrontImageIcon").addEventListener('click', () => {
+    document.getElementById("frontImage").required = true;
+  });
+  document.getElementById("deleteBrandTagImageIcon").addEventListener('click', () => {
+    document.getElementById("brandTagImage").required = true;
   });
 }
 
