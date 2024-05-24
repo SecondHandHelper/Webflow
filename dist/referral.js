@@ -21,7 +21,7 @@ document.getElementById("invitedFriends").innerText=user.current.referralData.re
 // 1 plagg orsakar 10 kg CO2 (2-17), och köpa begagnat orsakar 10/200 kg = 0.02kg så i genomsnitt 10kg sparat/plagg
 document.getElementById("savedCo2").innerText=(10*t.soldItems/1e3).toLocaleString("sv"),topStatsDiv.style.visibility="visible",triggerShowReferralTopStats.click(),//INVITE STATS
 document.getElementById("invitesRegistered").innerText=t.users?.length,document.getElementById("invitesAddedItems").innerText=t.users?.filter(e=>"activated"===e.status||"sold"===e.status).length,document.getElementById("invitesSoldItems").innerText=t.users?.filter(e=>"sold"===e.status).length;let r=document.getElementById("invitedFriendRow"),n=document.getElementById("invitedFriendStatusesDiv");for(let[e,o]of(n.innerHTML="",t.users?.entries()||[])){let t=r.cloneNode(!0);t.id=`${t.id}_${e}`,t.firstChild.innerText=o.name,t.childNodes[1].innerText=({registered:"Skapat konto",activated:"Lagt upp plagg",sold:"S\xe5lt plagg"})[o.status],n.appendChild(t)}document.getElementById("referralDetails").style.display="block",callFirebaseFunction("europe-west1","referralStats").then(e=>{let t=e.data;document.getElementById("nextFreePill").style.display=t.freeSells>t.usedFreeSells?"block":"none",document.getElementById("freeSells").innerText=t.freeSells,document.getElementById("usedFreeSells").innerText=t.usedFreeSells,document.getElementById("availableFreeSells").innerText=`/${t.freeSells}`,freeSellsStats.style.visibility="visible",freeSellsStatsLoadingIcon.style.display="none";//To add: Show airtable data...
-})}}shareReferralLinkButton.addEventListener("click",o.shareCode),document.getElementById("referralCode").innerText="";let l=JSON.parse(localStorage.getItem("sessionUser")),u=l?.referralData?.referralCode;if(document.getElementById("referralCode").innerText=u||"",l?.referralData?.referredUsers?.length>0&&(document.getElementById("topStatsLoadingIcon").style.display="block"),/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))user.whenSet(s),l||(location.href="/sign-in");else{let e=document.getElementById("qrCanvas");e&&(0,a.default).toCanvas(e,window.location.href,function(e){e&&console.error(e),console.log("success!")})}},{"./general":"1tOWF",qrcode:"6s2CO","@parcel/transformer-js/src/esmodule-helpers.js":"bNgzC"}],"1tOWF":[function(e,t,r){var n=e("@parcel/transformer-js/src/esmodule-helpers.js");function o(){firebase.auth().signOut().then(()=>{console.log("User signed out"),authUser.current=null,user.current=null,userId=null,localStorage.removeItem("sessionUser"),deleteCookie("maiAuth"),location.href="/"}).catch(e=>{errorHandler.report(e),console.log(e)})}function i(e){document.getElementById("addressFirstName").value=e.addressFirstName||"",document.getElementById("addressFirstName").dispatchEvent(new Event("input")),document.getElementById("addressLastName").value=e.addressLastName||"",document.getElementById("addressLastName").dispatchEvent(new Event("input")),document.getElementById("addressStreetAddress").value=e.addressStreetAddress||"",document.getElementById("addressStreetAddress").dispatchEvent(new Event("input")),document.getElementById("addressCO").value=e.addressCO||"",document.getElementById("addressCO").dispatchEvent(new Event("input")),document.getElementById("addressPostalCode").value=e.addressPostalCode||"",document.getElementById("addressPostalCode").dispatchEvent(new Event("input")),document.getElementById("addressCity").value=e.addressCity||"",document.getElementById("addressCity").dispatchEvent(new Event("input")),document.getElementById("addressDoorCode").value=e.addressDoorCode||"",document.getElementById("addressDoorCode").dispatchEvent(new Event("input"))}function a(){let e=document.getElementById("addressFirstName").value,t=document.getElementById("addressLastName").value,r=document.getElementById("addressStreetAddress").value,n=document.getElementById("addressCO").value,o=document.getElementById("addressPostalCode").value,i=document.getElementById("addressCity").value,a=document.getElementById("addressDoorCode").value;return e=e?e.trim().charAt(0).toUpperCase()+e.trim().slice(1):"",t=t?t.trim().charAt(0).toUpperCase()+t.trim().slice(1):"",r=r?r.trim().charAt(0).toUpperCase()+r.trim().slice(1):"",n=n?n.trim():"",{addressFirstName:e,addressLastName:t,addressStreetAddress:r,addressCO:n,addressPostalCode:o=o?o.trim().replace(/\D/g,""):"",addressCity:i=i?i.trim().charAt(0).toUpperCase()+i.trim().slice(1):"",addressDoorCode:a=a?a.trim():""}}function s(e){// verify we got 10 digits, otherwise it is invalid
+})}}shareReferralLinkButton.addEventListener("click",o.shareCode),document.getElementById("referralCode").innerText="";let l=JSON.parse(localStorage.getItem("sessionUser")),u=l?.referralData?.referralCode;if(document.getElementById("referralCode").innerText=u||"",l?.referralData?.referredUsers?.length>0&&(document.getElementById("topStatsLoadingIcon").style.display="block"),/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))user.whenSet(s),l||(location.href="/sign-in");else{let e=document.getElementById("qrCanvas");e&&(0,a.default).toCanvas(e,window.location.href,function(e){e&&console.error(e),console.log("success!")})}},{"./general":"1tOWF",qrcode:"6s2CO","@parcel/transformer-js/src/esmodule-helpers.js":"bNgzC"}],"1tOWF":[function(e,t,r){var n=e("@parcel/transformer-js/src/esmodule-helpers.js");function o(){firebase.auth().signOut().then(()=>{console.log("User signed out"),authUser.current=null,user.current=null,userId=null,localStorage.removeItem("sessionUser"),localStorage.removeItem("idToken"),localStorage.removeItem("authUserId"),deleteCookie("maiAuth"),location.href="/"}).catch(e=>{errorHandler.report(e),console.log(e)})}function i(e){document.getElementById("addressFirstName").value=e.addressFirstName||"",document.getElementById("addressFirstName").dispatchEvent(new Event("input")),document.getElementById("addressLastName").value=e.addressLastName||"",document.getElementById("addressLastName").dispatchEvent(new Event("input")),document.getElementById("addressStreetAddress").value=e.addressStreetAddress||"",document.getElementById("addressStreetAddress").dispatchEvent(new Event("input")),document.getElementById("addressCO").value=e.addressCO||"",document.getElementById("addressCO").dispatchEvent(new Event("input")),document.getElementById("addressPostalCode").value=e.addressPostalCode||"",document.getElementById("addressPostalCode").dispatchEvent(new Event("input")),document.getElementById("addressCity").value=e.addressCity||"",document.getElementById("addressCity").dispatchEvent(new Event("input")),document.getElementById("addressDoorCode").value=e.addressDoorCode||"",document.getElementById("addressDoorCode").dispatchEvent(new Event("input"))}function a(){let e=document.getElementById("addressFirstName").value,t=document.getElementById("addressLastName").value,r=document.getElementById("addressStreetAddress").value,n=document.getElementById("addressCO").value,o=document.getElementById("addressPostalCode").value,i=document.getElementById("addressCity").value,a=document.getElementById("addressDoorCode").value;return e=e?e.trim().charAt(0).toUpperCase()+e.trim().slice(1):"",t=t?t.trim().charAt(0).toUpperCase()+t.trim().slice(1):"",r=r?r.trim().charAt(0).toUpperCase()+r.trim().slice(1):"",n=n?n.trim():"",{addressFirstName:e,addressLastName:t,addressStreetAddress:r,addressCO:n,addressPostalCode:o=o?o.trim().replace(/\D/g,""):"",addressCity:i=i?i.trim().charAt(0).toUpperCase()+i.trim().slice(1):"",addressDoorCode:a=a?a.trim():""}}function s(e){// verify we got 10 digits, otherwise it is invalid
 if(10!==(e=e.replace(/\D/g,"")// strip out all but digits
 .split("")// convert string to array
 .reverse()// reverse order for Luhn
@@ -34,13 +34,13 @@ n.export(r,"isValidSwedishSsn",()=>s),n.export(r,"formatPersonalId",()=>l),n.exp
 r.toString=s.bind(null,function(e,t,r){return a.render(e,r)})},{da1f68cc1fc16077:"2F9VO","8c6cf49ef2287430":"e9qY0","8a60cf7722cc14ce":"i1BDL",f6fcc816b915ba37:"8CcR1"}],"2F9VO":[function(e,t,r){// can-promise has a crash in some versions of react native that dont have
 // standard global objects
 // https://github.com/soldair/node-qrcode/issues/157
-t.exports=function(){return"function"==typeof Promise&&Promise.prototype&&Promise.prototype.then}},{}],e9qY0:[function(e,t,r){let n=e("4cf6a8173d9f3a2"),o=e("2ad62f61c352884c"),i=e("87d5a6270eb1dc26"),a=e("91abc94f777368cc"),s=e("9737c3939ab85d95"),l=e("cee3d371e219e45e"),u=e("8700c8c682afabf3"),d=e("65ad903a6ba3e"),c=e("1e8e447afb4d169c"),f=e("8a4a19af97836d80"),g=e("26720f9d94c9e268"),h=e("7b6429a248ecc51f"),p=e("1368d0fa14524351");/**
+t.exports=function(){return"function"==typeof Promise&&Promise.prototype&&Promise.prototype.then}},{}],e9qY0:[function(e,t,r){let n=e("4cf6a8173d9f3a2"),o=e("2ad62f61c352884c"),i=e("87d5a6270eb1dc26"),a=e("91abc94f777368cc"),s=e("9737c3939ab85d95"),l=e("cee3d371e219e45e"),u=e("8700c8c682afabf3"),d=e("65ad903a6ba3e"),c=e("1e8e447afb4d169c"),f=e("8a4a19af97836d80"),g=e("26720f9d94c9e268"),h=e("7b6429a248ecc51f"),m=e("1368d0fa14524351");/**
  * Add format info bits to matrix
  *
  * @param  {BitMatrix} matrix               Modules matrix
  * @param  {ErrorCorrectionLevel}    errorCorrectionLevel Error correction level
  * @param  {Number}    maskPattern          Mask pattern reference value
- */function m(e,t,r){let n,o;let i=e.size,a=g.getEncodedBits(t,r);for(n=0;n<15;n++)o=(a>>n&1)==1,n<6?e.set(n,8,o,!0):n<8?e.set(n+1,8,o,!0):e.set(i-15+n,8,o,!0),n<8?e.set(8,i-n-1,o,!0):n<9?e.set(8,15-n-1+1,o,!0):e.set(8,15-n-1,o,!0);// fixed module
+ */function p(e,t,r){let n,o;let i=e.size,a=g.getEncodedBits(t,r);for(n=0;n<15;n++)o=(a>>n&1)==1,n<6?e.set(n,8,o,!0):n<8?e.set(n+1,8,o,!0):e.set(i-15+n,8,o,!0),n<8?e.set(8,i-n-1,o,!0):n<9?e.set(8,15-n-1+1,o,!0):e.set(8,15-n-1,o,!0);// fixed module
 e.set(i-8,8,1,!0)}/**
  * QR Code
  *
@@ -58,10 +58,10 @@ y=o.from(t.errorCorrectionLevel,o.M),r=f.from(t.version),g=u.from(t.maskPattern)
  * @param  {ErrorCorretionLevel} errorCorrectionLevel Error level
  * @param  {MaskPattern} maskPattern     Mask pattern
  * @return {Object}                      Object containing symbol data
- */function(e,t,r,o){let g;if(Array.isArray(e))g=p.fromArray(e);else if("string"==typeof e){let n=t;if(!n){let t=p.rawSplit(e);// Estimate best version that can contain raw splitted segments
+ */function(e,t,r,o){let g;if(Array.isArray(e))g=m.fromArray(e);else if("string"==typeof e){let n=t;if(!n){let t=m.rawSplit(e);// Estimate best version that can contain raw splitted segments
 n=f.getBestVersionForData(t,r)}// Build optimized segments
 // If estimated version is undefined, try with the highest version
-g=p.fromString(e,n||40)}else throw Error("Invalid data");// Get the min version that can contain data
+g=m.fromString(e,n||40)}else throw Error("Invalid data");// Get the min version that can contain data
 let y=f.getBestVersionForData(g,r);// If no version is found, data cannot be stored
 if(!y)throw Error("The amount of data is too big to be stored in a QR Code");// If not specified, use min version as default
 if(t){if(t<y)throw Error("\nThe chosen QR Code version cannot contain this amount of data.\nMinimum version required to store current data is: "+y+".\n")}else t=y;let E=/**
@@ -99,8 +99,8 @@ let u=(l-o.getLengthInBits())/8;for(let e=0;e<u;e++)o.put(e%2?17:236,8);return(/
  * @param  {ErrorCorrectionLevel} errorCorrectionLevel Error correction level
  * @return {Uint8Array}                     Buffer containing encoded codewords
  */function(e,t,r){let o,i;// Total codewords for this QR code version (Data + Error correction)
-let a=n.getSymbolTotalCodewords(t),s=d.getTotalCodewordsCount(t,r),l=a-s,u=d.getBlocksCount(t,r),f=a%u,g=u-f,h=Math.floor(a/u),p=Math.floor(l/u),m=p+1,y=h-p,E=new c(y),b=0,v=Array(u),I=Array(u),C=0,B=new Uint8Array(e.buffer);// Divide the buffer into the required number of blocks
-for(let e=0;e<u;e++){let t=e<g?p:m;// extract a block of data from buffer
+let a=n.getSymbolTotalCodewords(t),s=d.getTotalCodewordsCount(t,r),l=a-s,u=d.getBlocksCount(t,r),f=a%u,g=u-f,h=Math.floor(a/u),m=Math.floor(l/u),p=m+1,y=h-m,E=new c(y),b=0,v=Array(u),I=Array(u),C=0,B=new Uint8Array(e.buffer);// Divide the buffer into the required number of blocks
+for(let e=0;e<u;e++){let t=e<g?m:p;// extract a block of data from buffer
 v[e]=B.slice(b,b+t),// Calculate EC codewords for this data block
 I[e]=E.encode(v[e]),b+=t,C=Math.max(C,t)}// Create final data
 // Interleave the data and error correction codewords from each block
@@ -153,7 +153,7 @@ for(o=0;o<y;o++)for(i=0;i<u;i++)w[A++]=I[i][o];return w}(o,e,t))}(t,r,g),b=n.get
 // This is needed to prevent these bits from being masked by {@link MaskPattern.applyMask}
 // since the masking operation must be performed only on the encoding region.
 // These blocks will be replaced with correct values later in code.
-m(v,r,0),t>=7&&/**
+p(v,r,0),t>=7&&/**
  * Add version info bits to matrix
  *
  * @param  {BitMatrix} matrix  Modules matrix
@@ -164,9 +164,9 @@ m(v,r,0),t>=7&&/**
  *
  * @param  {BitMatrix}  matrix Modules matrix
  * @param  {Uint8Array} data   Data codewords
- */function(e,t){let r=e.size,n=-1,o=r-1,i=7,a=0;for(let s=r-1;s>0;s-=2)for(6===s&&s--;;){for(let r=0;r<2;r++)if(!e.isReserved(o,s-r)){let n=!1;a<t.length&&(n=(t[a]>>>i&1)==1),e.set(o,s-r,n),-1==--i&&(a++,i=7)}if((o+=n)<0||r<=o){o-=n,n=-n;break}}}(v,E),isNaN(o)&&(o=u.getBestMask(v,m.bind(null,v,r))),// Apply mask pattern
+ */function(e,t){let r=e.size,n=-1,o=r-1,i=7,a=0;for(let s=r-1;s>0;s-=2)for(6===s&&s--;;){for(let r=0;r<2;r++)if(!e.isReserved(o,s-r)){let n=!1;a<t.length&&(n=(t[a]>>>i&1)==1),e.set(o,s-r,n),-1==--i&&(a++,i=7)}if((o+=n)<0||r<=o){o-=n,n=-n;break}}}(v,E),isNaN(o)&&(o=u.getBestMask(v,p.bind(null,v,r))),// Apply mask pattern
 u.applyMask(o,v),// Replace format info bits with correct values
-m(v,r,o),{modules:v,version:t,errorCorrectionLevel:r,maskPattern:o,segments:g})}(e,r,y,g)}},{"4cf6a8173d9f3a2":"2iHLf","2ad62f61c352884c":"kU8Fo","87d5a6270eb1dc26":"dvmjt","91abc94f777368cc":"4koKB","9737c3939ab85d95":"2m37T",cee3d371e219e45e:"9BWaM","8700c8c682afabf3":"2hy8U","65ad903a6ba3e":"ivpAq","1e8e447afb4d169c":"ixGQe","8a4a19af97836d80":"61NkN","26720f9d94c9e268":"4DCia","7b6429a248ecc51f":"2XDDf","1368d0fa14524351":"kBoY1"}],"2iHLf":[function(e,t,r){let n;let o=[0,26,44,70,100,134,172,196,242,292,346,404,466,532,581,655,733,815,901,991,1085,1156,1258,1364,1474,1588,1706,1828,1921,2051,2185,2323,2465,2611,2761,2876,3034,3196,3362,3532,3706];/**
+p(v,r,o),{modules:v,version:t,errorCorrectionLevel:r,maskPattern:o,segments:g})}(e,r,y,g)}},{"4cf6a8173d9f3a2":"2iHLf","2ad62f61c352884c":"kU8Fo","87d5a6270eb1dc26":"dvmjt","91abc94f777368cc":"4koKB","9737c3939ab85d95":"2m37T",cee3d371e219e45e:"9BWaM","8700c8c682afabf3":"2hy8U","65ad903a6ba3e":"ivpAq","1e8e447afb4d169c":"ixGQe","8a4a19af97836d80":"61NkN","26720f9d94c9e268":"4DCia","7b6429a248ecc51f":"2XDDf","1368d0fa14524351":"kBoY1"}],"2iHLf":[function(e,t,r){let n;let o=[0,26,44,70,100,134,172,196,242,292,346,404,466,532,581,655,733,815,901,991,1085,1156,1258,1364,1474,1588,1706,1828,1921,2051,2185,2323,2465,2611,2761,2876,3034,3196,3362,3532,3706];/**
  * Returns the QR Code size for the specified version
  *
  * @param  {Number} version QR Code version
@@ -551,7 +551,7 @@ return(r<<10|i)^21522}},{eeca831a42e85d6c:"2iHLf"}],kBoY1:[function(e,t,r){let n
  * @param  {String} data             Input data
  * @param  {Mode | String} modesHint Data mode
  * @return {Segment}                 Segment
- */function p(e,t){let r;let l=n.getBestModeForData(e);// Make sure data can be encoded
+ */function m(e,t){let r;let l=n.getBestModeForData(e);// Make sure data can be encoded
 if((r=n.from(t,l))!==n.BYTE&&r.bit<l.bit)throw Error('"'+e+'" cannot be encoded with mode '+n.toString(r)+".\n Suggested mode is: "+n.toString(l));switch(r!==n.KANJI||u.isKanjiModeEnabled()||(r=n.BYTE),r){case n.NUMERIC:return new o(e);case n.ALPHANUMERIC:return new i(e);case n.KANJI:return new s(e);case n.BYTE:return new a(e)}}/**
  * Builds a list of segments from an array.
  * Array can contain Strings or Objects with segment's info.
@@ -566,7 +566,7 @@ if((r=n.from(t,l))!==n.BYTE&&r.bit<l.bit)throw Error('"'+e+'" cannot be encoded 
  *
  * @param  {Array} array Array of objects with segments data
  * @return {Array}       Array of Segments
- */r.fromArray=function(e){return e.reduce(function(e,t){return"string"==typeof t?e.push(p(t,null)):t.data&&e.push(p(t.data,t.mode)),e},[])},/**
+ */r.fromArray=function(e){return e.reduce(function(e,t){return"string"==typeof t?e.push(m(t,null)):t.data&&e.push(m(t.data,t.mode)),e},[])},/**
  * Builds an optimized sequence of segments from a string,
  * which will produce the shortest possible bitstream.
  *

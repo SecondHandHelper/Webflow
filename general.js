@@ -5,6 +5,8 @@ export function signOut() {
         user.current = null;
         userId = null;
         localStorage.removeItem('sessionUser');
+        localStorage.removeItem('idToken');
+        localStorage.removeItem('authUserId');
         deleteCookie('maiAuth');
         location.href = '/';
     }).catch((error) => {

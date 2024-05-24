@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'test800';
+  const JS_VERSION = 'test801';
   var errorHandler = new StackdriverErrorReporter();
   const environment = location.href.includes('maiapp.se') ? 'web-prod' : 'web-test';
   errorHandler.start({
@@ -46,9 +46,11 @@
         return;
       }
       this.value = newVal;
-      this.callbacks.forEach((cb) => {
-        typeof cb === 'function' && cb(newVal)
-      });
+      if (newVal) {
+        this.callbacks.forEach((cb) => {
+          typeof cb === 'function' && cb(newVal)
+        });
+      }
       this.callbacks = [];
     },
     async whenSet(cb) {
@@ -68,6 +70,10 @@
     set current(newVal) {
       if (this.value && newVal && newVal.uid === this.value.uid) {
         console.log('Not setting authUser, it is already set');
+        return;
+      }
+      if (!newVal) {
+        this.value = null;
         return;
       }
       this.value = { uid: newVal.uid, email: newVal.email, phoneNumber: newVal.phoneNumber,
@@ -172,9 +178,9 @@
   }
 </script>
 
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test800/cookieManagement.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test800/signIn.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test800/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test801/cookieManagement.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test801/signIn.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test801/referralFunctions.js"></script>
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>
