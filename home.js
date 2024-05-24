@@ -1,7 +1,7 @@
-import {itemCoverImage} from "./general";
+import {callFirebaseFunction, itemCoverImage} from "./general";
 
 function loadRecentlySold() {
-  const recentlySoldItems = firebase.app().functions('europe-west1').httpsCallable('recentlySoldItems');
+  const recentlySoldItems = callFirebaseFunction('europe-west1', 'recentlySoldItems');
 
   recentlySoldItems()
     .then((result) => {
@@ -42,9 +42,7 @@ function loadRecentlySold() {
 
 async function fetchAndLoadRecentlyAddedItems() {
   try {
-    const response = await firebase.app().functions("europe-west1").httpsCallable(
-      'fetchMaiShopRecentlyAddedItems',
-    )()
+    const response = await callFirebaseFunction("europe-west1", 'fetchMaiShopRecentlyAddedItems')
     const itemList = document.getElementById('ItemListRecentlyAddedItems');
     const itemListDesktop = document.getElementById('ItemListRecentlyAddedItemsDesktop');
     itemList.innerHTML = "";

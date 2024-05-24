@@ -1,4 +1,5 @@
 import QRCode from "qrcode";
+import {callFirebaseFunction} from "./general";
 
 const WS_SERVER = 'wss://lwl-to-mai-22-heypmjzjfq-lz.a.run.app';
 const params = getParamsObject();
@@ -14,7 +15,7 @@ if (params.createDrafts === 'true') {
     const draftItems = JSON.parse(localStorage.getItem('lwlItemDrafts'));
     authUser.whenSet(async () => {
         await Promise.all(draftItems.map(item =>
-          firebase.app().functions("europe-west1").httpsCallable('createItem')({id: item.id, item})
+          callFirebaseFunction("europe-west1", 'createItem', {id: item.id, item})
         ));
         localStorage.removeItem('lwlItemDrafts');
         location.href = '/private#wardrobe';
@@ -95,10 +96,10 @@ document.getElementById('doneButton').addEventListener('click', () => {
         webSocket.close();
         return;
       }
-      const draftItemResponse = await firebase.app().functions("europe-west3").httpsCallable('createItemDraftsFromLwl', {timeout: 240 * 1000})({
+      const draftItemResponse = await callFirebaseFunction("europe-west3", 'createItemDraftsFromLwl', {
         itemData: message.data,
         url: lwlThreadUrl.value,
-      });
+      }, 240);
       if (authUser.current) {
         location.href = '/private#wardrobe';
       } else {
@@ -214,7 +215,6 @@ document.getElementById('openIntroButton').addEventListener('click', () => {
 document.getElementById('chatLink').addEventListener('click', () => {
   Intercom('showNewMessage', 'Klistra in en länk till LWL tråden du försökte läsa in?\n\n');
 })
-
 
 window.intercomSettings = {
   app_id: "klyy0le5"

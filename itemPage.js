@@ -1,7 +1,7 @@
-import {itemCoverImage} from "./general";
+import {callFirebaseFunction, itemCoverImage} from "./general";
 
 async function loadItem(itemId) {
-  const item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId})
+  const item = await callFirebaseFunction("europe-west1", 'getItem', {itemId})
   if (!item.data) {
     return;
   }

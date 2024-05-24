@@ -1,8 +1,8 @@
-import {getFormAddressFields, setFormAddressFields} from "./general";
+import {callFirebaseFunction, getFormAddressFields, setFormAddressFields} from "./general";
 
 var maxNumBags = 10;
 async function getMaxNumBags() {
-  const maxBags = await firebase.app().functions("europe-west1").httpsCallable('maxNumBags')();
+  const maxBags = await callFirebaseFunction("europe-west1", 'maxNumBags');
   if (maxBags?.data) {
     if (maxBags.data?.errorCode === 'unfulfilled-order') {
       document.getElementById('orderBagsError').style.display = 'block';
@@ -111,7 +111,7 @@ document.getElementById('orderBags').addEventListener('click', async function ()
   const numMediumBags = +document.getElementById('numMedium').value;
   const numLargeBags = +document.getElementById('numLarge').value;
   try {
-    await firebase.app().functions("europe-west1").httpsCallable('orderSellerBags')({ numLargeBags, numSmallBags, numMediumBags });
+    await callFirebaseFunction("europe-west1", 'orderSellerBags', { numLargeBags, numSmallBags, numMediumBags});
     document.getElementById('bagsOrdered').innerText = `${numOrdered()} ${bagOrBags()} på väg!`;
   } catch (e) {
     errorHandler.report(e);

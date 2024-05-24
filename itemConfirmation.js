@@ -1,3 +1,5 @@
+import {callFirebaseFunction} from "./general";
+
 function colorName(color) {
     const mapping = {
         Beige: 'Beige', Blue: 'Blå', Brown: 'Brun', Green: 'Grön', Grey: 'Grå', Yellow: 'Gul', Gold: 'Guld',
@@ -81,7 +83,7 @@ function itemConditionText(item) {
 
 
 const getItem = async (itemId) => {
-    const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: itemId });
+    const res = await callFirebaseFunction("europe-west1", 'getItem', { itemId: itemId });
     return { ...(res?.data || {}), id: itemId };
 }
 

@@ -10,6 +10,7 @@ firebase.auth().onAuthStateChanged(async (result) => {
     authUser.current = authenticated;
     console.log("authUser:", authUser.current);
     localStorage.setItem('authUserId', authenticated.uid);
+    localStorage.setItem('authUser', JSON.stringify(authUser.current));
     localStorage.setItem('idToken', idToken);
     try {
       setPreferredLogInMethodCookie(authenticated.providerData[0].providerId);
@@ -46,14 +47,13 @@ firebase.auth().onAuthStateChanged(async (result) => {
 firebase.auth().onIdTokenChanged(async (user) => {
   if (user) {
     const idToken = await user.getIdToken();
-    localStorage.setItem('authUserId', user.uid);
     localStorage.setItem('idToken', idToken);
   }
 });
 
-if (!authUser.current && localStorage.getItem('authUserId') && localStorage.getItem('idToken')) {
+if (!authUser.current && localStorage.getItem('authUser') && localStorage.getItem('idToken')) {
   authUser.idToken = localStorage.getItem('idToken');
-  authUser.current = localStorage.getItem('authUserId');
+  authUser.current = localStorage.getItem('authUser');
 }
 if (!user.current && localStorage.getItem('sessionUser')) {
   user.current = JSON.parse(localStorage.getItem('sessionUser'));

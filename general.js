@@ -14,26 +14,42 @@ export function signOut() {
 }
 
 // Function to call Firebase backend function
-async function callFirebaseFunction(region, functionName, data) {
+export async function callFirebaseFunction(region, functionName, data = {}, timeoutSec = 20) {
   const idToken = localStorage.getItem('idToken');
   if (!idToken) {
+    if (firebase.auth().currentUser) {
+      const idToken = await result.getIdToken();
+      authUser.idToken = idToken;
+      localStorage.setItem('idToken', idToken);
+      authUser.current = firebase.auth().currentUser;
+      localStorage.setItem('authUser', JSON.stringify(authUser.current));
+    }
     throw new Error('User not authenticated');
   }
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), timeoutSec*1000);
 
-  const response = await fetch(`https://<your-cloud-functions-url>/${functionName}`, {
+  const response = fetch(`https://${region}-second-hand-helper.cloudfunctions.net/${functionName}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${idToken}`
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
+    signal: controller.signal
   });
-
-  if (!response.ok) {
-    throw new Error('Failed to call backend function');
-  }
-
-  return await response.json();
+  response.finally(() => clearTimeout(timeout));
+  response.catch(e => {
+    console.error(e);
+    errorHandler.report(`Failure calling backend function ${JSON.stringify(e)}`)
+    throw e;
+  })
+  return await response.then(resp => {
+    if (!response.ok) {
+      throw new Error('Failed to call backend function');
+    }
+    return response.json();
+  })
 }
 
 export function setFormAddressFields(user) {

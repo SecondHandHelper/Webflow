@@ -106,7 +106,7 @@ function handleVerifyEmail(auth, actionCode, continueUrl, lang) {
 // [END auth_handle_verify_email]
 
 function sendEmailVerification(auth) {
-  auth.onAuthStateChanged((user) => {
+  authUser.whenSet((user) => {
     if (user) {
       emailVerificationText.innerHTML = `Klicka på länken i mailet vi skickat till ${user.email} för att verifiera din email.`;
     }

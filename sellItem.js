@@ -11,7 +11,7 @@ import {
   fieldLabelToggle
 } from "./sellItemHelpers";
 import QRCode from "qrcode";
-import { formatPersonalId, getFormAddressFields, isValidSwedishSsn } from "./general";
+import {callFirebaseFunction, formatPersonalId, getFormAddressFields, isValidSwedishSsn} from "./general";
 import { autocomplete, brands } from "./autocomplete-brands";
 import { setFieldValue, setupModelSearchEventListeners } from "./sellItemModelSearch";
 
@@ -108,7 +108,7 @@ async function sellItemMainAuthenticated() {
       await createItemAfterSignIn();
       const shippingMethod = sessionStorage.getItem('shippingMethod');
       if (shippingMethod) {
-        await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
+        await callFirebaseFunction("europe-west1", 'updateFirebaseUser', { preferences: { shippingMethod } });
       }
       const userPhoneSet = user.current?.phoneNumber?.length;
       return location.href = userPhoneSet ? '/item-confirmation' : '/user-contact';
@@ -221,7 +221,7 @@ async function sellItemMain() {
     // Fill form if the user comes from a prefill link (re-sell item or continue with draft item)
     sessionStorage.removeItem('newItemId');
     localStorage.removeItem('newItem');
-    auth.onAuthStateChanged(function (user) {
+    authUser.whenSet(function (user) {
       if (!user) { document.getElementById('maiIntro').style.display = 'block'; }
     });
     document.getElementById('resellIntro').style.display = 'block';
@@ -281,7 +281,7 @@ async function saveValuationInStorageOrBackend(valuationData, itemId) {
       item: { ...item.item, ...valuationData }
     }));
   } else {
-    await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
+    await callFirebaseFunction("europe-west1", 'saveItemValuationFields', { itemId, ...valuationData });
     const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
     localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData }));
   }
@@ -360,13 +360,13 @@ async function getAndSaveValuation(itemId, item) {
     return '/item-confirmation';
   }
   if (params.id && params.type !== 'draft') {
-    const getItemResponse = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: params.id });
+    const getItemResponse = await callFirebaseFunction("europe-west1", 'getItem', { itemId: params.id });
     const resellItem = getItemResponse.data;
     await setValuationFromResellItem(resellItem, item, itemId);
     return '/item-valuation';
   }
   try {
-    const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({ itemId, item });
+    const res = await callFirebaseFunction("europe-west1", 'itemMlValuation', { itemId, item });
     const { minPrice, maxPrice, decline } = res.data || {};
     await saveItemValuation(itemId, res.data);
     return nextStepAfterValuation(minPrice && maxPrice, decline, needsHumanCheck(res.data));
@@ -487,7 +487,7 @@ async function getShippingMethod() {
   let shippingMethod = 'Service point';
   if (!user.current?.preferences?.shippingMethod) {
     if (authUser.current) {
-      await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
+      await callFirebaseFunction("europe-west1", 'updateFirebaseUser', { preferences: { shippingMethod } });
     } else {
       sessionStorage.setItem('shippingMethod', shippingMethod);
     }
@@ -511,7 +511,7 @@ async function addItemInner(id, status = 'New') {
   if (!authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
-    const createItemResponse = await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
+    const createItemResponse = await callFirebaseFunction("europe-west1", 'createItem', { id, item });
 
     await trackUserActivated();
     await setCampaignCoupon();
@@ -624,7 +624,7 @@ function isElementInView(el) {
 async function setCampaignCoupon() {
   const campaignDateOk = new Intl.DateTimeFormat('se-SV').format(new Date()) <= '2024-03-10';
   if (campaignDateOk && getCookie('noCommissionCampaignCookie') === 'noCommission' && (await userItemsCount()) === 1) {
-    await firebase.app().functions("europe-west1").httpsCallable('setNoCommissionCoupon')();
+    await callFirebaseFunction("europe-west1", 'setNoCommissionCoupon');
   }
 }
 
@@ -632,7 +632,7 @@ async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
   sessionStorage.removeItem('newItemId');
-  await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
+  await callFirebaseFunction("europe-west1", 'createItem', itemFromStorage);
   await trackUserActivated();
   await setCampaignCoupon()
   localStorage.removeItem('newItem');
@@ -717,7 +717,7 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
     let atItemResponse = null;
     if (!savedItem) {
       [item, atItemResponse] = await Promise.all([
-        firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId }),
+        callFirebaseFunction("europe-west1", 'getItem', { itemId }),
         fetch(`https://getatitem-heypmjzjfq-ew.a.run.app?itemId=${itemId}`)
       ]);
       itemDraft = item;
@@ -850,9 +850,7 @@ function selectFieldValue(field, value) {
 }
 
 async function checkAndDisplayShareSold(value) {
-  const response = await firebase.app().functions("europe-west1").httpsCallable(
-    'fetchBrandShareSoldInfo',
-  )({ cleanedBrandName: value });
+  const response = await callFirebaseFunction("europe-west1", 'fetchBrandShareSoldInfo', { cleanedBrandName: value });
 
   if (response.data && response.data.cleanedBrand) {
     console.log('data.shareSold', response.data.shareSold, 'data.cleanedBrand', response.data.cleanedBrand);
@@ -999,7 +997,7 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
       // Don't do anything if both brand and material already filled in
       return;
     }
-    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrandAndMaterialAndSize')({ imageUrl });
+    const response = await callFirebaseFunction("europe-west1", 'detectItemBrandAndMaterialAndSize', { imageUrl });
     if (!document.querySelector('#itemBrand').value.length && response.data?.brand) {
       document.querySelector('#itemBrand').value = response.data.brand;
       document.querySelector('#itemBrand').setCustomValidity('Bekräfta eller ändra märket');
@@ -1035,7 +1033,7 @@ async function detectAndFillColor(imageUrl) {
     return;
   }
   try {
-    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ imageUrl });
+    const response = await callFirebaseFunction("europe-west1", 'detectItemColor', { imageUrl });
     if (!response.data?.colors || !response.data.colors.length) {
       console.log("Unable to detect product color");
       return;

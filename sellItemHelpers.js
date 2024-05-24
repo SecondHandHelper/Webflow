@@ -1,3 +1,5 @@
+import {callFirebaseFunction} from "./general";
+
 export async function uploadTempImage(input, fileName) {
     if (!sessionStorage.getItem('newItemId')) {
         sessionStorage.setItem('newItemId', await  requestUniqueId());
@@ -95,7 +97,7 @@ export async function enhanceFrontImage(imageUrl, saveState = true) {
 
 async function createEnhancedImage(imageUrl) {
     try {
-        const response = await firebase.app().functions("europe-west1").httpsCallable('enhanceFrontImage')({ imageUrl });
+        const response = await callFirebaseFunction("europe-west1", 'enhanceFrontImage', { imageUrl });
         sessionStorage.setItem('enhancedFrontImage', response.data.url)
         return response.data;
     } catch (ex) {

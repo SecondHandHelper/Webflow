@@ -1,4 +1,4 @@
-import {shareCode} from "./general";
+import {callFirebaseFunction, shareCode} from "./general";
 import QRCode from "qrcode";
 
 async function main() {
@@ -9,7 +9,7 @@ async function main() {
   if (user.current?.referralData?.referredUsers?.length > 0) {
       //TOP STATS
       document.getElementById('invitedFriends').innerText = user.current.referralData.referredUsers.length;
-      const referredUserStatsResponse = await firebase.app().functions("europe-west1").httpsCallable('referredUserStats')();
+      const referredUserStatsResponse = await callFirebaseFunction("europe-west1", 'referredUserStats');
       const referredUserStats = referredUserStatsResponse.data;
       document.getElementById('soldItems').innerText = `${referredUserStats.soldItems}`;
       // https://supermiljobloggen.se/nyheter/secondhand-200-ganger-mindre-klimatskadligt-an-nyproducerat/
@@ -33,7 +33,7 @@ async function main() {
           invitedFriendStatusesDiv.appendChild(newRow);
       }
       document.getElementById('referralDetails').style.display = 'block';
-      firebase.app().functions("europe-west1").httpsCallable('referralStats')().then(referralStatsResponse => {
+      callFirebaseFunction('europe-west1', 'referralStats').then(referralStatsResponse => {
         const referralStats = referralStatsResponse.data;
         document.getElementById('nextFreePill').style.display = referralStats.freeSells > referralStats.usedFreeSells ? 'block' : 'none';
         document.getElementById('freeSells').innerText = referralStats.freeSells;

@@ -1,4 +1,4 @@
-import {formatPersonalId, isValidSwedishSsn} from "./general";
+import {callFirebaseFunction, formatPersonalId, isValidSwedishSsn} from "./general";
 
 const pageSetUp = async () => {
   const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'))?.item ||
@@ -23,7 +23,7 @@ const pageSetUp = async () => {
     personalId.setCustomValidity(personalIdError);
     if (document.getElementById('wf-form-User-Details').reportValidity()) {
       try {
-        await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')(
+        await callFirebaseFunction("europe-west1", 'updateFirebaseUser',
           { phoneNumber: formatPhoneNumber(phoneNumber.value), personalId: formatPersonalId(personalId.value) }
         );
       } catch (e) {

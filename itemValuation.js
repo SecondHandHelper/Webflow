@@ -1,3 +1,5 @@
+import {callFirebaseFunction} from "./general";
+
 window.itemValuationJsLoaded = true;
 async function showDeclineValuation(item) {
     document.getElementById('valuationHeading').style.display = 'none';
@@ -29,7 +31,7 @@ async function showDeclineValuation(item) {
         window.location.href = '/private';
     });
     if (item.id) {
-        await firebase.app().functions("europe-west1").httpsCallable('markItemRejected')({
+        await callFirebaseFunction("europe-west1", 'markItemRejected', {
             itemId: item.id, userDecline: false
         });
     }
@@ -170,7 +172,7 @@ async function saveValuationStatus(itemId, minPrice, maxPrice) {
         sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify(savedItem));
         return window.location.href = '/sign-in';
     } else {
-        await firebase.app().functions("europe-west1").httpsCallable('saveValuationStatus')({
+        await callFirebaseFunction("europe-west1", 'saveValuationStatus', {
             itemId, minPrice, maxPrice, adjustmentMin: adjustedMin, adjustmentMax: adjustedMax,
             userProposalMotivation: document.getElementById('userProposalMotivation').value,
             adjustmentRequiresReview: !adjustmentOk(minPrice, maxPrice)
@@ -220,7 +222,7 @@ const initialPageSetup = (item) => {
 
 const rejectValuation = async (item) => {
     if (item.id) {
-        await firebase.app().functions("europe-west1").httpsCallable('markItemRejected')({
+        await callFirebaseFunction("europe-west1", 'markItemRejected', {
             itemId: item.id, userDecline: true
         });
     }
@@ -437,7 +439,7 @@ const showAdjustValuation = async (item) => {
 }
 
 const getItem = async (itemId) => {
-    const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId })
+    const res = await callFirebaseFunction("europe-west1", 'getItem', { itemId })
     return { ...(res?.data || {}), id: itemId };
 }
 
