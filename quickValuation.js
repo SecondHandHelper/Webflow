@@ -1,6 +1,5 @@
 import {autocomplete, brands} from "./autocomplete-brands";
 import {fieldLabelToggle, initializeCategorySelect} from "./sellItemHelpers";
-import {callFirebaseFunction} from "./general";
 
 
 async function getValuation(itemBrand, itemCategory) {

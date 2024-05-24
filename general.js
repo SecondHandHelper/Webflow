@@ -13,45 +13,6 @@ export function signOut() {
     });
 }
 
-// Function to call Firebase backend function
-export async function callFirebaseFunction(region, functionName, data = {}, timeoutSec = 20) {
-  const idToken = localStorage.getItem('idToken');
-  if (!idToken) {
-    if (firebase.auth().currentUser) {
-      const idToken = await result.getIdToken();
-      authUser.idToken = idToken;
-      localStorage.setItem('idToken', idToken);
-      authUser.current = firebase.auth().currentUser;
-      localStorage.setItem('authUser', JSON.stringify(authUser.current));
-    }
-    throw new Error('User not authenticated');
-  }
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), timeoutSec*1000);
-
-  const response = fetch(`https://${region}-second-hand-helper.cloudfunctions.net/${functionName}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${idToken}`
-    },
-    body: JSON.stringify(data),
-    signal: controller.signal
-  });
-  response.finally(() => clearTimeout(timeout));
-  response.catch(e => {
-    console.error(e);
-    errorHandler.report(`Failure calling backend function ${JSON.stringify(e)}`)
-    throw e;
-  })
-  return await response.then(resp => {
-    if (!response.ok) {
-      throw new Error('Failed to call backend function');
-    }
-    return response.json();
-  })
-}
-
 export function setFormAddressFields(user) {
     document.getElementById("addressFirstName").value = user.addressFirstName || '';
     document.getElementById("addressFirstName").dispatchEvent(new Event('input'));

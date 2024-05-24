@@ -1,5 +1,3 @@
-import {callFirebaseFunction} from "./general";
-
 window.itemValuationJsLoaded = true;
 async function showDeclineValuation(item) {
     document.getElementById('valuationHeading').style.display = 'none';

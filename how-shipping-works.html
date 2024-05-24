@@ -1,6 +1,6 @@
 <script>
   async function showOrderBagsButton() {
-    const maxBags = await firebase.app().functions("europe-west1").httpsCallable('maxNumBags')();
+    const maxBags = await callFirebaseFunction("europe-west1", 'maxNumBags');
     if (maxBags?.data?.maxOrderBags > 0) {
       document.getElementById('orderBagsButton').style.display = 'flex';
     }

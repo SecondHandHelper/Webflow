@@ -1,4 +1,4 @@
-import {callFirebaseFunction, itemCoverImage} from "./general";
+import {itemCoverImage} from "./general";
 
 async function loadItem(itemId) {
   const item = await callFirebaseFunction("europe-west1", 'getItem', {itemId})

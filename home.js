@@ -1,4 +1,4 @@
-import {callFirebaseFunction, itemCoverImage} from "./general";
+import {itemCoverImage} from "./general";
 
 function loadRecentlySold() {
   const recentlySoldItems = callFirebaseFunction('europe-west1', 'recentlySoldItems');

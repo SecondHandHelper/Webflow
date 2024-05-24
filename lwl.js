@@ -1,5 +1,4 @@
 import QRCode from "qrcode";
-import {callFirebaseFunction} from "./general";
 
 const WS_SERVER = 'wss://lwl-to-mai-22-heypmjzjfq-lz.a.run.app';
 const params = getParamsObject();

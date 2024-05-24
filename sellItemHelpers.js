@@ -1,5 +1,3 @@
-import {callFirebaseFunction} from "./general";
-
 export async function uploadTempImage(input, fileName) {
     if (!sessionStorage.getItem('newItemId')) {
         sessionStorage.setItem('newItemId', await  requestUniqueId());

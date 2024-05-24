@@ -11,7 +11,7 @@ import {
   fieldLabelToggle
 } from "./sellItemHelpers";
 import QRCode from "qrcode";
-import {callFirebaseFunction, formatPersonalId, getFormAddressFields, isValidSwedishSsn} from "./general";
+import {formatPersonalId, getFormAddressFields, isValidSwedishSsn} from "./general";
 import { autocomplete, brands } from "./autocomplete-brands";
 import { setFieldValue, setupModelSearchEventListeners } from "./sellItemModelSearch";
 

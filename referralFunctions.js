@@ -1,5 +1,3 @@
-import {callFirebaseFunction} from "./general";
-
 async function showReferralSection() {
   if (user.current?.referralData?.referralCode) {
     document.getElementById("myReferralCodeText").innerHTML = user.current.referralData.referralCode;

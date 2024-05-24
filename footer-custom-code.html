@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.2.100';
+  const JS_VERSION = 'test799';
   var errorHandler = new StackdriverErrorReporter();
   const environment = location.href.includes('maiapp.se') ? 'web-prod' : 'web-test';
   $(document).ready(function () {
@@ -68,7 +68,7 @@
       return this.value;
     },
     set current(newVal) {
-      if (value && newVal && newVal.uid === this.value.uid) {
+      if (this.value && newVal && newVal.uid === this.value.uid) {
         console.log('Not setting authUser, it is already set');
         return;
       }
@@ -132,11 +132,51 @@
       campaign
     });
   }
+
+  // Function to call Firebase backend function
+  async function callFirebaseFunction(region, functionName, data = {}, timeoutSec = 20) {
+    const idToken = localStorage.getItem('idToken');
+    if (!idToken) {
+      if (firebase.auth().currentUser) {
+        const idToken = await result.getIdToken();
+        authUser.idToken = idToken;
+        localStorage.setItem('idToken', idToken);
+        authUser.current = firebase.auth().currentUser;
+        localStorage.setItem('authUser', JSON.stringify(authUser.current));
+      } else {
+        throw new Error('User not authenticated');
+      }
+    }
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), timeoutSec*1000);
+
+    const response = fetch(`https://${region}-second-hand-helper.cloudfunctions.net/${functionName}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`
+      },
+      body: JSON.stringify(data),
+      signal: controller.signal
+    });
+    response.finally(() => clearTimeout(timeout));
+    response.catch(e => {
+      console.error(e);
+      errorHandler.report(`Failure calling backend function ${JSON.stringify(e)}`)
+      throw e;
+    })
+    return await response.then(resp => {
+      if (!response.ok) {
+        throw new Error('Failed to call backend function');
+      }
+      return response.json();
+    })
+  }
 </script>
 
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.2.82/cookieManagement.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.2.94/signIn.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.2.78/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test799/cookieManagement.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test799/signIn.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test799/referralFunctions.js"></script>
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>

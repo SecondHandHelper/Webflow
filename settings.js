@@ -1,5 +1,4 @@
 import {
-  callFirebaseFunction,
   formatPersonalId,
   getFormAddressFields,
   isValidSwedishSsn,

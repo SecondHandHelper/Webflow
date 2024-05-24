@@ -1,4 +1,4 @@
-import {callFirebaseFunction, itemCoverImage, shareCode, signOut} from "./general";
+import {itemCoverImage, shareCode, signOut} from "./general";
 import {loadInfoRequests} from "./infoRequestsFunctions";
 import {loadItemCards} from "./loadItemCards";
 

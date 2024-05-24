@@ -1,4 +1,3 @@
-import {callFirebaseFunction} from "./general";
 
 function colorName(color) {
     const mapping = {
