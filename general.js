@@ -13,6 +13,29 @@ export function signOut() {
     });
 }
 
+// Function to call Firebase backend function
+async function callFirebaseFunction(region, functionName, data) {
+  const idToken = localStorage.getItem('idToken');
+  if (!idToken) {
+    throw new Error('User not authenticated');
+  }
+
+  const response = await fetch(`https://<your-cloud-functions-url>/${functionName}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${idToken}`
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to call backend function');
+  }
+
+  return await response.json();
+}
+
 export function setFormAddressFields(user) {
     document.getElementById("addressFirstName").value = user.addressFirstName || '';
     document.getElementById("addressFirstName").dispatchEvent(new Event('input'));
