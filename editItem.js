@@ -134,7 +134,7 @@ async function updateItem(itemId, changedImages) {
       }));
       if (changedImages.indexOf('frontImage') > -1) {
         // Front image was changed, also save the enhancedFrontImage in the right place
-        const item = await callFirebaseFunction("europe-west1", 'getItem', {itemId});
+        const item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId });
         const itemData = item.data;
         await callFirebaseFunction("europe-west1", 'saveItemImage', {
           itemId, fileName: `enhancedFrontImage`,
@@ -203,7 +203,7 @@ function showChangesSaved() {
 async function fillForm(itemId) {
   try {
     const userId = authUser.current.uid;
-    const item = await callFirebaseFunction("europe-west1", 'getItem', {itemId});
+    const item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId });
     const data = item.data;
     if (userId !== data.user && userId !== '3OkW5av20HP8ScpUDS8ip9fBEZr1') {
       return;

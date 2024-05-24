@@ -360,13 +360,13 @@ async function getAndSaveValuation(itemId, item) {
     return '/item-confirmation';
   }
   if (params.id && params.type !== 'draft') {
-    const getItemResponse = await callFirebaseFunction("europe-west1", 'getItem', { itemId: params.id });
+    const getItemResponse = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: params.id });
     const resellItem = getItemResponse.data;
     await setValuationFromResellItem(resellItem, item, itemId);
     return '/item-valuation';
   }
   try {
-    const res = await callFirebaseFunction("europe-west1", 'itemMlValuation', { itemId, item });
+    const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({ itemId, item });
     const { minPrice, maxPrice, decline } = res.data || {};
     await saveItemValuation(itemId, res.data);
     return nextStepAfterValuation(minPrice && maxPrice, decline, needsHumanCheck(res.data));
@@ -717,7 +717,7 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
     let atItemResponse = null;
     if (!savedItem) {
       [item, atItemResponse] = await Promise.all([
-        callFirebaseFunction("europe-west1", 'getItem', { itemId }),
+        firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId }),
         fetch(`https://getatitem-heypmjzjfq-ew.a.run.app?itemId=${itemId}`)
       ]);
       itemDraft = item;
@@ -850,7 +850,9 @@ function selectFieldValue(field, value) {
 }
 
 async function checkAndDisplayShareSold(value) {
-  const response = await callFirebaseFunction("europe-west1", 'fetchBrandShareSoldInfo', { cleanedBrandName: value });
+  const response = await firebase.app().functions("europe-west1").httpsCallable(
+    'fetchBrandShareSoldInfo',
+  )({ cleanedBrandName: value });
 
   if (response.data && response.data.cleanedBrand) {
     console.log('data.shareSold', response.data.shareSold, 'data.cleanedBrand', response.data.cleanedBrand);
@@ -997,7 +999,7 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
       // Don't do anything if both brand and material already filled in
       return;
     }
-    const response = await callFirebaseFunction("europe-west1", 'detectItemBrandAndMaterialAndSize', { imageUrl });
+    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrandAndMaterialAndSize')({ imageUrl });
     if (!document.querySelector('#itemBrand').value.length && response.data?.brand) {
       document.querySelector('#itemBrand').value = response.data.brand;
       document.querySelector('#itemBrand').setCustomValidity('Bekräfta eller ändra märket');
@@ -1033,7 +1035,7 @@ async function detectAndFillColor(imageUrl) {
     return;
   }
   try {
-    const response = await callFirebaseFunction("europe-west1", 'detectItemColor', { imageUrl });
+    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ imageUrl });
     if (!response.data?.colors || !response.data.colors.length) {
       console.log("Unable to detect product color");
       return;

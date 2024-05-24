@@ -95,7 +95,7 @@ document.getElementById('doneButton').addEventListener('click', () => {
         webSocket.close();
         return;
       }
-      const draftItemResponse = await callFirebaseFunction("europe-west3", 'createItemDraftsFromLwl', {
+      const draftItemResponse = await firebase.app().functions("europe-west3").httpsCallable('createItemDraftsFromLwl', {timeout: 240 * 1000})({
         itemData: message.data,
         url: lwlThreadUrl.value,
       }, 240);

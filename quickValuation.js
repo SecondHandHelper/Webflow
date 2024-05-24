@@ -26,7 +26,7 @@ async function getValuation(itemBrand, itemCategory) {
   document.getElementById('howItWorksDiv').style.display = 'none';
   document.getElementById('valuationInfoButton').style.display = 'none';
   try {
-    const valuationRes = await callFirebaseFunction("europe-west1", 'partialMlValuation', { brand, category });
+    const valuationRes = await firebase.app().functions("europe-west1").httpsCallable('partialMlValuation')({ brand, category });
     const {
       minPrice, maxPrice, decline, newBrand, valuatedBrandItems, fewBrand, valuatedBrandCategoryItems,
       brandCategoryAccuracy, brandAccuracy, highPriceVarBrandCategory, brandShareSold, humanCheckExplanation,
