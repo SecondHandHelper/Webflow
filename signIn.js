@@ -53,7 +53,7 @@ firebase.auth().onIdTokenChanged(async (user) => {
 
 if (!authUser.current && localStorage.getItem('authUser') && localStorage.getItem('idToken')) {
   authUser.idToken = localStorage.getItem('idToken');
-  authUser.current = localStorage.getItem('authUser');
+  authUser.current = JSON.parse(localStorage.getItem('authUser'));
 }
 if (!user.current && localStorage.getItem('sessionUser')) {
   user.current = JSON.parse(localStorage.getItem('sessionUser'));
