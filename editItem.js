@@ -55,7 +55,7 @@ async function validateInput() {
     document.getElementById('confirmLowerPrice').addEventListener('click', () => {
       document.getElementById('lowPriceInfoBox').style.display = 'none';
       document.getElementById('darkOverlay').style.display = 'none';
-      document.getElementById('lowestPrice').innerText = currentPrice.value;
+      document.getElementById('lowestPrice').innerText = `${currentPrice.value} kr`;
       resolve(true);
     });
     document.getElementById('closePricingInfoBox').addEventListener('click', () => {
@@ -98,8 +98,8 @@ async function updateItem(itemId, changedImages) {
     condition: condition,
     defectDescription: defectDescription,
     userComment: userComment,
-    ...(userSetCurrentPrice >= 100 ? { userSetCurrentPrice } : {}),
-    ...(initialCurrentPrice > 0 && userSetCurrentPrice !== 0 && userSetCurrentPrice < lowestPrice  ? { minPriceEstimate: userSetCurrentPrice } : {}),
+    ...(userSetCurrentPrice >= 100 && userSetCurrentPrice !== initialCurrentPrice ? { userSetCurrentPrice } : {}),
+    ...(userSetCurrentPrice >= 100 && userSetCurrentPrice < lowestPrice ? { minPriceEstimate: userSetCurrentPrice } : {}),
   }
 
   async function uploadImages(itemId) {

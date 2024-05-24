@@ -41,6 +41,8 @@ document.getElementById('doneButton').addEventListener('click', () => {
   if (scrapingStarted) {
     return;
   }
+  firstPreviewShown = false;
+  document.getElementById('lwlItemsDiv').style.display = 'none'
   document.getElementsByClassName('w-form-fail')[0].style.display = 'none';
   const lwlThreadUrl = document.getElementById('lwlThreadUrl');
   if (!lwlThreadUrl.value.length) {

@@ -46,7 +46,7 @@ async function loadItem(itemId) {
     text1 = daysLeftText;
     text2 = valuationText;
     if (data.currentPrice) {
-      document.getElementById('itemCurrentPrice').innerText = data.currentPrice;
+      document.getElementById('itemCurrentPrice').innerText = Math.min(data.userSetCurrentPrice || data.currentPrice, data.currentPrice);
       document.getElementById('itemCurrentPriceDiv').style.display = 'flex';
     }
     editItemLink.style.display = 'block';
