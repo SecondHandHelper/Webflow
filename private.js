@@ -58,22 +58,35 @@ export function updateIC(userId, em, ph) {
   });
 }
 
-function showAccountInfo() {
+function prepareMenu(u) {
   let identifier;
-  if (authUser.current.phoneNumber) {
-    identifier = authUser.current.phoneNumber;
-  } else if (authUser.current.email) {
-    identifier = authUser.current.email;
+  if (u.phoneNumber) {
+    identifier = u.phoneNumber;
+  } else if (u.email) {
+    identifier = u.email;
   }
   if (identifier) {
     account.innerHTML = identifier;
     account.style.display = 'block'
   }
-  if (user.current.addressFirstName && user.current.addressLastName) {
-    accountName.innerHTML = user.current.addressFirstName + ' ' + user.current.addressLastName;
+  if (u.addressFirstName && u.addressLastName) {
+    accountName.innerHTML = u.addressFirstName + ' ' + u.addressLastName;
     accountName.style.display = 'block';
   }
+  if (u?.referralData?.referralCode) {
+    referralCodeText.innerHTML = u.referralData.referralCode;
+    headerInviteButton.style.display = 'flex';
+    menuInviteLink.style.display = 'block';
+  }
 }
+
+const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
+if (sessionUser) {
+  const referralCode = sessionUser?.referralData?.referralCode;
+  prepareMenu(sessionUser);
+}
+
+
 
 async function showOrderBagsSection() {
   const maxBags = await firebase.app().functions("europe-west1").httpsCallable('maxNumBags')();
@@ -250,11 +263,6 @@ async function privateMain() {
 
   const items = (await firebase.app().functions("europe-west1").httpsCallable('getUserItems')())?.data;
   showInviteToast(items);
-  if (user.current?.referralData?.referralCode) {
-    referralCodeText.innerHTML = user.current.referralData.referralCode;
-    headerInviteButton.style.display = 'flex';
-    menuInviteLink.style.display = 'block';
-  }
 
   const inviteCode = checkCookie("invite");
   if (inviteCode) {
@@ -284,8 +292,7 @@ async function privateMain() {
   fetchAndShowRecommendedItems(items);
   showReferralSection();
   showBonusSection();
-
-  showAccountInfo();
+  prepareMenu(user.current);
   loadInfoRequests(items);
   //showHolidayModeDiv(items);
 
