@@ -103,8 +103,6 @@ async function sellItemMainAuthenticated() {
   if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
     // ... if we are redirected here from the sign-in page
     if (document.referrer.includes('/sign-in')) {
-      document.getElementById('loadingDiv').style.display = 'flex';
-      document.getElementById('creatingItemText').style.display = 'block';
       await createItemAfterSignIn();
       const shippingMethod = sessionStorage.getItem('shippingMethod');
       if (shippingMethod) {
@@ -129,6 +127,13 @@ async function sellItemMain() {
   }
   localStorage.removeItem('latestItemCreated');
   sessionStorage.removeItem('itemValuation');
+
+  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
+    // ... if we are redirected here from the sign-in page and have a saved item that should be created
+    document.getElementById('loadingDiv').style.display = 'flex';
+    document.getElementById('creatingItemText').style.display = 'block';
+    return;
+  }
 
   // Initial state
   imageUploadHandlers();
@@ -234,8 +239,6 @@ async function sellItemMain() {
     }
     await fillForm(params.id, null, params.type === 'draft');
     document.getElementById("triggerShowSellItemContent").click();
-  } else if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
-    // A new item will be created in sellItemMainAuthenticated
   } else if (localStorage.getItem('newItem') && !isDefaultFormState(JSON.parse(localStorage.getItem('newItem')))) {
     // Saved state from a previous visit to /sell-item - restore the data
     const newItem = JSON.parse(localStorage.getItem('newItem'));

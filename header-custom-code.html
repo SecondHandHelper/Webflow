@@ -13,6 +13,77 @@
       location.href = './sign-in' + window.location.search;
     }
   }
+  let errorHandler;
+  const user = {
+    value: null,
+    callbacks: [],
+    get current() {
+      return this.value;
+    },
+    set current(newVal) {
+      if (newVal === this.value) {
+        return;
+      }
+      this.value = newVal;
+      if (newVal) {
+        this.callbacks.forEach((cb) => {
+          typeof cb === 'function' && cb(newVal)
+        });
+      }
+      this.callbacks = [];
+    },
+    async whenSet(cb) {
+      if (this.value) {
+        cb(this.value);
+      } else {
+        this.callbacks.push(cb);
+      }
+    },
+  };
+  const authUser = {
+    value: null,
+    callbacks: [],
+    get current() {
+      return this.value;
+    },
+    set current(newVal) {
+      if (this.value && newVal && newVal.uid === this.value.uid) {
+        console.log('Not setting authUser, it is already set');
+        return;
+      }
+      if (!newVal) {
+        this.value = null;
+        return;
+      }
+      this.value = { uid: newVal.uid, email: newVal.email, phoneNumber: newVal.phoneNumber,
+        providerData: [ { providerId: newVal?.providerData?.[0]?.providerId }], metadata: { creationTime: newVal.metadata?.creationTime },
+        emailVerified: newVal.emailVerified, personalId: newVal.personalId };
+      if (newVal.uid) {
+        errorHandler.setUser(newVal.uid);
+      }
+      this.callbacks.forEach((cb) => {
+        typeof cb === 'function' && cb(newVal)
+      });
+      this.callbacks = [];
+    },
+    whenSet(cb) {
+      if (this.value) {
+        cb(this.value);
+      } else {
+        this.callbacks.push(cb);
+      }
+    },
+  };
+
+  if (!authUser.current && localStorage.getItem('authUser') && localStorage.getItem('idToken')) {
+    authUser.idToken = localStorage.getItem('idToken');
+    authUser.current = JSON.parse(localStorage.getItem('authUser'));
+  }
+  if (!user.current && authUser.current) {
+    db.collection("users").doc(authUser.current.uid).get()
+            .then(doc => user.current = doc.data())
+  }
+
 </script>
 
 <!-- Segment -->

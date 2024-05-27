@@ -93,7 +93,7 @@ function showInviteToast(items) {
   let inviteToastViews = user.current?.elementViews ? user.current.elementViews.filter(e => e.elementID === 'inviteToast') : [];
   const daysSinceToastViewsArray = inviteToastViews.length ? Array.from(inviteToastViews, (e) => parseInt(Math.floor((nowDate.getTime() - e.timestamp.toDate().getTime()) / (1000 * 3600 * 24)))) : [];
   const daysSinceToastLastViewed = daysSinceToastViewsArray.length ? Math.min(...daysSinceToastViewsArray) : null;
-  let viewedToastBefore = inviteToastViews.length ? true : false;
+  let viewedToastBefore = !!inviteToastViews.length;
 
   if (items) {
     items.forEach(item => {
