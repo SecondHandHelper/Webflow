@@ -1,7 +1,7 @@
 import {itemCoverImage} from "./general";
 
 async function loadItem(itemId) {
-  const item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({itemId})
+  const item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId });
   if (!item.data) {
     return;
   }

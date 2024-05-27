@@ -11,7 +11,7 @@ import {
   fieldLabelToggle
 } from "./sellItemHelpers";
 import QRCode from "qrcode";
-import { formatPersonalId, getFormAddressFields, isValidSwedishSsn } from "./general";
+import {formatPersonalId, getFormAddressFields, isValidSwedishSsn} from "./general";
 import { autocomplete, brands } from "./autocomplete-brands";
 import { setFieldValue, setupModelSearchEventListeners } from "./sellItemModelSearch";
 
@@ -103,12 +103,10 @@ async function sellItemMainAuthenticated() {
   if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
     // ... if we are redirected here from the sign-in page
     if (document.referrer.includes('/sign-in')) {
-      document.getElementById('loadingDiv').style.display = 'flex';
-      document.getElementById('creatingItemText').style.display = 'block';
       await createItemAfterSignIn();
       const shippingMethod = sessionStorage.getItem('shippingMethod');
       if (shippingMethod) {
-        await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
+        await callFirebaseFunction("europe-west1", 'updateFirebaseUser', { preferences: { shippingMethod } });
       }
       const userPhoneSet = user.current?.phoneNumber?.length;
       return location.href = userPhoneSet ? '/item-confirmation' : '/user-contact';
@@ -129,6 +127,13 @@ async function sellItemMain() {
   }
   localStorage.removeItem('latestItemCreated');
   sessionStorage.removeItem('itemValuation');
+
+  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
+    // ... if we are redirected here from the sign-in page and have a saved item that should be created
+    document.getElementById('loadingDiv').style.display = 'flex';
+    document.getElementById('creatingItemText').style.display = 'block';
+    return;
+  }
 
   // Initial state
   imageUploadHandlers();
@@ -221,7 +226,7 @@ async function sellItemMain() {
     // Fill form if the user comes from a prefill link (re-sell item or continue with draft item)
     sessionStorage.removeItem('newItemId');
     localStorage.removeItem('newItem');
-    auth.onAuthStateChanged(function (user) {
+    authUser.whenSet(function (user) {
       if (!user) { document.getElementById('maiIntro').style.display = 'block'; }
     });
     document.getElementById('resellIntro').style.display = 'block';
@@ -234,8 +239,6 @@ async function sellItemMain() {
     }
     await fillForm(params.id, null, params.type === 'draft');
     document.getElementById("triggerShowSellItemContent").click();
-  } else if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
-    // A new item will be created in sellItemMainAuthenticated
   } else if (localStorage.getItem('newItem') && !isDefaultFormState(JSON.parse(localStorage.getItem('newItem')))) {
     // Saved state from a previous visit to /sell-item - restore the data
     const newItem = JSON.parse(localStorage.getItem('newItem'));
@@ -281,7 +284,7 @@ async function saveValuationInStorageOrBackend(valuationData, itemId) {
       item: { ...item.item, ...valuationData }
     }));
   } else {
-    await firebase.app().functions("europe-west1").httpsCallable('saveItemValuationFields')({ itemId, ...valuationData });
+    await callFirebaseFunction("europe-west1", 'saveItemValuationFields', { itemId, ...valuationData });
     const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
     localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData }));
   }
@@ -487,7 +490,7 @@ async function getShippingMethod() {
   let shippingMethod = 'Service point';
   if (!user.current?.preferences?.shippingMethod) {
     if (authUser.current) {
-      await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')({ preferences: { shippingMethod } });
+      await callFirebaseFunction("europe-west1", 'updateFirebaseUser', { preferences: { shippingMethod } });
     } else {
       sessionStorage.setItem('shippingMethod', shippingMethod);
     }
@@ -511,7 +514,7 @@ async function addItemInner(id, status = 'New') {
   if (!authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
-    const createItemResponse = await firebase.app().functions("europe-west1").httpsCallable('createItem')({ id, item });
+    const createItemResponse = await callFirebaseFunction("europe-west1", 'createItem', { id, item });
 
     await trackUserActivated();
     await setCampaignCoupon();
@@ -624,7 +627,7 @@ function isElementInView(el) {
 async function setCampaignCoupon() {
   const campaignDateOk = new Intl.DateTimeFormat('se-SV').format(new Date()) <= '2024-03-10';
   if (campaignDateOk && getCookie('noCommissionCampaignCookie') === 'noCommission' && (await userItemsCount()) === 1) {
-    await firebase.app().functions("europe-west1").httpsCallable('setNoCommissionCoupon')();
+    await callFirebaseFunction("europe-west1", 'setNoCommissionCoupon');
   }
 }
 
@@ -632,7 +635,7 @@ async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
   sessionStorage.removeItem('newItemId');
-  await firebase.app().functions("europe-west1").httpsCallable('createItem')(itemFromStorage);
+  await callFirebaseFunction("europe-west1", 'createItem', itemFromStorage);
   await trackUserActivated();
   await setCampaignCoupon()
   localStorage.removeItem('newItem');

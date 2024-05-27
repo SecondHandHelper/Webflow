@@ -1,3 +1,4 @@
+
 function colorName(color) {
     const mapping = {
         Beige: 'Beige', Blue: 'Blå', Brown: 'Brun', Green: 'Grön', Grey: 'Grå', Yellow: 'Gul', Gold: 'Guld',
@@ -81,7 +82,7 @@ function itemConditionText(item) {
 
 
 const getItem = async (itemId) => {
-    const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: itemId });
+    const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId });
     return { ...(res?.data || {}), id: itemId };
 }
 

@@ -94,15 +94,15 @@ export async function enhanceFrontImage(imageUrl, saveState = true) {
 }
 
 async function createEnhancedImage(imageUrl) {
-    try {
-        const response = await firebase.app().functions("europe-west1").httpsCallable('enhanceFrontImage')({ imageUrl });
-        sessionStorage.setItem('enhancedFrontImage', response.data.url)
-        return response.data;
-    } catch (ex) {
-        errorHandler.report(ex);
-        console.error(ex);
-        return '';
-    }
+  try {
+    const response = await firebase.app().functions("europe-west1").httpsCallable('enhanceFrontImage')({ imageUrl });
+    sessionStorage.setItem('enhancedFrontImage', response.data.url)
+    return response.data;
+  } catch (ex) {
+    errorHandler.report(ex);
+    console.error(ex);
+    return '';
+  }
 }
 
 export function showDeleteImageIcon(imageName) {

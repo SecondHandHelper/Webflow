@@ -1,11 +1,14 @@
-import {formatPersonalId, getFormAddressFields, isValidSwedishSsn, setFormAddressFields} from "./general";
+import {
+  formatPersonalId,
+  getFormAddressFields,
+  isValidSwedishSsn,
+  setFormAddressFields
+} from "./general";
 
 async function updateUserAddress() {
     try {
         loadOnSavePressed()
-        await firebase.app().functions("europe-west1").httpsCallable(
-            'updateFirebaseUser',
-        )({ ...getFormAddressFields() })
+        await callFirebaseFunction("europe-west1", 'updateFirebaseUser', { ...getFormAddressFields() })
         await onUpdateComplete()
     } catch (e) {
         errorHandler.report(e);
@@ -22,18 +25,14 @@ async function updateShippingPreference() {
             shippingMethod = radioButtons[x].value; // "Service point" or "Pickup"
         }
     }
-    await firebase.app().functions("europe-west1").httpsCallable(
-        'updateFirebaseUser',
-    )({ preferences: { shippingMethod } })
+    await callFirebaseFunction("europe-west1", 'updateFirebaseUser', { preferences: { shippingMethod } })
     await onUpdateComplete()
 }
 
 async function updateContactNumbers(isSwish) {
     try {
         loadOnSavePressed()
-        await firebase.app().functions("europe-west1").httpsCallable(
-            'updateFirebaseUser',
-        )({ ...getCleanedNumber(isSwish) })
+        await callFirebaseFunction("europe-west1", 'updateFirebaseUser',{ ...getCleanedNumber(isSwish) })
         await onUpdateComplete()
     } catch (e) {
       errorHandler.report(e);
@@ -43,9 +42,8 @@ async function updateContactNumbers(isSwish) {
 async function updateUserPersonId() {
     try {
         loadOnSavePressed()
-        await firebase.app().functions("europe-west1").httpsCallable(
-            'updateFirebaseUser',
-        )({ personalId: formatPersonalId(personalId.value.trim().replace(/\D/g, '')) })
+        await callFirebaseFunction("europe-west1", 'updateFirebaseUser',
+          { personalId: formatPersonalId(personalId.value.trim().replace(/\D/g, '')) })
         await onUpdateComplete()
     } catch (e) {
         errorHandler.report(e);
@@ -59,7 +57,7 @@ let pageHeader = document.getElementById('pageTitleText');
 
 async function getUserInfo(onUpdate) {
   try {
-    const response = await firebase.app().functions("europe-west1").httpsCallable('getUserInfo')();
+    const response = await callFirebaseFunction("europe-west1", 'getUserInfo');
     data = response.data;
     await displayPersonalId(data.personalId);
     console.log('data', data);

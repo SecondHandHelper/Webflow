@@ -23,7 +23,7 @@ const pageSetUp = async () => {
     personalId.setCustomValidity(personalIdError);
     if (document.getElementById('wf-form-User-Details').reportValidity()) {
       try {
-        await firebase.app().functions("europe-west1").httpsCallable('updateFirebaseUser')(
+        await callFirebaseFunction("europe-west1", 'updateFirebaseUser',
           { phoneNumber: formatPhoneNumber(phoneNumber.value), personalId: formatPersonalId(personalId.value) }
         );
       } catch (e) {

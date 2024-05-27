@@ -5,9 +5,13 @@ firebase.auth().onAuthStateChanged(async (result) => {
   if (result) {
     // Get and set current user
     const authenticated = result;
+    const idToken = await result.getIdToken();
+    authUser.idToken = idToken;
     authUser.current = authenticated;
     console.log("authUser:", authUser.current);
     localStorage.setItem('authUserId', authenticated.uid);
+    localStorage.setItem('authUser', JSON.stringify(authUser.current));
+    localStorage.setItem('idToken', idToken);
     try {
       setPreferredLogInMethodCookie(authenticated.providerData[0].providerId);
       const doc = await db.collection("users").doc(authenticated.uid).get();
@@ -23,8 +27,11 @@ firebase.auth().onAuthStateChanged(async (result) => {
     }
   } else {
     console.log('No user');
+    user.current = null;
+    authUser.current = null;
     localStorage.removeItem('authUserId');
     localStorage.removeItem('sessionUser');
+    localStorage.removeItem('idToken');
     // Go to landing page if no user and on logged in pages
     // Latest page view for logged out users
     analytics.identify({ latestPageView: now });
@@ -36,25 +43,13 @@ firebase.auth().onAuthStateChanged(async (result) => {
   }
 });
 
-// If onAuthStateChanged has not run in 1000ms we try this backup for getting the current user
-setTimeout(() => {
-  console.log('fallback for onAuthStateChanged running');
-  if (!authUser.current && !firebase.auth().currentUser) {
-    errorHandler.report('firebase.auth().currentUser is not set in fallback for onAuthStateChanged');
+// Refresh token and update localStorage
+firebase.auth().onIdTokenChanged(async (user) => {
+  if (user) {
+    const idToken = await user.getIdToken();
+    localStorage.setItem('idToken', idToken);
   }
-  if (!authUser.current && localStorage.getItem('authUserId') && firebase.auth().currentUser) {
-    errorHandler.report('firebase.auth().currentUser is set in fallback for onAuthStateChanged');
-    if (firebase.auth().currentUser.uid === localStorage.getItem('authUserId')) {
-      console.log('Setting authUser.current from localStorage')
-      authUser.current = firebase.auth().currentUser;
-    }
-    if (localStorage.getItem('sessionUser') !== null) {
-      console.log('Setting user.current from localStorage')
-      user.current = JSON.parse(localStorage.getItem('sessionUser'));
-    }
-  }
-}, 3000);
-
+});
 
 function userIsSellingNewItem() {
   return sessionStorage.getItem('itemToBeCreatedAfterSignIn') &&

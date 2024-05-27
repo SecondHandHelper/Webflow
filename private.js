@@ -89,7 +89,7 @@ if (sessionUser) {
 
 
 async function showOrderBagsSection() {
-  const maxBags = await firebase.app().functions("europe-west1").httpsCallable('maxNumBags')();
+  const maxBags = await callFirebaseFunction("europe-west1", 'maxNumBags');
   if (maxBags?.data?.maxOrderBags > 0) {
     document.getElementById('orderBagsSection').style.display = 'block';
   }
@@ -104,9 +104,10 @@ function showInviteToast(items) {
 
   // Last viewed
   let inviteToastViews = user.current?.elementViews ? user.current.elementViews.filter(e => e.elementID === 'inviteToast') : [];
-  const daysSinceToastViewsArray = inviteToastViews.length ? Array.from(inviteToastViews, (e) => parseInt(Math.floor((nowDate.getTime() - e.timestamp.toDate().getTime()) / (1000 * 3600 * 24)))) : [];
+  const daysSinceToastViewsArray = inviteToastViews.length ? Array.from(inviteToastViews, (e) =>
+    parseInt(Math.floor((nowDate.getTime() - (e.timestamp.seconds*1000)) / (1000 * 3600 * 24)))) : [];
   const daysSinceToastLastViewed = daysSinceToastViewsArray.length ? Math.min(...daysSinceToastViewsArray) : null;
-  let viewedToastBefore = inviteToastViews.length ? true : false;
+  let viewedToastBefore = !!inviteToastViews.length;
 
   if (items) {
     items.forEach(item => {
@@ -261,7 +262,7 @@ async function privateMain() {
   });
   */
 
-  const items = (await firebase.app().functions("europe-west1").httpsCallable('getUserItems')())?.data;
+  const items = (await callFirebaseFunction("europe-west1", 'getUserItems'))?.data;
   showInviteToast(items);
 
   const inviteCode = checkCookie("invite");
@@ -355,7 +356,7 @@ function inSeason(category) {
 }
 
 async function showInactiveItemsSection() {
-  const unsoldItems = await firebase.app().functions("europe-west1").httpsCallable('getUserUnsoldItems')();
+  const unsoldItems = await callFirebaseFunction("europe-west1", 'getUserUnsoldItems');
   if (!unsoldItems.data?.length) {
     return;
   }
@@ -414,7 +415,7 @@ async function showInactiveItemsSection() {
 }
 
 async function showInYourWardrobeSection() {
-  const wardrobeItems = await firebase.app().functions("europe-west1").httpsCallable('getUserWardrobeItems')();
+  const wardrobeItems = await callFirebaseFunction("europe-west1", 'getUserWardrobeItems');
   if (!wardrobeItems.data?.length) {
     return;
   }
@@ -483,14 +484,14 @@ function setupBottomMenuPopupListeners() {
       if (!visibleChildren) {
         document.getElementById('inactiveItemsDiv').style.display = 'none';
       }
-      await firebase.app().functions("europe-west1").httpsCallable('hideUserUnsoldItem')({ itemId: itemMoreMenu.dataset.itemId });
+      await callFirebaseFunction("europe-west1", 'hideUserUnsoldItem', { itemId: itemMoreMenu.dataset.itemId });
     } else {
       const itemList = document.getElementById('wardrobeItemList');
       const visibleChildren = Array.from(itemList.children).find(it => it.style.display !== 'none')
       if (!visibleChildren) {
         document.getElementById('wardrobeItemsDiv').style.display = 'none';
       }
-      await firebase.app().functions("europe-west1").httpsCallable('hideUserWardrobeItem')({ itemId: itemMoreMenu.dataset.itemId });
+      await callFirebaseFunction("europe-west1", 'hideUserWardrobeItem', { itemId: itemMoreMenu.dataset.itemId });
     }
   });
 }
@@ -557,7 +558,7 @@ async function fetchAndShowRecommendedItems(items) {
   try {
     const ids = [];
     items.forEach(item => ids.push(item.id));
-    const response = await firebase.app().functions("europe-west1").httpsCallable('itemRecommendations')({ items: ids.slice(0, 10), number: 20 })
+    const response = await callFirebaseFunction("europe-west1", 'itemRecommendations', { items: ids.slice(0, 10), number: 20 })
     if (!response.data.length) {
       return;
     }
