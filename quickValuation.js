@@ -277,4 +277,11 @@ function unfold(element) {
   element.classList.toggle('collapsed', false);
 }
 
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    console.log('This page was restored from the bfcache.');
+    if (menu.style.display !== 'none') { menu.style.display = 'none' }
+  }
+});
+
 quickValuationMain();
