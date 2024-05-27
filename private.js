@@ -521,7 +521,7 @@ async function showNpsSurvey(items) {
 
   // Last viewed
   const x = user.current?.elementViews ? user.current.elementViews.reverse().find(e => e.elementID === 'npsSurvey') : null;
-  const surveyLastViewed = x ? x.timestamp.toDate() : null;
+  const surveyLastViewed = x ? new Date(x.timestamp.seconds*1000) : null;
   const daysSinceSurveyLastViewed = surveyLastViewed ? Math.floor((nowDate.getTime() - surveyLastViewed.getTime()) / (1000 * 3600 * 24)) : null;
 
   if (items) {
