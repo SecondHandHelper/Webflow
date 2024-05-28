@@ -18,7 +18,7 @@ async function showBonusSection() {
   console.log("Days since user registered", daysDiff);
   const referralData = user.current?.referralData;
 
-  if (referralData && referralData?.referredBy && !referralData?.referredByBonusPaid && !referralData?.referredByDiscountUsed) { //TODO: Behöver 'referredByDiscountUsed' till FS för att kunna se om de redan löst in 1 kommissionsfri försäljning
+  if (referralData && referralData?.referredBy && !referralData?.referredByBonusPaid && !referralData?.referredByDiscountUsed) {
     // Get inviters first name
     const inviter = referralData?.referredBy;
     const res = await callFirebaseFunction("europe-west3", 'referrerName', { referrerId: inviter });
@@ -28,7 +28,7 @@ async function showBonusSection() {
     return;
   }
   
-  if ((user.current?.referralData?.referredBy ? false : true) && (daysDiff <= 30 || daysDiff >= 60)) { //Ändra tillbaks till <=30 på måndag 29 april 2024
+  if ((user.current?.referralData?.referredBy ? false : true) && daysDiff <= 30) {
     if (bonusActivatedState.style.display === 'none' || bonusActivatedState.style.display === '') {
       enterCodeState.style.display = 'block';
       bonusSection.style.display = 'block';
