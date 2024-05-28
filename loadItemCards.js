@@ -312,7 +312,7 @@ export function loadItemCards(items) {
   itemListSold.innerHTML = "";
   var youEarned = 0;
 
-  items.forEach((item) => {
+  (items || []).forEach((item) => {
     var itemId = item.id;
     var soldDate = item.soldDate;
     var status = item.status;
