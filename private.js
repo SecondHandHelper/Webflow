@@ -60,9 +60,10 @@ export function updateIC(userId, em, ph) {
 
 function prepareMenu(u) {
   let identifier;
-  if (u.phoneNumber) {
+  console.log(u.signInMethod)
+  if (u.signInMethod === 'phone' && u.phoneNumber) {
     identifier = u.phoneNumber;
-  } else if (u.email) {
+  } else if (u.signInMethod === 'password' && u.email) {
     identifier = u.email;
   }
   if (identifier) {
