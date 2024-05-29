@@ -179,7 +179,6 @@ async function sellItemMain() {
   itemCondition.addEventListener("input", () => {
     if (itemCondition.value === "Använd, men utan anmärkning") {
       if (authUser.current) {
-        console.log("Inloggad");
         if (getCookie('conditionUsedInfoBoxSeen') !== 'true') {
           let conditionUsedInfoBoxViews = user.current?.elementViews ? user.current.elementViews.filter((e) => e.elementID === "conditionUsedInfoBox") : [];
           if (!conditionUsedInfoBoxViews.length) {
@@ -198,6 +197,19 @@ async function sellItemMain() {
         }
       }
     }
+  })
+
+  nwt.addEventListener('click', () => {
+    selectFieldValue(itemCondition, 'Helt ny, med prislapp kvar');
+  })
+  nwot.addEventListener('click', () => {
+    selectFieldValue(itemCondition, 'Helt ny, men utan prislapp');
+  })
+  usedNoDefect.addEventListener('click', () => {
+    selectFieldValue(itemCondition, 'Använd, men utan anmärkning');
+  })
+  usedDefect.addEventListener('click', () => {
+    selectFieldValue(itemCondition, 'Använd, tecken på slitage');
   })
 
   personalId.addEventListener("input", () => {
