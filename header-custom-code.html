@@ -40,6 +40,7 @@
   };
   const authUser = {
     value: null,
+    idToken: null,
     callbacks: [],
     get current() {
       return this.value;
@@ -51,6 +52,7 @@
       }
       if (!newVal) {
         this.value = null;
+        this.idToken = null;
         return;
       }
       this.value = { uid: newVal.uid, email: newVal.email, phoneNumber: newVal.phoneNumber,
@@ -74,10 +76,15 @@
   };
 
   if (!authUser.current && localStorage.getItem('authUser') && localStorage.getItem('idToken')) {
-    authUser.idToken = localStorage.getItem('idToken');
-    authUser.current = JSON.parse(localStorage.getItem('authUser'));
-    if (!user.current && localStorage.getItem('sessionUser')) {
-      user.current = JSON.parse(localStorage.getItem('sessionUser'));
+    const p = new URL(window.location).searchParams
+    const savedUser = localStorage.getItem('sessionUser') ? JSON.parse(localStorage.getItem('sessionUser')) : undefined;
+    if (!p.has('s') || (savedUser && savedUser.signInInfoKey === p.get('s'))) {
+      // Don't restore user if s param with different signInInfoKey than logged in user
+      authUser.idToken = localStorage.getItem('idToken');
+      authUser.current = JSON.parse(localStorage.getItem('authUser'));
+      if (!user.current && localStorage.getItem('sessionUser')) {
+        user.current = JSON.parse(localStorage.getItem('sessionUser'));
+      }
     }
   }
 

@@ -35,6 +35,17 @@
   var functions = firebase.functions();
   var auth = firebase.auth();
 
+  const p = new URL(window.location).searchParams
+  const savedUser = localStorage.getItem('sessionUser') ? JSON.parse(localStorage.getItem('sessionUser')) : undefined;
+  if (p.has('s') && savedUser.signInInfoKey !== p.get('s')) {
+    firebase.auth().signOut().then(() => {
+      authUser.current = null;
+      user.current = null;
+      localStorage.removeItem('sessionUser');
+      localStorage.removeItem('idToken');
+      localStorage.removeItem('authUserId');
+    })
+  }
 
   // SEGMENT IDENTIFY
   function identify(authenticatedUser, dbUser) {
