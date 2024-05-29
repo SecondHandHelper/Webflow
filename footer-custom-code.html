@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.2.105';
+  const JS_VERSION = 'test806';
   errorHandler = new StackdriverErrorReporter();
   const environment = location.href.includes('maiapp.se') ? 'web-prod' : 'web-test';
   errorHandler.start({
@@ -35,6 +35,21 @@
   var functions = firebase.functions();
   var auth = firebase.auth();
 
+  const p = new URL(window.location).searchParams
+  const savedUser = localStorage.getItem('sessionUser') ? JSON.parse(localStorage.getItem('sessionUser')) : undefined;
+  console.log(`comparing ${p.get('s')} and ${savedUser?.signInInfoKey}`)
+  if (p.has('s') && savedUser && savedUser.signInInfoKey !== p.get('s')) {
+    console.log('Signing out user because of signInInfoKey mismatch');
+    firebase.auth().signOut().then(() => {
+      authUser.current = null;
+      user.current = null;
+      localStorage.removeItem('sessionUser');
+      localStorage.removeItem('idToken');
+      localStorage.removeItem('authUserId');
+      localStorage.removeItem('authUser');
+      window.location.reload();
+    })
+  }
 
   // SEGMENT IDENTIFY
   function identify(authenticatedUser, dbUser) {
@@ -85,7 +100,6 @@
     if (!idToken) {
       if (firebase.auth().currentUser) {
         const idToken = await result.getIdToken();
-        authUser.idToken = idToken;
         localStorage.setItem('idToken', idToken);
         authUser.current = firebase.auth().currentUser;
         localStorage.setItem('authUser', JSON.stringify(authUser.current));
@@ -118,9 +132,9 @@
   }
 </script>
 
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.2.104/cookieManagement.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.2.104/signIn.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.2.104/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test806/cookieManagement.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test806/signIn.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/test806/referralFunctions.js"></script>
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>

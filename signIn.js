@@ -6,7 +6,6 @@ firebase.auth().onAuthStateChanged(async (result) => {
     // Get and set current user
     const authenticated = result;
     const idToken = await result.getIdToken();
-    authUser.idToken = idToken;
     authUser.current = authenticated;
     console.log("authUser:", authUser.current);
     localStorage.setItem('authUserId', authenticated.uid);
@@ -32,6 +31,7 @@ firebase.auth().onAuthStateChanged(async (result) => {
     localStorage.removeItem('authUserId');
     localStorage.removeItem('sessionUser');
     localStorage.removeItem('idToken');
+    localStorage.removeItem('authUser');
     // Go to landing page if no user and on logged in pages
     // Latest page view for logged out users
     analytics.identify({ latestPageView: now });
