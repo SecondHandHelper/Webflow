@@ -1,7 +1,7 @@
 <script>
   if (localStorage.getItem('authUserId')) {
     if (window.location.pathname === '/' || window.location.pathname === '/sign-in') {
-      location.href = '/private';
+      location.href = '/private' + window.location.search;
     }
   } else {
     const protectedPages = ['/private', '/personal-id-form', '/address-form', '/item', '/ship-item', '/edit-item',

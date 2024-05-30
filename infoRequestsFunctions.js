@@ -169,7 +169,7 @@ export function loadInfoRequests(items) {
     const infoRequestsList = document.getElementById('infoRequestsList');
     infoRequestsList.replaceChildren();
 
-    items.forEach((item) => {
+    (items || []).forEach((item) => {
         const itemId = item.id;
         const infoRequests = item.infoRequests;
             const status = item.status;
