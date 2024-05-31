@@ -73,7 +73,11 @@ async function getUserInfo(onUpdate) {
 
     if (shippingMethod) {
       if (shippingMethod === 'Pickup') { shippingPreferencesDisplay.innerHTML = 'Upphämtning vid dörren' }
-      if (shippingMethod === 'Service point') { shippingPreferencesDisplay.innerHTML = 'Lämna till ombud' }
+      if (shippingMethod === 'Service point') { 
+        shippingPreferencesDisplay.innerHTML = 'Lämna till ombud';
+        // Hide expand button since we don't allow users to change to Pickup anymore
+        expandShippingPrefButton.style.display = 'none';
+      }
     } else {
       shippingPreferencesDisplay.innerHTML = '-';
     }
@@ -216,7 +220,12 @@ phoneNumber.addEventListener("input", function () {
 
 //Shipping
 shippingPrefDiv.addEventListener("click", function () {
-  displayForm('shippingPreferencesDisplay', 'shippingPrefForm', null, 'Skicka plagg')
+  if(shippingPreferencesDisplay.innerHTML.includes('ombud')){
+    shippingPrefInfoText.style.display = 'block';
+    setTimeout(function () { shippingPrefInfoText.style.display = 'none'; }, 3000);
+  } else {
+    displayForm('shippingPreferencesDisplay', 'shippingPrefForm', null, 'Skicka plagg')
+  }
 })
 
 //Swish
