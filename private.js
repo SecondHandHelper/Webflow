@@ -60,15 +60,23 @@ export function updateIC(userId, em, ph) {
 
 function prepareMenu(u) {
   let identifier;
-  console.log(u.signInMethod)
+  let signInMethodText;
+  console.log("Prepare menu", u.signInMethod)
   if (u.signInMethod === 'phone' && u.phoneNumber) {
     identifier = u.phoneNumber;
+    signInMethodText = 'Inloggad med SMS-kod';
   } else if (u.signInMethod === 'password' && u.email) {
     identifier = u.email;
+    signInMethodText = 'Inloggad med email';
+  } else if (u.signInMethod === 'google.com' && u.email){
+    identifier = u.email;
+    signInMethodText = 'Inloggad med Google';
   }
   if (identifier) {
     account.innerHTML = identifier;
-    account.style.display = 'block'
+    account.style.display = 'block';
+    accountSignInMethod.innerHTML = signInMethodText;
+    accountSignInMethod.style.display = 'block';
   }
   if (u.addressFirstName && u.addressLastName) {
     accountName.innerHTML = u.addressFirstName + ' ' + u.addressLastName;

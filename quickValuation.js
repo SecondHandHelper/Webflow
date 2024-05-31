@@ -119,22 +119,30 @@ function round10(val) {
   return Math.round((val || 0) / 10) * 10;
 }
 
-function showMenu(sessionUser) {
+function showMenu(u) {
   let identifier = '';
-  if (sessionUser.signInMethod.includes('google') || sessionUser.signInMethod.includes('password')) {
-    identifier = sessionUser.email;
-  } else if (sessionUser.signInMethod.includes('phone')) {
-    identifier = sessionUser.phoneNumber;
+  let signInMethodText;
+  if (u.signInMethod.includes('phone') && u.phoneNumber) {
+    identifier = u.phoneNumber;
+    signInMethodText = 'Inloggad med SMS-kod';
+  } else if (u.signInMethod.includes('password') && u.email) {
+    identifier = u.email;
+    signInMethodText = 'Inloggad med email';
+  } else if (u.signInMethod.includes('google') && u.email){
+    identifier = u.email;
+    signInMethodText = 'Inloggad med Google';
   }
   if (identifier) {
     account.innerHTML = identifier;
-    account.style.display = 'block'
+    account.style.display = 'block';
+    accountSignInMethod.innerHTML = signInMethodText;
+    accountSignInMethod.style.display = 'block';
   }
-  if (sessionUser.addressFirstName && sessionUser.addressLastName) {
-    accountName.innerHTML = sessionUser.addressFirstName + ' ' + sessionUser.addressLastName;
+  if (u.addressFirstName && u.addressLastName) {
+    accountName.innerHTML = u.addressFirstName + ' ' + u.addressLastName;
     accountName.style.display = 'block';
   }
-  if(sessionUser?.referralData?.referralCode){
+  if (u?.referralData?.referralCode) {
     menuInviteLink.style.display = 'block';
   }
   menuButton.style.display = 'flex';
