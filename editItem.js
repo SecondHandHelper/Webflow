@@ -1,5 +1,5 @@
-import {enhanceFrontImage, showImageState, uploadImageAndShowPreview, uploadTempImage} from "./sellItemHelpers";
-import {autocomplete, brands} from "./autocomplete-brands";
+import { enhanceFrontImage, showImageState, uploadImageAndShowPreview, uploadTempImage } from "./sellItemHelpers";
+import { autocomplete, brands } from "./autocomplete-brands";
 
 function isNumeric(str) {
   if (typeof str != "string") return false // we only process strings!
@@ -18,7 +18,7 @@ async function validateInput() {
         setTimeout(() => {
           if (!isElementInView(element)) {
             const y = element.getBoundingClientRect().top + window.scrollY - 40;
-            window.scrollTo({top: y, behavior: 'smooth'});
+            window.scrollTo({ top: y, behavior: 'smooth' });
           }
           document.getElementById('wf-form-Add-Item').reportValidity();
         }, 300);
@@ -125,7 +125,7 @@ async function updateItem(itemId, changedImages) {
         // If images was changed, set photo directions to default, since an 'info request' of images could have been shown
         infoRequestImagesText.style.display = 'block';
         infoRequestImagesDiv.style.display = 'none';
-        const {url: imageUrl} = await uploadTempImage(value, imageName);
+        const { url: imageUrl } = await uploadTempImage(value, imageName);
         await callFirebaseFunction("europe-west1", 'saveItemImage', {
           itemId,
           fileName: imageName,
@@ -315,13 +315,14 @@ async function fillForm(itemId) {
 
     // If "info request" for images exist, show the directions
     if (infoRequests?.images?.status === "Active" && infoRequests?.images?.description) {
-      infoRequestImagesText.style.display = 'none';
+      infoRequestImagesText.style.display = 'block';
       infoRequestImagesText.innerHTML = infoRequests.images.description;
       infoRequestImagesDiv.style.display = 'flex';
     }
 
     // Show form
     updateItemFormDiv.style.display = "block";
+    cancelSaleButton.style.display = "flex";
     pageTitleDiv.style.display = "flex";
     loadingDiv.style.display = "none";
   } catch (error) {
@@ -366,7 +367,7 @@ function setUpEventListeners() {
   });
 
   let elementsArray = [...document.querySelectorAll("input").values(),
-    ...document.querySelectorAll("textarea").values(), ...document.querySelectorAll("select").values()];
+  ...document.querySelectorAll("textarea").values(), ...document.querySelectorAll("select").values()];
   elementsArray.forEach(function (elem) {
     elem.addEventListener("input", function (event) {
       showSaveButton();
@@ -413,6 +414,104 @@ function setUpEventListeners() {
   document.getElementById("deleteBrandTagImageIcon").addEventListener('click', () => {
     document.getElementById("brandTagImage").required = true;
   });
+
+  cancelSaleButton.addEventListener('click', async () => {
+    const itemId = params.id;
+    const item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId });
+    const data = item.data;
+    const hasBid = data.traderaBidExists || (data?.soldPlatform?.includes('Vestiaire') && data.soldDate && data.soldPrice) ? true : false;
+    if (hasBid) {
+      initiateCancelFlow(cancelHasBid)
+      return
+    }
+    if (data.status === 'New') {
+      cancelConfirmationText.innerHTML = 'Plagget har raderats';
+      initiateCancelFlow(cancelReason)
+      return
+    }
+    initiateCancelFlow(cancelGoodToKnow)
+  });
+
+  function initiateCancelFlow(flowStart) {
+    [...flowStart.parentNode.children].forEach(sibling => {
+      sibling.classList.add('card-hidden');
+      sibling.style.display = 'none';
+    });
+    cancelFlow.style.display = 'flex';
+    darkOverlay.style.display = 'block';
+    crossFade(flowStart);
+  }
+
+  cancelGoodToKnowNextButton.addEventListener('click', () => {
+    crossFade(cancelReason);
+  });
+
+
+  cancelConfirmButton.addEventListener('click', async () => {
+    let reason = '';
+    
+    const radioButtons = document.getElementsByName('cancelReason');
+    for (var i = 0; i < radioButtons.length; i++) {
+      if (radioButtons[i].checked) {
+        reason = radioButtons[i].value;
+      }
+    }
+    console.log('reason', reason);
+    if (reason) {
+      //TODO
+      // 1. Show spinner
+      cancelButtonSpinner.style.display = 'flex';
+      cancelConfirmButton.style.display = 'none';
+
+      // Call endpoint to remove item
+      await callFirebaseFunction("europe-west1", 'archiveItem', {
+        itemId: params.id, archivedReason: reason
+      });
+      // Show confirmation
+      const cancelReason = document.getElementById('cancelReason')
+      const cancelConfirmation = document.getElementById('cancelConfirmation')
+      crossFade(cancelConfirmation);
+
+      //document.getElementById('cancelReason').style.display = 'none';
+      //document.getElementById('cancelConfirmation').style.display = 'flex';
+    }
+  });
+
+  const cancelCloseButtons = document.querySelectorAll('.cancel-secondary-btn');
+  cancelCloseButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      darkOverlay.style.display = 'none';
+      cancelFlow.style.display = 'none';
+    });
+  });
+
+  const radioButtons = document.getElementsByName("cancelReason");
+  for (const radioButton of radioButtons) {
+    radioButton.addEventListener('change', () => {
+      cancelConfirmButton.style.backgroundColor = '#101010';
+      cancelConfirmButton.style.color = '#ffffff';
+    });
+  }
+}
+
+function crossFade(showElm) {
+  [...showElm.parentNode.children].forEach(sibling => {
+    // Start the fade-out effect
+    sibling.addEventListener('transitionend', () => {
+      if (sibling.style.opacity === '0') {
+        sibling.style.display = 'none'; // Hide element after transition to opacity 0 ends
+      }
+    }, { once: true });
+    sibling.classList.remove('fade-in');
+    sibling.classList.add('fade-out');
+  });
+
+  // Prepare and start the fade-in effect
+  showElm.style.display = 'flex';
+  setTimeout(() => {
+    showElm.classList.add('fade-in'); // Add fade-in class to start transition
+    showElm.classList.remove('card-hidden');
+  }, 10); // Slight delay to ensure display change takes effect
 }
 
 let changedImages = [];
@@ -421,3 +520,13 @@ setUpEventListeners();
 const params = getParamsObject();
 user.whenSet(async () => await fillForm(params.id));
 autocomplete(document.getElementById("itemBrand"), brands); // Enable autocomplete
+
+document.getElementById('cancelChatWithMai').addEventListener('click', () => {
+  cancelFlow.style.display = 'none';
+  darkOverlay.style.display = 'none';
+  Intercom('showNewMessage', `Angående att avsluta försäljning för plagg ${params.id}:\n\n`);
+})
+
+window.intercomSettings = { app_id: "klyy0le5" };
+(function () { var w = window; var ic = w.Intercom; if (typeof ic === "function") { ic('reattach_activator'); ic('update', w.intercomSettings); } else { var d = document; var i = function () { i.c(arguments); }; i.q = []; i.c = function (args) { i.q.push(args); }; w.Intercom = i; var l = function () { var s = d.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = 'https://widget.intercom.io/widget/klyy0le5'; var x = d.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x); }; if (w.attachEvent) { w.attachEvent('onload', l); } else { w.addEventListener('load', l, false); } } })();
+Intercom('update', { 'hide_default_launcher': true });
