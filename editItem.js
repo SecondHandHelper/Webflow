@@ -449,31 +449,23 @@ function setUpEventListeners() {
 
   cancelConfirmButton.addEventListener('click', async () => {
     let reason = '';
-    
     const radioButtons = document.getElementsByName('cancelReason');
     for (var i = 0; i < radioButtons.length; i++) {
       if (radioButtons[i].checked) {
         reason = radioButtons[i].value;
       }
     }
-    console.log('reason', reason);
     if (reason) {
-      //TODO
-      // 1. Show spinner
+      // Show spinner
       cancelButtonSpinner.style.display = 'flex';
       cancelConfirmButton.style.display = 'none';
-
       // Call endpoint to remove item
       await callFirebaseFunction("europe-west1", 'archiveItem', {
         itemId: params.id, archivedReason: reason
       });
       // Show confirmation
-      const cancelReason = document.getElementById('cancelReason')
-      const cancelConfirmation = document.getElementById('cancelConfirmation')
+      if (reason === 'Seller sold elsewhere') { cancelSoldElsewhereWarning.style.display = 'flex'; }
       crossFade(cancelConfirmation);
-
-      //document.getElementById('cancelReason').style.display = 'none';
-      //document.getElementById('cancelConfirmation').style.display = 'flex';
     }
   });
 
