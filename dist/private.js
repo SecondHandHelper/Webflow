@@ -49,9 +49,14 @@ Om du registrerar dig med min kod (f\xf6lj l\xe4nken) och provar s\xe4lja ett pl
                         </a>`}(n,I,0,b,x,o),x&&("Service point"===I||"Pickup"===I&&b)&&(B='<div class="spacing-15-px"></div>'+B,t+=`
           <a id="changeShippingMethodA-${n}" href="#">
               <div id="changeShippingMethod-${n}" class="change-shipping-method-text">\xc4ndra frakts\xe4tt</div>
-          </a>`,setTimeout(()=>{document.getElementById(`changeShippingMethodA-${n}`).addEventListener("click",()=>{s(n,a)})},0))}var N="";N=`<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><a id="itemLinkFromSoldNotSentSection" href="${e}"><div class="img-container" style="background-image: url('${M}');"></div></a></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">${C}</div><div class="text-block-44">${F}</div>
+          </a>`,setTimeout(()=>{document.getElementById(`changeShippingMethodA-${n}`).addEventListener("click",()=>{s(n,a)})},0))}var N="";N=`<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><a id="itemLinkFromSoldNotSentSection" href="${e}"><div class="img-container" style="background-image: url('${M}');"></div></a></div></div></div><div class="div-block-46">
+          <a id="youGetLink-${n}" href="#" class="you-get-link">
+              <div class="text-block-43">${C}</div>
+              <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="you-get-info-icon">
+          </a>
+          <div class="text-block-44">${F}</div>
                       ${L}
                       ${B}
                       ${t}
-                  </div></div></div></div>`,itemListSoldNotSent.innerHTML+=N,soldNotSentDiv.style.display="block",noItemsDiv.style.display="none",headerSellItemButton.style.display="block",sellButtonText.innerHTML="Sälj ett plagg"}}()}),loadingDiv.style.display="none",sectionsDiv.style.display="block",analytics.track("Element Viewed",{elementID:"sectionsDiv"}),quickInfoDiv.style.display="block"}},{"./general":"1tOWF","./private":"flS2m","@parcel/transformer-js/src/esmodule-helpers.js":"bNgzC"}]},["flS2m"],"flS2m","parcelRequire81ca");
+                  </div></div></div></div>`,setTimeout(()=>{document.getElementById(`youGetLink-${n}`).addEventListener("click",()=>{console.log(`clicked youGetLink-${n}`),priceAfterPlatformFee.innerHTML=g,commission.innerHTML="-"+(g-p),youGetAmount.innerHTML=p,youGetInfoBox.style.display="flex",darkOverlay.style.display="block",closeYouGetInfoBox.addEventListener("click",()=>{youGetInfoBox.style.display="none",darkOverlay.style.display="none"})})},0),itemListSoldNotSent.innerHTML+=N,soldNotSentDiv.style.display="block",noItemsDiv.style.display="none",headerSellItemButton.style.display="block",sellButtonText.innerHTML="Sälj ett plagg"}}()}),loadingDiv.style.display="none",sectionsDiv.style.display="block",analytics.track("Element Viewed",{elementID:"sectionsDiv"}),quickInfoDiv.style.display="block"}},{"./general":"1tOWF","./private":"flS2m","@parcel/transformer-js/src/esmodule-helpers.js":"bNgzC"}]},["flS2m"],"flS2m","parcelRequire81ca");
 //# sourceMappingURL=private.js.map

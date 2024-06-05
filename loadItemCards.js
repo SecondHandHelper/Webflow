@@ -99,6 +99,19 @@ function openServicePointToast(itemId, soldDate) {
   triggerServicePointToastOpen.click();
 }
 
+function openYouGetInfoBox(soldPrice, sellerGets) {  
+  priceAfterPlatformFee.innerHTML = soldPrice;
+  const commissionAmount = soldPrice - sellerGets;
+  commission.innerHTML = '-'+commissionAmount;
+  youGetAmount.innerHTML = sellerGets;
+  youGetInfoBox.style.display = 'flex';
+  darkOverlay.style.display = 'block';
+  closeYouGetInfoBox.addEventListener('click', () => {
+    youGetInfoBox.style.display = 'none';
+    darkOverlay.style.display = 'none';
+  });
+}
+
 function openPickupToast(itemId, soldDate, servicePointButtonDisplay = 'none') {
   console.log(`openPickupToast(${itemId}, ${soldDate}) is running`);
   triggerShippingToastClose.click();
@@ -409,7 +422,7 @@ export function loadItemCards(items) {
         var text1 = `Du får ${sellerGets}`;
         var text2 = '';
 
-        if (!isCanceled) {          
+        if (!isCanceled) {
           if (buyerFirstName != null && buyerAddressCity != null && soldPrice) {
             const str = `Såld till ${buyerFirstName} i ${buyerAddressCity} för ${soldPrice} kr`;
 
@@ -487,14 +500,27 @@ export function loadItemCards(items) {
           text2 = 'Skickades ej inom 7 dagar';
         }
 
+
         //Create card
         var soldNotSentCardHTML = ``;
         soldNotSentCardHTML =
-          `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><a id="itemLinkFromSoldNotSentSection" href="${itemPageUrl}"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></a></div></div></div><div class="div-block-46"><div class="div-block-47"><div class="text-block-43">${text1}</div><div class="text-block-44">${text2}</div>
+          `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><a id="itemLinkFromSoldNotSentSection" href="${itemPageUrl}"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></a></div></div></div><div class="div-block-46">
+          <a id="youGetLink-${itemId}" href="#" class="you-get-link">
+              <div class="text-block-43">${text1}</div>
+              <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="you-get-info-icon">
+          </a>
+          <div class="text-block-44">${text2}</div>
                       ${userActionDiv}
                       ${shippingInfoDiv}
                       ${changeShippingMethod}
                   </div></div></div></div>`;
+
+        setTimeout(() => {
+          document.getElementById(`youGetLink-${itemId}`).addEventListener('click', () => {
+            console.log(`clicked youGetLink-${itemId}`);
+            openYouGetInfoBox(soldPrice, sellerGets);
+          });
+        }, 0)
         itemListSoldNotSent.innerHTML += soldNotSentCardHTML;
 
         // Display list
