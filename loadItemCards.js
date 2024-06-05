@@ -101,8 +101,21 @@ function openServicePointToast(itemId, soldDate) {
 
 function openYouGetInfoBox(soldPrice, sellerGets) {  
   priceAfterPlatformFee.innerHTML = soldPrice;
-  const commissionAmount = soldPrice - sellerGets;
-  commission.innerHTML = '-'+commissionAmount;
+  const commission = soldPrice - sellerGets;
+  commissionAmount.innerHTML = commission === 0 ? '-' : '-'+commission;
+  if ((commission/soldPrice) > 0.9 && (commission/soldPrice) < 0.11) {
+    commissionTitle.innerHTML = `Rabatterad kommission (10%)`;
+  }
+  if ((commission/soldPrice) > 0.19 && (commission/soldPrice) < 0.21) {
+    commissionTitle.innerHTML = `Kommission (20%)`;
+  }
+  if ((commission/soldPrice) > 0.29 && (commission/soldPrice) < 0.31 && commission !== 50 && commission !== 500) {
+    commissionTitle.innerHTML = `Kommission (30%)`;
+  }
+  if (commission < 1) {
+    commissionTitle.innerHTML = `Fri kommission (0%)`;
+  }
+  
   youGetAmount.innerHTML = sellerGets;
   youGetInfoBox.style.display = 'flex';
   darkOverlay.style.display = 'block';
@@ -507,7 +520,7 @@ export function loadItemCards(items) {
           `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><a id="itemLinkFromSoldNotSentSection" href="${itemPageUrl}"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></a></div></div></div><div class="div-block-46">
           <a id="youGetLink-${itemId}" href="#" class="you-get-link">
               <div class="text-block-43">${text1}</div>
-              <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="you-get-info-icon">
+              ${text1 !== 'Köparen avbröt köpet'? '<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="you-get-info-icon"></img>':''}
           </a>
           <div class="text-block-44">${text2}</div>
                       ${userActionDiv}
