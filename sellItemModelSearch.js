@@ -3,19 +3,24 @@ export const setFieldValue = (fieldId, value) => {
   document.getElementById(fieldId).dispatchEvent(new Event('input'));
 }
 
-const selectSize = (modelClicked) => (event) => {
-  closeModelSelect();
+export const showSelectedModel = (modelJson) => {
   // Show selected model in search box
+  const model = JSON.parse(modelJson);
   document.getElementById('findModelBoxEmpty').style.display = 'none';
   document.getElementById('findModelBoxFilled').style.display = 'flex';
-  const modelJson = modelClicked.getAttribute("data-model");
   document.getElementById('findModelBoxFilled').setAttribute("data-model", modelJson)
-  const model = JSON.parse(modelJson);
   document.getElementById('findModelBoxImage').style.backgroundImage = `url('${model["coverImageSmall"]}')`;
   document.getElementById('findModelBoxNameCategory').innerText = `${model['brand']}, ${model['category']}`;
   document.getElementById('findModelBoxName').innerText = `${model['maiName']}`;
   document.getElementById('findModelBoxColor').innerText = `${model['color']}`;
   document.getElementById('findModelBoxGender').innerText = `${model['gender']}`;
+}
+
+const selectSize = (modelClicked) => (event) => {
+  closeModelSelect();
+  const modelJson = modelClicked.getAttribute("data-model");
+  const model = JSON.parse(modelJson);
+  showSelectedModel(modelJson);
 
   // Fill form with attributes from selected model
   document.getElementById(model['gender']).parentElement.click();
@@ -184,14 +189,17 @@ export const setupModelSearchEventListeners = () => {
 
 export const displayFindModelDiv = async (value) => {
   if (featureIsEnabled('modelDB')) {
-    if (value === 'Rodebjer'){
+    if (value === 'Eytys'){
       findModelDiv.style.display = 'block';
-      let response = await fetch('https://getbrandmodels-heypmjzjfq-ew.a.run.app?brand=Rodebjer', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const models = await response.json();
-      sessionStorage.setItem('models', JSON.stringify(models));
+      let models = sessionStorage.getItem('models') ? JSON.parse(sessionStorage.getItem('models')) : undefined;
+      if (!models) {
+        let response = await fetch('https://getbrandmodels-heypmjzjfq-ew.a.run.app?brand=Eytys', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        models = await response.json();
+        sessionStorage.setItem('models', JSON.stringify(models));
+      }
     }
   }
 }

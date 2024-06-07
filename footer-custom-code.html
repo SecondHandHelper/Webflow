@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.2.110';
+  const JS_VERSION = 'test807';
   errorHandler = new StackdriverErrorReporter();
   const environment = location.href.includes('maiapp.se') ? 'web-prod' : 'web-test';
   errorHandler.start({
@@ -214,7 +214,7 @@
 
   // FEATURE TOGGLE FUNCTION
   const featureConfig = {
-    alpha: { modelDB: false, adjustValuation: true },
+    alpha: { modelDB: true, adjustValuation: true },
     beta: { modelDB: false, adjustValuation: true },
     default: { modelDB: false, adjustValuation: true }
   };

@@ -13,7 +13,12 @@ import {
 import QRCode from "qrcode";
 import {formatPersonalId, getFormAddressFields, isValidSwedishSsn} from "./general";
 import { autocomplete, brands } from "./autocomplete-brands";
-import { setFieldValue, setupModelSearchEventListeners } from "./sellItemModelSearch";
+import {
+  displayFindModelDiv,
+  setFieldValue,
+  setupModelSearchEventListeners,
+  showSelectedModel
+} from "./sellItemModelSearch";
 
 
 let itemDraftSaved = false;
@@ -158,6 +163,7 @@ async function sellItemMain() {
       warningIcon.style.display = 'block';
       hardToSellDiv.style.display = 'block';
     }
+    displayFindModelDiv(this.value);
   }
 
   // Hide/Show extra fields for defects
@@ -661,6 +667,7 @@ function rememberUnsavedChanges() {
   if (!shouldSaveState()) {
     return;
   }
+  console.log('rememberUnsavedChanges');
   const {
     user, createdAt, status, shippingStatus, modelVariantFields, ...itemToSave
   } = collect();
@@ -785,6 +792,17 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
 
     // Populate text input fields
     itemBrand.value = data.brand || '';
+    data.brand ? displayFindModelDiv(data.brand).then(
+      () => {
+        if (sessionStorage.getItem('models') && data.atModelVariantId) {
+          const models = JSON.parse(sessionStorage.getItem('models'));
+          const model = models.find(m => m.atVariantId === data.atModelVariantId);
+          if (model) {
+            showSelectedModel(JSON.stringify(model));
+          }
+        }
+      }
+    ) : null;
     showSuggestButtons('itemBrand', restoreSavedState, data.itemBrandConfirm);
     // Don't use the setFieldValue for the brand since that triggers a dropdown to open
     document.getElementById('itemBrandLabel').style.display = data.brand ? 'inline-block' : 'none';

@@ -19,7 +19,7 @@
                 }
                 const newSlide = cloneSlide.cloneNode(true);
                 newSlide.id = imageName;
-                newSlide.firstChild.src = window.innerWidth <= 350 ? images[`${imageName}Small`] : images[imageName];
+                newSlide.firstChild.src = window.innerWidth <= 350 ? (images[`${imageName}Small`] || images[imageName]): images[imageName];
                 sliderMask.appendChild(newSlide);
             }
         }
