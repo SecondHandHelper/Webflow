@@ -189,7 +189,7 @@ export const setupModelSearchEventListeners = () => {
 
 export const displayFindModelDiv = async (value) => {
   if (featureIsEnabled('modelDB')) {
-    if (value === 'Eytys'){
+    if (value === 'Eytys') {
       findModelDiv.style.display = 'block';
       let models = sessionStorage.getItem('models') ? JSON.parse(sessionStorage.getItem('models')) : undefined;
       if (!models) {
@@ -200,6 +200,8 @@ export const displayFindModelDiv = async (value) => {
         models = await response.json();
         sessionStorage.setItem('models', JSON.stringify(models));
       }
+    } else {
+      findModelDiv.style.display = 'none';
     }
   }
 }
