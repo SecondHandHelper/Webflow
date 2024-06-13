@@ -20,6 +20,7 @@ function initializePage(item) {
     const contact = item.buyer.Email || item.buyer.PhoneNumber;
     thankYouText.innerText = `Vi tittar på ärendet och skickar svar ${contact.includes('@') ? `till din email ${contact}` : `på SMS till ditt telefonnummer ${contact}`}`;
     // Om reclaim redan finns -> Gå direkt till Tack!
+    /*
     if (item?.reclaim?.status){
         hideAllButtons();
         toMaiButton.style.display = 'flex';
@@ -27,6 +28,7 @@ function initializePage(item) {
         thankYouDiv.style.display = 'block';
         itemBanner.style.display = 'block';
     }
+    */
 }
 
 function addEventListeners() {
@@ -154,13 +156,16 @@ async function saveReclaim(itemId) {
     for (var i = 0; i < radios.length; i++) {
       if (radios[i].checked) { compensationPreference = radios[i].value; }
     }
+    const refundAmount = compensationPreference.includes('10 percent discount') ? parseInt(discount10PercentText.innerText.match(/\d+/g)) : null ;
+    
     let reclaim = {
         createdAt: now,
         status: 'Pending',
         reason,
         description,
         listingError,
-        compensationPreference
+        compensationPreference,
+        ...(refundAmount ? { refundAmount } : {}),
     }
 
     console.log('Will update: ', { itemId, reclaim });
