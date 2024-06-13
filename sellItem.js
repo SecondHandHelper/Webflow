@@ -11,7 +11,7 @@ import {
   fieldLabelToggle
 } from "./sellItemHelpers";
 import QRCode from "qrcode";
-import {formatPersonalId, getFormAddressFields, isValidSwedishSsn} from "./general";
+import {formatPersonalId, getFormAddressFields, isValidSwedishSsn, callBackendApi} from "./general";
 import { autocomplete, brands } from "./autocomplete-brands";
 import {
   displayFindModelDiv,
@@ -532,7 +532,7 @@ async function addItemInner(id, status = 'New') {
   if (!authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
-    const createItemResponse = await callFirebaseFunction("europe-west1", 'createItem', { id, item });
+    const createItemResponse = await callBackendApi('POST', '/api/items', { id, item }, true);
 
     await trackUserActivated();
     await setCampaignCoupon();
@@ -653,7 +653,7 @@ async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
   sessionStorage.removeItem('newItemId');
-  await callFirebaseFunction("europe-west1", 'createItem', itemFromStorage);
+  await callBackendApi('POST', '/api/items', itemFromStorage, true);
   await trackUserActivated();
   await setCampaignCoupon()
   localStorage.removeItem('newItem');
@@ -739,7 +739,7 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
     let atItemResponse = null;
     if (!savedItem) {
       [item, atItemResponse] = await Promise.all([
-        firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId }),
+        callBackendApi('get', `/api/items?itemId=${itemId}`),
         fetch(`https://getatitem-heypmjzjfq-ew.a.run.app?itemId=${itemId}`)
       ]);
       itemDraft = item;
