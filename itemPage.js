@@ -1,7 +1,7 @@
-import {itemCoverImage} from "./general";
+import {callBackendApi, itemCoverImage} from "./general";
 
 async function loadItem(itemId) {
-  const item = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId });
+  const item = await callBackendApi('get', `/api/items?itemId=${itemId}`);
   if (!item.data) {
     return;
   }

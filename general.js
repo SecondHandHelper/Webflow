@@ -16,6 +16,30 @@ export function signOut() {
     });
 }
 
+// Function to call new web api backend function, with or without auth
+export async function callBackendApi(method, path, data, requiresAuth) {
+  let idToken = '';
+  if (requiresAuth) {
+    idToken = await getIdToken();
+  }
+  try {
+    const response = await fetch(`https://europe-west1-second-hand-helper.cloudfunctions.net/webApi${path}`, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`
+      },
+      ...(method === 'POST' && data ? { body: JSON.stringify(data) } : {}),
+    })
+    const json = await response.json();
+    return { data: json };
+  } catch(e) {
+    console.error(e);
+    errorHandler.report(`Failure calling backend function ${JSON.stringify(e)}`)
+    throw e;
+  }
+}
+
 export function setFormAddressFields(user) {
     document.getElementById("addressFirstName").value = user.addressFirstName || '';
     document.getElementById("addressFirstName").dispatchEvent(new Event('input'));

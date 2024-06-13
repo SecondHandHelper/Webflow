@@ -94,8 +94,7 @@
     });
   }
 
-  // Function to call Firebase backend function
-  async function callFirebaseFunction(region, functionName, data = {}, timeoutSec = 20) {
+  async function getIdToken() {
     const idToken = localStorage.getItem('idToken');
     if (!idToken) {
       if (firebase.auth().currentUser) {
@@ -107,6 +106,12 @@
         throw new Error('User not authenticated');
       }
     }
+    return idToken;
+  }
+
+  // Function to call auth protected Firebase backend function
+  async function callFirebaseFunction(region, functionName, data = {}, timeoutSec = 20) {
+    const idToken = await getIdToken();
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), timeoutSec*1000);
 

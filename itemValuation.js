@@ -437,7 +437,7 @@ const showAdjustValuation = async (item) => {
 }
 
 const getItem = async (itemId) => {
-    const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId });
+    const res = await callBackendApi('get', `/api/items?itemId=${itemId}`);
     return { ...(res?.data || {}), id: itemId };
 }
 
