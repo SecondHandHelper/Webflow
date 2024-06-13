@@ -1,3 +1,5 @@
+import { enhanceFrontImage, showImageState, uploadImageAndShowPreview, uploadTempImage, capitalizeFirstLetter } from "./sellItemHelpers";
+
 function initializePage(item) {
     const itemTitle = (item.cleanedBrand || item.brand).trim() + "-" + item.category.toLowerCase();
     document.getElementById('itemTitle').innerText = itemTitle;
@@ -15,7 +17,7 @@ function initializePage(item) {
     document.getElementById('itemImageBanner').src = imageUrl;
     document.getElementById('resellButton').href = `./sell-item?id=${item.id}`;
     let compensation = Math.round(item.soldPrice * 0.1)
-    compensation = compensation < 60 ? 60 : compensation > 250 ? 250 : compensation ;
+    compensation = compensation < 60 ? 60 : compensation > 250 ? 250 : compensation;
     discount10PercentText.innerText = `Behålla plagget och få ${compensation} kr återbetalt`;
     const contact = item.buyer.Email || item.buyer.PhoneNumber;
     thankYouText.innerText = `Vi tittar på ärendet och skickar svar ${contact.includes('@') ? `till din email ${contact}` : `på SMS till ditt telefonnummer ${contact}`}`;
@@ -54,7 +56,7 @@ function addEventListeners() {
             reasonLabel.style.display = 'block';
             this.style.color = "#101010";
         }
-        
+
         // Hide all fields
         const elements = document.querySelectorAll('.simple-input-container');
         elements.forEach(function (element) {
@@ -62,7 +64,7 @@ function addEventListeners() {
                 element.style.display = 'none';
             }
         });
-        reclaimImagesContainer.style.display = 'none';        
+        reclaimImagesContainer.style.display = 'none';
 
         // Show the right fields
         if (input.includes('Defects')) {
@@ -96,7 +98,7 @@ function addEventListeners() {
             listingErrorLabel.style.display = 'block';
             this.style.color = "#101010";
         }
-        if (input === 'Other'){
+        if (input === 'Other') {
             reclaimDescriptionContainer.style.display = 'block';
         }
     };
@@ -112,18 +114,25 @@ function addEventListeners() {
         thankYouDiv.style.display = 'block';
     });
 
-    // Image event listeners
-    /*
-    const imageElements = ["reclaimImage1", "reclaimImage2", "reclaimImage3", "reclaimImage4"];
-    imageElements.forEach(imageName => {
-        document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).addEventListener('click', () => {
-            removeSavedImage(imageName);
+    let imageElementIds = ['reclaimImage1', 'reclaimImage2', 'reclaimImage3', 'reclaimImage4'];
+    imageElementIds.forEach(function (id) {
+        let elemUpload = document.getElementById(id);
+        let elemPreviewUploading = document.getElementById(`${id}PreviewUploading`);
+        let elemPreview = document.getElementById(`${id}Preview`);
+        elemUpload.addEventListener("change", function () {
+            let input = this.files[0];
+            if (input) {
+                let src = URL.createObjectURL(input);
+                elemPreviewUploading.style.backgroundImage = `url('${src}')`;
+                elemPreview.style.backgroundImage = `url('${src}')`;
+                document.getElementById(`loading${capitalizeFirstLetter(id)}Icon`).style.display = 'none';
+                document.getElementById(id).required = false;
+            }
         });
-    })
-    */
+    });
 }
 
-function hideAllButtons(){
+function hideAllButtons() {
     resellButton.style.display = 'none';
     reclaimButton.style.display = 'none';
     cancelButton.style.display = 'none';
@@ -134,14 +143,14 @@ function hideAllButtons(){
 async function validateInput() {
     document.getElementById('reclaimFormInner').reportValidity();
     return new Promise((resolve, reject) => {
-      // Custom
-      const reclaimReason = document.getElementById('reclaimReason');
-      if (!reclaimReason.value) {
-        reclaimReason.setCustomValidity(`Välj anledning till reklamationen`);
-        document.getElementById('reclaimFormInner').reportValidity();
-        return resolve(false);
-      }
-      return resolve(true)
+        // Custom
+        const reclaimReason = document.getElementById('reclaimReason');
+        if (!reclaimReason.value) {
+            reclaimReason.setCustomValidity(`Välj anledning till reklamationen`);
+            document.getElementById('reclaimFormInner').reportValidity();
+            return resolve(false);
+        }
+        return resolve(true)
     });
 }
 
@@ -154,10 +163,10 @@ async function saveReclaim(itemId) {
     let compensationPreference = '';
     const radios = document.getElementsByName('compensationPreference');
     for (var i = 0; i < radios.length; i++) {
-      if (radios[i].checked) { compensationPreference = radios[i].value; }
+        if (radios[i].checked) { compensationPreference = radios[i].value; }
     }
-    const refundAmount = compensationPreference.includes('10 percent discount') ? parseInt(discount10PercentText.innerText.match(/\d+/g)) : null ;
-    
+    const refundAmount = compensationPreference.includes('10 percent discount') ? parseInt(discount10PercentText.innerText.match(/\d+/g)) : null;
+
     let reclaim = {
         createdAt: now,
         status: 'Pending',
@@ -171,12 +180,42 @@ async function saveReclaim(itemId) {
     console.log('Will update: ', { itemId, reclaim });
 
     await callFirebaseFunction("europe-west1", 'saveReclaim', { itemId, reclaim });
+    await uploadAndSaveImages(itemId);
 }
+
+//IMAGE FUNCTIONS START
+async function uploadAndSaveImages(itemId) {
+    let elements = document.querySelectorAll("input").values();
+    let images = new Map(); //Gather files from the form in a map "Images"
+    elements.forEach(elem => {
+        if (elem.id.includes("Image") && elem.files[0]) {
+            let file = elem.files[0];
+            images.set(elem, file);
+        }
+    });
+    console.log('images', images);
+
+    // Uploads files and add the new imageUrls to the changes object
+    /*
+    await Promise.all(Array.from(images).map(async ([imageName, value]) => {
+        console.log(`${imageName}: ${value}`);
+        const { url: imageUrl } = await uploadTempImage(value, imageName);
+        await callFirebaseFunction("europe-west1", 'saveReclaimImage', {
+            itemId,
+            fileName: imageName,
+            url: imageUrl
+        });
+    }));
+    */
+}
+//IMAGE FUNCTIONS END
+
 
 const getItem = async (itemId) => {
     const res = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId });
     return { ...(res?.data || {}), id: itemId };
 }
+
 
 const main = async () => {
     const params = getParamsObject();
@@ -190,4 +229,5 @@ const main = async () => {
     triggerShowContent.click();
 }
 
+let changedImages = [];
 main();
