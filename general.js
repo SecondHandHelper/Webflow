@@ -17,7 +17,7 @@ export function signOut() {
 }
 
 // Function to call new web api backend function, with or without auth
-export async function callBackendApi(method, path, data, requiresAuth) {
+export async function callBackendApi(path, data, method = 'GET', requiresAuth = false) {
   let idToken = '';
   if (requiresAuth) {
     idToken = await getIdToken();

@@ -1,7 +1,7 @@
 import {callBackendApi, itemCoverImage} from "./general";
 
 async function loadItem(itemId) {
-  const item = await callBackendApi('get', `/api/items?itemId=${itemId}`);
+  const item = await callBackendApi(`/api/items/${itemId}`);
   if (!item.data) {
     return;
   }

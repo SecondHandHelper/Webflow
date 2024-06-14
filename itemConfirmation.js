@@ -82,7 +82,7 @@ function itemConditionText(item) {
 
 
 const getItem = async (itemId) => {
-    const res = await callBackendApi('get', `/api/items?itemId=${itemId}`);
+    const res = await callBackendApi(`/api/items/${itemId}`);
     return { ...(res?.data || {}), id: itemId };
 }
 

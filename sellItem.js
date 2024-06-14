@@ -532,7 +532,7 @@ async function addItemInner(id, status = 'New') {
   if (!authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
-    const createItemResponse = await callBackendApi('POST', '/api/items', { id, item }, true);
+    const createItemResponse = await callBackendApi('/api/items', {id, item}, 'POST', true);
 
     await trackUserActivated();
     await setCampaignCoupon();
@@ -653,7 +653,7 @@ async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
   sessionStorage.removeItem('newItemId');
-  await callBackendApi('POST', '/api/items', itemFromStorage, true);
+  await callBackendApi('/api/items', itemFromStorage, 'POST', true);
   await trackUserActivated();
   await setCampaignCoupon()
   localStorage.removeItem('newItem');
@@ -739,8 +739,8 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
     let atItemResponse = null;
     if (!savedItem) {
       [item, atItemResponse] = await Promise.all([
-        callBackendApi('get', `/api/items?itemId=${itemId}`),
-        fetch(`https://getatitem-heypmjzjfq-ew.a.run.app?itemId=${itemId}`)
+        callBackendApi(`/api/items/${itemId}`),
+        callBackendApi(`/api/items/${itemId}/atItem`)
       ]);
       itemDraft = item;
     }

@@ -127,20 +127,19 @@ async function updateItem(itemId, changedImages) {
         infoRequestImagesText.style.display = 'block';
         infoRequestImagesDiv.style.display = 'none';
         const { url: imageUrl } = await uploadTempImage(value, imageName);
-        await callFirebaseFunction("europe-west1", 'saveItemImage', {
-          itemId,
+        await callBackendApi('/api/items/:itemId/images', {
           fileName: imageName,
           url: imageUrl
-        });
+        }, 'POST', true);
       }));
       if (changedImages.indexOf('frontImage') > -1) {
         // Front image was changed, also save the enhancedFrontImage in the right place
-        const item = await callBackendApi('get', `/api/items?itemId=${itemId}`);
+        const item = await callBackendApi(`/api/items/${itemId}`);
         const itemData = item.data;
-        await callFirebaseFunction("europe-west1", 'saveItemImage', {
-          itemId, fileName: `enhancedFrontImage`,
+        await callBackendApi('/api/items/:itemId/images', {
+          fileName: `enhancedFrontImage`,
           url: `${sessionStorage.getItem('enhancedFrontImage')}`
-        });
+        }, 'POST', true);
         changes[`images.versionsStatus.enhancedFrontImage`] = '';
         if (itemData.images.coverImage === itemData.images.enhancedFrontImage) {
           changes['images.coverImage'] = '';
@@ -204,7 +203,7 @@ function showChangesSaved() {
 async function fillForm(itemId) {
   try {
     const userId = authUser.current.uid;
-    const item = await callBackendApi('get', `/api/items?itemId=${itemId}`);
+    const item = await callBackendApi(`/api/items/${itemId}`);
     const data = item.data;
     if (userId !== data.user && userId !== '3OkW5av20HP8ScpUDS8ip9fBEZr1') {
       return;
@@ -418,7 +417,7 @@ function setUpEventListeners() {
 
   cancelSaleButton.addEventListener('click', async () => {
     const itemId = params.id;
-    const item = await callBackendApi('get', `/api/items?itemId=${itemId}`);
+    const item = await callBackendApi(`/api/items/${itemId}`);
     const data = item.data;
     const hasBid = data.traderaBidExists || (data?.soldPlatform?.includes('Vestiaire') && data.soldDate && data.soldPrice) ? true : false;
     if (hasBid) {
