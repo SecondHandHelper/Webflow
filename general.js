@@ -29,7 +29,7 @@ export async function callBackendApi(path, data, method = 'GET', requiresAuth = 
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${idToken}`
       },
-      ...(method === 'POST' && data ? { body: JSON.stringify(data) } : {}),
+      ...(data ? { body: JSON.stringify(data) } : {}),
     })
     const json = await response.json();
     return { data: json };

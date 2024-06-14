@@ -532,7 +532,7 @@ async function addItemInner(id, status = 'New') {
   if (!authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
-    const createItemResponse = await callBackendApi('/api/items', {id, item}, 'POST', true);
+    const createItemResponse = await callBackendApi(`/api/items/${id}`, { item }, 'POST', true);
 
     await trackUserActivated();
     await setCampaignCoupon();

@@ -1,4 +1,5 @@
-import { enhanceFrontImage, showImageState, uploadImageAndShowPreview, uploadTempImage, capitalizeFirstLetter } from "./sellItemHelpers";
+import {capitalizeFirstLetter, uploadTempImage} from "./sellItemHelpers";
+import {callBackendApi} from "./general";
 
 function initializePage(item) {
     const itemTitle = (item.cleanedBrand || item.brand).trim() + "-" + item.category.toLowerCase();
@@ -179,37 +180,26 @@ async function saveReclaim(itemId) {
 
     console.log('Will update: ', { itemId, reclaim });
 
-    await callFirebaseFunction("europe-west1", 'saveReclaim', { itemId, reclaim });
+    await callBackendApi(`/api/items/${itemId}/reclaim`, { reclaim }, 'POST', true);
     await uploadAndSaveImages(itemId);
 }
 
-//IMAGE FUNCTIONS START
 async function uploadAndSaveImages(itemId) {
     let elements = document.querySelectorAll("input").values();
-    let images = new Map(); //Gather files from the form in a map "Images"
+    let images = [];
     elements.forEach(elem => {
         if (elem.id.includes("Image") && elem.files[0]) {
-            let file = elem.files[0];
-            images.set(elem, file);
+          images.push(elem.files[0]);
         }
     });
     console.log('images', images);
 
     // Uploads files and add the new imageUrls to the changes object
-    /*
-    await Promise.all(Array.from(images).map(async ([imageName, value]) => {
-        console.log(`${imageName}: ${value}`);
-        const { url: imageUrl } = await uploadTempImage(value, imageName);
-        await callFirebaseFunction("europe-west1", 'saveReclaimImage', {
-            itemId,
-            fileName: imageName,
-            url: imageUrl
-        });
+    await Promise.all(images.map(async (image, index) => {
+        const { url: imageUrl } = await uploadTempImage(image, `reclaim_${itemId}_${index}`);
+        await callBackendApi(`/api/items/${itemId}/reclaim`, { imageUrl }, 'PUT', true);
     }));
-    */
 }
-//IMAGE FUNCTIONS END
-
 
 const getItem = async (itemId) => {
     const res = await callBackendApi(`/api/items/${itemId}`);
