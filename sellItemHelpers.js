@@ -1,3 +1,5 @@
+import {BACKEND_API_URL, callBackendApi} from "./general";
+
 export async function uploadTempImage(input, fileName) {
     if (!sessionStorage.getItem('newItemId')) {
         sessionStorage.setItem('newItemId', await  requestUniqueId());
@@ -13,7 +15,7 @@ export async function uploadTempImage(input, fileName) {
     form.append('file', image);
     form.append('temporary', 'true');
     form.append('generateSmallImage', 'true');
-    const response = await fetch('https://uploaditemimagebinary-heypmjzjfq-ew.a.run.app', {
+    const response = await fetch(`${BACKEND_API_URL}/api/items/${tempId}/uploadImage`, {
         method: 'POST',
         body: form
     });
@@ -61,14 +63,8 @@ async function scaleImageToMaxSize(input) {
 }
 
 export async function requestUniqueId() {
-    const endpointUrl = 'https://generateuniqueid-heypmjzjfq-ew.a.run.app';
     try {
-        const response = await fetch(endpointUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+        const response = await callBackendApi('/api/items/id', { method: 'POST', requiresAuth: false });
         if (!response.ok) {
             console.error(`Error: ${response.statusText}`);
             return null;

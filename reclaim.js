@@ -180,7 +180,7 @@ async function saveReclaim(itemId) {
 
     console.log('Will update: ', { itemId, reclaim });
 
-    await callBackendApi(`/api/items/${itemId}/reclaim`, { reclaim }, 'POST', true);
+    await callBackendApi(`/api/items/${itemId}/reclaim`, { data: { reclaim }});
     await uploadAndSaveImages(itemId);
 }
 
@@ -197,7 +197,7 @@ async function uploadAndSaveImages(itemId) {
     // Uploads files and add the new imageUrls to the changes object
     await Promise.all(images.map(async (image, index) => {
         const { url: imageUrl } = await uploadTempImage(image, `reclaim_${itemId}_${index}`);
-        await callBackendApi(`/api/items/${itemId}/reclaim`, { imageUrl }, 'PUT', true);
+        await callBackendApi(`/api/items/${itemId}/reclaim`, { data: { imageUrl }});
     }));
 }
 

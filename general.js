@@ -16,20 +16,27 @@ export function signOut() {
     });
 }
 
-// Function to call new web api backend function, with or without auth
-export async function callBackendApi(path, data, method = 'GET', requiresAuth = false) {
+export const BACKEND_API_URL = 'https://europe-west1-second-hand-helper.cloudfunctions.net/webApi';
+
+// Function to call web api backend function, with or without auth
+export async function callBackendApi(path, opts) {
+  const { data, method, requiresAuth, timeoutSec = 20 } = opts;
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), timeoutSec*1000);
   let idToken = '';
-  if (requiresAuth) {
+  const useMethod = method || (data ? 'POST' : 'GET');
+  if (requiresAuth || useMethod !== 'GET') {
     idToken = await getIdToken();
   }
   try {
-    const response = await fetch(`https://europe-west1-second-hand-helper.cloudfunctions.net/webApi${path}`, {
-      method,
+    const response = await fetch(`${BACKEND_API_URL}${path}`, {
+      method: useMethod,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${idToken}`
       },
       ...(data ? { body: JSON.stringify(data) } : {}),
+      signal: controller.signal
     })
     const json = await response.json();
     return { data: json };
@@ -37,7 +44,24 @@ export async function callBackendApi(path, data, method = 'GET', requiresAuth = 
     console.error(e);
     errorHandler.report(`Failure calling backend function ${JSON.stringify(e)}`)
     throw e;
+  } finally {
+    clearTimeout(timeout);
   }
+}
+
+async function getIdToken() {
+  const idToken = localStorage.getItem('idToken');
+  if (!idToken) {
+    if (firebase.auth().currentUser) {
+      const idToken = await result.getIdToken();
+      localStorage.setItem('idToken', idToken);
+      authUser.current = firebase.auth().currentUser;
+      localStorage.setItem('authUser', JSON.stringify(authUser.current));
+    } else {
+      throw new Error('User not authenticated');
+    }
+  }
+  return idToken;
 }
 
 export function setFormAddressFields(user) {

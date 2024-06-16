@@ -1,7 +1,7 @@
-import {itemCoverImage} from "./general";
+import {callBackendApi, itemCoverImage} from "./general";
 
 function loadRecentlySold() {
-  const recentlySoldItems = firebase.app().functions('europe-west1').httpsCallable('recentlySoldItems');
+  const recentlySoldItems = callBackendApi('/api/items/recentlySold');
 
   recentlySoldItems()
     .then((result) => {
