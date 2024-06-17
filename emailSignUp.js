@@ -3,7 +3,10 @@ import {callBackendApi} from "./general";
 const campaignSignUpMain = async () => {
   try {
     document.getElementById('emailText').innerText = getParamsObject().email;
-    const response = await callBackendApi('/api/items/recommendations', { data: { email: getParamsObject().email } })
+    const response = await callBackendApi('/api/items/recommendationsSignup', {
+      data: { email: getParamsObject().email },
+      method: 'PUT'
+    });
     if (!response.ok) {
       console.error(`Error: ${response.statusText}`);
       return null;
