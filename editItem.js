@@ -127,7 +127,7 @@ async function updateItem(itemId, changedImages) {
         infoRequestImagesText.style.display = 'block';
         infoRequestImagesDiv.style.display = 'none';
         const { url: imageUrl } = await uploadTempImage(value, imageName);
-        await callBackendApi('/api/items/:itemId/images', {
+        await callBackendApi(`/api/items/${itemId}/images`, {
           fileName: imageName,
           url: imageUrl
         }, 'POST', true);
@@ -136,7 +136,7 @@ async function updateItem(itemId, changedImages) {
         // Front image was changed, also save the enhancedFrontImage in the right place
         const item = await callBackendApi(`/api/items/${itemId}`);
         const itemData = item.data;
-        await callBackendApi('/api/items/:itemId/images', {
+        await callBackendApi(`/api/items/${itemId}/images`, {
           fileName: `enhancedFrontImage`,
           url: `${sessionStorage.getItem('enhancedFrontImage')}`
         }, 'POST', true);
