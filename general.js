@@ -42,7 +42,7 @@ export async function callBackendApi(path, { data, method, requiresAuth, timeout
       return { data: undefined }
     }
     const json = await response.json();
-    return { data: json };
+    return json.data ? json : { data: json };
   } catch(e) {
     console.error(e);
     errorHandler.report(`Failure calling backend function ${JSON.stringify(e)}`)

@@ -111,7 +111,7 @@ async function sellItemMainAuthenticated() {
       await createItemAfterSignIn();
       const shippingMethod = sessionStorage.getItem('shippingMethod');
       if (shippingMethod) {
-        await callBackendApi('/api/users', { preferences: { shippingMethod } });
+        await callBackendApi('/api/users', { data: { preferences: { shippingMethod } }});
       }
       const userPhoneSet = user.current?.phoneNumber?.length;
       return location.href = userPhoneSet ? '/item-confirmation' : '/user-contact';
@@ -302,7 +302,7 @@ async function saveValuationInStorageOrBackend(valuationData, itemId) {
       item: { ...item.item, ...valuationData }
     }));
   } else {
-    await callBackendApi(`/api/valuation/${itemId}`, valuationData);
+    await callBackendApi(`/api/valuation/${itemId}`, { data: valuationData });
     const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
     localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData }));
   }
@@ -387,7 +387,7 @@ async function getAndSaveValuation(itemId, item) {
     return '/item-valuation';
   }
   try {
-    const res = callBackendApi('/api/valuation', { data: { itemId, item }});
+    const res = await callBackendApi('/api/valuation', { data: { itemId, item }});
     const { minPrice, maxPrice, decline } = res.data || {};
     await saveItemValuation(itemId, res.data);
     return nextStepAfterValuation(minPrice && maxPrice, decline, needsHumanCheck(res.data));
@@ -508,7 +508,7 @@ async function getShippingMethod() {
   let shippingMethod = 'Service point';
   if (!user.current?.preferences?.shippingMethod) {
     if (authUser.current) {
-      await callBackendApi('/api/users', { preferences: { shippingMethod } });
+      await callBackendApi('/api/users', { data: { preferences: { shippingMethod } }});
     } else {
       sessionStorage.setItem('shippingMethod', shippingMethod);
     }
@@ -667,7 +667,6 @@ function rememberUnsavedChanges() {
   if (!shouldSaveState()) {
     return;
   }
-  console.log('rememberUnsavedChanges');
   const {
     user, createdAt, status, shippingStatus, modelVariantFields, ...itemToSave
   } = collect();

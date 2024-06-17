@@ -84,7 +84,7 @@ async function connectReferralUsers(inputCode) {
 
   // Find user with matching referral code and connect users
   try {
-    const res = await callBackendApi('/api/users/referredBy', { code: inputCode, method: 'PUT' });
+    const res = await callBackendApi('/api/users/referredBy', { data: { code: inputCode }, method: 'PUT' });
     deleteCookie('invite');
     console.log('connecReferralUser response: ', res);
     if (res?.data?.code === 400) { //User already used a referral

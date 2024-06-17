@@ -9,7 +9,7 @@ async function main() {
   if (user.current?.referralData?.referredUsers?.length > 0) {
       //TOP STATS
       document.getElementById('invitedFriends').innerText = user.current.referralData.referredUsers.length;
-      const referredUserStatsResponse = await callBackendApi('/api/users/referredUserStats');
+      const referredUserStatsResponse = await callBackendApi('/api/users/referredUserStats', { requiresAuth: true });
       const referredUserStats = referredUserStatsResponse.data;
       document.getElementById('soldItems').innerText = `${referredUserStats.soldItems}`;
       // https://supermiljobloggen.se/nyheter/secondhand-200-ganger-mindre-klimatskadligt-an-nyproducerat/

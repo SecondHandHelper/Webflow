@@ -64,13 +64,8 @@ async function scaleImageToMaxSize(input) {
 
 export async function requestUniqueId() {
     try {
-        const response = await callBackendApi('/api/items/id', { method: 'POST', requiresAuth: false });
-        if (!response.ok) {
-            console.error(`Error: ${response.statusText}`);
-            return null;
-        }
-        const data = await response.json();
-        return data.id;
+        const response = await callBackendApi('/api/id', { method: 'POST', requiresAuth: false });
+        return response.data.id;
     } catch (error) {
         console.error(`Failed to fetch unique ID, generating uuidv4 id: ${error.message}`, error);
         return uuidv4();

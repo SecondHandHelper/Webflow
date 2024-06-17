@@ -27,7 +27,7 @@ async function getValuation(itemBrand, itemCategory) {
   document.getElementById('howItWorksDiv').style.display = 'none';
   document.getElementById('valuationInfoButton').style.display = 'none';
   try {
-    const valuationRes = await callBackendApi('/api/valuation/partial',
+    const valuationRes = await callBackendApi('/api/valuation?partial=true',
       { data: { brand, category }});
     const {
       minPrice, maxPrice, decline, newBrand, valuatedBrandItems, fewBrand, valuatedBrandCategoryItems,

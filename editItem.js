@@ -461,7 +461,8 @@ function setUpEventListeners() {
       cancelButtonSpinner.style.display = 'flex';
       cancelConfirmButton.style.display = 'none';
       // Call endpoint to remove item
-      await callBackendApi(`/api/items/${itemId}/archive`, { data: { archivedReason: reason } });
+      await callBackendApi(`/api/items/${itemId}/archive`,
+        { method: 'PUT', data: { archivedReason: reason } });
       // Show confirmation
       if (reason === 'Seller sold elsewhere') { cancelSoldElsewhereWarning.style.display = 'flex'; }
       crossFade(cancelConfirmation);

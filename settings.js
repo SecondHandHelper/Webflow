@@ -9,7 +9,7 @@ import {
 async function updateUserAddress() {
     try {
         loadOnSavePressed()
-        await callBackendApi('/api/users', { ...getFormAddressFields() })
+        await callBackendApi('/api/users', { data: getFormAddressFields() })
         await onUpdateComplete()
     } catch (e) {
         errorHandler.report(e);
@@ -26,14 +26,14 @@ async function updateShippingPreference() {
             shippingMethod = radioButtons[x].value; // "Service point" or "Pickup"
         }
     }
-    await callBackendApi('/api/users', { preferences: { shippingMethod } })
+    await callBackendApi('/api/users', { data: { preferences: { shippingMethod } } })
     await onUpdateComplete()
 }
 
 async function updateContactNumbers(isSwish) {
     try {
         loadOnSavePressed()
-        await callBackendApi('/api/users',{ ...getCleanedNumber(isSwish) })
+        await callBackendApi('/api/users',{ data: getCleanedNumber(isSwish) })
         await onUpdateComplete()
     } catch (e) {
       errorHandler.report(e);
@@ -44,7 +44,7 @@ async function updateUserPersonId() {
     try {
         loadOnSavePressed()
         await callBackendApi('/api/users',
-          { personalId: formatPersonalId(personalId.value.trim().replace(/\D/g, '')) })
+          { data: { personalId: formatPersonalId(personalId.value.trim().replace(/\D/g, '')) }})
         await onUpdateComplete()
     } catch (e) {
         errorHandler.report(e);

@@ -242,10 +242,11 @@ async function uploadAndSaveImages(itemId) {
     const images = getFormImages();
 
     // Uploads files and add the new imageUrls to the changes object
-    await Promise.all(images.map(async (image, index) => {
+    const imageUrls = await Promise.all(images.map(async (image, index) => {
         const { url: imageUrl } = await uploadTempImage(image, `reclaim_${itemId}_${index}`);
-        await callBackendApi(`/api/items/${itemId}/reclaim`, { data: { imageUrl }});
+        return url;
     }));
+    await callBackendApi(`/api/items/${itemId}/reclaim`, { data: { imageUrls }});
 }
 
 const getItem = async (itemId) => {
