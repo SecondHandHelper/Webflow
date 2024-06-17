@@ -33,7 +33,7 @@ async function main() {
           invitedFriendStatusesDiv.appendChild(newRow);
       }
       document.getElementById('referralDetails').style.display = 'block';
-      callBackendApi('/api/users/referralStats').then(referralStatsResponse => {
+      callBackendApi('/api/users/referralStats', { requiresAuth: true }).then(referralStatsResponse => {
         const referralStats = referralStatsResponse.data;
         document.getElementById('nextFreePill').style.display = referralStats.freeSells > referralStats.usedFreeSells ? 'block' : 'none';
         document.getElementById('freeSells').innerText = referralStats.freeSells;
