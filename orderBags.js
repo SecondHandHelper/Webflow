@@ -2,7 +2,7 @@ import {callBackendApi, getFormAddressFields, setFormAddressFields} from "./gene
 
 var maxNumBags = 10;
 async function getMaxNumBags() {
-  const maxBags = await callBackendApi('/api/bags/allowedOrders');
+  const maxBags = await callBackendApi('/api/bags/orders/allowed', { requiresAuth: true });
   if (maxBags?.data) {
     if (maxBags.data?.errorCode === 'unfulfilled-order') {
       document.getElementById('orderBagsError').style.display = 'block';

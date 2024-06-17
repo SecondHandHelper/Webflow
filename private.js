@@ -99,9 +99,13 @@ if (sessionUser) {
 
 
 async function showOrderBagsSection() {
-  const maxBags = await callBackendApi('/api/bags/allowedOrders');
-  if (maxBags?.data?.maxOrderBags > 0) {
-    document.getElementById('orderBagsSection').style.display = 'block';
+  try {
+    const maxBags = await callBackendApi('/api/bags/orders/allowed', { requiresAuth: true });
+    if (maxBags?.data?.maxOrderBags > 0) {
+      document.getElementById('orderBagsSection').style.display = 'block';
+    }
+  } catch (e) {
+    console.log(e);
   }
 }
 
@@ -272,7 +276,7 @@ async function privateMain() {
   });
   */
 
-  const items = (await callBackendApi('/api/items'))?.data;
+  const items = (await callBackendApi('/api/items', { requiresAuth: true }))?.data;
   showInviteToast(items);
 
   const inviteCode = checkCookie("invite");
@@ -425,7 +429,7 @@ async function showInactiveItemsSection() {
 }
 
 async function showInYourWardrobeSection() {
-  const wardrobeItems = await callBackendApi('/api/items/wardrobe');
+  const wardrobeItems = await callBackendApi('/api/items/wardrobe', { requiresAuth: true });
   if (!wardrobeItems.data?.length) {
     return;
   }
@@ -571,8 +575,8 @@ async function fetchAndShowRecommendedItems(items) {
   try {
     const ids = [];
     items.forEach(item => ids.push(item.id));
-    const response = await callBackendApi('/api/items/recommendations',
-      { data: { items: ids.slice(0, 10), number: 20 }});
+    const query = ids.slice(0, 10).map(id => `items=${ id }`).join('&') + '&number=20';
+    const response = await callBackendApi(`/api/items/recommendations?${query}`);
     if (!response.data.length) {
       return;
     }

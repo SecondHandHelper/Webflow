@@ -127,7 +127,7 @@ async function updateItem(itemId, changedImages) {
         infoRequestImagesText.style.display = 'block';
         infoRequestImagesDiv.style.display = 'none';
         const { url: imageUrl } = await uploadTempImage(value, imageName);
-        await callBackendApi('/api/items/:itemId/images', { data: {
+        await callBackendApi(`/api/items/${itemId}/images`, { data: {
           fileName: imageName,
           url: imageUrl
         } });
@@ -136,7 +136,7 @@ async function updateItem(itemId, changedImages) {
         // Front image was changed, also save the enhancedFrontImage in the right place
         const item = await callBackendApi(`/api/items/${itemId}`);
         const itemData = item.data;
-        await callBackendApi('/api/items/:itemId/images', { data: {
+        await callBackendApi(`/api/items/${itemId}/images`, { data: {
           fileName: `enhancedFrontImage`,
           url: `${sessionStorage.getItem('enhancedFrontImage')}`
         }});
@@ -448,6 +448,7 @@ function setUpEventListeners() {
 
 
   cancelConfirmButton.addEventListener('click', async () => {
+    const itemId = params.id;
     let reason = '';
     const radioButtons = document.getElementsByName('cancelReason');
     for (var i = 0; i < radioButtons.length; i++) {
