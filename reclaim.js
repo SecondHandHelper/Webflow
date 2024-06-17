@@ -1,5 +1,5 @@
-import {capitalizeFirstLetter, uploadTempImage} from "./sellItemHelpers";
-import {callBackendApi} from "./general";
+import { capitalizeFirstLetter, uploadTempImage } from "./sellItemHelpers";
+import { callBackendApi } from "./general";
 
 function initializePage(item) {
     const itemTitle = (item.cleanedBrand || item.brand).trim() + "-" + item.category.toLowerCase();
@@ -66,6 +66,8 @@ function addEventListeners() {
             }
         });
         reclaimImagesContainer.style.display = 'none';
+        reclaimDescription.required = true;
+        reclaimListingError.required = false;
 
         // Show the right fields
         if (input.includes('Defects')) {
@@ -73,6 +75,8 @@ function addEventListeners() {
             reclaimImagesContainer.style.display = 'block';
         } else if (input.includes('Listing')) {
             reclaimListingErrorContainer.style.display = 'block';
+            reclaimDescription.required = false;
+            reclaimListingError.required = true;
         } else if (input.includes('False')) {
             reclaimDescriptionContainer.style.display = 'block';
             reclaimImagesContainer.style.display = 'block';
@@ -107,12 +111,14 @@ function addEventListeners() {
     document.getElementById('doneButton').addEventListener('click', async function () {
         //showSpinner();
         const params = getParamsObject();
-        await saveReclaim(params.id);
-        console.log('RECLAIM SAVED');
-        reclaimForm.style.display = 'none';
-        hideAllButtons();
-        toMaiButton.style.display = 'flex';
-        thankYouDiv.style.display = 'block';
+        const res = await saveReclaim(params.id);
+        if (res) {
+            console.log('RECLAIM SAVED');
+            reclaimForm.style.display = 'none';
+            hideAllButtons();
+            toMaiButton.style.display = 'flex';
+            thankYouDiv.style.display = 'block';
+        }
     });
 
     let imageElementIds = ['reclaimImage1', 'reclaimImage2', 'reclaimImage3', 'reclaimImage4'];
@@ -131,6 +137,20 @@ function addEventListeners() {
             }
         });
     });
+
+    let inputs = document.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        // Add an event listener to each input to clear validation message on input
+        input.addEventListener('input', (input) => {
+            input.setCustomValidity(''); // Clear validation message
+        });
+
+        if (input.tagName.toLowerCase() === 'select') {
+            input.addEventListener('change', () => {
+                input.setCustomValidity('');
+            });
+        }
+    });
 }
 
 function hideAllButtons() {
@@ -141,31 +161,64 @@ function hideAllButtons() {
     toMaiButton.style.display = 'none';
 }
 
+function getFormImages() {
+    let elements = document.querySelectorAll("input").values();
+    let images = [];
+    elements.forEach(elem => {
+        if (elem.id.includes("Image") && elem.files[0]) {
+            images.push(elem.files[0]);
+        }
+    });
+    return images
+}
+
+function validateMandatoryImages() {
+    const i = getFormImages();
+    if (!i.length) {
+        document.getElementById('reclaimImage1').setCustomValidity(`Ladda upp minst en bild på felet`);
+        document.getElementById('reclaimFormInner').reportValidity();
+        return false;
+    }
+    return true
+}
+
 async function validateInput() {
     document.getElementById('reclaimFormInner').reportValidity();
     return new Promise((resolve, reject) => {
         // Custom
         const reclaimReason = document.getElementById('reclaimReason');
+        console.log('reclaimReason', reclaimReason.value);
         if (!reclaimReason.value) {
+            console.log('reporting validity');
             reclaimReason.setCustomValidity(`Välj anledning till reklamationen`);
             document.getElementById('reclaimFormInner').reportValidity();
             return resolve(false);
+        }
+        // Images mandatory
+        if (reclaimReason.value.includes('Defects') || reclaimReason.value.includes('False')) {
+            imagesTitle.innerText = 'Bilder på felet (obligatoriskt)'
+            return resolve(validateMandatoryImages());
         }
         return resolve(true)
     });
 }
 
 async function saveReclaim(itemId) {
-    if (!(await validateInput())) { return; }
+    const validation = await validateInput();
+    console.log('Validation: ', validation);
+    if (!(await validateInput())) { return false }
     const now = new Date();
     const reason = reclaimReason.value;
     const listingError = reclaimListingError.value || '';
+    if(reclaimListingError.required && !listingError){ return false } // Borde vara del av validering
     const description = reclaimDescription.value || '';
     let compensationPreference = '';
     const radios = document.getElementsByName('compensationPreference');
     for (var i = 0; i < radios.length; i++) {
         if (radios[i].checked) { compensationPreference = radios[i].value; }
     }
+    if(!compensationPreference){ return false } // Borde vara del av validering
+    
     const refundAmount = compensationPreference.includes('10 percent discount') ? parseInt(discount10PercentText.innerText.match(/\d+/g)) : null;
 
     let reclaim = {
@@ -182,17 +235,11 @@ async function saveReclaim(itemId) {
 
     await callBackendApi(`/api/items/${itemId}/reclaim`, { data: { reclaim }});
     await uploadAndSaveImages(itemId);
+    return true
 }
 
 async function uploadAndSaveImages(itemId) {
-    let elements = document.querySelectorAll("input").values();
-    let images = [];
-    elements.forEach(elem => {
-        if (elem.id.includes("Image") && elem.files[0]) {
-          images.push(elem.files[0]);
-        }
-    });
-    console.log('images', images);
+    const images = getFormImages();
 
     // Uploads files and add the new imageUrls to the changes object
     await Promise.all(images.map(async (image, index) => {
@@ -205,7 +252,6 @@ const getItem = async (itemId) => {
     const res = await callBackendApi(`/api/items/${itemId}`);
     return { ...(res?.data || {}), id: itemId };
 }
-
 
 const main = async () => {
     const params = getParamsObject();
