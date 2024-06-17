@@ -743,7 +743,7 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
       ]);
       itemDraft = item;
     }
-    const atItem = (await atItemResponse?.json()) || {};
+    const atItem = atItemResponse.data;
     const data = item.data;
     const images = data.images || {};
     let originalPrice = data.originalPrice;
