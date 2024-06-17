@@ -653,7 +653,7 @@ async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
   sessionStorage.removeItem('newItemId');
-  await callBackendApi('/api/items', { data: itemFromStorage });
+  await callBackendApi(`/api/items/${itemFromStorage.id}`, { data: itemFromStorage });
   await trackUserActivated();
   await setCampaignCoupon()
   localStorage.removeItem('newItem');
@@ -1352,4 +1352,5 @@ export const isNoBgImage = async (source) => {
 // Call sellItemMain directly
 sellItemMain();
 // and call sellItemMainAuthenticated after/when a user has logged in
+console.log(`registering sellItemMainAuthenticated for when user is set - ${user.current.email}`)
 user.whenSet(sellItemMainAuthenticated);
