@@ -5,8 +5,6 @@ function initializePage(item) {
     const itemTitle = (item.cleanedBrand || item.brand).trim() + "-" + item.category.toLowerCase();
     document.getElementById('itemTitle').innerText = itemTitle;
     document.getElementById('itemTitleBanner').innerText = itemTitle;
-    console.log('item', item);
-    console.log('soldDate', item.soldDate);
     const soldDate = new Date(item.soldDate).toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', year: 'numeric' });
     const subtitleText = `${item.soldPrice} kr, ${soldDate}`;
     document.getElementById('itemSubtitle').innerText = 'Köptes för ' + subtitleText;
@@ -23,7 +21,6 @@ function initializePage(item) {
     const contact = item.buyer.Email || item.buyer.PhoneNumber;
     thankYouText.innerText = `Vi tittar på ärendet och skickar svar ${contact.includes('@') ? `till din email ${contact}` : `på SMS till ditt telefonnummer ${contact}`}`;
     // Om reclaim redan finns -> Gå direkt till Tack!
-    /*
     if (item?.reclaim?.status){
         hideAllButtons();
         toMaiButton.style.display = 'flex';
@@ -31,7 +28,6 @@ function initializePage(item) {
         thankYouDiv.style.display = 'block';
         itemBanner.style.display = 'block';
     }
-    */
 }
 
 function addEventListeners() {
@@ -48,7 +44,6 @@ function addEventListeners() {
     reclaimReason.onchange = function () {
         // Color and label
         let input = this.value;
-        console.log('input', input);
         if (input === '') {
             reasonLabel.style.display = 'none';
             this.style.color = "#929292";
@@ -73,6 +68,7 @@ function addEventListeners() {
         if (input.includes('Defects')) {
             reclaimDescriptionContainer.style.display = 'block';
             reclaimImagesContainer.style.display = 'block';
+            imagesTitle.innerText = 'Bilder på felet (obligatoriskt)';
         } else if (input.includes('Listing')) {
             reclaimListingErrorContainer.style.display = 'block';
             reclaimDescription.required = false;
@@ -80,9 +76,11 @@ function addEventListeners() {
         } else if (input.includes('False')) {
             reclaimDescriptionContainer.style.display = 'block';
             reclaimImagesContainer.style.display = 'block';
+            imagesTitle.innerText = 'Bilder på felet (obligatoriskt)';
         } else if (input.includes('Dirty')) {
             reclaimDescriptionContainer.style.display = 'block';
             reclaimImagesContainer.style.display = 'block';
+            imagesTitle.innerText = 'Bilder på felet (obligatoriskt)';
         } else if (input.includes('Smelly')) {
             reclaimDescriptionContainer.style.display = 'block';
         } else {
@@ -105,13 +103,15 @@ function addEventListeners() {
         }
         if (input === 'Other') {
             reclaimDescriptionContainer.style.display = 'block';
+            reclaimDescription.required = true;
         }
     };
 
     document.getElementById('doneButton').addEventListener('click', async function () {
-        //showSpinner();
+        // Save reclaim
         const params = getParamsObject();
         const res = await saveReclaim(params.id);
+        // Show confirmation
         if (res) {
             console.log('RECLAIM SAVED');
             reclaimForm.style.display = 'none';
@@ -187,15 +187,13 @@ async function validateInput() {
     return new Promise((resolve, reject) => {
         // Custom
         const reclaimReason = document.getElementById('reclaimReason');
-        console.log('reclaimReason', reclaimReason.value);
         if (!reclaimReason.value) {
-            console.log('reporting validity');
             reclaimReason.setCustomValidity(`Välj anledning till reklamationen`);
             document.getElementById('reclaimFormInner').reportValidity();
             return resolve(false);
         }
         // Images mandatory
-        if (reclaimReason.value.includes('Defects') || reclaimReason.value.includes('False')) {
+        if (reclaimReason.value.includes('Defects') || reclaimReason.value.includes('False') || reclaimReason.value.includes('Dirty')) {
             imagesTitle.innerText = 'Bilder på felet (obligatoriskt)'
             return resolve(validateMandatoryImages());
         }
@@ -204,8 +202,6 @@ async function validateInput() {
 }
 
 async function saveReclaim(itemId) {
-    const validation = await validateInput();
-    console.log('Validation: ', validation);
     if (!(await validateInput())) { return false }
     const now = new Date();
     const reason = reclaimReason.value;
@@ -231,8 +227,11 @@ async function saveReclaim(itemId) {
         ...(refundAmount ? { refundAmount } : {}),
     }
 
+    // Spinner
+    document.getElementById('doneButtonSpinner').style.display = 'block';
+    document.getElementById('doneButtonText').style.display = 'none';
+    // Save reclaim
     console.log('Will update: ', { itemId, reclaim });
-
     await callBackendApi(`/api/items/${itemId}/reclaim`, { reclaim }, 'POST', true);
     await uploadAndSaveImages(itemId);
     return true
@@ -240,8 +239,7 @@ async function saveReclaim(itemId) {
 
 async function uploadAndSaveImages(itemId) {
     const images = getFormImages();
-
-    // Uploads files and add the new imageUrls to the changes object
+    // Uploads files
     await Promise.all(images.map(async (image, index) => {
         const { url: imageUrl } = await uploadTempImage(image, `reclaim_${itemId}_${index}`);
         await callBackendApi(`/api/items/${itemId}/reclaim`, { imageUrl }, 'PUT', true);
@@ -265,5 +263,4 @@ const main = async () => {
     triggerShowContent.click();
 }
 
-let changedImages = [];
 main();
