@@ -1,4 +1,4 @@
-import { capitalizeFirstLetter, uploadTempImage } from "./sellItemHelpers";
+import {capitalizeFirstLetter, uploadTempImage} from "./sellItemHelpers";
 
 function initializePage(item) {
     const itemTitle = (item.cleanedBrand || item.brand).trim() + "-" + item.category.toLowerCase();
@@ -231,19 +231,18 @@ async function saveReclaim(itemId) {
     document.getElementById('doneButtonText').style.display = 'none';
     // Save reclaim
     console.log('Will update: ', { itemId, reclaim });
+    reclaim.images = await uploadImages(itemId);
     await callBackendApi(`/api/items/${itemId}/reclaim`, { data: { reclaim }});
-    await uploadAndSaveImages(itemId);
     return true
 }
 
-async function uploadAndSaveImages(itemId) {
+async function uploadImages(itemId) {
     const images = getFormImages();
     // Uploads files and add the new imageUrls to the changes object
-    const imageUrls = await Promise.all(images.map(async (image, index) => {
-        const { url: imageUrl } = await uploadTempImage(image, `reclaim_${itemId}_${index}`);
-        return url;
+    return await Promise.all(images.map(async (image, index) => {
+        const response = await uploadTempImage(image, `reclaim_${itemId}_${index}`);
+        return response.url;
     }));
-    await callBackendApi(`/api/items/${itemId}/reclaim`, { data: { imageUrls }});
 }
 
 const getItem = async (itemId) => {
