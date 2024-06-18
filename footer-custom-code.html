@@ -37,7 +37,6 @@
 
   const p = new URL(window.location).searchParams
   const savedUser = localStorage.getItem('sessionUser') ? JSON.parse(localStorage.getItem('sessionUser')) : undefined;
-  console.log(`comparing ${p.get('s')} and ${savedUser?.signInInfoKey}`)
   if (p.has('s') && savedUser && savedUser.signInInfoKey !== p.get('s')) {
     console.log('Signing out user because of signInInfoKey mismatch');
     firebase.auth().signOut().then(() => {
@@ -54,8 +53,8 @@
   // SEGMENT IDENTIFY
   function identify(authenticatedUser, dbUser) {
     const now = new Date().toISOString();
-    let createdAt = new Date(authenticatedUser.metadata.creationTime).toISOString();
-    let latestLogin = new Date(authenticatedUser.metadata.lastSignInTime || authenticatedUser.metadata.creationTime).toISOString();
+    let createdAt = new Date(authenticatedUser.metadata.creationTime || now).toISOString();
+    let latestLogin = new Date(authenticatedUser.metadata.lastSignInTime || authenticatedUser.metadata.creationTime || now).toISOString();
     let signInMethod = authenticatedUser.providerData[0].providerId;
     const firstName = dbUser.addressFirstName ? dbUser.addressFirstName : null;
     const lastName = dbUser.addressLastName ? dbUser.addressLastName : null;

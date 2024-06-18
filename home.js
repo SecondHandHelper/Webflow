@@ -3,7 +3,7 @@ import {callBackendApi, itemCoverImage} from "./general";
 function loadRecentlySold() {
   const recentlySoldItems = callBackendApi('/api/items/recentlySold');
 
-  recentlySoldItems()
+  recentlySoldItems
     .then((result) => {
       // Read result of the Cloud Function.
       const itemListRecentlySoldStartPage = document.getElementById('itemListRecentlySoldStartPage');

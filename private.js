@@ -576,7 +576,7 @@ async function fetchAndShowRecommendedItems(items) {
     const ids = [];
     items.forEach(item => ids.push(item.id));
     const query = ids.slice(0, 10).map(id => `items=${ id }`).join('&') + '&number=20';
-    const response = await callBackendApi(`/api/items/recommendations?${query}`);
+    const response = await callBackendApi(`/api/items/recommendations?${query}`, { requiresAuth: true });
     if (!response.data.length) {
       return;
     }

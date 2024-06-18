@@ -111,7 +111,10 @@ async function sellItemMainAuthenticated() {
       await createItemAfterSignIn();
       const shippingMethod = sessionStorage.getItem('shippingMethod');
       if (shippingMethod) {
-        await callBackendApi('/api/users', { data: { preferences: { shippingMethod } }});
+        await callBackendApi('/api/users', {
+          data: { preferences: { shippingMethod } },
+          method: 'PUT'
+        });
       }
       const userPhoneSet = user.current?.phoneNumber?.length;
       return location.href = userPhoneSet ? '/item-confirmation' : '/user-contact';
@@ -123,7 +126,6 @@ async function sellItemMainAuthenticated() {
 }
 
 async function sellItemMain() {
-  console.log('sellItemMain');
   const qrCanvas = document.getElementById('qrCanvas')
   if (qrCanvas) {
     QRCode.toCanvas(qrCanvas, window.location.href, function (error) {
@@ -1352,7 +1354,6 @@ export const isNoBgImage = async (source) => {
 };
 
 // Call sellItemMainAuthenticated after/when a user has logged in
-console.log(`registering sellItemMainAuthenticated for when user is set - ${user.current?.email}`)
 user.whenSet(sellItemMainAuthenticated);
 
 // Call sellItemMain directly
