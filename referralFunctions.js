@@ -21,7 +21,7 @@ async function showBonusSection() {
   if (referralData && referralData?.referredBy && !referralData?.referredByBonusPaid && !referralData?.referredByDiscountUsed) {
     // Get inviters first name
     const inviter = referralData?.referredBy;
-    const res = await callBackendApi(`/api/users/${inviter}/referrerInfo`);
+    const res = await callBackendApi(`/api/users/${inviter}/referrerInfo`, { requiresAuth: true });
     console.log('referrerName result', res);
     await showActivatedBonus(res?.data?.name, res?.data?.code);
     bonusSection.style.display = 'block';
