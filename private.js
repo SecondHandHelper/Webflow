@@ -320,21 +320,18 @@ async function privateMain() {
 function showHolidayModeDiv(items) {
   if (items) {
     items.forEach((item) => {
-      let publishedDate = item.publishedDate;
       const status = item.status;
       const archived = item.archived;
 
-      if (!archived && status === 'Published' && publishedDate) {
-        if (publishedDate) {
-          publishedDate = new Date(publishedDate);
-          let nowDate = new Date();
-          const daysDiff = Math.floor((nowDate.getTime() - publishedDate.getTime()) / (1000 * 3600 * 24));
+      if (!archived && status === 'Published' && item.publishedDate) {
+          const date = new Date(item.publishedDate);
+          const nowDate = new Date();
+          const daysDiff = Math.floor((nowDate.getTime() - date.getTime()) / (1000 * 3600 * 24));
           if (daysDiff <= 45) {
             document.getElementById('holidayModeDiv').style.display = 'block';
             document.getElementById('openHolidayChat').onclick = () => Intercom('showNewMessage', 'När reser du iväg, och när är du tillbaka?\n\n');
           }
         }
-      }
     });
   }
 }
