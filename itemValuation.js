@@ -1,4 +1,4 @@
-import {callBackendApi} from "./general";
+import { callBackendApi } from "./general";
 
 window.itemValuationJsLoaded = true;
 async function showDeclineValuation(item) {
