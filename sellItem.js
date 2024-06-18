@@ -306,7 +306,7 @@ async function saveValuationInStorageOrBackend(valuationData, itemId) {
       item: { ...item.item, ...valuationData }
     }));
   } else {
-    await callBackendApi(`/api/valuation/${itemId}`, { data: valuationData, requiresAuth: false });
+    await callBackendApi(`/api/valuation/${itemId}`, { data: valuationData });
     const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
     localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData }));
   }
