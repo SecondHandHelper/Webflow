@@ -1,6 +1,5 @@
 import { enhanceFrontImage, showImageState, uploadImageAndShowPreview, uploadTempImage } from "./sellItemHelpers";
 import { autocomplete, brands } from "./autocomplete-brands";
-import {callBackendApi} from "./general";
 
 function isNumeric(str) {
   if (typeof str != "string") return false // we only process strings!

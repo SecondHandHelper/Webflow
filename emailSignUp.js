@@ -1,5 +1,3 @@
-import {callBackendApi} from "./general";
-
 const campaignSignUpMain = async () => {
   try {
     document.getElementById('emailText').innerText = getParamsObject().email;

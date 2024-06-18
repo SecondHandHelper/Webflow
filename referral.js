@@ -1,4 +1,4 @@
-import {callBackendApi, shareCode} from "./general";
+import {shareCode} from "./general";
 import QRCode from "qrcode";
 
 async function main() {

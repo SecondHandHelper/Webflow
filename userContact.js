@@ -1,4 +1,4 @@
-import {callBackendApi, formatPersonalId, isValidSwedishSsn} from "./general";
+import {formatPersonalId, isValidSwedishSsn} from "./general";
 
 const pageSetUp = async () => {
   const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'))?.item ||

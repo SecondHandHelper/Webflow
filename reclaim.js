@@ -1,5 +1,4 @@
 import { capitalizeFirstLetter, uploadTempImage } from "./sellItemHelpers";
-import { callBackendApi } from "./general";
 
 function initializePage(item) {
     const itemTitle = (item.cleanedBrand || item.brand).trim() + "-" + item.category.toLowerCase();

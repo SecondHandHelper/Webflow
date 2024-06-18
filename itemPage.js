@@ -1,4 +1,4 @@
-import {callBackendApi, itemCoverImage} from "./general";
+import {itemCoverImage} from "./general";
 
 async function loadItem(itemId) {
   const item = await callBackendApi(`/api/items/${itemId}`);

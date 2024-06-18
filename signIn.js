@@ -1,5 +1,3 @@
-import {callBackendApi} from "./general";
-
 console.log('Check onAuthStateChanged: ', new Date());
 firebase.auth().onAuthStateChanged(async (result) => {
   console.log("onAuthStateChanged callback: ", new Date());
@@ -126,7 +124,7 @@ function displayIntroDivText(introId, email) {
 async function getSignInInfo(signInInfoKey) {
   try {
     // response data: {"method":"google.com","email":"user@maiapp.se","phone":"+46734433221"}
-    const response = await callBackendApi(`/api/users/signInInfo?signInInfoKey=${signInInfoKey}`);
+    const response = await fetch(`https://europe-west1-second-hand-helper.cloudfunctions.net/webApi/api/users/signInInfo?signInInfoKey=${signInInfoKey}`);
     return await response.json();
   } catch(e) {
     console.error(e);

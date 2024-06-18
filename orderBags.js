@@ -1,4 +1,4 @@
-import {callBackendApi, getFormAddressFields, setFormAddressFields} from "./general";
+import {getFormAddressFields, setFormAddressFields} from "./general";
 
 var maxNumBags = 10;
 async function getMaxNumBags() {

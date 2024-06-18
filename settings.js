@@ -1,5 +1,4 @@
 import {
-  callBackendApi,
   formatPersonalId,
   getFormAddressFields,
   isValidSwedishSsn,

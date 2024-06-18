@@ -1,5 +1,3 @@
-import { callBackendApi } from "./general";
-
 function colorName(color) {
     const mapping = {
         Beige: 'Beige', Blue: 'Blå', Brown: 'Brun', Green: 'Grön', Grey: 'Grå', Yellow: 'Gul', Gold: 'Guld',

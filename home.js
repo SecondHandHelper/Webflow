@@ -1,4 +1,4 @@
-import {callBackendApi, itemCoverImage} from "./general";
+import {itemCoverImage} from "./general";
 
 function loadRecentlySold() {
   const recentlySoldItems = callBackendApi('/api/items/recentlySold');
