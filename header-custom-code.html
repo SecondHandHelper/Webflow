@@ -21,9 +21,11 @@
       return this.value;
     },
     set current(newVal) {
-      const oldAtId = this.value?.airtableRecordID;
+      const oldEmail = this.value?.email;
+      const oldPhone = this.value?.phoneNumber;
       this.value = newVal;
-      if (newVal && newVal.airtableRecordID !== oldAtId) {
+      console.log({oldEmail, oldPhone, newVal});
+      if (newVal && (newVal.email != oldEmail || newVal.phoneNumber != oldPhone)) {
         this.callbacks.forEach((cb) => {
           typeof cb === 'function' && cb(newVal)
         });
@@ -80,6 +82,8 @@
       console.log('Restoring logged in user from localStorage');
       // Restore user if no s param or signInInfoKey matches s param
       authUser.current = JSON.parse(localStorage.getItem('authUser'));
+      // TODO: När vi skapar ett nytt item och en ny user verkar inte sessionUser vara satt!
+      // Missar vi det när det skapas en ny användare?
       if (!user.current && localStorage.getItem('sessionUser')) {
         user.current = JSON.parse(localStorage.getItem('sessionUser'));
       }

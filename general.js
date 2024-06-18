@@ -19,13 +19,13 @@ export function signOut() {
 export const BACKEND_API_URL = 'https://europe-west1-second-hand-helper.cloudfunctions.net/webApi';
 
 // Function to call web api backend function, with or without auth
-export async function callBackendApi(path, { data, method, requiresAuth, timeoutSec = 20 } = {}) {
+export async function callBackendApi(path, { data, method, requiresAuth = true, timeoutSec = 20 } = {}) {
   // const { data, method, requiresAuth, timeoutSec = 20 } = opts;
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), timeoutSec*1000);
   let idToken = '';
   const useMethod = method || (data ? 'POST' : 'GET');
-  if (requiresAuth || useMethod !== 'GET') {
+  if (requiresAuth === true || (requiresAuth !== false && useMethod !== 'GET')) {
     idToken = await getIdToken();
   }
   try {

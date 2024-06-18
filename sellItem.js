@@ -123,6 +123,7 @@ async function sellItemMainAuthenticated() {
 }
 
 async function sellItemMain() {
+  console.log('sellItemMain');
   const qrCanvas = document.getElementById('qrCanvas')
   if (qrCanvas) {
     QRCode.toCanvas(qrCanvas, window.location.href, function (error) {
@@ -134,6 +135,7 @@ async function sellItemMain() {
   sessionStorage.removeItem('itemValuation');
 
   if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
+    console.log(`showing spinner and waiting for item to be created when user is set ${user.current?.email}`);
     // ... if we are redirected here from the sign-in page and have a saved item that should be created
     document.getElementById('loadingDiv').style.display = 'flex';
     document.getElementById('creatingItemText').style.display = 'block';
@@ -302,7 +304,7 @@ async function saveValuationInStorageOrBackend(valuationData, itemId) {
       item: { ...item.item, ...valuationData }
     }));
   } else {
-    await callBackendApi(`/api/valuation/${itemId}`, { data: valuationData });
+    await callBackendApi(`/api/valuation/${itemId}`, { data: valuationData, requiresAuth: false });
     const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
     localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData }));
   }
@@ -381,13 +383,13 @@ async function getAndSaveValuation(itemId, item) {
     return '/item-confirmation';
   }
   if (params.id && params.type !== 'draft') {
-    const getItemResponse = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: params.id });
+    const getItemResponse = await callBackendApi(`/api/items/${params.id}`);
     const resellItem = getItemResponse.data;
     await setValuationFromResellItem(resellItem, item, itemId);
     return '/item-valuation';
   }
   try {
-    const res = await callBackendApi('/api/valuation', { data: { itemId, item }});
+    const res = await callBackendApi('/api/valuation', { data: { itemId, item }, requiresAuth: false});
     const { minPrice, maxPrice, decline } = res.data || {};
     await saveItemValuation(itemId, res.data);
     return nextStepAfterValuation(minPrice && maxPrice, decline, needsHumanCheck(res.data));
@@ -743,7 +745,7 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
       ]);
       itemDraft = item;
     }
-    const atItem = atItemResponse.data;
+    const atItem = atItemResponse?.data || {};
     const data = item.data;
     const images = data.images || {};
     let originalPrice = data.originalPrice;
@@ -1349,8 +1351,9 @@ export const isNoBgImage = async (source) => {
   }
 };
 
+// Call sellItemMainAuthenticated after/when a user has logged in
+console.log(`registering sellItemMainAuthenticated for when user is set - ${user.current?.email}`)
+user.whenSet(sellItemMainAuthenticated);
+
 // Call sellItemMain directly
 sellItemMain();
-// and call sellItemMainAuthenticated after/when a user has logged in
-console.log(`registering sellItemMainAuthenticated for when user is set - ${user.current.email}`)
-user.whenSet(sellItemMainAuthenticated);

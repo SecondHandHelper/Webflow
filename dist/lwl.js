@@ -1,101 +1,899 @@
-!// modules are defined as an array
+// modules are defined as an array
 // [ module function, map of requires ]
 //
 // map of requires is short require name -> numeric require
 //
 // anything defined in a previous bundle is accessed via the
 // orig method which is the require for previous bundles
-function(e,t,n,r,o){/* eslint-disable no-undef */var i="undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:"undefined"!=typeof window?window:"undefined"!=typeof global?global:{},a="function"==typeof i[r]&&i[r],l=a.cache||{},s="undefined"!=typeof module&&"function"==typeof module.require&&module.require.bind(module);function d(t,n){if(!l[t]){if(!e[t]){// if we cannot find the module within our internal map or
-// cache jump to the current global require ie. the last bundle
-// that was added to the page.
-var o="function"==typeof i[r]&&i[r];if(!n&&o)return o(t,!0);// If there are other bundles on this page the require from the
-// previous one is saved to 'previousRequire'. Repeat this as
-// many times as there are bundles until the module is found or
-// we exhaust the require chain.
-if(a)return a(t,!0);// Try the node require function if it exists.
-if(s&&"string"==typeof t)return s(t);var c=Error("Cannot find module '"+t+"'");throw c.code="MODULE_NOT_FOUND",c}f.resolve=function(n){var r=e[t][1][n];return null!=r?r:n},f.cache={};var u=l[t]=new d.Module(t);e[t][0].call(u.exports,f,u,u.exports,this)}return l[t].exports;function f(e){var t=f.resolve(e);return!1===t?{}:d(t)}}d.isParcelRequire=!0,d.Module=function(e){this.id=e,this.bundle=d,this.exports={}},d.modules=e,d.cache=l,d.parent=a,d.register=function(t,n){e[t]=[function(e,t){t.exports=n},{}]},Object.defineProperty(d,"root",{get:function(){return i[r]}}),i[r]=d;for(var c=0;c<t.length;c++)d(t[c]);if(n){// Expose entry point to Node, AMD or browser globals
-// Based on https://github.com/ForbesLindesay/umd/blob/master/template.js
-var u=d(n);// CommonJS
-"object"==typeof exports&&"undefined"!=typeof module?module.exports=u:"function"==typeof define&&define.amd?define(function(){return u}):o&&(this[o]=u)}}({"2mRjC":[function(e,t,n){var r=e("@parcel/transformer-js/src/esmodule-helpers.js"),o=e("qrcode"),i=r.interopDefault(o),a=e("./general");let l=getParamsObject();if("true"===l.createDrafts&&localStorage.getItem("lwlItemDrafts")&&(document.referrer.includes("sign-in")||document.referrer.includes("private"))){document.getElementsByClassName("div-block-230")[0].style.display="none",document.getElementById("header").style.display="none",document.getElementById("formDiv").style.display="none",document.getElementById("threadInputDiv").style.display="none",document.getElementById("lwlItemsDiv").style.display="none",document.getElementById("loadingDiv").style.display="flex";let e=JSON.parse(localStorage.getItem("lwlItemDrafts"));authUser.whenSet(async()=>{await Promise.all(e.map(e=>(0,a.callBackendApi)(`/api/items/${e.id}`,{data:{item:e}}))),localStorage.removeItem("lwlItemDrafts"),location.href="/private#wardrobe"})}let s=!1,d=e=>{document.getElementById("errorMessage").innerHTML=e||"N\xe5got gick fel, kontrollera att du skrivit in en giltig LWL tr\xe5d och f\xf6rs\xf6k igen.",document.getElementsByClassName("w-form-fail")[0].style.display="block",document.getElementById("lwlThreadUrl").style.display="block",document.getElementById("buttonsDiv").style.display="block",document.getElementById("doneButton").style.display="flex",document.getElementById("doneButton").innerText="Starta om",document.getElementById("introHeading").style.display="block",document.getElementById("scrapeProgressDiv").style.display="none",s=!1};document.getElementById("doneButton").addEventListener("click",()=>{if(s)return;c=!1,document.getElementById("lwlItemsDiv").style.display="none",document.getElementsByClassName("w-form-fail")[0].style.display="none";let e=document.getElementById("lwlThreadUrl");if(!e.value.length){console.log("No url thread given");return}if(!e.value.match(/^https:\/\/www.facebook.com\/groups\/982264948455365\/permalink\/\d+/)&&!e.value.match(/^https:\/\/www.facebook.com\/share\/p\/\w+/)){d("Ogilitg LWL url angiven.");return}s=!0,document.getElementById("lwlThreadUrl").style.display="none",document.getElementById("buttonsDiv").style.display="none",document.getElementById("doneButton").style.display="none",document.getElementById("introHeading").style.display="none",document.getElementById("openIntroDiv").style.display="none",document.getElementById("scrapeProgressDiv").style.display="flex",document.getElementById("scrapeProgress").innerText="Startar...";let t=new WebSocket("wss://lwl-to-mai-22-heypmjzjfq-lz.a.run.app");t.addEventListener("open",()=>{console.log("connected to lwl thread scraping server"),t.send(JSON.stringify({url:e.value}))}),t.addEventListener("error",e=>{d(),t.close()}),t.addEventListener("message",async n=>{console.log("received message from server",n.data);let r=n.data;try{r=JSON.parse(n.data)}catch(e){r={status:"Startar..."}}if("Error"===r.status){d(r.data?.threadIsValid?"N\xe5got gick fel, f\xf6rs\xf6k g\xe4rna igen.":null),t.close();return}if("Item"===r.status&&r.data&&u(r.data),document.getElementById("scrapeProgress").innerText=r.status,r.status.match(/klar/i)){if(t.close(),document.getElementById("scrapeProgress").innerText="Skapar plaggen i Mai...",!r.data.length){d(),t.close();return}let n=await (0,a.callBackendApi)("/api/items/lwl",{data:{itemData:r.data,url:e.value},timeoutSec:240});authUser.current?location.href="/private#wardrobe":(document.getElementById("scrapeProgressDiv").style.display="none",document.getElementById("introHeading").innerText="Os\xe5lda plagg fr\xe5n din tr\xe5d. Logga in f\xf6r att justera och s\xe4lja.",document.getElementById("introHeading").style.display="block",f(n.data),// TODO: remove this comment and the function when we are happy with addLwLItemPreview + showLwLDraftItemsFromPreview
-// showLwLDraftItems(draftItemResponse.data);
-document.getElementById("buttonsDiv").style.display="block",document.getElementById("signInButton").style.display="flex",document.getElementById("signInButton").addEventListener("click",async()=>{localStorage.setItem("lwlItemDrafts",JSON.stringify(n.data)),location.href="/sign-in"}))}})});let c=!1,u=e=>{let t=document.getElementsByClassName("lwlitemcard")[0],n=document.getElementById("lwlItemList");c||(document.getElementById("lwlItemsDiv").style.display="block",n.innerHTML="",c=!0);let r=t.cloneNode(!0);r.classList.add("lwlItemCard");let o=e.images?.[0];o?(r.querySelector(".img-container").style.backgroundImage=`url("${o}")`,r.querySelector(".no-image-text").style.display="none",r.style.opacity="0.5"):r.querySelector(".img-container").style.display="none",r.querySelector(".lwl-item-title").innerText="",r.querySelector(".lwl-item-subtext").innerText="",n.appendChild(r)},f=e=>{let t=document.getElementsByClassName("lwlItemCard");for(let n of t){let t=n.getElementsByClassName("img-container")[0].style.backgroundImage.slice(4,-1).replaceAll(/"/g,""),r=e.find(e=>e.draftSourceProperties.rawData.images.includes(t));n.style.opacity="1",n.querySelector(".lwl-item-title").innerText=`${r.cleanedBrand||r.brand?.trim()}`,n.querySelector(".lwl-item-subtext").innerText=`${[r.category,r.maiSize].filter(e=>e).join(", ")}`}},g=document.getElementById("qrCanvas");g&&(0,i.default).toCanvas(g,window.location.href,function(e){e&&console.error(e)}),//INTRO STUFF
-document.getElementById("introNext").addEventListener("click",()=>{"S\xe4tt ig\xe5ng"===document.getElementById("introNext").innerText&&(setCookie("lwlIntroSeen","true"),document.getElementById("introSection").style.display="none"),document.getElementById("introRightArrow").click(),document.querySelector(".w-slider-nav div:last-child").classList.contains("w-active")&&(document.getElementById("introNext").innerText="S\xe4tt ig\xe5ng")}),document.getElementById("skipIntro").addEventListener("click",()=>{setCookie("lwlIntroSeen","true"),document.getElementById("introSection").style.display="none"}),"true"!==getCookie("lwlIntroSeen")&&(document.getElementById("introSection").style.display="flex"),document.getElementById("openIntroButton").addEventListener("click",()=>{document.getElementById("introSection").style.display="flex",document.querySelector(".slide-nav-lwl div.w-slider-dot").click(),document.getElementById("introNext").innerText="N\xe4sta"}),document.getElementById("chatLink").addEventListener("click",()=>{Intercom("showNewMessage","Klistra in en l\xe4nk till LWL tr\xe5den du f\xf6rs\xf6kte l\xe4sa in?\n\n")}),window.intercomSettings={app_id:"klyy0le5"},function(){var e=window,t=e.Intercom;if("function"==typeof t)t("reattach_activator"),t("update",e.intercomSettings);else{var n=document,r=function(){r.c(arguments)};r.q=[],r.c=function(e){r.q.push(e)},e.Intercom=r;var o=function(){var e=n.createElement("script");e.type="text/javascript",e.async=!0,e.src="https://widget.intercom.io/widget/klyy0le5";var t=n.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)};e.attachEvent?e.attachEvent("onload",o):e.addEventListener("load",o,!1)}}()},{qrcode:"6s2CO","./general":"1tOWF","@parcel/transformer-js/src/esmodule-helpers.js":"bNgzC"}],"6s2CO":[function(e,t,n){let r=e("da1f68cc1fc16077"),o=e("8c6cf49ef2287430"),i=e("8a60cf7722cc14ce"),a=e("f6fcc816b915ba37");function l(e,t,n,i,a){let l=[].slice.call(arguments,1),s=l.length,d="function"==typeof l[s-1];if(!d&&!r())throw Error("Callback required as last argument");if(d){if(s<2)throw Error("Too few arguments provided");2===s?(a=n,n=t,t=i=void 0):3===s&&(t.getContext&&void 0===a?(a=i,i=void 0):(a=i,i=n,n=t,t=void 0))}else{if(s<1)throw Error("Too few arguments provided");return 1===s?(n=t,t=i=void 0):2!==s||t.getContext||(i=n,n=t,t=void 0),new Promise(function(r,a){try{let a=o.create(n,i);r(e(a,t,i))}catch(e){a(e)}})}try{let r=o.create(n,i);a(null,e(r,t,i))}catch(e){a(e)}}n.create=o.create,n.toCanvas=l.bind(null,i.render),n.toDataURL=l.bind(null,i.renderToDataURL),// only svg for now.
-n.toString=l.bind(null,function(e,t,n){return a.render(e,n)})},{da1f68cc1fc16077:"2F9VO","8c6cf49ef2287430":"e9qY0","8a60cf7722cc14ce":"i1BDL",f6fcc816b915ba37:"8CcR1"}],"2F9VO":[function(e,t,n){// can-promise has a crash in some versions of react native that dont have
+
+(function (modules, entry, mainEntry, parcelRequireName, globalName) {
+  /* eslint-disable no-undef */
+  var globalObject =
+    typeof globalThis !== 'undefined'
+      ? globalThis
+      : typeof self !== 'undefined'
+      ? self
+      : typeof window !== 'undefined'
+      ? window
+      : typeof global !== 'undefined'
+      ? global
+      : {};
+  /* eslint-enable no-undef */
+
+  // Save the require from previous bundle to this closure if any
+  var previousRequire =
+    typeof globalObject[parcelRequireName] === 'function' &&
+    globalObject[parcelRequireName];
+
+  var cache = previousRequire.cache || {};
+  // Do not use `require` to prevent Webpack from trying to bundle this call
+  var nodeRequire =
+    typeof module !== 'undefined' &&
+    typeof module.require === 'function' &&
+    module.require.bind(module);
+
+  function newRequire(name, jumped) {
+    if (!cache[name]) {
+      if (!modules[name]) {
+        // if we cannot find the module within our internal map or
+        // cache jump to the current global require ie. the last bundle
+        // that was added to the page.
+        var currentRequire =
+          typeof globalObject[parcelRequireName] === 'function' &&
+          globalObject[parcelRequireName];
+        if (!jumped && currentRequire) {
+          return currentRequire(name, true);
+        }
+
+        // If there are other bundles on this page the require from the
+        // previous one is saved to 'previousRequire'. Repeat this as
+        // many times as there are bundles until the module is found or
+        // we exhaust the require chain.
+        if (previousRequire) {
+          return previousRequire(name, true);
+        }
+
+        // Try the node require function if it exists.
+        if (nodeRequire && typeof name === 'string') {
+          return nodeRequire(name);
+        }
+
+        var err = new Error("Cannot find module '" + name + "'");
+        err.code = 'MODULE_NOT_FOUND';
+        throw err;
+      }
+
+      localRequire.resolve = resolve;
+      localRequire.cache = {};
+
+      var module = (cache[name] = new newRequire.Module(name));
+
+      modules[name][0].call(
+        module.exports,
+        localRequire,
+        module,
+        module.exports,
+        this
+      );
+    }
+
+    return cache[name].exports;
+
+    function localRequire(x) {
+      var res = localRequire.resolve(x);
+      return res === false ? {} : newRequire(res);
+    }
+
+    function resolve(x) {
+      var id = modules[name][1][x];
+      return id != null ? id : x;
+    }
+  }
+
+  function Module(moduleName) {
+    this.id = moduleName;
+    this.bundle = newRequire;
+    this.exports = {};
+  }
+
+  newRequire.isParcelRequire = true;
+  newRequire.Module = Module;
+  newRequire.modules = modules;
+  newRequire.cache = cache;
+  newRequire.parent = previousRequire;
+  newRequire.register = function (id, exports) {
+    modules[id] = [
+      function (require, module) {
+        module.exports = exports;
+      },
+      {},
+    ];
+  };
+
+  Object.defineProperty(newRequire, 'root', {
+    get: function () {
+      return globalObject[parcelRequireName];
+    },
+  });
+
+  globalObject[parcelRequireName] = newRequire;
+
+  for (var i = 0; i < entry.length; i++) {
+    newRequire(entry[i]);
+  }
+
+  if (mainEntry) {
+    // Expose entry point to Node, AMD or browser globals
+    // Based on https://github.com/ForbesLindesay/umd/blob/master/template.js
+    var mainExports = newRequire(mainEntry);
+
+    // CommonJS
+    if (typeof exports === 'object' && typeof module !== 'undefined') {
+      module.exports = mainExports;
+
+      // RequireJS
+    } else if (typeof define === 'function' && define.amd) {
+      define(function () {
+        return mainExports;
+      });
+
+      // <script>
+    } else if (globalName) {
+      this[globalName] = mainExports;
+    }
+  }
+})({"3meYV":[function(require,module,exports) {
+var global = arguments[3];
+var HMR_HOST = null;
+var HMR_PORT = 50619;
+var HMR_SECURE = false;
+var HMR_ENV_HASH = "d6ea1d42532a7575";
+module.bundle.HMR_BUNDLE_ID = "8ba4611ce441d97b";
+"use strict";
+/* global HMR_HOST, HMR_PORT, HMR_ENV_HASH, HMR_SECURE, chrome, browser, __parcel__import__, __parcel__importScripts__, ServiceWorkerGlobalScope */ /*::
+import type {
+  HMRAsset,
+  HMRMessage,
+} from '@parcel/reporter-dev-server/src/HMRServer.js';
+interface ParcelRequire {
+  (string): mixed;
+  cache: {|[string]: ParcelModule|};
+  hotData: {|[string]: mixed|};
+  Module: any;
+  parent: ?ParcelRequire;
+  isParcelRequire: true;
+  modules: {|[string]: [Function, {|[string]: string|}]|};
+  HMR_BUNDLE_ID: string;
+  root: ParcelRequire;
+}
+interface ParcelModule {
+  hot: {|
+    data: mixed,
+    accept(cb: (Function) => void): void,
+    dispose(cb: (mixed) => void): void,
+    // accept(deps: Array<string> | string, cb: (Function) => void): void,
+    // decline(): void,
+    _acceptCallbacks: Array<(Function) => void>,
+    _disposeCallbacks: Array<(mixed) => void>,
+  |};
+}
+interface ExtensionContext {
+  runtime: {|
+    reload(): void,
+    getURL(url: string): string;
+    getManifest(): {manifest_version: number, ...};
+  |};
+}
+declare var module: {bundle: ParcelRequire, ...};
+declare var HMR_HOST: string;
+declare var HMR_PORT: string;
+declare var HMR_ENV_HASH: string;
+declare var HMR_SECURE: boolean;
+declare var chrome: ExtensionContext;
+declare var browser: ExtensionContext;
+declare var __parcel__import__: (string) => Promise<void>;
+declare var __parcel__importScripts__: (string) => Promise<void>;
+declare var globalThis: typeof self;
+declare var ServiceWorkerGlobalScope: Object;
+*/ var OVERLAY_ID = "__parcel__error__overlay__";
+var OldModule = module.bundle.Module;
+function Module(moduleName) {
+    OldModule.call(this, moduleName);
+    this.hot = {
+        data: module.bundle.hotData[moduleName],
+        _acceptCallbacks: [],
+        _disposeCallbacks: [],
+        accept: function(fn) {
+            this._acceptCallbacks.push(fn || function() {});
+        },
+        dispose: function(fn) {
+            this._disposeCallbacks.push(fn);
+        }
+    };
+    module.bundle.hotData[moduleName] = undefined;
+}
+module.bundle.Module = Module;
+module.bundle.hotData = {};
+var checkedAssets /*: {|[string]: boolean|} */ , assetsToDispose /*: Array<[ParcelRequire, string]> */ , assetsToAccept /*: Array<[ParcelRequire, string]> */ ;
+function getHostname() {
+    return HMR_HOST || (location.protocol.indexOf("http") === 0 ? location.hostname : "localhost");
+}
+function getPort() {
+    return HMR_PORT || location.port;
+}
+// eslint-disable-next-line no-redeclare
+var parent = module.bundle.parent;
+if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== "undefined") {
+    var hostname = getHostname();
+    var port = getPort();
+    var protocol = HMR_SECURE || location.protocol == "https:" && !/localhost|127.0.0.1|0.0.0.0/.test(hostname) ? "wss" : "ws";
+    var ws = new WebSocket(protocol + "://" + hostname + (port ? ":" + port : "") + "/");
+    // Web extension context
+    var extCtx = typeof chrome === "undefined" ? typeof browser === "undefined" ? null : browser : chrome;
+    // Safari doesn't support sourceURL in error stacks.
+    // eval may also be disabled via CSP, so do a quick check.
+    var supportsSourceURL = false;
+    try {
+        (0, eval)('throw new Error("test"); //# sourceURL=test.js');
+    } catch (err) {
+        supportsSourceURL = err.stack.includes("test.js");
+    }
+    // $FlowFixMe
+    ws.onmessage = async function(event /*: {data: string, ...} */ ) {
+        checkedAssets = {} /*: {|[string]: boolean|} */ ;
+        assetsToAccept = [];
+        assetsToDispose = [];
+        var data /*: HMRMessage */  = JSON.parse(event.data);
+        if (data.type === "update") {
+            // Remove error overlay if there is one
+            if (typeof document !== "undefined") removeErrorOverlay();
+            let assets = data.assets.filter((asset)=>asset.envHash === HMR_ENV_HASH);
+            // Handle HMR Update
+            let handled = assets.every((asset)=>{
+                return asset.type === "css" || asset.type === "js" && hmrAcceptCheck(module.bundle.root, asset.id, asset.depsByBundle);
+            });
+            if (handled) {
+                console.clear();
+                // Dispatch custom event so other runtimes (e.g React Refresh) are aware.
+                if (typeof window !== "undefined" && typeof CustomEvent !== "undefined") window.dispatchEvent(new CustomEvent("parcelhmraccept"));
+                await hmrApplyUpdates(assets);
+                // Dispose all old assets.
+                let processedAssets = {} /*: {|[string]: boolean|} */ ;
+                for(let i = 0; i < assetsToDispose.length; i++){
+                    let id = assetsToDispose[i][1];
+                    if (!processedAssets[id]) {
+                        hmrDispose(assetsToDispose[i][0], id);
+                        processedAssets[id] = true;
+                    }
+                }
+                // Run accept callbacks. This will also re-execute other disposed assets in topological order.
+                processedAssets = {};
+                for(let i = 0; i < assetsToAccept.length; i++){
+                    let id = assetsToAccept[i][1];
+                    if (!processedAssets[id]) {
+                        hmrAccept(assetsToAccept[i][0], id);
+                        processedAssets[id] = true;
+                    }
+                }
+            } else fullReload();
+        }
+        if (data.type === "error") {
+            // Log parcel errors to console
+            for (let ansiDiagnostic of data.diagnostics.ansi){
+                let stack = ansiDiagnostic.codeframe ? ansiDiagnostic.codeframe : ansiDiagnostic.stack;
+                console.error("\uD83D\uDEA8 [parcel]: " + ansiDiagnostic.message + "\n" + stack + "\n\n" + ansiDiagnostic.hints.join("\n"));
+            }
+            if (typeof document !== "undefined") {
+                // Render the fancy html overlay
+                removeErrorOverlay();
+                var overlay = createErrorOverlay(data.diagnostics.html);
+                // $FlowFixMe
+                document.body.appendChild(overlay);
+            }
+        }
+    };
+    ws.onerror = function(e) {
+        console.error(e.message);
+    };
+    ws.onclose = function() {
+        console.warn("[parcel] \uD83D\uDEA8 Connection to the HMR server was lost");
+    };
+}
+function removeErrorOverlay() {
+    var overlay = document.getElementById(OVERLAY_ID);
+    if (overlay) {
+        overlay.remove();
+        console.log("[parcel] ✨ Error resolved");
+    }
+}
+function createErrorOverlay(diagnostics) {
+    var overlay = document.createElement("div");
+    overlay.id = OVERLAY_ID;
+    let errorHTML = '<div style="background: black; opacity: 0.85; font-size: 16px; color: white; position: fixed; height: 100%; width: 100%; top: 0px; left: 0px; padding: 30px; font-family: Menlo, Consolas, monospace; z-index: 9999;">';
+    for (let diagnostic of diagnostics){
+        let stack = diagnostic.frames.length ? diagnostic.frames.reduce((p, frame)=>{
+            return `${p}
+<a href="/__parcel_launch_editor?file=${encodeURIComponent(frame.location)}" style="text-decoration: underline; color: #888" onclick="fetch(this.href); return false">${frame.location}</a>
+${frame.code}`;
+        }, "") : diagnostic.stack;
+        errorHTML += `
+      <div>
+        <div style="font-size: 18px; font-weight: bold; margin-top: 20px;">
+          🚨 ${diagnostic.message}
+        </div>
+        <pre>${stack}</pre>
+        <div>
+          ${diagnostic.hints.map((hint)=>"<div>\uD83D\uDCA1 " + hint + "</div>").join("")}
+        </div>
+        ${diagnostic.documentation ? `<div>📝 <a style="color: violet" href="${diagnostic.documentation}" target="_blank">Learn more</a></div>` : ""}
+      </div>
+    `;
+    }
+    errorHTML += "</div>";
+    overlay.innerHTML = errorHTML;
+    return overlay;
+}
+function fullReload() {
+    if ("reload" in location) location.reload();
+    else if (extCtx && extCtx.runtime && extCtx.runtime.reload) extCtx.runtime.reload();
+}
+function getParents(bundle, id) /*: Array<[ParcelRequire, string]> */ {
+    var modules = bundle.modules;
+    if (!modules) return [];
+    var parents = [];
+    var k, d, dep;
+    for(k in modules)for(d in modules[k][1]){
+        dep = modules[k][1][d];
+        if (dep === id || Array.isArray(dep) && dep[dep.length - 1] === id) parents.push([
+            bundle,
+            k
+        ]);
+    }
+    if (bundle.parent) parents = parents.concat(getParents(bundle.parent, id));
+    return parents;
+}
+function updateLink(link) {
+    var href = link.getAttribute("href");
+    if (!href) return;
+    var newLink = link.cloneNode();
+    newLink.onload = function() {
+        if (link.parentNode !== null) // $FlowFixMe
+        link.parentNode.removeChild(link);
+    };
+    newLink.setAttribute("href", // $FlowFixMe
+    href.split("?")[0] + "?" + Date.now());
+    // $FlowFixMe
+    link.parentNode.insertBefore(newLink, link.nextSibling);
+}
+var cssTimeout = null;
+function reloadCSS() {
+    if (cssTimeout) return;
+    cssTimeout = setTimeout(function() {
+        var links = document.querySelectorAll('link[rel="stylesheet"]');
+        for(var i = 0; i < links.length; i++){
+            // $FlowFixMe[incompatible-type]
+            var href /*: string */  = links[i].getAttribute("href");
+            var hostname = getHostname();
+            var servedFromHMRServer = hostname === "localhost" ? new RegExp("^(https?:\\/\\/(0.0.0.0|127.0.0.1)|localhost):" + getPort()).test(href) : href.indexOf(hostname + ":" + getPort());
+            var absolute = /^https?:\/\//i.test(href) && href.indexOf(location.origin) !== 0 && !servedFromHMRServer;
+            if (!absolute) updateLink(links[i]);
+        }
+        cssTimeout = null;
+    }, 50);
+}
+function hmrDownload(asset) {
+    if (asset.type === "js") {
+        if (typeof document !== "undefined") {
+            let script = document.createElement("script");
+            script.src = asset.url + "?t=" + Date.now();
+            if (asset.outputFormat === "esmodule") script.type = "module";
+            return new Promise((resolve, reject)=>{
+                var _document$head;
+                script.onload = ()=>resolve(script);
+                script.onerror = reject;
+                (_document$head = document.head) === null || _document$head === void 0 || _document$head.appendChild(script);
+            });
+        } else if (typeof importScripts === "function") {
+            // Worker scripts
+            if (asset.outputFormat === "esmodule") return import(asset.url + "?t=" + Date.now());
+            else return new Promise((resolve, reject)=>{
+                try {
+                    importScripts(asset.url + "?t=" + Date.now());
+                    resolve();
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        }
+    }
+}
+async function hmrApplyUpdates(assets) {
+    global.parcelHotUpdate = Object.create(null);
+    let scriptsToRemove;
+    try {
+        // If sourceURL comments aren't supported in eval, we need to load
+        // the update from the dev server over HTTP so that stack traces
+        // are correct in errors/logs. This is much slower than eval, so
+        // we only do it if needed (currently just Safari).
+        // https://bugs.webkit.org/show_bug.cgi?id=137297
+        // This path is also taken if a CSP disallows eval.
+        if (!supportsSourceURL) {
+            let promises = assets.map((asset)=>{
+                var _hmrDownload;
+                return (_hmrDownload = hmrDownload(asset)) === null || _hmrDownload === void 0 ? void 0 : _hmrDownload.catch((err)=>{
+                    // Web extension bugfix for Chromium
+                    // https://bugs.chromium.org/p/chromium/issues/detail?id=1255412#c12
+                    if (extCtx && extCtx.runtime && extCtx.runtime.getManifest().manifest_version == 3) {
+                        if (typeof ServiceWorkerGlobalScope != "undefined" && global instanceof ServiceWorkerGlobalScope) {
+                            extCtx.runtime.reload();
+                            return;
+                        }
+                        asset.url = extCtx.runtime.getURL("/__parcel_hmr_proxy__?url=" + encodeURIComponent(asset.url + "?t=" + Date.now()));
+                        return hmrDownload(asset);
+                    }
+                    throw err;
+                });
+            });
+            scriptsToRemove = await Promise.all(promises);
+        }
+        assets.forEach(function(asset) {
+            hmrApply(module.bundle.root, asset);
+        });
+    } finally{
+        delete global.parcelHotUpdate;
+        if (scriptsToRemove) scriptsToRemove.forEach((script)=>{
+            if (script) {
+                var _document$head2;
+                (_document$head2 = document.head) === null || _document$head2 === void 0 || _document$head2.removeChild(script);
+            }
+        });
+    }
+}
+function hmrApply(bundle /*: ParcelRequire */ , asset /*:  HMRAsset */ ) {
+    var modules = bundle.modules;
+    if (!modules) return;
+    if (asset.type === "css") reloadCSS();
+    else if (asset.type === "js") {
+        let deps = asset.depsByBundle[bundle.HMR_BUNDLE_ID];
+        if (deps) {
+            if (modules[asset.id]) {
+                // Remove dependencies that are removed and will become orphaned.
+                // This is necessary so that if the asset is added back again, the cache is gone, and we prevent a full page reload.
+                let oldDeps = modules[asset.id][1];
+                for(let dep in oldDeps)if (!deps[dep] || deps[dep] !== oldDeps[dep]) {
+                    let id = oldDeps[dep];
+                    let parents = getParents(module.bundle.root, id);
+                    if (parents.length === 1) hmrDelete(module.bundle.root, id);
+                }
+            }
+            if (supportsSourceURL) // Global eval. We would use `new Function` here but browser
+            // support for source maps is better with eval.
+            (0, eval)(asset.output);
+            // $FlowFixMe
+            let fn = global.parcelHotUpdate[asset.id];
+            modules[asset.id] = [
+                fn,
+                deps
+            ];
+        } else if (bundle.parent) hmrApply(bundle.parent, asset);
+    }
+}
+function hmrDelete(bundle, id) {
+    let modules = bundle.modules;
+    if (!modules) return;
+    if (modules[id]) {
+        // Collect dependencies that will become orphaned when this module is deleted.
+        let deps = modules[id][1];
+        let orphans = [];
+        for(let dep in deps){
+            let parents = getParents(module.bundle.root, deps[dep]);
+            if (parents.length === 1) orphans.push(deps[dep]);
+        }
+        // Delete the module. This must be done before deleting dependencies in case of circular dependencies.
+        delete modules[id];
+        delete bundle.cache[id];
+        // Now delete the orphans.
+        orphans.forEach((id)=>{
+            hmrDelete(module.bundle.root, id);
+        });
+    } else if (bundle.parent) hmrDelete(bundle.parent, id);
+}
+function hmrAcceptCheck(bundle /*: ParcelRequire */ , id /*: string */ , depsByBundle /*: ?{ [string]: { [string]: string } }*/ ) {
+    if (hmrAcceptCheckOne(bundle, id, depsByBundle)) return true;
+    // Traverse parents breadth first. All possible ancestries must accept the HMR update, or we'll reload.
+    let parents = getParents(module.bundle.root, id);
+    let accepted = false;
+    while(parents.length > 0){
+        let v = parents.shift();
+        let a = hmrAcceptCheckOne(v[0], v[1], null);
+        if (a) // If this parent accepts, stop traversing upward, but still consider siblings.
+        accepted = true;
+        else {
+            // Otherwise, queue the parents in the next level upward.
+            let p = getParents(module.bundle.root, v[1]);
+            if (p.length === 0) {
+                // If there are no parents, then we've reached an entry without accepting. Reload.
+                accepted = false;
+                break;
+            }
+            parents.push(...p);
+        }
+    }
+    return accepted;
+}
+function hmrAcceptCheckOne(bundle /*: ParcelRequire */ , id /*: string */ , depsByBundle /*: ?{ [string]: { [string]: string } }*/ ) {
+    var modules = bundle.modules;
+    if (!modules) return;
+    if (depsByBundle && !depsByBundle[bundle.HMR_BUNDLE_ID]) {
+        // If we reached the root bundle without finding where the asset should go,
+        // there's nothing to do. Mark as "accepted" so we don't reload the page.
+        if (!bundle.parent) return true;
+        return hmrAcceptCheck(bundle.parent, id, depsByBundle);
+    }
+    if (checkedAssets[id]) return true;
+    checkedAssets[id] = true;
+    var cached = bundle.cache[id];
+    assetsToDispose.push([
+        bundle,
+        id
+    ]);
+    if (!cached || cached.hot && cached.hot._acceptCallbacks.length) {
+        assetsToAccept.push([
+            bundle,
+            id
+        ]);
+        return true;
+    }
+}
+function hmrDispose(bundle /*: ParcelRequire */ , id /*: string */ ) {
+    var cached = bundle.cache[id];
+    bundle.hotData[id] = {};
+    if (cached && cached.hot) cached.hot.data = bundle.hotData[id];
+    if (cached && cached.hot && cached.hot._disposeCallbacks.length) cached.hot._disposeCallbacks.forEach(function(cb) {
+        cb(bundle.hotData[id]);
+    });
+    delete bundle.cache[id];
+}
+function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
+    // Execute the module.
+    bundle(id);
+    // Run the accept callbacks in the new version of the module.
+    var cached = bundle.cache[id];
+    if (cached && cached.hot && cached.hot._acceptCallbacks.length) cached.hot._acceptCallbacks.forEach(function(cb) {
+        var assetsToAlsoAccept = cb(function() {
+            return getParents(module.bundle.root, id);
+        });
+        if (assetsToAlsoAccept && assetsToAccept.length) {
+            assetsToAlsoAccept.forEach(function(a) {
+                hmrDispose(a[0], a[1]);
+            });
+            // $FlowFixMe[method-unbinding]
+            assetsToAccept.push.apply(assetsToAccept, assetsToAlsoAccept);
+        }
+    });
+}
+
+},{}],"8V3ht":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+var _qrcode = require("qrcode");
+var _qrcodeDefault = parcelHelpers.interopDefault(_qrcode);
+var _general = require("./general");
+const WS_SERVER = "wss://lwl-to-mai-22-heypmjzjfq-lz.a.run.app";
+const params = getParamsObject();
+if (params.createDrafts === "true") {
+    if (localStorage.getItem("lwlItemDrafts") && (document.referrer.includes("sign-in") || document.referrer.includes("private"))) {
+        document.getElementsByClassName("div-block-230")[0].style.display = "none";
+        document.getElementById("header").style.display = "none";
+        document.getElementById("formDiv").style.display = "none";
+        document.getElementById("threadInputDiv").style.display = "none";
+        document.getElementById("lwlItemsDiv").style.display = "none";
+        document.getElementById("loadingDiv").style.display = "flex";
+        const draftItems = JSON.parse(localStorage.getItem("lwlItemDrafts"));
+        authUser.whenSet(async ()=>{
+            await Promise.all(draftItems.map((item)=>(0, _general.callBackendApi)(`/api/items/${item.id}`, {
+                    data: {
+                        item
+                    }
+                })));
+            localStorage.removeItem("lwlItemDrafts");
+            location.href = "/private#wardrobe";
+        });
+    }
+}
+let scrapingStarted = false;
+const showParseError = (error)=>{
+    const message = error || "N\xe5got gick fel, kontrollera att du skrivit in en giltig LWL tr\xe5d och f\xf6rs\xf6k igen.";
+    document.getElementById("errorMessage").innerHTML = message;
+    document.getElementsByClassName("w-form-fail")[0].style.display = "block";
+    document.getElementById("lwlThreadUrl").style.display = "block";
+    document.getElementById("buttonsDiv").style.display = "block";
+    document.getElementById("doneButton").style.display = "flex";
+    document.getElementById("doneButton").innerText = "Starta om";
+    document.getElementById("introHeading").style.display = "block";
+    document.getElementById("scrapeProgressDiv").style.display = "none";
+    scrapingStarted = false;
+};
+document.getElementById("doneButton").addEventListener("click", ()=>{
+    if (scrapingStarted) return;
+    firstPreviewShown = false;
+    document.getElementById("lwlItemsDiv").style.display = "none";
+    document.getElementsByClassName("w-form-fail")[0].style.display = "none";
+    const lwlThreadUrl = document.getElementById("lwlThreadUrl");
+    if (!lwlThreadUrl.value.length) {
+        console.log("No url thread given");
+        return;
+    }
+    if (!lwlThreadUrl.value.match(/^https:\/\/www.facebook.com\/groups\/982264948455365\/permalink\/\d+/) && !lwlThreadUrl.value.match(/^https:\/\/www.facebook.com\/share\/p\/\w+/)) {
+        showParseError("Ogilitg LWL url angiven.");
+        return;
+    }
+    scrapingStarted = true;
+    document.getElementById("lwlThreadUrl").style.display = "none";
+    document.getElementById("buttonsDiv").style.display = "none";
+    document.getElementById("doneButton").style.display = "none";
+    document.getElementById("introHeading").style.display = "none";
+    document.getElementById("openIntroDiv").style.display = "none";
+    document.getElementById("scrapeProgressDiv").style.display = "flex";
+    document.getElementById("scrapeProgress").innerText = "Startar...";
+    const webSocket = new WebSocket(WS_SERVER);
+    webSocket.addEventListener("open", ()=>{
+        console.log("connected to lwl thread scraping server");
+        webSocket.send(JSON.stringify({
+            url: lwlThreadUrl.value
+        }));
+    });
+    webSocket.addEventListener("error", (event)=>{
+        showParseError();
+        webSocket.close();
+    });
+    webSocket.addEventListener("message", async (event)=>{
+        console.log("received message from server", event.data);
+        let message = event.data;
+        try {
+            message = JSON.parse(event.data);
+        } catch (e) {
+            message = {
+                status: "Startar..."
+            };
+        }
+        if (message.status === "Error") {
+            showParseError(message.data?.threadIsValid ? "N\xe5got gick fel, f\xf6rs\xf6k g\xe4rna igen." : null);
+            webSocket.close();
+            return;
+        }
+        if (message.status === "Item" && message.data) addLwLItemPreview(message.data);
+        document.getElementById("scrapeProgress").innerText = message.status;
+        if (message.status.match(/klar/i)) {
+            webSocket.close();
+            document.getElementById("scrapeProgress").innerText = "Skapar plaggen i Mai...";
+            if (!message.data.length) {
+                showParseError();
+                webSocket.close();
+                return;
+            }
+            const draftItemResponse = await (0, _general.callBackendApi)("/api/items/lwl", {
+                data: {
+                    itemData: message.data,
+                    url: lwlThreadUrl.value
+                },
+                timeoutSec: 240
+            });
+            if (authUser.current) location.href = "/private#wardrobe";
+            else {
+                document.getElementById("scrapeProgressDiv").style.display = "none";
+                document.getElementById("introHeading").innerText = "Os\xe5lda plagg fr\xe5n din tr\xe5d. Logga in f\xf6r att justera och s\xe4lja.";
+                document.getElementById("introHeading").style.display = "block";
+                showLwLDraftItemsFromPreview(draftItemResponse.data);
+                // TODO: remove this comment and the function when we are happy with addLwLItemPreview + showLwLDraftItemsFromPreview
+                // showLwLDraftItems(draftItemResponse.data);
+                document.getElementById("buttonsDiv").style.display = "block";
+                document.getElementById("signInButton").style.display = "flex";
+                document.getElementById("signInButton").addEventListener("click", async ()=>{
+                    localStorage.setItem("lwlItemDrafts", JSON.stringify(draftItemResponse.data));
+                    location.href = "/sign-in";
+                });
+            }
+        }
+    });
+});
+let firstPreviewShown = false;
+const addLwLItemPreview = (itemData)=>{
+    const itemCard = document.getElementsByClassName("lwlitemcard")[0];
+    const itemList = document.getElementById("lwlItemList");
+    if (!firstPreviewShown) {
+        document.getElementById("lwlItemsDiv").style.display = "block";
+        itemList.innerHTML = "";
+        firstPreviewShown = true;
+    }
+    const newItemCard = itemCard.cloneNode(true);
+    newItemCard.classList.add("lwlItemCard");
+    const frontImage = itemData.images?.[0];
+    if (frontImage) {
+        newItemCard.querySelector(".img-container").style.backgroundImage = `url("${frontImage}")`;
+        newItemCard.querySelector(".no-image-text").style.display = "none";
+        newItemCard.style.opacity = "0.5";
+    } else newItemCard.querySelector(".img-container").style.display = "none";
+    newItemCard.querySelector(".lwl-item-title").innerText = "";
+    newItemCard.querySelector(".lwl-item-subtext").innerText = "";
+    itemList.appendChild(newItemCard);
+};
+const showLwLDraftItemsFromPreview = (draftItems)=>{
+    const itemCards = document.getElementsByClassName("lwlItemCard");
+    for (const itemCard of itemCards){
+        const itemImageUrl = itemCard.getElementsByClassName("img-container")[0].style.backgroundImage.slice(4, -1).replaceAll(/"/g, "");
+        const draftItem = draftItems.find((di)=>di.draftSourceProperties.rawData.images.includes(itemImageUrl));
+        itemCard.style.opacity = "1";
+        itemCard.querySelector(".lwl-item-title").innerText = `${draftItem.cleanedBrand || draftItem.brand?.trim()}`;
+        itemCard.querySelector(".lwl-item-subtext").innerText = `${[
+            draftItem.category,
+            draftItem.maiSize
+        ].filter((i)=>i).join(", ")}`;
+    }
+};
+const showLwLDraftItems = (draftItems)=>{
+    document.getElementById("lwlItemsDiv").style.display = "block";
+    const itemCard = document.getElementById("lwlItemCard") || document.getElementsByClassName("lwlItemCard")[0];
+    const itemList = document.getElementById("lwlItemList");
+    itemList.innerHTML = "";
+    for (const item of draftItems){
+        const newItemCard = itemCard.cloneNode(true);
+        newItemCard.id = `lwlItemCard${item.id}`;
+        newItemCard.classList.add("lwlItemCard");
+        const frontImage = item.images?.frontImage;
+        if (frontImage) {
+            newItemCard.querySelector(".img-container").style.backgroundImage = `url("${frontImage}")`;
+            newItemCard.querySelector(".no-image-text").style.display = "none";
+        } else newItemCard.querySelector(".img-container").style.display = "none";
+        newItemCard.querySelector(".lwl-item-title").innerText = `${item.cleanedBrand || item.brand?.trim()}`;
+        newItemCard.querySelector(".lwl-item-subtext").innerText = `${[
+            item.category,
+            item.maiSize
+        ].filter((i)=>i).join(", ")}`;
+        itemList.appendChild(newItemCard);
+    }
+};
+// Only on mobile
+const qrCanvas = document.getElementById("qrCanvas");
+if (qrCanvas) (0, _qrcodeDefault.default).toCanvas(qrCanvas, window.location.href, function(error) {
+    if (error) console.error(error);
+});
+//INTRO STUFF
+document.getElementById("introNext").addEventListener("click", ()=>{
+    if (document.getElementById("introNext").innerText === "S\xe4tt ig\xe5ng") {
+        setCookie("lwlIntroSeen", "true");
+        document.getElementById("introSection").style.display = "none";
+    }
+    document.getElementById("introRightArrow").click();
+    if (document.querySelector(".w-slider-nav div:last-child").classList.contains("w-active")) document.getElementById("introNext").innerText = "S\xe4tt ig\xe5ng";
+});
+document.getElementById("skipIntro").addEventListener("click", ()=>{
+    setCookie("lwlIntroSeen", "true");
+    document.getElementById("introSection").style.display = "none";
+});
+if (getCookie("lwlIntroSeen") !== "true") document.getElementById("introSection").style.display = "flex";
+document.getElementById("openIntroButton").addEventListener("click", ()=>{
+    document.getElementById("introSection").style.display = "flex";
+    document.querySelector(".slide-nav-lwl div.w-slider-dot").click();
+    document.getElementById("introNext").innerText = "N\xe4sta";
+});
+document.getElementById("chatLink").addEventListener("click", ()=>{
+    Intercom("showNewMessage", "Klistra in en l\xe4nk till LWL tr\xe5den du f\xf6rs\xf6kte l\xe4sa in?\n\n");
+});
+window.intercomSettings = {
+    app_id: "klyy0le5"
+};
+(function() {
+    var w = window;
+    var ic = w.Intercom;
+    if (typeof ic === "function") {
+        ic("reattach_activator");
+        ic("update", w.intercomSettings);
+    } else {
+        var d = document;
+        var i = function() {
+            i.c(arguments);
+        };
+        i.q = [];
+        i.c = function(args) {
+            i.q.push(args);
+        };
+        w.Intercom = i;
+        var l = function() {
+            var s = d.createElement("script");
+            s.type = "text/javascript";
+            s.async = true;
+            s.src = "https://widget.intercom.io/widget/klyy0le5";
+            var x = d.getElementsByTagName("script")[0];
+            x.parentNode.insertBefore(s, x);
+        };
+        if (w.attachEvent) w.attachEvent("onload", l);
+        else w.addEventListener("load", l, false);
+    }
+})();
+
+},{"qrcode":"lB7MY","./general":"lWrRo","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lB7MY":[function(require,module,exports) {
+const canPromise = require("da1f68cc1fc16077");
+const QRCode = require("8c6cf49ef2287430");
+const CanvasRenderer = require("8a60cf7722cc14ce");
+const SvgRenderer = require("f6fcc816b915ba37");
+function renderCanvas(renderFunc, canvas, text, opts, cb) {
+    const args = [].slice.call(arguments, 1);
+    const argsNum = args.length;
+    const isLastArgCb = typeof args[argsNum - 1] === "function";
+    if (!isLastArgCb && !canPromise()) throw new Error("Callback required as last argument");
+    if (isLastArgCb) {
+        if (argsNum < 2) throw new Error("Too few arguments provided");
+        if (argsNum === 2) {
+            cb = text;
+            text = canvas;
+            canvas = opts = undefined;
+        } else if (argsNum === 3) {
+            if (canvas.getContext && typeof cb === "undefined") {
+                cb = opts;
+                opts = undefined;
+            } else {
+                cb = opts;
+                opts = text;
+                text = canvas;
+                canvas = undefined;
+            }
+        }
+    } else {
+        if (argsNum < 1) throw new Error("Too few arguments provided");
+        if (argsNum === 1) {
+            text = canvas;
+            canvas = opts = undefined;
+        } else if (argsNum === 2 && !canvas.getContext) {
+            opts = text;
+            text = canvas;
+            canvas = undefined;
+        }
+        return new Promise(function(resolve, reject) {
+            try {
+                const data = QRCode.create(text, opts);
+                resolve(renderFunc(data, canvas, opts));
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+    try {
+        const data = QRCode.create(text, opts);
+        cb(null, renderFunc(data, canvas, opts));
+    } catch (e) {
+        cb(e);
+    }
+}
+exports.create = QRCode.create;
+exports.toCanvas = renderCanvas.bind(null, CanvasRenderer.render);
+exports.toDataURL = renderCanvas.bind(null, CanvasRenderer.renderToDataURL);
+// only svg for now.
+exports.toString = renderCanvas.bind(null, function(data, _, opts) {
+    return SvgRenderer.render(data, opts);
+});
+
+},{"da1f68cc1fc16077":"9FrZa","8c6cf49ef2287430":"20hbG","8a60cf7722cc14ce":"2oGFV","f6fcc816b915ba37":"7Akrj"}],"9FrZa":[function(require,module,exports) {
+// can-promise has a crash in some versions of react native that dont have
 // standard global objects
 // https://github.com/soldair/node-qrcode/issues/157
-t.exports=function(){return"function"==typeof Promise&&Promise.prototype&&Promise.prototype.then}},{}],e9qY0:[function(e,t,n){let r=e("4cf6a8173d9f3a2"),o=e("2ad62f61c352884c"),i=e("87d5a6270eb1dc26"),a=e("91abc94f777368cc"),l=e("9737c3939ab85d95"),s=e("cee3d371e219e45e"),d=e("8700c8c682afabf3"),c=e("65ad903a6ba3e"),u=e("1e8e447afb4d169c"),f=e("8a4a19af97836d80"),g=e("26720f9d94c9e268"),h=e("7b6429a248ecc51f"),m=e("1368d0fa14524351");/**
- * Add format info bits to matrix
- *
- * @param  {BitMatrix} matrix               Modules matrix
- * @param  {ErrorCorrectionLevel}    errorCorrectionLevel Error correction level
- * @param  {Number}    maskPattern          Mask pattern reference value
- */function p(e,t,n){let r,o;let i=e.size,a=g.getEncodedBits(t,n);for(r=0;r<15;r++)o=(a>>r&1)==1,r<6?e.set(r,8,o,!0):r<8?e.set(r+1,8,o,!0):e.set(i-15+r,8,o,!0),r<8?e.set(8,i-r-1,o,!0):r<9?e.set(8,15-r-1+1,o,!0):e.set(8,15-r-1,o,!0);// fixed module
-e.set(i-8,8,1,!0)}/**
- * QR Code
- *
- * @param {String | Array} data                 Input data
- * @param {Object} options                      Optional configurations
- * @param {Number} options.version              QR Code version
- * @param {String} options.errorCorrectionLevel Error correction level
- * @param {Function} options.toSJISFunc         Helper func to convert utf8 to sjis
- */n.create=function(e,t){let n,g;if(void 0===e||""===e)throw Error("No input text");let y=o.M;return void 0!==t&&(// Use higher error correction level as default
-y=o.from(t.errorCorrectionLevel,o.M),n=f.from(t.version),g=d.from(t.maskPattern),t.toSJISFunc&&r.setToSJISFunction(t.toSJISFunc)),/**
- * Build QR Code symbol
- *
- * @param  {String} data                 Input string
- * @param  {Number} version              QR Code version
- * @param  {ErrorCorretionLevel} errorCorrectionLevel Error level
- * @param  {MaskPattern} maskPattern     Mask pattern
- * @return {Object}                      Object containing symbol data
- */function(e,t,n,o){let g;if(Array.isArray(e))g=m.fromArray(e);else if("string"==typeof e){let r=t;if(!r){let t=m.rawSplit(e);// Estimate best version that can contain raw splitted segments
-r=f.getBestVersionForData(t,n)}// Build optimized segments
-// If estimated version is undefined, try with the highest version
-g=m.fromString(e,r||40)}else throw Error("Invalid data");// Get the min version that can contain data
-let y=f.getBestVersionForData(g,n);// If no version is found, data cannot be stored
-if(!y)throw Error("The amount of data is too big to be stored in a QR Code");// If not specified, use min version as default
-if(t){if(t<y)throw Error("\nThe chosen QR Code version cannot contain this amount of data.\nMinimum version required to store current data is: "+y+".\n")}else t=y;let E=/**
- * Create encoded codewords from data input
- *
- * @param  {Number}   version              QR Code version
- * @param  {ErrorCorrectionLevel}   errorCorrectionLevel Error correction level
- * @param  {ByteData} data                 Data input
- * @return {Uint8Array}                    Buffer containing encoded codewords
- */function(e,t,n){// Prepare data buffer
-let o=new i;n.forEach(function(t){// prefix data with mode indicator (4 bits)
-o.put(t.mode.bit,4),// Prefix data with character count indicator.
-// The character count indicator is a string of bits that represents the
-// number of characters that are being encoded.
-// The character count indicator must be placed after the mode indicator
-// and must be a certain number of bits long, depending on the QR version
-// and data mode
-// @see {@link Mode.getCharCountIndicator}.
-o.put(t.getLength(),h.getCharCountIndicator(t.mode,e)),// add binary data sequence to buffer
-t.write(o)});// Calculate required number of bits
-let a=r.getSymbolTotalCodewords(e),l=c.getTotalCodewordsCount(e,t),s=(a-l)*8;// If the bit string is fewer than four bits shorter, add only the number of 0s that
-// are needed to reach the required number of bits.
-// After adding the terminator, if the number of bits in the string is not a multiple of 8,
-// pad the string on the right with 0s to make the string's length a multiple of 8.
-for(o.getLengthInBits()+4<=s&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(0);// Add pad bytes if the string is still shorter than the total number of required bits.
-// Extend the buffer to fill the data capacity of the symbol corresponding to
-// the Version and Error Correction Level by adding the Pad Codewords 11101100 (0xEC)
-// and 00010001 (0x11) alternately.
-let d=(s-o.getLengthInBits())/8;for(let e=0;e<d;e++)o.put(e%2?17:236,8);return(/**
- * Encode input data with Reed-Solomon and return codewords with
- * relative error correction bits
- *
- * @param  {BitBuffer} bitBuffer            Data to encode
- * @param  {Number}    version              QR Code version
- * @param  {ErrorCorrectionLevel} errorCorrectionLevel Error correction level
- * @return {Uint8Array}                     Buffer containing encoded codewords
- */function(e,t,n){let o,i;// Total codewords for this QR code version (Data + Error correction)
-let a=r.getSymbolTotalCodewords(t),l=c.getTotalCodewordsCount(t,n),s=a-l,d=c.getBlocksCount(t,n),f=a%d,g=d-f,h=Math.floor(a/d),m=Math.floor(s/d),p=m+1,y=h-m,E=new u(y),I=0,v=Array(d),b=Array(d),w=0,B=new Uint8Array(e.buffer);// Divide the buffer into the required number of blocks
-for(let e=0;e<d;e++){let t=e<g?m:p;// extract a block of data from buffer
-v[e]=B.slice(I,I+t),// Calculate EC codewords for this data block
-b[e]=E.encode(v[e]),I+=t,w=Math.max(w,t)}// Create final data
-// Interleave the data and error correction codewords from each block
-let x=new Uint8Array(a),C=0;// Add data codewords
-for(o=0;o<w;o++)for(i=0;i<d;i++)o<v[i].length&&(x[C++]=v[i][o]);// Apped EC codewords
-for(o=0;o<y;o++)for(i=0;i<d;i++)x[C++]=b[i][o];return x}(o,e,t))}(t,n,g),I=r.getSymbolSize(t),v=new a(I);return(// Add function modules
+module.exports = function() {
+    return typeof Promise === "function" && Promise.prototype && Promise.prototype.then;
+};
+
+},{}],"20hbG":[function(require,module,exports) {
+const Utils = require("4cf6a8173d9f3a2");
+const ECLevel = require("2ad62f61c352884c");
+const BitBuffer = require("87d5a6270eb1dc26");
+const BitMatrix = require("91abc94f777368cc");
+const AlignmentPattern = require("9737c3939ab85d95");
+const FinderPattern = require("cee3d371e219e45e");
+const MaskPattern = require("8700c8c682afabf3");
+const ECCode = require("65ad903a6ba3e");
+const ReedSolomonEncoder = require("1e8e447afb4d169c");
+const Version = require("8a4a19af97836d80");
+const FormatInfo = require("26720f9d94c9e268");
+const Mode = require("7b6429a248ecc51f");
+const Segments = require("1368d0fa14524351");
 /**
  * QRCode for JavaScript
  *
@@ -120,61 +918,486 @@ for(o=0;o<y;o++)for(i=0;i<d;i++)x[C++]=b[i][o];return x}(o,e,t))}(t,n,g),I=r.get
 //   http://www.denso-wave.com/qrcode/faqpatent-e.html
 //
 //---------------------------------------------------------------------
-*//**
+*/ /**
  * Add finder patterns bits to matrix
  *
  * @param  {BitMatrix} matrix  Modules matrix
  * @param  {Number}    version QR Code version
- */function(e,t){let n=e.size,r=s.getPositions(t);for(let t=0;t<r.length;t++){let o=r[t][0],i=r[t][1];for(let t=-1;t<=7;t++)if(!(o+t<=-1)&&!(n<=o+t))for(let r=-1;r<=7;r++)i+r<=-1||n<=i+r||(t>=0&&t<=6&&(0===r||6===r)||r>=0&&r<=6&&(0===t||6===t)||t>=2&&t<=4&&r>=2&&r<=4?e.set(o+t,i+r,!0,!0):e.set(o+t,i+r,!1,!0))}}(v,t),/**
+ */ function setupFinderPattern(matrix, version) {
+    const size = matrix.size;
+    const pos = FinderPattern.getPositions(version);
+    for(let i = 0; i < pos.length; i++){
+        const row = pos[i][0];
+        const col = pos[i][1];
+        for(let r = -1; r <= 7; r++){
+            if (row + r <= -1 || size <= row + r) continue;
+            for(let c = -1; c <= 7; c++){
+                if (col + c <= -1 || size <= col + c) continue;
+                if (r >= 0 && r <= 6 && (c === 0 || c === 6) || c >= 0 && c <= 6 && (r === 0 || r === 6) || r >= 2 && r <= 4 && c >= 2 && c <= 4) matrix.set(row + r, col + c, true, true);
+                else matrix.set(row + r, col + c, false, true);
+            }
+        }
+    }
+}
+/**
  * Add timing pattern bits to matrix
  *
  * Note: this function must be called before {@link setupAlignmentPattern}
  *
  * @param  {BitMatrix} matrix Modules matrix
- */function(e){let t=e.size;for(let n=8;n<t-8;n++){let t=n%2==0;e.set(n,6,t,!0),e.set(6,n,t,!0)}}(v),/**
+ */ function setupTimingPattern(matrix) {
+    const size = matrix.size;
+    for(let r = 8; r < size - 8; r++){
+        const value = r % 2 === 0;
+        matrix.set(r, 6, value, true);
+        matrix.set(6, r, value, true);
+    }
+}
+/**
  * Add alignment patterns bits to matrix
  *
  * Note: this function must be called after {@link setupTimingPattern}
  *
  * @param  {BitMatrix} matrix  Modules matrix
  * @param  {Number}    version QR Code version
- */function(e,t){let n=l.getPositions(t);for(let t=0;t<n.length;t++){let r=n[t][0],o=n[t][1];for(let t=-2;t<=2;t++)for(let n=-2;n<=2;n++)-2===t||2===t||-2===n||2===n||0===t&&0===n?e.set(r+t,o+n,!0,!0):e.set(r+t,o+n,!1,!0)}}(v,t),// Add temporary dummy bits for format info just to set them as reserved.
-// This is needed to prevent these bits from being masked by {@link MaskPattern.applyMask}
-// since the masking operation must be performed only on the encoding region.
-// These blocks will be replaced with correct values later in code.
-p(v,n,0),t>=7&&/**
+ */ function setupAlignmentPattern(matrix, version) {
+    const pos = AlignmentPattern.getPositions(version);
+    for(let i = 0; i < pos.length; i++){
+        const row = pos[i][0];
+        const col = pos[i][1];
+        for(let r = -2; r <= 2; r++){
+            for(let c = -2; c <= 2; c++)if (r === -2 || r === 2 || c === -2 || c === 2 || r === 0 && c === 0) matrix.set(row + r, col + c, true, true);
+            else matrix.set(row + r, col + c, false, true);
+        }
+    }
+}
+/**
  * Add version info bits to matrix
  *
  * @param  {BitMatrix} matrix  Modules matrix
  * @param  {Number}    version QR Code version
- */function(e,t){let n,r,o;let i=e.size,a=f.getEncodedBits(t);for(let t=0;t<18;t++)n=Math.floor(t/3),r=t%3+i-8-3,o=(a>>t&1)==1,e.set(n,r,o,!0),e.set(r,n,o,!0)}(v,t),// Add data codewords
+ */ function setupVersionInfo(matrix, version) {
+    const size = matrix.size;
+    const bits = Version.getEncodedBits(version);
+    let row, col, mod;
+    for(let i = 0; i < 18; i++){
+        row = Math.floor(i / 3);
+        col = i % 3 + size - 8 - 3;
+        mod = (bits >> i & 1) === 1;
+        matrix.set(row, col, mod, true);
+        matrix.set(col, row, mod, true);
+    }
+}
+/**
+ * Add format info bits to matrix
+ *
+ * @param  {BitMatrix} matrix               Modules matrix
+ * @param  {ErrorCorrectionLevel}    errorCorrectionLevel Error correction level
+ * @param  {Number}    maskPattern          Mask pattern reference value
+ */ function setupFormatInfo(matrix, errorCorrectionLevel, maskPattern) {
+    const size = matrix.size;
+    const bits = FormatInfo.getEncodedBits(errorCorrectionLevel, maskPattern);
+    let i, mod;
+    for(i = 0; i < 15; i++){
+        mod = (bits >> i & 1) === 1;
+        // vertical
+        if (i < 6) matrix.set(i, 8, mod, true);
+        else if (i < 8) matrix.set(i + 1, 8, mod, true);
+        else matrix.set(size - 15 + i, 8, mod, true);
+        // horizontal
+        if (i < 8) matrix.set(8, size - i - 1, mod, true);
+        else if (i < 9) matrix.set(8, 15 - i - 1 + 1, mod, true);
+        else matrix.set(8, 15 - i - 1, mod, true);
+    }
+    // fixed module
+    matrix.set(size - 8, 8, 1, true);
+}
 /**
  * Add encoded data bits to matrix
  *
  * @param  {BitMatrix}  matrix Modules matrix
  * @param  {Uint8Array} data   Data codewords
- */function(e,t){let n=e.size,r=-1,o=n-1,i=7,a=0;for(let l=n-1;l>0;l-=2)for(6===l&&l--;;){for(let n=0;n<2;n++)if(!e.isReserved(o,l-n)){let r=!1;a<t.length&&(r=(t[a]>>>i&1)==1),e.set(o,l-n,r),-1==--i&&(a++,i=7)}if((o+=r)<0||n<=o){o-=r,r=-r;break}}}(v,E),isNaN(o)&&(o=d.getBestMask(v,p.bind(null,v,n))),// Apply mask pattern
-d.applyMask(o,v),// Replace format info bits with correct values
-p(v,n,o),{modules:v,version:t,errorCorrectionLevel:n,maskPattern:o,segments:g})}(e,n,y,g)}},{"4cf6a8173d9f3a2":"2iHLf","2ad62f61c352884c":"kU8Fo","87d5a6270eb1dc26":"dvmjt","91abc94f777368cc":"4koKB","9737c3939ab85d95":"2m37T",cee3d371e219e45e:"9BWaM","8700c8c682afabf3":"2hy8U","65ad903a6ba3e":"ivpAq","1e8e447afb4d169c":"ixGQe","8a4a19af97836d80":"61NkN","26720f9d94c9e268":"4DCia","7b6429a248ecc51f":"2XDDf","1368d0fa14524351":"kBoY1"}],"2iHLf":[function(e,t,n){let r;let o=[0,26,44,70,100,134,172,196,242,292,346,404,466,532,581,655,733,815,901,991,1085,1156,1258,1364,1474,1588,1706,1828,1921,2051,2185,2323,2465,2611,2761,2876,3034,3196,3362,3532,3706];/**
+ */ function setupData(matrix, data) {
+    const size = matrix.size;
+    let inc = -1;
+    let row = size - 1;
+    let bitIndex = 7;
+    let byteIndex = 0;
+    for(let col = size - 1; col > 0; col -= 2){
+        if (col === 6) col--;
+        while(true){
+            for(let c = 0; c < 2; c++)if (!matrix.isReserved(row, col - c)) {
+                let dark = false;
+                if (byteIndex < data.length) dark = (data[byteIndex] >>> bitIndex & 1) === 1;
+                matrix.set(row, col - c, dark);
+                bitIndex--;
+                if (bitIndex === -1) {
+                    byteIndex++;
+                    bitIndex = 7;
+                }
+            }
+            row += inc;
+            if (row < 0 || size <= row) {
+                row -= inc;
+                inc = -inc;
+                break;
+            }
+        }
+    }
+}
+/**
+ * Create encoded codewords from data input
+ *
+ * @param  {Number}   version              QR Code version
+ * @param  {ErrorCorrectionLevel}   errorCorrectionLevel Error correction level
+ * @param  {ByteData} data                 Data input
+ * @return {Uint8Array}                    Buffer containing encoded codewords
+ */ function createData(version, errorCorrectionLevel, segments) {
+    // Prepare data buffer
+    const buffer = new BitBuffer();
+    segments.forEach(function(data) {
+        // prefix data with mode indicator (4 bits)
+        buffer.put(data.mode.bit, 4);
+        // Prefix data with character count indicator.
+        // The character count indicator is a string of bits that represents the
+        // number of characters that are being encoded.
+        // The character count indicator must be placed after the mode indicator
+        // and must be a certain number of bits long, depending on the QR version
+        // and data mode
+        // @see {@link Mode.getCharCountIndicator}.
+        buffer.put(data.getLength(), Mode.getCharCountIndicator(data.mode, version));
+        // add binary data sequence to buffer
+        data.write(buffer);
+    });
+    // Calculate required number of bits
+    const totalCodewords = Utils.getSymbolTotalCodewords(version);
+    const ecTotalCodewords = ECCode.getTotalCodewordsCount(version, errorCorrectionLevel);
+    const dataTotalCodewordsBits = (totalCodewords - ecTotalCodewords) * 8;
+    // Add a terminator.
+    // If the bit string is shorter than the total number of required bits,
+    // a terminator of up to four 0s must be added to the right side of the string.
+    // If the bit string is more than four bits shorter than the required number of bits,
+    // add four 0s to the end.
+    if (buffer.getLengthInBits() + 4 <= dataTotalCodewordsBits) buffer.put(0, 4);
+    // If the bit string is fewer than four bits shorter, add only the number of 0s that
+    // are needed to reach the required number of bits.
+    // After adding the terminator, if the number of bits in the string is not a multiple of 8,
+    // pad the string on the right with 0s to make the string's length a multiple of 8.
+    while(buffer.getLengthInBits() % 8 !== 0)buffer.putBit(0);
+    // Add pad bytes if the string is still shorter than the total number of required bits.
+    // Extend the buffer to fill the data capacity of the symbol corresponding to
+    // the Version and Error Correction Level by adding the Pad Codewords 11101100 (0xEC)
+    // and 00010001 (0x11) alternately.
+    const remainingByte = (dataTotalCodewordsBits - buffer.getLengthInBits()) / 8;
+    for(let i = 0; i < remainingByte; i++)buffer.put(i % 2 ? 0x11 : 0xEC, 8);
+    return createCodewords(buffer, version, errorCorrectionLevel);
+}
+/**
+ * Encode input data with Reed-Solomon and return codewords with
+ * relative error correction bits
+ *
+ * @param  {BitBuffer} bitBuffer            Data to encode
+ * @param  {Number}    version              QR Code version
+ * @param  {ErrorCorrectionLevel} errorCorrectionLevel Error correction level
+ * @return {Uint8Array}                     Buffer containing encoded codewords
+ */ function createCodewords(bitBuffer, version, errorCorrectionLevel) {
+    // Total codewords for this QR code version (Data + Error correction)
+    const totalCodewords = Utils.getSymbolTotalCodewords(version);
+    // Total number of error correction codewords
+    const ecTotalCodewords = ECCode.getTotalCodewordsCount(version, errorCorrectionLevel);
+    // Total number of data codewords
+    const dataTotalCodewords = totalCodewords - ecTotalCodewords;
+    // Total number of blocks
+    const ecTotalBlocks = ECCode.getBlocksCount(version, errorCorrectionLevel);
+    // Calculate how many blocks each group should contain
+    const blocksInGroup2 = totalCodewords % ecTotalBlocks;
+    const blocksInGroup1 = ecTotalBlocks - blocksInGroup2;
+    const totalCodewordsInGroup1 = Math.floor(totalCodewords / ecTotalBlocks);
+    const dataCodewordsInGroup1 = Math.floor(dataTotalCodewords / ecTotalBlocks);
+    const dataCodewordsInGroup2 = dataCodewordsInGroup1 + 1;
+    // Number of EC codewords is the same for both groups
+    const ecCount = totalCodewordsInGroup1 - dataCodewordsInGroup1;
+    // Initialize a Reed-Solomon encoder with a generator polynomial of degree ecCount
+    const rs = new ReedSolomonEncoder(ecCount);
+    let offset = 0;
+    const dcData = new Array(ecTotalBlocks);
+    const ecData = new Array(ecTotalBlocks);
+    let maxDataSize = 0;
+    const buffer = new Uint8Array(bitBuffer.buffer);
+    // Divide the buffer into the required number of blocks
+    for(let b = 0; b < ecTotalBlocks; b++){
+        const dataSize = b < blocksInGroup1 ? dataCodewordsInGroup1 : dataCodewordsInGroup2;
+        // extract a block of data from buffer
+        dcData[b] = buffer.slice(offset, offset + dataSize);
+        // Calculate EC codewords for this data block
+        ecData[b] = rs.encode(dcData[b]);
+        offset += dataSize;
+        maxDataSize = Math.max(maxDataSize, dataSize);
+    }
+    // Create final data
+    // Interleave the data and error correction codewords from each block
+    const data = new Uint8Array(totalCodewords);
+    let index = 0;
+    let i, r;
+    // Add data codewords
+    for(i = 0; i < maxDataSize; i++){
+        for(r = 0; r < ecTotalBlocks; r++)if (i < dcData[r].length) data[index++] = dcData[r][i];
+    }
+    // Apped EC codewords
+    for(i = 0; i < ecCount; i++)for(r = 0; r < ecTotalBlocks; r++)data[index++] = ecData[r][i];
+    return data;
+}
+/**
+ * Build QR Code symbol
+ *
+ * @param  {String} data                 Input string
+ * @param  {Number} version              QR Code version
+ * @param  {ErrorCorretionLevel} errorCorrectionLevel Error level
+ * @param  {MaskPattern} maskPattern     Mask pattern
+ * @return {Object}                      Object containing symbol data
+ */ function createSymbol(data, version, errorCorrectionLevel, maskPattern) {
+    let segments;
+    if (Array.isArray(data)) segments = Segments.fromArray(data);
+    else if (typeof data === "string") {
+        let estimatedVersion = version;
+        if (!estimatedVersion) {
+            const rawSegments = Segments.rawSplit(data);
+            // Estimate best version that can contain raw splitted segments
+            estimatedVersion = Version.getBestVersionForData(rawSegments, errorCorrectionLevel);
+        }
+        // Build optimized segments
+        // If estimated version is undefined, try with the highest version
+        segments = Segments.fromString(data, estimatedVersion || 40);
+    } else throw new Error("Invalid data");
+    // Get the min version that can contain data
+    const bestVersion = Version.getBestVersionForData(segments, errorCorrectionLevel);
+    // If no version is found, data cannot be stored
+    if (!bestVersion) throw new Error("The amount of data is too big to be stored in a QR Code");
+    // If not specified, use min version as default
+    if (!version) version = bestVersion;
+    else if (version < bestVersion) throw new Error("\nThe chosen QR Code version cannot contain this amount of data.\nMinimum version required to store current data is: " + bestVersion + ".\n");
+    const dataBits = createData(version, errorCorrectionLevel, segments);
+    // Allocate matrix buffer
+    const moduleCount = Utils.getSymbolSize(version);
+    const modules = new BitMatrix(moduleCount);
+    // Add function modules
+    setupFinderPattern(modules, version);
+    setupTimingPattern(modules);
+    setupAlignmentPattern(modules, version);
+    // Add temporary dummy bits for format info just to set them as reserved.
+    // This is needed to prevent these bits from being masked by {@link MaskPattern.applyMask}
+    // since the masking operation must be performed only on the encoding region.
+    // These blocks will be replaced with correct values later in code.
+    setupFormatInfo(modules, errorCorrectionLevel, 0);
+    if (version >= 7) setupVersionInfo(modules, version);
+    // Add data codewords
+    setupData(modules, dataBits);
+    if (isNaN(maskPattern)) // Find best mask pattern
+    maskPattern = MaskPattern.getBestMask(modules, setupFormatInfo.bind(null, modules, errorCorrectionLevel));
+    // Apply mask pattern
+    MaskPattern.applyMask(maskPattern, modules);
+    // Replace format info bits with correct values
+    setupFormatInfo(modules, errorCorrectionLevel, maskPattern);
+    return {
+        modules: modules,
+        version: version,
+        errorCorrectionLevel: errorCorrectionLevel,
+        maskPattern: maskPattern,
+        segments: segments
+    };
+}
+/**
+ * QR Code
+ *
+ * @param {String | Array} data                 Input data
+ * @param {Object} options                      Optional configurations
+ * @param {Number} options.version              QR Code version
+ * @param {String} options.errorCorrectionLevel Error correction level
+ * @param {Function} options.toSJISFunc         Helper func to convert utf8 to sjis
+ */ exports.create = function create(data, options) {
+    if (typeof data === "undefined" || data === "") throw new Error("No input text");
+    let errorCorrectionLevel = ECLevel.M;
+    let version;
+    let mask;
+    if (typeof options !== "undefined") {
+        // Use higher error correction level as default
+        errorCorrectionLevel = ECLevel.from(options.errorCorrectionLevel, ECLevel.M);
+        version = Version.from(options.version);
+        mask = MaskPattern.from(options.maskPattern);
+        if (options.toSJISFunc) Utils.setToSJISFunction(options.toSJISFunc);
+    }
+    return createSymbol(data, version, errorCorrectionLevel, mask);
+};
+
+},{"4cf6a8173d9f3a2":"iXLHI","2ad62f61c352884c":"kbPwo","87d5a6270eb1dc26":"kiPfj","91abc94f777368cc":"fTjkX","9737c3939ab85d95":"1o9KB","cee3d371e219e45e":"dc6Ma","8700c8c682afabf3":"fyimH","65ad903a6ba3e":"5yWYH","1e8e447afb4d169c":"47Qq0","8a4a19af97836d80":"a8ag2","26720f9d94c9e268":"iThdR","7b6429a248ecc51f":"f1e9A","1368d0fa14524351":"4tKki"}],"iXLHI":[function(require,module,exports) {
+let toSJISFunction;
+const CODEWORDS_COUNT = [
+    0,
+    26,
+    44,
+    70,
+    100,
+    134,
+    172,
+    196,
+    242,
+    292,
+    346,
+    404,
+    466,
+    532,
+    581,
+    655,
+    733,
+    815,
+    901,
+    991,
+    1085,
+    1156,
+    1258,
+    1364,
+    1474,
+    1588,
+    1706,
+    1828,
+    1921,
+    2051,
+    2185,
+    2323,
+    2465,
+    2611,
+    2761,
+    2876,
+    3034,
+    3196,
+    3362,
+    3532,
+    3706
+];
+/**
  * Returns the QR Code size for the specified version
  *
  * @param  {Number} version QR Code version
  * @return {Number}         size of QR code
- */n.getSymbolSize=function(e){if(!e)throw Error('"version" cannot be null or undefined');if(e<1||e>40)throw Error('"version" should be in range from 1 to 40');return 4*e+17},/**
+ */ exports.getSymbolSize = function getSymbolSize(version) {
+    if (!version) throw new Error('"version" cannot be null or undefined');
+    if (version < 1 || version > 40) throw new Error('"version" should be in range from 1 to 40');
+    return version * 4 + 17;
+};
+/**
  * Returns the total number of codewords used to store data and EC information.
  *
  * @param  {Number} version QR Code version
  * @return {Number}         Data length in bits
- */n.getSymbolTotalCodewords=function(e){return o[e]},/**
+ */ exports.getSymbolTotalCodewords = function getSymbolTotalCodewords(version) {
+    return CODEWORDS_COUNT[version];
+};
+/**
  * Encode data with Bose-Chaudhuri-Hocquenghem
  *
  * @param  {Number} data Value to encode
  * @return {Number}      Encoded value
- */n.getBCHDigit=function(e){let t=0;for(;0!==e;)t++,e>>>=1;return t},n.setToSJISFunction=function(e){if("function"!=typeof e)throw Error('"toSJISFunc" is not a valid function.');r=e},n.isKanjiModeEnabled=function(){return void 0!==r},n.toSJIS=function(e){return r(e)}},{}],kU8Fo:[function(e,t,n){n.L={bit:1},n.M={bit:0},n.Q={bit:3},n.H={bit:2},n.isValid=function(e){return e&&void 0!==e.bit&&e.bit>=0&&e.bit<4},n.from=function(e,t){if(n.isValid(e))return e;try{return function(e){if("string"!=typeof e)throw Error("Param is not a string");let t=e.toLowerCase();switch(t){case"l":case"low":return n.L;case"m":case"medium":return n.M;case"q":case"quartile":return n.Q;case"h":case"high":return n.H;default:throw Error("Unknown EC Level: "+e)}}(e)}catch(e){return t}}},{}],dvmjt:[function(e,t,n){function r(){this.buffer=[],this.length=0}r.prototype={get:function(e){return(this.buffer[Math.floor(e/8)]>>>7-e%8&1)==1},put:function(e,t){for(let n=0;n<t;n++)this.putBit((e>>>t-n-1&1)==1)},getLengthInBits:function(){return this.length},putBit:function(e){let t=Math.floor(this.length/8);this.buffer.length<=t&&this.buffer.push(0),e&&(this.buffer[t]|=128>>>this.length%8),this.length++}},t.exports=r},{}],"4koKB":[function(e,t,n){/**
+ */ exports.getBCHDigit = function(data) {
+    let digit = 0;
+    while(data !== 0){
+        digit++;
+        data >>>= 1;
+    }
+    return digit;
+};
+exports.setToSJISFunction = function setToSJISFunction(f) {
+    if (typeof f !== "function") throw new Error('"toSJISFunc" is not a valid function.');
+    toSJISFunction = f;
+};
+exports.isKanjiModeEnabled = function() {
+    return typeof toSJISFunction !== "undefined";
+};
+exports.toSJIS = function toSJIS(kanji) {
+    return toSJISFunction(kanji);
+};
+
+},{}],"kbPwo":[function(require,module,exports) {
+exports.L = {
+    bit: 1
+};
+exports.M = {
+    bit: 0
+};
+exports.Q = {
+    bit: 3
+};
+exports.H = {
+    bit: 2
+};
+function fromString(string) {
+    if (typeof string !== "string") throw new Error("Param is not a string");
+    const lcStr = string.toLowerCase();
+    switch(lcStr){
+        case "l":
+        case "low":
+            return exports.L;
+        case "m":
+        case "medium":
+            return exports.M;
+        case "q":
+        case "quartile":
+            return exports.Q;
+        case "h":
+        case "high":
+            return exports.H;
+        default:
+            throw new Error("Unknown EC Level: " + string);
+    }
+}
+exports.isValid = function isValid(level) {
+    return level && typeof level.bit !== "undefined" && level.bit >= 0 && level.bit < 4;
+};
+exports.from = function from(value, defaultValue) {
+    if (exports.isValid(value)) return value;
+    try {
+        return fromString(value);
+    } catch (e) {
+        return defaultValue;
+    }
+};
+
+},{}],"kiPfj":[function(require,module,exports) {
+function BitBuffer() {
+    this.buffer = [];
+    this.length = 0;
+}
+BitBuffer.prototype = {
+    get: function(index) {
+        const bufIndex = Math.floor(index / 8);
+        return (this.buffer[bufIndex] >>> 7 - index % 8 & 1) === 1;
+    },
+    put: function(num, length) {
+        for(let i = 0; i < length; i++)this.putBit((num >>> length - i - 1 & 1) === 1);
+    },
+    getLengthInBits: function() {
+        return this.length;
+    },
+    putBit: function(bit) {
+        const bufIndex = Math.floor(this.length / 8);
+        if (this.buffer.length <= bufIndex) this.buffer.push(0);
+        if (bit) this.buffer[bufIndex] |= 0x80 >>> this.length % 8;
+        this.length++;
+    }
+};
+module.exports = BitBuffer;
+
+},{}],"fTjkX":[function(require,module,exports) {
+/**
  * Helper class to handle QR Code symbol modules
  *
  * @param {Number} size Symbol size
- */function r(e){if(!e||e<1)throw Error("BitMatrix size must be defined and greater than 0");this.size=e,this.data=new Uint8Array(e*e),this.reservedBit=new Uint8Array(e*e)}/**
+ */ function BitMatrix(size) {
+    if (!size || size < 1) throw new Error("BitMatrix size must be defined and greater than 0");
+    this.size = size;
+    this.data = new Uint8Array(size * size);
+    this.reservedBit = new Uint8Array(size * size);
+}
+/**
  * Set bit value at specified location
  * If reserved flag is set, this bit will be ignored during masking process
  *
@@ -182,26 +1405,43 @@ p(v,n,o),{modules:v,version:t,errorCorrectionLevel:n,maskPattern:o,segments:g})}
  * @param {Number}  col
  * @param {Boolean} value
  * @param {Boolean} reserved
- */r.prototype.set=function(e,t,n,r){let o=e*this.size+t;this.data[o]=n,r&&(this.reservedBit[o]=!0)},/**
+ */ BitMatrix.prototype.set = function(row, col, value, reserved) {
+    const index = row * this.size + col;
+    this.data[index] = value;
+    if (reserved) this.reservedBit[index] = true;
+};
+/**
  * Returns bit value at specified location
  *
  * @param  {Number}  row
  * @param  {Number}  col
  * @return {Boolean}
- */r.prototype.get=function(e,t){return this.data[e*this.size+t]},/**
+ */ BitMatrix.prototype.get = function(row, col) {
+    return this.data[row * this.size + col];
+};
+/**
  * Applies xor operator at specified location
  * (used during masking process)
  *
  * @param {Number}  row
  * @param {Number}  col
  * @param {Boolean} value
- */r.prototype.xor=function(e,t,n){this.data[e*this.size+t]^=n},/**
+ */ BitMatrix.prototype.xor = function(row, col, value) {
+    this.data[row * this.size + col] ^= value;
+};
+/**
  * Check if bit at specified location is reserved
  *
  * @param {Number}   row
  * @param {Number}   col
  * @return {Boolean}
- */r.prototype.isReserved=function(e,t){return this.reservedBit[e*this.size+t]},t.exports=r},{}],"2m37T":[function(e,t,n){/**
+ */ BitMatrix.prototype.isReserved = function(row, col) {
+    return this.reservedBit[row * this.size + col];
+};
+module.exports = BitMatrix;
+
+},{}],"1o9KB":[function(require,module,exports) {
+/**
  * Alignment pattern are fixed reference pattern in defined positions
  * in a matrix symbology, which enables the decode software to re-synchronise
  * the coordinate mapping of the image modules in the event of moderate amounts
@@ -209,7 +1449,8 @@ p(v,n,o),{modules:v,version:t,errorCorrectionLevel:n,maskPattern:o,segments:g})}
  *
  * Alignment patterns are present only in QR Code symbols of version 2 or larger
  * and their number depends on the symbol version.
- */let r=e("3fa093180e62a22a").getSymbolSize;/**
+ */ const getSymbolSize = require("3fa093180e62a22a").getSymbolSize;
+/**
  * Calculate the row/column coordinates of the center module of each alignment pattern
  * for the specified QR Code version.
  *
@@ -222,9 +1463,21 @@ p(v,n,o),{modules:v,version:t,errorCorrectionLevel:n,maskPattern:o,segments:g})}
  *
  * @param  {Number} version QR Code version
  * @return {Array}          Array of coordinate
- */n.getRowColCoords=function(e){if(1===e)return[];let t=Math.floor(e/7)+2,n=r(e),o=145===n?26:2*Math.ceil((n-13)/(2*t-2)),i=[n-7]// Last coord is always (size - 7)
-;for(let e=1;e<t-1;e++)i[e]=i[e-1]-o;return i.push(6)// First coord is always 6
-,i.reverse()},/**
+ */ exports.getRowColCoords = function getRowColCoords(version) {
+    if (version === 1) return [];
+    const posCount = Math.floor(version / 7) + 2;
+    const size = getSymbolSize(version);
+    const intervals = size === 145 ? 26 : Math.ceil((size - 13) / (2 * posCount - 2)) * 2;
+    const positions = [
+        size - 7
+    ] // Last coord is always (size - 7)
+    ;
+    for(let i = 1; i < posCount - 1; i++)positions[i] = positions[i - 1] - intervals;
+    positions.push(6) // First coord is always 6
+    ;
+    return positions.reverse();
+};
+/**
  * Returns an array containing the positions of each alignment pattern.
  * Each array's element represent the center point of the pattern as (x, y) coordinates
  *
@@ -243,163 +1496,809 @@ p(v,n,o),{modules:v,version:t,errorCorrectionLevel:n,maskPattern:o,segments:g})}
  *
  * @param  {Number} version QR Code version
  * @return {Array}          Array of coordinates
- */n.getPositions=function(e){let t=[],r=n.getRowColCoords(e),o=r.length;for(let e=0;e<o;e++)for(let n=0;n<o;n++)// Skip if position is occupied by finder patterns
-(0!==e||0!==n)&&// top-left
-(0!==e||n!==o-1)&&// bottom-left
-(e!==o-1||0!==n)&&t.push([r[e],r[n]]);return t}},{"3fa093180e62a22a":"2iHLf"}],"9BWaM":[function(e,t,n){let r=e("6ec9ae5660047293").getSymbolSize;/**
+ */ exports.getPositions = function getPositions(version) {
+    const coords = [];
+    const pos = exports.getRowColCoords(version);
+    const posLength = pos.length;
+    for(let i = 0; i < posLength; i++)for(let j = 0; j < posLength; j++){
+        // Skip if position is occupied by finder patterns
+        if (i === 0 && j === 0 || // top-left
+        i === 0 && j === posLength - 1 || // bottom-left
+        i === posLength - 1 && j === 0) continue;
+        coords.push([
+            pos[i],
+            pos[j]
+        ]);
+    }
+    return coords;
+};
+
+},{"3fa093180e62a22a":"iXLHI"}],"dc6Ma":[function(require,module,exports) {
+const getSymbolSize = require("6ec9ae5660047293").getSymbolSize;
+const FINDER_PATTERN_SIZE = 7;
+/**
  * Returns an array containing the positions of each finder pattern.
  * Each array's element represent the top-left point of the pattern as (x, y) coordinates
  *
  * @param  {Number} version QR Code version
  * @return {Array}          Array of coordinates
- */n.getPositions=function(e){let t=r(e);return[// top-left
-[0,0],// top-right
-[t-7,0],// bottom-left
-[0,t-7]]}},{"6ec9ae5660047293":"2iHLf"}],"2hy8U":[function(e,t,n){/**
+ */ exports.getPositions = function getPositions(version) {
+    const size = getSymbolSize(version);
+    return [
+        // top-left
+        [
+            0,
+            0
+        ],
+        // top-right
+        [
+            size - FINDER_PATTERN_SIZE,
+            0
+        ],
+        // bottom-left
+        [
+            0,
+            size - FINDER_PATTERN_SIZE
+        ]
+    ];
+};
+
+},{"6ec9ae5660047293":"iXLHI"}],"fyimH":[function(require,module,exports) {
+/**
  * Data mask pattern reference
  * @type {Object}
- */n.Patterns={PATTERN000:0,PATTERN001:1,PATTERN010:2,PATTERN011:3,PATTERN100:4,PATTERN101:5,PATTERN110:6,PATTERN111:7};/**
+ */ exports.Patterns = {
+    PATTERN000: 0,
+    PATTERN001: 1,
+    PATTERN010: 2,
+    PATTERN011: 3,
+    PATTERN100: 4,
+    PATTERN101: 5,
+    PATTERN110: 6,
+    PATTERN111: 7
+};
+/**
  * Weighted penalty scores for the undesirable features
  * @type {Object}
- */let r={N1:3,N2:3,N3:40,N4:10};/**
+ */ const PenaltyScores = {
+    N1: 3,
+    N2: 3,
+    N3: 40,
+    N4: 10
+};
+/**
  * Check if mask pattern value is valid
  *
  * @param  {Number}  mask    Mask pattern
  * @return {Boolean}         true if valid, false otherwise
- */n.isValid=function(e){return null!=e&&""!==e&&!isNaN(e)&&e>=0&&e<=7},/**
+ */ exports.isValid = function isValid(mask) {
+    return mask != null && mask !== "" && !isNaN(mask) && mask >= 0 && mask <= 7;
+};
+/**
  * Returns mask pattern from a value.
  * If value is not valid, returns undefined
  *
  * @param  {Number|String} value        Mask pattern value
  * @return {Number}                     Valid mask pattern or undefined
- */n.from=function(e){return n.isValid(e)?parseInt(e,10):void 0},/**
+ */ exports.from = function from(value) {
+    return exports.isValid(value) ? parseInt(value, 10) : undefined;
+};
+/**
 * Find adjacent modules in row/column with the same color
 * and assign a penalty value.
 *
 * Points: N1 + i
 * i is the amount by which the number of adjacent modules of the same color exceeds 5
-*/n.getPenaltyN1=function(e){let t=e.size,n=0,o=0,i=0,a=null,l=null;for(let s=0;s<t;s++){o=i=0,a=l=null;for(let d=0;d<t;d++){let t=e.get(s,d);t===a?o++:(o>=5&&(n+=r.N1+(o-5)),a=t,o=1),(t=e.get(d,s))===l?i++:(i>=5&&(n+=r.N1+(i-5)),l=t,i=1)}o>=5&&(n+=r.N1+(o-5)),i>=5&&(n+=r.N1+(i-5))}return n},/**
+*/ exports.getPenaltyN1 = function getPenaltyN1(data) {
+    const size = data.size;
+    let points = 0;
+    let sameCountCol = 0;
+    let sameCountRow = 0;
+    let lastCol = null;
+    let lastRow = null;
+    for(let row = 0; row < size; row++){
+        sameCountCol = sameCountRow = 0;
+        lastCol = lastRow = null;
+        for(let col = 0; col < size; col++){
+            let module = data.get(row, col);
+            if (module === lastCol) sameCountCol++;
+            else {
+                if (sameCountCol >= 5) points += PenaltyScores.N1 + (sameCountCol - 5);
+                lastCol = module;
+                sameCountCol = 1;
+            }
+            module = data.get(col, row);
+            if (module === lastRow) sameCountRow++;
+            else {
+                if (sameCountRow >= 5) points += PenaltyScores.N1 + (sameCountRow - 5);
+                lastRow = module;
+                sameCountRow = 1;
+            }
+        }
+        if (sameCountCol >= 5) points += PenaltyScores.N1 + (sameCountCol - 5);
+        if (sameCountRow >= 5) points += PenaltyScores.N1 + (sameCountRow - 5);
+    }
+    return points;
+};
+/**
  * Find 2x2 blocks with the same color and assign a penalty value
  *
  * Points: N2 * (m - 1) * (n - 1)
- */n.getPenaltyN2=function(e){let t=e.size,n=0;for(let r=0;r<t-1;r++)for(let o=0;o<t-1;o++){let t=e.get(r,o)+e.get(r,o+1)+e.get(r+1,o)+e.get(r+1,o+1);(4===t||0===t)&&n++}return n*r.N2},/**
+ */ exports.getPenaltyN2 = function getPenaltyN2(data) {
+    const size = data.size;
+    let points = 0;
+    for(let row = 0; row < size - 1; row++)for(let col = 0; col < size - 1; col++){
+        const last = data.get(row, col) + data.get(row, col + 1) + data.get(row + 1, col) + data.get(row + 1, col + 1);
+        if (last === 4 || last === 0) points++;
+    }
+    return points * PenaltyScores.N2;
+};
+/**
  * Find 1:1:3:1:1 ratio (dark:light:dark:light:dark) pattern in row/column,
  * preceded or followed by light area 4 modules wide
  *
  * Points: N3 * number of pattern found
- */n.getPenaltyN3=function(e){let t=e.size,n=0,o=0,i=0;for(let r=0;r<t;r++){o=i=0;for(let a=0;a<t;a++)o=o<<1&2047|e.get(r,a),a>=10&&(1488===o||93===o)&&n++,i=i<<1&2047|e.get(a,r),a>=10&&(1488===i||93===i)&&n++}return n*r.N3},/**
+ */ exports.getPenaltyN3 = function getPenaltyN3(data) {
+    const size = data.size;
+    let points = 0;
+    let bitsCol = 0;
+    let bitsRow = 0;
+    for(let row = 0; row < size; row++){
+        bitsCol = bitsRow = 0;
+        for(let col = 0; col < size; col++){
+            bitsCol = bitsCol << 1 & 0x7FF | data.get(row, col);
+            if (col >= 10 && (bitsCol === 0x5D0 || bitsCol === 0x05D)) points++;
+            bitsRow = bitsRow << 1 & 0x7FF | data.get(col, row);
+            if (col >= 10 && (bitsRow === 0x5D0 || bitsRow === 0x05D)) points++;
+        }
+    }
+    return points * PenaltyScores.N3;
+};
+/**
  * Calculate proportion of dark modules in entire symbol
  *
  * Points: N4 * k
  *
  * k is the rating of the deviation of the proportion of dark modules
  * in the symbol from 50% in steps of 5%
- */n.getPenaltyN4=function(e){let t=0,n=e.data.length;for(let r=0;r<n;r++)t+=e.data[r];let o=Math.abs(Math.ceil(100*t/n/5)-10);return o*r.N4},/**
- * Apply a mask pattern to a BitMatrix
- *
- * @param  {Number}    pattern Pattern reference number
- * @param  {BitMatrix} data    BitMatrix data
- */n.applyMask=function(e,t){let r=t.size;for(let o=0;o<r;o++)for(let i=0;i<r;i++)t.isReserved(i,o)||t.xor(i,o,/**
+ */ exports.getPenaltyN4 = function getPenaltyN4(data) {
+    let darkCount = 0;
+    const modulesCount = data.data.length;
+    for(let i = 0; i < modulesCount; i++)darkCount += data.data[i];
+    const k = Math.abs(Math.ceil(darkCount * 100 / modulesCount / 5) - 10);
+    return k * PenaltyScores.N4;
+};
+/**
  * Return mask value at given position
  *
  * @param  {Number} maskPattern Pattern reference value
  * @param  {Number} i           Row
  * @param  {Number} j           Column
  * @return {Boolean}            Mask value
- */function(e,t,r){switch(e){case n.Patterns.PATTERN000:return(t+r)%2==0;case n.Patterns.PATTERN001:return t%2==0;case n.Patterns.PATTERN010:return r%3==0;case n.Patterns.PATTERN011:return(t+r)%3==0;case n.Patterns.PATTERN100:return(Math.floor(t/2)+Math.floor(r/3))%2==0;case n.Patterns.PATTERN101:return t*r%2+t*r%3==0;case n.Patterns.PATTERN110:return(t*r%2+t*r%3)%2==0;case n.Patterns.PATTERN111:return(t*r%3+(t+r)%2)%2==0;default:throw Error("bad maskPattern:"+e)}}(e,i,o))},/**
+ */ function getMaskAt(maskPattern, i, j) {
+    switch(maskPattern){
+        case exports.Patterns.PATTERN000:
+            return (i + j) % 2 === 0;
+        case exports.Patterns.PATTERN001:
+            return i % 2 === 0;
+        case exports.Patterns.PATTERN010:
+            return j % 3 === 0;
+        case exports.Patterns.PATTERN011:
+            return (i + j) % 3 === 0;
+        case exports.Patterns.PATTERN100:
+            return (Math.floor(i / 2) + Math.floor(j / 3)) % 2 === 0;
+        case exports.Patterns.PATTERN101:
+            return i * j % 2 + i * j % 3 === 0;
+        case exports.Patterns.PATTERN110:
+            return (i * j % 2 + i * j % 3) % 2 === 0;
+        case exports.Patterns.PATTERN111:
+            return (i * j % 3 + (i + j) % 2) % 2 === 0;
+        default:
+            throw new Error("bad maskPattern:" + maskPattern);
+    }
+}
+/**
+ * Apply a mask pattern to a BitMatrix
+ *
+ * @param  {Number}    pattern Pattern reference number
+ * @param  {BitMatrix} data    BitMatrix data
+ */ exports.applyMask = function applyMask(pattern, data) {
+    const size = data.size;
+    for(let col = 0; col < size; col++)for(let row = 0; row < size; row++){
+        if (data.isReserved(row, col)) continue;
+        data.xor(row, col, getMaskAt(pattern, row, col));
+    }
+};
+/**
  * Returns the best mask pattern for data
  *
  * @param  {BitMatrix} data
  * @return {Number} Mask pattern reference number
- */n.getBestMask=function(e,t){let r=Object.keys(n.Patterns).length,o=0,i=1/0;for(let a=0;a<r;a++){t(a),n.applyMask(a,e);// Calculate penalty
-let r=n.getPenaltyN1(e)+n.getPenaltyN2(e)+n.getPenaltyN3(e)+n.getPenaltyN4(e);// Undo previously applied mask
-n.applyMask(a,e),r<i&&(i=r,o=a)}return o}},{}],ivpAq:[function(e,t,n){let r=e("7baaa530584d1bc4"),o=[// L  M  Q  H
-1,1,1,1,1,1,1,1,1,1,2,2,1,2,2,4,1,2,4,4,2,4,4,4,2,4,6,5,2,4,6,6,2,5,8,8,4,5,8,8,4,5,8,11,4,8,10,11,4,9,12,16,4,9,16,16,6,10,12,18,6,10,17,16,6,11,16,19,6,13,18,21,7,14,21,25,8,16,20,25,8,17,23,25,9,17,23,34,9,18,25,30,10,20,27,32,12,21,29,35,12,23,34,37,12,25,34,40,13,26,35,42,14,28,38,45,15,29,40,48,16,31,43,51,17,33,45,54,18,35,48,57,19,37,51,60,19,38,53,63,20,40,56,66,21,43,59,70,22,45,62,74,24,47,65,77,25,49,68,81],i=[// L  M  Q  H
-7,10,13,17,10,16,22,28,15,26,36,44,20,36,52,64,26,48,72,88,36,64,96,112,40,72,108,130,48,88,132,156,60,110,160,192,72,130,192,224,80,150,224,264,96,176,260,308,104,198,288,352,120,216,320,384,132,240,360,432,144,280,408,480,168,308,448,532,180,338,504,588,196,364,546,650,224,416,600,700,224,442,644,750,252,476,690,816,270,504,750,900,300,560,810,960,312,588,870,1050,336,644,952,1110,360,700,1020,1200,390,728,1050,1260,420,784,1140,1350,450,812,1200,1440,480,868,1290,1530,510,924,1350,1620,540,980,1440,1710,570,1036,1530,1800,570,1064,1590,1890,600,1120,1680,1980,630,1204,1770,2100,660,1260,1860,2220,720,1316,1950,2310,750,1372,2040,2430];/**
+ */ exports.getBestMask = function getBestMask(data, setupFormatFunc) {
+    const numPatterns = Object.keys(exports.Patterns).length;
+    let bestPattern = 0;
+    let lowerPenalty = Infinity;
+    for(let p = 0; p < numPatterns; p++){
+        setupFormatFunc(p);
+        exports.applyMask(p, data);
+        // Calculate penalty
+        const penalty = exports.getPenaltyN1(data) + exports.getPenaltyN2(data) + exports.getPenaltyN3(data) + exports.getPenaltyN4(data);
+        // Undo previously applied mask
+        exports.applyMask(p, data);
+        if (penalty < lowerPenalty) {
+            lowerPenalty = penalty;
+            bestPattern = p;
+        }
+    }
+    return bestPattern;
+};
+
+},{}],"5yWYH":[function(require,module,exports) {
+const ECLevel = require("7baaa530584d1bc4");
+const EC_BLOCKS_TABLE = [
+    // L  M  Q  H
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    2,
+    1,
+    2,
+    2,
+    4,
+    1,
+    2,
+    4,
+    4,
+    2,
+    4,
+    4,
+    4,
+    2,
+    4,
+    6,
+    5,
+    2,
+    4,
+    6,
+    6,
+    2,
+    5,
+    8,
+    8,
+    4,
+    5,
+    8,
+    8,
+    4,
+    5,
+    8,
+    11,
+    4,
+    8,
+    10,
+    11,
+    4,
+    9,
+    12,
+    16,
+    4,
+    9,
+    16,
+    16,
+    6,
+    10,
+    12,
+    18,
+    6,
+    10,
+    17,
+    16,
+    6,
+    11,
+    16,
+    19,
+    6,
+    13,
+    18,
+    21,
+    7,
+    14,
+    21,
+    25,
+    8,
+    16,
+    20,
+    25,
+    8,
+    17,
+    23,
+    25,
+    9,
+    17,
+    23,
+    34,
+    9,
+    18,
+    25,
+    30,
+    10,
+    20,
+    27,
+    32,
+    12,
+    21,
+    29,
+    35,
+    12,
+    23,
+    34,
+    37,
+    12,
+    25,
+    34,
+    40,
+    13,
+    26,
+    35,
+    42,
+    14,
+    28,
+    38,
+    45,
+    15,
+    29,
+    40,
+    48,
+    16,
+    31,
+    43,
+    51,
+    17,
+    33,
+    45,
+    54,
+    18,
+    35,
+    48,
+    57,
+    19,
+    37,
+    51,
+    60,
+    19,
+    38,
+    53,
+    63,
+    20,
+    40,
+    56,
+    66,
+    21,
+    43,
+    59,
+    70,
+    22,
+    45,
+    62,
+    74,
+    24,
+    47,
+    65,
+    77,
+    25,
+    49,
+    68,
+    81
+];
+const EC_CODEWORDS_TABLE = [
+    // L  M  Q  H
+    7,
+    10,
+    13,
+    17,
+    10,
+    16,
+    22,
+    28,
+    15,
+    26,
+    36,
+    44,
+    20,
+    36,
+    52,
+    64,
+    26,
+    48,
+    72,
+    88,
+    36,
+    64,
+    96,
+    112,
+    40,
+    72,
+    108,
+    130,
+    48,
+    88,
+    132,
+    156,
+    60,
+    110,
+    160,
+    192,
+    72,
+    130,
+    192,
+    224,
+    80,
+    150,
+    224,
+    264,
+    96,
+    176,
+    260,
+    308,
+    104,
+    198,
+    288,
+    352,
+    120,
+    216,
+    320,
+    384,
+    132,
+    240,
+    360,
+    432,
+    144,
+    280,
+    408,
+    480,
+    168,
+    308,
+    448,
+    532,
+    180,
+    338,
+    504,
+    588,
+    196,
+    364,
+    546,
+    650,
+    224,
+    416,
+    600,
+    700,
+    224,
+    442,
+    644,
+    750,
+    252,
+    476,
+    690,
+    816,
+    270,
+    504,
+    750,
+    900,
+    300,
+    560,
+    810,
+    960,
+    312,
+    588,
+    870,
+    1050,
+    336,
+    644,
+    952,
+    1110,
+    360,
+    700,
+    1020,
+    1200,
+    390,
+    728,
+    1050,
+    1260,
+    420,
+    784,
+    1140,
+    1350,
+    450,
+    812,
+    1200,
+    1440,
+    480,
+    868,
+    1290,
+    1530,
+    510,
+    924,
+    1350,
+    1620,
+    540,
+    980,
+    1440,
+    1710,
+    570,
+    1036,
+    1530,
+    1800,
+    570,
+    1064,
+    1590,
+    1890,
+    600,
+    1120,
+    1680,
+    1980,
+    630,
+    1204,
+    1770,
+    2100,
+    660,
+    1260,
+    1860,
+    2220,
+    720,
+    1316,
+    1950,
+    2310,
+    750,
+    1372,
+    2040,
+    2430
+];
+/**
  * Returns the number of error correction block that the QR Code should contain
  * for the specified version and error correction level.
  *
  * @param  {Number} version              QR Code version
  * @param  {Number} errorCorrectionLevel Error correction level
  * @return {Number}                      Number of error correction blocks
- */n.getBlocksCount=function(e,t){switch(t){case r.L:return o[(e-1)*4+0];case r.M:return o[(e-1)*4+1];case r.Q:return o[(e-1)*4+2];case r.H:return o[(e-1)*4+3];default:return}},/**
+ */ exports.getBlocksCount = function getBlocksCount(version, errorCorrectionLevel) {
+    switch(errorCorrectionLevel){
+        case ECLevel.L:
+            return EC_BLOCKS_TABLE[(version - 1) * 4 + 0];
+        case ECLevel.M:
+            return EC_BLOCKS_TABLE[(version - 1) * 4 + 1];
+        case ECLevel.Q:
+            return EC_BLOCKS_TABLE[(version - 1) * 4 + 2];
+        case ECLevel.H:
+            return EC_BLOCKS_TABLE[(version - 1) * 4 + 3];
+        default:
+            return undefined;
+    }
+};
+/**
  * Returns the number of error correction codewords to use for the specified
  * version and error correction level.
  *
  * @param  {Number} version              QR Code version
  * @param  {Number} errorCorrectionLevel Error correction level
  * @return {Number}                      Number of error correction codewords
- */n.getTotalCodewordsCount=function(e,t){switch(t){case r.L:return i[(e-1)*4+0];case r.M:return i[(e-1)*4+1];case r.Q:return i[(e-1)*4+2];case r.H:return i[(e-1)*4+3];default:return}}},{"7baaa530584d1bc4":"kU8Fo"}],ixGQe:[function(e,t,n){let r=e("742a7ee6d6a2d145");function o(e){this.genPoly=void 0,this.degree=e,this.degree&&this.initialize(this.degree)}/**
+ */ exports.getTotalCodewordsCount = function getTotalCodewordsCount(version, errorCorrectionLevel) {
+    switch(errorCorrectionLevel){
+        case ECLevel.L:
+            return EC_CODEWORDS_TABLE[(version - 1) * 4 + 0];
+        case ECLevel.M:
+            return EC_CODEWORDS_TABLE[(version - 1) * 4 + 1];
+        case ECLevel.Q:
+            return EC_CODEWORDS_TABLE[(version - 1) * 4 + 2];
+        case ECLevel.H:
+            return EC_CODEWORDS_TABLE[(version - 1) * 4 + 3];
+        default:
+            return undefined;
+    }
+};
+
+},{"7baaa530584d1bc4":"kbPwo"}],"47Qq0":[function(require,module,exports) {
+const Polynomial = require("742a7ee6d6a2d145");
+function ReedSolomonEncoder(degree) {
+    this.genPoly = undefined;
+    this.degree = degree;
+    if (this.degree) this.initialize(this.degree);
+}
+/**
  * Initialize the encoder.
  * The input param should correspond to the number of error correction codewords.
  *
  * @param  {Number} degree
- */o.prototype.initialize=function(e){// create an irreducible generator polynomial
-this.degree=e,this.genPoly=r.generateECPolynomial(this.degree)},/**
+ */ ReedSolomonEncoder.prototype.initialize = function initialize(degree) {
+    // create an irreducible generator polynomial
+    this.degree = degree;
+    this.genPoly = Polynomial.generateECPolynomial(this.degree);
+};
+/**
  * Encodes a chunk of data
  *
  * @param  {Uint8Array} data Buffer containing input data
  * @return {Uint8Array}      Buffer containing encoded data
- */o.prototype.encode=function(e){if(!this.genPoly)throw Error("Encoder not initialized");// Calculate EC for this data block
-// extends data size to data+genPoly size
-let t=new Uint8Array(e.length+this.degree);t.set(e);// The error correction codewords are the remainder after dividing the data codewords
-// by a generator polynomial
-let n=r.mod(t,this.genPoly),o=this.degree-n.length;if(o>0){let e=new Uint8Array(this.degree);return e.set(n,o),e}return n},t.exports=o},{"742a7ee6d6a2d145":"bFrZA"}],bFrZA:[function(e,t,n){let r=e("780c74029318268c");/**
+ */ ReedSolomonEncoder.prototype.encode = function encode(data) {
+    if (!this.genPoly) throw new Error("Encoder not initialized");
+    // Calculate EC for this data block
+    // extends data size to data+genPoly size
+    const paddedData = new Uint8Array(data.length + this.degree);
+    paddedData.set(data);
+    // The error correction codewords are the remainder after dividing the data codewords
+    // by a generator polynomial
+    const remainder = Polynomial.mod(paddedData, this.genPoly);
+    // return EC data blocks (last n byte, where n is the degree of genPoly)
+    // If coefficients number in remainder are less than genPoly degree,
+    // pad with 0s to the left to reach the needed number of coefficients
+    const start = this.degree - remainder.length;
+    if (start > 0) {
+        const buff = new Uint8Array(this.degree);
+        buff.set(remainder, start);
+        return buff;
+    }
+    return remainder;
+};
+module.exports = ReedSolomonEncoder;
+
+},{"742a7ee6d6a2d145":"dxhHI"}],"dxhHI":[function(require,module,exports) {
+const GF = require("780c74029318268c");
+/**
  * Multiplies two polynomials inside Galois Field
  *
  * @param  {Uint8Array} p1 Polynomial
  * @param  {Uint8Array} p2 Polynomial
  * @return {Uint8Array}    Product of p1 and p2
- */n.mul=function(e,t){let n=new Uint8Array(e.length+t.length-1);for(let o=0;o<e.length;o++)for(let i=0;i<t.length;i++)n[o+i]^=r.mul(e[o],t[i]);return n},/**
+ */ exports.mul = function mul(p1, p2) {
+    const coeff = new Uint8Array(p1.length + p2.length - 1);
+    for(let i = 0; i < p1.length; i++)for(let j = 0; j < p2.length; j++)coeff[i + j] ^= GF.mul(p1[i], p2[j]);
+    return coeff;
+};
+/**
  * Calculate the remainder of polynomials division
  *
  * @param  {Uint8Array} divident Polynomial
  * @param  {Uint8Array} divisor  Polynomial
  * @return {Uint8Array}          Remainder
- */n.mod=function(e,t){let n=new Uint8Array(e);for(;n.length-t.length>=0;){let e=n[0];for(let o=0;o<t.length;o++)n[o]^=r.mul(t[o],e);// remove all zeros from buffer head
-let o=0;for(;o<n.length&&0===n[o];)o++;n=n.slice(o)}return n},/**
+ */ exports.mod = function mod(divident, divisor) {
+    let result = new Uint8Array(divident);
+    while(result.length - divisor.length >= 0){
+        const coeff = result[0];
+        for(let i = 0; i < divisor.length; i++)result[i] ^= GF.mul(divisor[i], coeff);
+        // remove all zeros from buffer head
+        let offset = 0;
+        while(offset < result.length && result[offset] === 0)offset++;
+        result = result.slice(offset);
+    }
+    return result;
+};
+/**
  * Generate an irreducible generator polynomial of specified degree
  * (used by Reed-Solomon encoder)
  *
  * @param  {Number} degree Degree of the generator polynomial
  * @return {Uint8Array}    Buffer containing polynomial coefficients
- */n.generateECPolynomial=function(e){let t=new Uint8Array([1]);for(let o=0;o<e;o++)t=n.mul(t,new Uint8Array([1,r.exp(o)]));return t}},{"780c74029318268c":"3WlDl"}],"3WlDl":[function(e,t,n){let r=new Uint8Array(512),o=new Uint8Array(256)/**
+ */ exports.generateECPolynomial = function generateECPolynomial(degree) {
+    let poly = new Uint8Array([
+        1
+    ]);
+    for(let i = 0; i < degree; i++)poly = exports.mul(poly, new Uint8Array([
+        1,
+        GF.exp(i)
+    ]));
+    return poly;
+};
+
+},{"780c74029318268c":"2JC5s"}],"2JC5s":[function(require,module,exports) {
+const EXP_TABLE = new Uint8Array(512);
+const LOG_TABLE = new Uint8Array(256) /**
  * Precompute the log and anti-log tables for faster computation later
  *
  * For each possible value in the galois field 2^8, we will pre-compute
  * the logarithm and anti-logarithm (exponential) of this value
  *
  * ref {@link https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders#Introduction_to_mathematical_fields}
- */;!function(){let e=1;for(let t=0;t<255;t++)r[t]=e,o[e]=t,256&(e<<=1// multiply by 2
-)&&(e^=285);// Optimization: double the size of the anti-log table so that we don't need to mod 255 to
-// stay inside the bounds (because we will mainly use this table for the multiplication of
-// two GF numbers, no more).
-// @see {@link mul}
-for(let e=255;e<512;e++)r[e]=r[e-255]}(),/**
+ */ ;
+(function initTables() {
+    let x = 1;
+    for(let i = 0; i < 255; i++){
+        EXP_TABLE[i] = x;
+        LOG_TABLE[x] = i;
+        x <<= 1 // multiply by 2
+        ;
+        // The QR code specification says to use byte-wise modulo 100011101 arithmetic.
+        // This means that when a number is 256 or larger, it should be XORed with 0x11D.
+        if (x & 0x100) x ^= 0x11D;
+    }
+    // Optimization: double the size of the anti-log table so that we don't need to mod 255 to
+    // stay inside the bounds (because we will mainly use this table for the multiplication of
+    // two GF numbers, no more).
+    // @see {@link mul}
+    for(let i = 255; i < 512; i++)EXP_TABLE[i] = EXP_TABLE[i - 255];
+})();
+/**
  * Returns log value of n inside Galois Field
  *
  * @param  {Number} n
  * @return {Number}
- */n.log=function(e){if(e<1)throw Error("log("+e+")");return o[e]},/**
+ */ exports.log = function log(n) {
+    if (n < 1) throw new Error("log(" + n + ")");
+    return LOG_TABLE[n];
+};
+/**
  * Returns anti-log value of n inside Galois Field
  *
  * @param  {Number} n
  * @return {Number}
- */n.exp=function(e){return r[e]},/**
+ */ exports.exp = function exp(n) {
+    return EXP_TABLE[n];
+};
+/**
  * Multiplies two number inside Galois Field
  *
  * @param  {Number} x
  * @param  {Number} y
  * @return {Number}
- */n.mul=function(e,t){return 0===e||0===t?0:r[o[e]+o[t]]}},{}],"61NkN":[function(e,t,n){let r=e("f67b02cdf61cb7c6"),o=e("777da0d92c463f2e"),i=e("acd5b4fcd696edf3"),a=e("5303c314c4a688d7"),l=e("663d0e03da8b2897"),s=r.getBCHDigit(7973);function d(e,t){// Character count indicator + mode indicator bits
-return a.getCharCountIndicator(e,t)+4}/**
+ */ exports.mul = function mul(x, y) {
+    if (x === 0 || y === 0) return 0;
+    // should be EXP_TABLE[(LOG_TABLE[x] + LOG_TABLE[y]) % 255] if EXP_TABLE wasn't oversized
+    // @see {@link initTables}
+    return EXP_TABLE[LOG_TABLE[x] + LOG_TABLE[y]];
+};
+
+},{}],"a8ag2":[function(require,module,exports) {
+const Utils = require("f67b02cdf61cb7c6");
+const ECCode = require("777da0d92c463f2e");
+const ECLevel = require("acd5b4fcd696edf3");
+const Mode = require("5303c314c4a688d7");
+const VersionCheck = require("663d0e03da8b2897");
+// Generator polynomial used to encode version information
+const G18 = 7973;
+const G18_BCH = Utils.getBCHDigit(G18);
+function getBestVersionForDataLength(mode, length, errorCorrectionLevel) {
+    for(let currentVersion = 1; currentVersion <= 40; currentVersion++){
+        if (length <= exports.getCapacity(currentVersion, errorCorrectionLevel, mode)) return currentVersion;
+    }
+    return undefined;
+}
+function getReservedBitsCount(mode, version) {
+    // Character count indicator + mode indicator bits
+    return Mode.getCharCountIndicator(mode, version) + 4;
+}
+function getTotalBitsFromDataArray(segments, version) {
+    let totalBits = 0;
+    segments.forEach(function(data) {
+        const reservedBits = getReservedBitsCount(data.mode, version);
+        totalBits += reservedBits + data.getBitsLength();
+    });
+    return totalBits;
+}
+function getBestVersionForMixedData(segments, errorCorrectionLevel) {
+    for(let currentVersion = 1; currentVersion <= 40; currentVersion++){
+        const length = getTotalBitsFromDataArray(segments, currentVersion);
+        if (length <= exports.getCapacity(currentVersion, errorCorrectionLevel, Mode.MIXED)) return currentVersion;
+    }
+    return undefined;
+}
+/**
  * Returns version number from a value.
  * If value is not a valid version, returns defaultValue
  *
  * @param  {Number|String} value        QR Code version
  * @param  {Number}        defaultValue Fallback value
  * @return {Number}                     QR Code version number
- */n.from=function(e,t){return l.isValid(e)?parseInt(e,10):t},/**
+ */ exports.from = function from(value, defaultValue) {
+    if (VersionCheck.isValid(value)) return parseInt(value, 10);
+    return defaultValue;
+};
+/**
  * Returns how much data can be stored with the specified QR code version
  * and error correction level
  *
@@ -407,17 +2306,49 @@ return a.getCharCountIndicator(e,t)+4}/**
  * @param  {Number} errorCorrectionLevel Error correction level
  * @param  {Mode}   mode                 Data mode
  * @return {Number}                      Quantity of storable data
- */n.getCapacity=function(e,t,n){if(!l.isValid(e))throw Error("Invalid QR Code version");// Use Byte mode as default
-void 0===n&&(n=a.BYTE);// Total codewords for this QR code version (Data + Error correction)
-let i=r.getSymbolTotalCodewords(e),s=o.getTotalCodewordsCount(e,t),c=(i-s)*8;if(n===a.MIXED)return c;let u=c-d(n,e);// Return max number of storable codewords
-switch(n){case a.NUMERIC:return Math.floor(u/10*3);case a.ALPHANUMERIC:return Math.floor(u/11*2);case a.KANJI:return Math.floor(u/13);case a.BYTE:default:return Math.floor(u/8)}},/**
+ */ exports.getCapacity = function getCapacity(version, errorCorrectionLevel, mode) {
+    if (!VersionCheck.isValid(version)) throw new Error("Invalid QR Code version");
+    // Use Byte mode as default
+    if (typeof mode === "undefined") mode = Mode.BYTE;
+    // Total codewords for this QR code version (Data + Error correction)
+    const totalCodewords = Utils.getSymbolTotalCodewords(version);
+    // Total number of error correction codewords
+    const ecTotalCodewords = ECCode.getTotalCodewordsCount(version, errorCorrectionLevel);
+    // Total number of data codewords
+    const dataTotalCodewordsBits = (totalCodewords - ecTotalCodewords) * 8;
+    if (mode === Mode.MIXED) return dataTotalCodewordsBits;
+    const usableBits = dataTotalCodewordsBits - getReservedBitsCount(mode, version);
+    // Return max number of storable codewords
+    switch(mode){
+        case Mode.NUMERIC:
+            return Math.floor(usableBits / 10 * 3);
+        case Mode.ALPHANUMERIC:
+            return Math.floor(usableBits / 11 * 2);
+        case Mode.KANJI:
+            return Math.floor(usableBits / 13);
+        case Mode.BYTE:
+        default:
+            return Math.floor(usableBits / 8);
+    }
+};
+/**
  * Returns the minimum version needed to contain the amount of data
  *
  * @param  {Segment} data                    Segment of data
  * @param  {Number} [errorCorrectionLevel=H] Error correction level
  * @param  {Mode} mode                       Data mode
  * @return {Number}                          QR Code version
- */n.getBestVersionForData=function(e,t){let r;let o=i.from(t,i.M);if(Array.isArray(e)){if(e.length>1)return function(e,t){for(let r=1;r<=40;r++){let o=function(e,t){let n=0;return e.forEach(function(e){let r=d(e.mode,t);n+=r+e.getBitsLength()}),n}(e,r);if(o<=n.getCapacity(r,t,a.MIXED))return r}}(e,o);if(0===e.length)return 1;r=e[0]}else r=e;return function(e,t,r){for(let o=1;o<=40;o++)if(t<=n.getCapacity(o,r,e))return o}(r.mode,r.getLength(),o)},/**
+ */ exports.getBestVersionForData = function getBestVersionForData(data, errorCorrectionLevel) {
+    let seg;
+    const ecl = ECLevel.from(errorCorrectionLevel, ECLevel.M);
+    if (Array.isArray(data)) {
+        if (data.length > 1) return getBestVersionForMixedData(data, ecl);
+        if (data.length === 0) return 1;
+        seg = data[0];
+    } else seg = data;
+    return getBestVersionForDataLength(seg.mode, seg.getLength(), ecl);
+};
+/**
  * Returns version information with relative error correction bits
  *
  * The version information is included in QR Code symbols of version 7 or larger.
@@ -426,13 +2357,32 @@ switch(n){case a.NUMERIC:return Math.floor(u/10*3);case a.ALPHANUMERIC:return Ma
  *
  * @param  {Number} version QR Code version
  * @return {Number}         Encoded version info bits
- */n.getEncodedBits=function(e){if(!l.isValid(e)||e<7)throw Error("Invalid QR Code version");let t=e<<12;for(;r.getBCHDigit(t)-s>=0;)t^=7973<<r.getBCHDigit(t)-s;return e<<12|t}},{f67b02cdf61cb7c6:"2iHLf","777da0d92c463f2e":"ivpAq",acd5b4fcd696edf3:"kU8Fo","5303c314c4a688d7":"2XDDf","663d0e03da8b2897":"dFhhu"}],"2XDDf":[function(e,t,n){let r=e("488660fac9162579"),o=e("a23fd227d32f3622");/**
+ */ exports.getEncodedBits = function getEncodedBits(version) {
+    if (!VersionCheck.isValid(version) || version < 7) throw new Error("Invalid QR Code version");
+    let d = version << 12;
+    while(Utils.getBCHDigit(d) - G18_BCH >= 0)d ^= G18 << Utils.getBCHDigit(d) - G18_BCH;
+    return version << 12 | d;
+};
+
+},{"f67b02cdf61cb7c6":"iXLHI","777da0d92c463f2e":"5yWYH","acd5b4fcd696edf3":"kbPwo","5303c314c4a688d7":"f1e9A","663d0e03da8b2897":"enfTX"}],"f1e9A":[function(require,module,exports) {
+const VersionCheck = require("488660fac9162579");
+const Regex = require("a23fd227d32f3622");
+/**
  * Numeric mode encodes data from the decimal digit set (0 - 9)
  * (byte values 30HEX to 39HEX).
  * Normally, 3 data characters are represented by 10 bits.
  *
  * @type {Object}
- */n.NUMERIC={id:"Numeric",bit:1,ccBits:[10,12,14]},/**
+ */ exports.NUMERIC = {
+    id: "Numeric",
+    bit: 1,
+    ccBits: [
+        10,
+        12,
+        14
+    ]
+};
+/**
  * Alphanumeric mode encodes data from a set of 45 characters,
  * i.e. 10 numeric digits (0 - 9),
  *      26 alphabetic characters (A - Z),
@@ -440,11 +2390,29 @@ switch(n){case a.NUMERIC:return Math.floor(u/10*3);case a.ALPHANUMERIC:return Ma
  * Normally, two input characters are represented by 11 bits.
  *
  * @type {Object}
- */n.ALPHANUMERIC={id:"Alphanumeric",bit:2,ccBits:[9,11,13]},/**
+ */ exports.ALPHANUMERIC = {
+    id: "Alphanumeric",
+    bit: 2,
+    ccBits: [
+        9,
+        11,
+        13
+    ]
+};
+/**
  * In byte mode, data is encoded at 8 bits per character.
  *
  * @type {Object}
- */n.BYTE={id:"Byte",bit:4,ccBits:[8,16,16]},/**
+ */ exports.BYTE = {
+    id: "Byte",
+    bit: 4,
+    ccBits: [
+        8,
+        16,
+        16
+    ]
+};
+/**
  * The Kanji mode efficiently encodes Kanji characters in accordance with
  * the Shift JIS system based on JIS X 0208.
  * The Shift JIS values are shifted from the JIS X 0208 values.
@@ -452,51 +2420,142 @@ switch(n){case a.NUMERIC:return Math.floor(u/10*3);case a.ALPHANUMERIC:return Ma
  * Each two-byte character value is compacted to a 13-bit binary codeword.
  *
  * @type {Object}
- */n.KANJI={id:"Kanji",bit:8,ccBits:[8,10,12]},/**
+ */ exports.KANJI = {
+    id: "Kanji",
+    bit: 8,
+    ccBits: [
+        8,
+        10,
+        12
+    ]
+};
+/**
  * Mixed mode will contain a sequences of data in a combination of any of
  * the modes described above
  *
  * @type {Object}
- */n.MIXED={bit:-1},/**
+ */ exports.MIXED = {
+    bit: -1
+};
+/**
  * Returns the number of bits needed to store the data length
  * according to QR Code specifications.
  *
  * @param  {Mode}   mode    Data mode
  * @param  {Number} version QR Code version
  * @return {Number}         Number of bits
- */n.getCharCountIndicator=function(e,t){if(!e.ccBits)throw Error("Invalid mode: "+e);if(!r.isValid(t))throw Error("Invalid version: "+t);return t>=1&&t<10?e.ccBits[0]:t<27?e.ccBits[1]:e.ccBits[2]},/**
+ */ exports.getCharCountIndicator = function getCharCountIndicator(mode, version) {
+    if (!mode.ccBits) throw new Error("Invalid mode: " + mode);
+    if (!VersionCheck.isValid(version)) throw new Error("Invalid version: " + version);
+    if (version >= 1 && version < 10) return mode.ccBits[0];
+    else if (version < 27) return mode.ccBits[1];
+    return mode.ccBits[2];
+};
+/**
  * Returns the most efficient mode to store the specified data
  *
  * @param  {String} dataStr Input data string
  * @return {Mode}           Best mode
- */n.getBestModeForData=function(e){return o.testNumeric(e)?n.NUMERIC:o.testAlphanumeric(e)?n.ALPHANUMERIC:o.testKanji(e)?n.KANJI:n.BYTE},/**
+ */ exports.getBestModeForData = function getBestModeForData(dataStr) {
+    if (Regex.testNumeric(dataStr)) return exports.NUMERIC;
+    else if (Regex.testAlphanumeric(dataStr)) return exports.ALPHANUMERIC;
+    else if (Regex.testKanji(dataStr)) return exports.KANJI;
+    else return exports.BYTE;
+};
+/**
  * Return mode name as string
  *
  * @param {Mode} mode Mode object
  * @returns {String}  Mode name
- */n.toString=function(e){if(e&&e.id)return e.id;throw Error("Invalid mode")},/**
+ */ exports.toString = function toString(mode) {
+    if (mode && mode.id) return mode.id;
+    throw new Error("Invalid mode");
+};
+/**
  * Check if input param is a valid mode object
  *
  * @param   {Mode}    mode Mode object
  * @returns {Boolean} True if valid mode, false otherwise
- */n.isValid=function(e){return e&&e.bit&&e.ccBits},/**
+ */ exports.isValid = function isValid(mode) {
+    return mode && mode.bit && mode.ccBits;
+};
+/**
+ * Get mode object from its name
+ *
+ * @param   {String} string Mode name
+ * @returns {Mode}          Mode object
+ */ function fromString(string) {
+    if (typeof string !== "string") throw new Error("Param is not a string");
+    const lcStr = string.toLowerCase();
+    switch(lcStr){
+        case "numeric":
+            return exports.NUMERIC;
+        case "alphanumeric":
+            return exports.ALPHANUMERIC;
+        case "kanji":
+            return exports.KANJI;
+        case "byte":
+            return exports.BYTE;
+        default:
+            throw new Error("Unknown mode: " + string);
+    }
+}
+/**
  * Returns mode from a value.
  * If value is not a valid mode, returns defaultValue
  *
  * @param  {Mode|String} value        Encoding mode
  * @param  {Mode}        defaultValue Fallback value
  * @return {Mode}                     Encoding mode
- */n.from=function(e,t){if(n.isValid(e))return e;try{return(/**
- * Get mode object from its name
- *
- * @param   {String} string Mode name
- * @returns {Mode}          Mode object
- */function(e){if("string"!=typeof e)throw Error("Param is not a string");let t=e.toLowerCase();switch(t){case"numeric":return n.NUMERIC;case"alphanumeric":return n.ALPHANUMERIC;case"kanji":return n.KANJI;case"byte":return n.BYTE;default:throw Error("Unknown mode: "+e)}}(e))}catch(e){return t}}},{"488660fac9162579":"dFhhu",a23fd227d32f3622:"fkiQV"}],dFhhu:[function(e,t,n){/**
+ */ exports.from = function from(value, defaultValue) {
+    if (exports.isValid(value)) return value;
+    try {
+        return fromString(value);
+    } catch (e) {
+        return defaultValue;
+    }
+};
+
+},{"488660fac9162579":"enfTX","a23fd227d32f3622":"3Bqru"}],"enfTX":[function(require,module,exports) {
+/**
  * Check if QR Code version is valid
  *
  * @param  {Number}  version QR Code version
  * @return {Boolean}         true if valid version, false otherwise
- */n.isValid=function(e){return!isNaN(e)&&e>=1&&e<=40}},{}],fkiQV:[function(e,t,n){let r="[0-9]+",o="(?:[u3000-u303F]|[u3040-u309F]|[u30A0-u30FF]|[uFF00-uFFEF]|[u4E00-u9FAF]|[u2605-u2606]|[u2190-u2195]|u203B|[u2010u2015u2018u2019u2025u2026u201Cu201Du2225u2260]|[u0391-u0451]|[u00A7u00A8u00B1u00B4u00D7u00F7])+";o=o.replace(/u/g,"\\u");let i="(?:(?![A-Z0-9 $%*+\\-./:]|"+o+")(?:.|[\r\n]))+";n.KANJI=RegExp(o,"g"),n.BYTE_KANJI=RegExp("[^A-Z0-9 $%*+\\-./:]+","g"),n.BYTE=RegExp(i,"g"),n.NUMERIC=RegExp(r,"g"),n.ALPHANUMERIC=RegExp("[A-Z $%*+\\-./:]+","g");let a=RegExp("^"+o+"$"),l=RegExp("^"+r+"$"),s=RegExp("^[A-Z0-9 $%*+\\-./:]+$");n.testKanji=function(e){return a.test(e)},n.testNumeric=function(e){return l.test(e)},n.testAlphanumeric=function(e){return s.test(e)}},{}],"4DCia":[function(e,t,n){let r=e("eeca831a42e85d6c"),o=r.getBCHDigit(1335);/**
+ */ exports.isValid = function isValid(version) {
+    return !isNaN(version) && version >= 1 && version <= 40;
+};
+
+},{}],"3Bqru":[function(require,module,exports) {
+const numeric = "[0-9]+";
+const alphanumeric = "[A-Z $%*+\\-./:]+";
+let kanji = "(?:[u3000-u303F]|[u3040-u309F]|[u30A0-u30FF]|[uFF00-uFFEF]|[u4E00-u9FAF]|[u2605-u2606]|[u2190-u2195]|u203B|[u2010u2015u2018u2019u2025u2026u201Cu201Du2225u2260]|[u0391-u0451]|[u00A7u00A8u00B1u00B4u00D7u00F7])+";
+kanji = kanji.replace(/u/g, "\\u");
+const byte = "(?:(?![A-Z0-9 $%*+\\-./:]|" + kanji + ")(?:.|[\r\n]))+";
+exports.KANJI = new RegExp(kanji, "g");
+exports.BYTE_KANJI = new RegExp("[^A-Z0-9 $%*+\\-./:]+", "g");
+exports.BYTE = new RegExp(byte, "g");
+exports.NUMERIC = new RegExp(numeric, "g");
+exports.ALPHANUMERIC = new RegExp(alphanumeric, "g");
+const TEST_KANJI = new RegExp("^" + kanji + "$");
+const TEST_NUMERIC = new RegExp("^" + numeric + "$");
+const TEST_ALPHANUMERIC = new RegExp("^[A-Z0-9 $%*+\\-./:]+$");
+exports.testKanji = function testKanji(str) {
+    return TEST_KANJI.test(str);
+};
+exports.testNumeric = function testNumeric(str) {
+    return TEST_NUMERIC.test(str);
+};
+exports.testAlphanumeric = function testAlphanumeric(str) {
+    return TEST_ALPHANUMERIC.test(str);
+};
+
+},{}],"iThdR":[function(require,module,exports) {
+const Utils = require("eeca831a42e85d6c");
+const G15 = 1335;
+const G15_MASK = 21522;
+const G15_BCH = Utils.getBCHDigit(G15);
+/**
  * Returns format information with relative error correction bits
  *
  * The format information is a 15-bit sequence containing 5 data bits,
@@ -505,64 +2564,116 @@ switch(n){case a.NUMERIC:return Math.floor(u/10*3);case a.ALPHANUMERIC:return Ma
  * @param  {Number} errorCorrectionLevel Error correction level
  * @param  {Number} mask                 Mask pattern
  * @return {Number}                      Encoded format information bits
- */n.getEncodedBits=function(e,t){let n=e.bit<<3|t,i=n<<10;for(;r.getBCHDigit(i)-o>=0;)i^=1335<<r.getBCHDigit(i)-o;// xor final data with mask pattern in order to ensure that
-// no combination of Error Correction Level and data mask pattern
-// will result in an all-zero data string
-return(n<<10|i)^21522}},{eeca831a42e85d6c:"2iHLf"}],kBoY1:[function(e,t,n){let r=e("45f6d4bff9d2fc72"),o=e("73109cbf4f3c309d"),i=e("5320016e34c30467"),a=e("fd16f8f25b581951"),l=e("8a7b84039f1cf0d2"),s=e("79379a3a8f3c26bb"),d=e("66903ca51bd2ea1d"),c=e("3b9f47d541e7d71f");/**
+ */ exports.getEncodedBits = function getEncodedBits(errorCorrectionLevel, mask) {
+    const data = errorCorrectionLevel.bit << 3 | mask;
+    let d = data << 10;
+    while(Utils.getBCHDigit(d) - G15_BCH >= 0)d ^= G15 << Utils.getBCHDigit(d) - G15_BCH;
+    // xor final data with mask pattern in order to ensure that
+    // no combination of Error Correction Level and data mask pattern
+    // will result in an all-zero data string
+    return (data << 10 | d) ^ G15_MASK;
+};
+
+},{"eeca831a42e85d6c":"iXLHI"}],"4tKki":[function(require,module,exports) {
+const Mode = require("45f6d4bff9d2fc72");
+const NumericData = require("73109cbf4f3c309d");
+const AlphanumericData = require("5320016e34c30467");
+const ByteData = require("fd16f8f25b581951");
+const KanjiData = require("8a7b84039f1cf0d2");
+const Regex = require("79379a3a8f3c26bb");
+const Utils = require("66903ca51bd2ea1d");
+const dijkstra = require("3b9f47d541e7d71f");
+/**
  * Returns UTF8 byte length
  *
  * @param  {String} str Input string
  * @return {Number}     Number of byte
- */function u(e){return unescape(encodeURIComponent(e)).length}/**
+ */ function getStringByteLength(str) {
+    return unescape(encodeURIComponent(str)).length;
+}
+/**
  * Get a list of segments of the specified mode
  * from a string
  *
  * @param  {Mode}   mode Segment mode
  * @param  {String} str  String to process
  * @return {Array}       Array of object with segments data
- */function f(e,t,n){let r;let o=[];for(;null!==(r=e.exec(n));)o.push({data:r[0],index:r.index,mode:t,length:r[0].length});return o}/**
+ */ function getSegments(regex, mode, str) {
+    const segments = [];
+    let result;
+    while((result = regex.exec(str)) !== null)segments.push({
+        data: result[0],
+        index: result.index,
+        mode: mode,
+        length: result[0].length
+    });
+    return segments;
+}
+/**
  * Extracts a series of segments with the appropriate
  * modes from a string
  *
  * @param  {String} dataStr Input string
  * @return {Array}          Array of object with segments data
- */function g(e){let t,n;let o=f(s.NUMERIC,r.NUMERIC,e),i=f(s.ALPHANUMERIC,r.ALPHANUMERIC,e);d.isKanjiModeEnabled()?(t=f(s.BYTE,r.BYTE,e),n=f(s.KANJI,r.KANJI,e)):(t=f(s.BYTE_KANJI,r.BYTE,e),n=[]);let a=o.concat(i,t,n);return a.sort(function(e,t){return e.index-t.index}).map(function(e){return{data:e.data,mode:e.mode,length:e.length}})}/**
+ */ function getSegmentsFromString(dataStr) {
+    const numSegs = getSegments(Regex.NUMERIC, Mode.NUMERIC, dataStr);
+    const alphaNumSegs = getSegments(Regex.ALPHANUMERIC, Mode.ALPHANUMERIC, dataStr);
+    let byteSegs;
+    let kanjiSegs;
+    if (Utils.isKanjiModeEnabled()) {
+        byteSegs = getSegments(Regex.BYTE, Mode.BYTE, dataStr);
+        kanjiSegs = getSegments(Regex.KANJI, Mode.KANJI, dataStr);
+    } else {
+        byteSegs = getSegments(Regex.BYTE_KANJI, Mode.BYTE, dataStr);
+        kanjiSegs = [];
+    }
+    const segs = numSegs.concat(alphaNumSegs, byteSegs, kanjiSegs);
+    return segs.sort(function(s1, s2) {
+        return s1.index - s2.index;
+    }).map(function(obj) {
+        return {
+            data: obj.data,
+            mode: obj.mode,
+            length: obj.length
+        };
+    });
+}
+/**
  * Returns how many bits are needed to encode a string of
  * specified length with the specified mode
  *
  * @param  {Number} length String length
  * @param  {Mode} mode     Segment mode
  * @return {Number}        Bit length
- */function h(e,t){switch(t){case r.NUMERIC:return o.getBitsLength(e);case r.ALPHANUMERIC:return i.getBitsLength(e);case r.KANJI:return l.getBitsLength(e);case r.BYTE:return a.getBitsLength(e)}}/**
- * Builds a segment from a specified data and mode.
- * If a mode is not specified, the more suitable will be used.
+ */ function getSegmentBitsLength(length, mode) {
+    switch(mode){
+        case Mode.NUMERIC:
+            return NumericData.getBitsLength(length);
+        case Mode.ALPHANUMERIC:
+            return AlphanumericData.getBitsLength(length);
+        case Mode.KANJI:
+            return KanjiData.getBitsLength(length);
+        case Mode.BYTE:
+            return ByteData.getBitsLength(length);
+    }
+}
+/**
+ * Merges adjacent segments which have the same mode
  *
- * @param  {String} data             Input data
- * @param  {Mode | String} modesHint Data mode
- * @return {Segment}                 Segment
- */function m(e,t){let n;let s=r.getBestModeForData(e);// Make sure data can be encoded
-if((n=r.from(t,s))!==r.BYTE&&n.bit<s.bit)throw Error('"'+e+'" cannot be encoded with mode '+r.toString(n)+".\n Suggested mode is: "+r.toString(s));switch(n!==r.KANJI||d.isKanjiModeEnabled()||(n=r.BYTE),n){case r.NUMERIC:return new o(e);case r.ALPHANUMERIC:return new i(e);case r.KANJI:return new l(e);case r.BYTE:return new a(e)}}/**
- * Builds a list of segments from an array.
- * Array can contain Strings or Objects with segment's info.
- *
- * For each item which is a string, will be generated a segment with the given
- * string and the more appropriate encoding mode.
- *
- * For each item which is an object, will be generated a segment with the given
- * data and mode.
- * Objects must contain at least the property "data".
- * If property "mode" is not present, the more suitable mode will be used.
- *
- * @param  {Array} array Array of objects with segments data
- * @return {Array}       Array of Segments
- */n.fromArray=function(e){return e.reduce(function(e,t){return"string"==typeof t?e.push(m(t,null)):t.data&&e.push(m(t.data,t.mode)),e},[])},/**
- * Builds an optimized sequence of segments from a string,
- * which will produce the shortest possible bitstream.
- *
- * @param  {String} data    Input string
- * @param  {Number} version QR Code version
- * @return {Array}          Array of segments
- */n.fromString=function(e,t){let o=g(e,d.isKanjiModeEnabled()),i=/**
+ * @param  {Array} segs Array of object with segments data
+ * @return {Array}      Array of object with segments data
+ */ function mergeSegments(segs) {
+    return segs.reduce(function(acc, curr) {
+        const prevSeg = acc.length - 1 >= 0 ? acc[acc.length - 1] : null;
+        if (prevSeg && prevSeg.mode === curr.mode) {
+            acc[acc.length - 1].data += curr.data;
+            return acc;
+        }
+        acc.push(curr);
+        return acc;
+    }, []);
+}
+/**
  * Generates a list of all possible nodes combination which
  * will be used to build a segments graph.
  *
@@ -577,7 +2688,59 @@ if((n=r.from(t,s))!==r.BYTE&&n.bit<s.bit)throw Error('"'+e+'" cannot be encoded 
  *
  * @param  {Array} segs Array of object with segments data
  * @return {Array}      Array of object with segments data
- */function(e){let t=[];for(let n=0;n<e.length;n++){let o=e[n];switch(o.mode){case r.NUMERIC:t.push([o,{data:o.data,mode:r.ALPHANUMERIC,length:o.length},{data:o.data,mode:r.BYTE,length:o.length}]);break;case r.ALPHANUMERIC:t.push([o,{data:o.data,mode:r.BYTE,length:o.length}]);break;case r.KANJI:t.push([o,{data:o.data,mode:r.BYTE,length:u(o.data)}]);break;case r.BYTE:t.push([{data:o.data,mode:r.BYTE,length:u(o.data)}])}}return t}(o),a=/**
+ */ function buildNodes(segs) {
+    const nodes = [];
+    for(let i = 0; i < segs.length; i++){
+        const seg = segs[i];
+        switch(seg.mode){
+            case Mode.NUMERIC:
+                nodes.push([
+                    seg,
+                    {
+                        data: seg.data,
+                        mode: Mode.ALPHANUMERIC,
+                        length: seg.length
+                    },
+                    {
+                        data: seg.data,
+                        mode: Mode.BYTE,
+                        length: seg.length
+                    }
+                ]);
+                break;
+            case Mode.ALPHANUMERIC:
+                nodes.push([
+                    seg,
+                    {
+                        data: seg.data,
+                        mode: Mode.BYTE,
+                        length: seg.length
+                    }
+                ]);
+                break;
+            case Mode.KANJI:
+                nodes.push([
+                    seg,
+                    {
+                        data: seg.data,
+                        mode: Mode.BYTE,
+                        length: getStringByteLength(seg.data)
+                    }
+                ]);
+                break;
+            case Mode.BYTE:
+                nodes.push([
+                    {
+                        data: seg.data,
+                        mode: Mode.BYTE,
+                        length: getStringByteLength(seg.data)
+                    }
+                ]);
+        }
+    }
+    return nodes;
+}
+/**
  * Builds a graph from a list of nodes.
  * All segments in each node group will be connected with all the segments of
  * the next group and so on.
@@ -588,8 +2751,110 @@ if((n=r.from(t,s))!==r.BYTE&&n.bit<s.bit)throw Error('"'+e+'" cannot be encoded 
  * @param  {Array} nodes    Array of object with segments data
  * @param  {Number} version QR Code version
  * @return {Object}         Graph of all possible segments
- */function(e,t){let n={},o={start:{}},i=["start"];for(let a=0;a<e.length;a++){let l=e[a],s=[];for(let e=0;e<l.length;e++){let d=l[e],c=""+a+e;s.push(c),n[c]={node:d,lastCount:0},o[c]={};for(let e=0;e<i.length;e++){let a=i[e];n[a]&&n[a].node.mode===d.mode?(o[a][c]=h(n[a].lastCount+d.length,d.mode)-h(n[a].lastCount,d.mode),n[a].lastCount+=d.length):(n[a]&&(n[a].lastCount=d.length),o[a][c]=h(d.length,d.mode)+4+r.getCharCountIndicator(d.mode,t)// switch cost
-)}}i=s}for(let e=0;e<i.length;e++)o[i[e]].end=0;return{map:o,table:n}}(i,t),l=c.find_path(a.map,"start","end"),s=[];for(let e=1;e<l.length-1;e++)s.push(a.table[l[e]].node);return n.fromArray(s.reduce(function(e,t){let n=e.length-1>=0?e[e.length-1]:null;return n&&n.mode===t.mode?e[e.length-1].data+=t.data:e.push(t),e},[]))},/**
+ */ function buildGraph(nodes, version) {
+    const table = {};
+    const graph = {
+        start: {}
+    };
+    let prevNodeIds = [
+        "start"
+    ];
+    for(let i = 0; i < nodes.length; i++){
+        const nodeGroup = nodes[i];
+        const currentNodeIds = [];
+        for(let j = 0; j < nodeGroup.length; j++){
+            const node = nodeGroup[j];
+            const key = "" + i + j;
+            currentNodeIds.push(key);
+            table[key] = {
+                node: node,
+                lastCount: 0
+            };
+            graph[key] = {};
+            for(let n = 0; n < prevNodeIds.length; n++){
+                const prevNodeId = prevNodeIds[n];
+                if (table[prevNodeId] && table[prevNodeId].node.mode === node.mode) {
+                    graph[prevNodeId][key] = getSegmentBitsLength(table[prevNodeId].lastCount + node.length, node.mode) - getSegmentBitsLength(table[prevNodeId].lastCount, node.mode);
+                    table[prevNodeId].lastCount += node.length;
+                } else {
+                    if (table[prevNodeId]) table[prevNodeId].lastCount = node.length;
+                    graph[prevNodeId][key] = getSegmentBitsLength(node.length, node.mode) + 4 + Mode.getCharCountIndicator(node.mode, version) // switch cost
+                    ;
+                }
+            }
+        }
+        prevNodeIds = currentNodeIds;
+    }
+    for(let n = 0; n < prevNodeIds.length; n++)graph[prevNodeIds[n]].end = 0;
+    return {
+        map: graph,
+        table: table
+    };
+}
+/**
+ * Builds a segment from a specified data and mode.
+ * If a mode is not specified, the more suitable will be used.
+ *
+ * @param  {String} data             Input data
+ * @param  {Mode | String} modesHint Data mode
+ * @return {Segment}                 Segment
+ */ function buildSingleSegment(data, modesHint) {
+    let mode;
+    const bestMode = Mode.getBestModeForData(data);
+    mode = Mode.from(modesHint, bestMode);
+    // Make sure data can be encoded
+    if (mode !== Mode.BYTE && mode.bit < bestMode.bit) throw new Error('"' + data + '"' + " cannot be encoded with mode " + Mode.toString(mode) + ".\n Suggested mode is: " + Mode.toString(bestMode));
+    // Use Mode.BYTE if Kanji support is disabled
+    if (mode === Mode.KANJI && !Utils.isKanjiModeEnabled()) mode = Mode.BYTE;
+    switch(mode){
+        case Mode.NUMERIC:
+            return new NumericData(data);
+        case Mode.ALPHANUMERIC:
+            return new AlphanumericData(data);
+        case Mode.KANJI:
+            return new KanjiData(data);
+        case Mode.BYTE:
+            return new ByteData(data);
+    }
+}
+/**
+ * Builds a list of segments from an array.
+ * Array can contain Strings or Objects with segment's info.
+ *
+ * For each item which is a string, will be generated a segment with the given
+ * string and the more appropriate encoding mode.
+ *
+ * For each item which is an object, will be generated a segment with the given
+ * data and mode.
+ * Objects must contain at least the property "data".
+ * If property "mode" is not present, the more suitable mode will be used.
+ *
+ * @param  {Array} array Array of objects with segments data
+ * @return {Array}       Array of Segments
+ */ exports.fromArray = function fromArray(array) {
+    return array.reduce(function(acc, seg) {
+        if (typeof seg === "string") acc.push(buildSingleSegment(seg, null));
+        else if (seg.data) acc.push(buildSingleSegment(seg.data, seg.mode));
+        return acc;
+    }, []);
+};
+/**
+ * Builds an optimized sequence of segments from a string,
+ * which will produce the shortest possible bitstream.
+ *
+ * @param  {String} data    Input string
+ * @param  {Number} version QR Code version
+ * @return {Array}          Array of segments
+ */ exports.fromString = function fromString(data, version) {
+    const segs = getSegmentsFromString(data, Utils.isKanjiModeEnabled());
+    const nodes = buildNodes(segs);
+    const graph = buildGraph(nodes, version);
+    const path = dijkstra.find_path(graph.map, "start", "end");
+    const optimizedSegs = [];
+    for(let i = 1; i < path.length - 1; i++)optimizedSegs.push(graph.table[path[i]].node);
+    return exports.fromArray(mergeSegments(optimizedSegs));
+};
+/**
  * Splits a string in various segments with the modes which
  * best represent their content.
  * The produced segments are far from being optimized.
@@ -598,31 +2863,243 @@ if((n=r.from(t,s))!==r.BYTE&&n.bit<s.bit)throw Error('"'+e+'" cannot be encoded 
  *
  * @param  {string} data Input string
  * @return {Array}       Array of segments
- */n.rawSplit=function(e){return n.fromArray(g(e,d.isKanjiModeEnabled()))}},{"45f6d4bff9d2fc72":"2XDDf","73109cbf4f3c309d":"hTs8T","5320016e34c30467":"203uh",fd16f8f25b581951:"f7sIe","8a7b84039f1cf0d2":"1otz8","79379a3a8f3c26bb":"fkiQV","66903ca51bd2ea1d":"2iHLf","3b9f47d541e7d71f":"2Nh6w"}],hTs8T:[function(e,t,n){let r=e("29134b0b0820b091");function o(e){this.mode=r.NUMERIC,this.data=e.toString()}o.getBitsLength=function(e){return 10*Math.floor(e/3)+(e%3?e%3*3+1:0)},o.prototype.getLength=function(){return this.data.length},o.prototype.getBitsLength=function(){return o.getBitsLength(this.data.length)},o.prototype.write=function(e){let t,n;// The input data string is divided into groups of three digits,
-// and each group is converted to its 10-bit binary equivalent.
-for(t=0;t+3<=this.data.length;t+=3)n=parseInt(this.data.substr(t,3),10),e.put(n,10);// If the number of input digits is not an exact multiple of three,
-// the final one or two digits are converted to 4 or 7 bits respectively.
-let r=this.data.length-t;r>0&&(n=parseInt(this.data.substr(t),10),e.put(n,3*r+1))},t.exports=o},{"29134b0b0820b091":"2XDDf"}],"203uh":[function(e,t,n){let r=e("9c7c9b869570f846"),o=["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"," ","$","%","*","+","-",".","/",":"];function i(e){this.mode=r.ALPHANUMERIC,this.data=e}i.getBitsLength=function(e){return 11*Math.floor(e/2)+6*(e%2)},i.prototype.getLength=function(){return this.data.length},i.prototype.getBitsLength=function(){return i.getBitsLength(this.data.length)},i.prototype.write=function(e){let t;// Input data characters are divided into groups of two characters
-// and encoded as 11-bit binary codes.
-for(t=0;t+2<=this.data.length;t+=2){// The character value of the first character is multiplied by 45
-let n=45*o.indexOf(this.data[t]);// The character value of the second digit is added to the product
-n+=o.indexOf(this.data[t+1]),// The sum is then stored as 11-bit binary number
-e.put(n,11)}// If the number of input data characters is not a multiple of two,
-// the character value of the final character is encoded as a 6-bit binary number.
-this.data.length%2&&e.put(o.indexOf(this.data[t]),6)},t.exports=i},{"9c7c9b869570f846":"2XDDf"}],f7sIe:[function(e,t,n){let r=e("1658cb836325c397"),o=e("a20a51f6cd184253");function i(e){this.mode=o.BYTE,"string"==typeof e&&(e=r(e)),this.data=new Uint8Array(e)}i.getBitsLength=function(e){return 8*e},i.prototype.getLength=function(){return this.data.length},i.prototype.getBitsLength=function(){return i.getBitsLength(this.data.length)},i.prototype.write=function(e){for(let t=0,n=this.data.length;t<n;t++)e.put(this.data[t],8)},t.exports=i},{"1658cb836325c397":"lmLJ0",a20a51f6cd184253:"2XDDf"}],lmLJ0:[function(e,t,n){t.exports=function(e){for(var t=[],n=e.length,r=0;r<n;r++){var o=e.charCodeAt(r);if(o>=55296&&o<=56319&&n>r+1){var i=e.charCodeAt(r+1);i>=56320&&i<=57343&&(// https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
-o=(o-55296)*1024+i-56320+65536,r+=1)}// US-ASCII
-if(o<128){t.push(o);continue}// 2-byte UTF-8
-if(o<2048){t.push(o>>6|192),t.push(63&o|128);continue}// 3-byte UTF-8
-if(o<55296||o>=57344&&o<65536){t.push(o>>12|224),t.push(o>>6&63|128),t.push(63&o|128);continue}// 4-byte UTF-8
-if(o>=65536&&o<=1114111){t.push(o>>18|240),t.push(o>>12&63|128),t.push(o>>6&63|128),t.push(63&o|128);continue}// Invalid character
-t.push(239,191,189)}return new Uint8Array(t).buffer}},{}],"1otz8":[function(e,t,n){let r=e("b935cfd1cd03a1f6"),o=e("ca4944585cc8d12d");function i(e){this.mode=r.KANJI,this.data=e}i.getBitsLength=function(e){return 13*e},i.prototype.getLength=function(){return this.data.length},i.prototype.getBitsLength=function(){return i.getBitsLength(this.data.length)},i.prototype.write=function(e){let t;// In the Shift JIS system, Kanji characters are represented by a two byte combination.
-// These byte values are shifted from the JIS X 0208 values.
-// JIS X 0208 gives details of the shift coded representation.
-for(t=0;t<this.data.length;t++){let n=o.toSJIS(this.data[t]);// For characters with Shift JIS values from 0x8140 to 0x9FFC:
-if(n>=33088&&n<=40956)n-=33088;else if(n>=57408&&n<=60351)n-=49472;else throw Error("Invalid SJIS character: "+this.data[t]+"\nMake sure your charset is UTF-8");// Multiply most significant byte of result by 0xC0
-// and add least significant byte to product
-n=(n>>>8&255)*192+(255&n),// Convert result to a 13-bit binary string
-e.put(n,13)}},t.exports=i},{b935cfd1cd03a1f6:"2XDDf",ca4944585cc8d12d:"2iHLf"}],"2Nh6w":[function(e,t,n){/******************************************************************************
+ */ exports.rawSplit = function rawSplit(data) {
+    return exports.fromArray(getSegmentsFromString(data, Utils.isKanjiModeEnabled()));
+};
+
+},{"45f6d4bff9d2fc72":"f1e9A","73109cbf4f3c309d":"c44F8","5320016e34c30467":"cdBOf","fd16f8f25b581951":"ediQ9","8a7b84039f1cf0d2":"gphIw","79379a3a8f3c26bb":"3Bqru","66903ca51bd2ea1d":"iXLHI","3b9f47d541e7d71f":"lDJz9"}],"c44F8":[function(require,module,exports) {
+const Mode = require("29134b0b0820b091");
+function NumericData(data) {
+    this.mode = Mode.NUMERIC;
+    this.data = data.toString();
+}
+NumericData.getBitsLength = function getBitsLength(length) {
+    return 10 * Math.floor(length / 3) + (length % 3 ? length % 3 * 3 + 1 : 0);
+};
+NumericData.prototype.getLength = function getLength() {
+    return this.data.length;
+};
+NumericData.prototype.getBitsLength = function getBitsLength() {
+    return NumericData.getBitsLength(this.data.length);
+};
+NumericData.prototype.write = function write(bitBuffer) {
+    let i, group, value;
+    // The input data string is divided into groups of three digits,
+    // and each group is converted to its 10-bit binary equivalent.
+    for(i = 0; i + 3 <= this.data.length; i += 3){
+        group = this.data.substr(i, 3);
+        value = parseInt(group, 10);
+        bitBuffer.put(value, 10);
+    }
+    // If the number of input digits is not an exact multiple of three,
+    // the final one or two digits are converted to 4 or 7 bits respectively.
+    const remainingNum = this.data.length - i;
+    if (remainingNum > 0) {
+        group = this.data.substr(i);
+        value = parseInt(group, 10);
+        bitBuffer.put(value, remainingNum * 3 + 1);
+    }
+};
+module.exports = NumericData;
+
+},{"29134b0b0820b091":"f1e9A"}],"cdBOf":[function(require,module,exports) {
+const Mode = require("9c7c9b869570f846");
+/**
+ * Array of characters available in alphanumeric mode
+ *
+ * As per QR Code specification, to each character
+ * is assigned a value from 0 to 44 which in this case coincides
+ * with the array index
+ *
+ * @type {Array}
+ */ const ALPHA_NUM_CHARS = [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
+    " ",
+    "$",
+    "%",
+    "*",
+    "+",
+    "-",
+    ".",
+    "/",
+    ":"
+];
+function AlphanumericData(data) {
+    this.mode = Mode.ALPHANUMERIC;
+    this.data = data;
+}
+AlphanumericData.getBitsLength = function getBitsLength(length) {
+    return 11 * Math.floor(length / 2) + 6 * (length % 2);
+};
+AlphanumericData.prototype.getLength = function getLength() {
+    return this.data.length;
+};
+AlphanumericData.prototype.getBitsLength = function getBitsLength() {
+    return AlphanumericData.getBitsLength(this.data.length);
+};
+AlphanumericData.prototype.write = function write(bitBuffer) {
+    let i;
+    // Input data characters are divided into groups of two characters
+    // and encoded as 11-bit binary codes.
+    for(i = 0; i + 2 <= this.data.length; i += 2){
+        // The character value of the first character is multiplied by 45
+        let value = ALPHA_NUM_CHARS.indexOf(this.data[i]) * 45;
+        // The character value of the second digit is added to the product
+        value += ALPHA_NUM_CHARS.indexOf(this.data[i + 1]);
+        // The sum is then stored as 11-bit binary number
+        bitBuffer.put(value, 11);
+    }
+    // If the number of input data characters is not a multiple of two,
+    // the character value of the final character is encoded as a 6-bit binary number.
+    if (this.data.length % 2) bitBuffer.put(ALPHA_NUM_CHARS.indexOf(this.data[i]), 6);
+};
+module.exports = AlphanumericData;
+
+},{"9c7c9b869570f846":"f1e9A"}],"ediQ9":[function(require,module,exports) {
+const encodeUtf8 = require("1658cb836325c397");
+const Mode = require("a20a51f6cd184253");
+function ByteData(data) {
+    this.mode = Mode.BYTE;
+    if (typeof data === "string") data = encodeUtf8(data);
+    this.data = new Uint8Array(data);
+}
+ByteData.getBitsLength = function getBitsLength(length) {
+    return length * 8;
+};
+ByteData.prototype.getLength = function getLength() {
+    return this.data.length;
+};
+ByteData.prototype.getBitsLength = function getBitsLength() {
+    return ByteData.getBitsLength(this.data.length);
+};
+ByteData.prototype.write = function(bitBuffer) {
+    for(let i = 0, l = this.data.length; i < l; i++)bitBuffer.put(this.data[i], 8);
+};
+module.exports = ByteData;
+
+},{"1658cb836325c397":"3UdK6","a20a51f6cd184253":"f1e9A"}],"3UdK6":[function(require,module,exports) {
+"use strict";
+module.exports = function encodeUtf8(input) {
+    var result = [];
+    var size = input.length;
+    for(var index = 0; index < size; index++){
+        var point = input.charCodeAt(index);
+        if (point >= 0xD800 && point <= 0xDBFF && size > index + 1) {
+            var second = input.charCodeAt(index + 1);
+            if (second >= 0xDC00 && second <= 0xDFFF) {
+                // https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+                point = (point - 0xD800) * 0x400 + second - 0xDC00 + 0x10000;
+                index += 1;
+            }
+        }
+        // US-ASCII
+        if (point < 0x80) {
+            result.push(point);
+            continue;
+        }
+        // 2-byte UTF-8
+        if (point < 0x800) {
+            result.push(point >> 6 | 192);
+            result.push(point & 63 | 128);
+            continue;
+        }
+        // 3-byte UTF-8
+        if (point < 0xD800 || point >= 0xE000 && point < 0x10000) {
+            result.push(point >> 12 | 224);
+            result.push(point >> 6 & 63 | 128);
+            result.push(point & 63 | 128);
+            continue;
+        }
+        // 4-byte UTF-8
+        if (point >= 0x10000 && point <= 0x10FFFF) {
+            result.push(point >> 18 | 240);
+            result.push(point >> 12 & 63 | 128);
+            result.push(point >> 6 & 63 | 128);
+            result.push(point & 63 | 128);
+            continue;
+        }
+        // Invalid character
+        result.push(0xEF, 0xBF, 0xBD);
+    }
+    return new Uint8Array(result).buffer;
+};
+
+},{}],"gphIw":[function(require,module,exports) {
+const Mode = require("b935cfd1cd03a1f6");
+const Utils = require("ca4944585cc8d12d");
+function KanjiData(data) {
+    this.mode = Mode.KANJI;
+    this.data = data;
+}
+KanjiData.getBitsLength = function getBitsLength(length) {
+    return length * 13;
+};
+KanjiData.prototype.getLength = function getLength() {
+    return this.data.length;
+};
+KanjiData.prototype.getBitsLength = function getBitsLength() {
+    return KanjiData.getBitsLength(this.data.length);
+};
+KanjiData.prototype.write = function(bitBuffer) {
+    let i;
+    // In the Shift JIS system, Kanji characters are represented by a two byte combination.
+    // These byte values are shifted from the JIS X 0208 values.
+    // JIS X 0208 gives details of the shift coded representation.
+    for(i = 0; i < this.data.length; i++){
+        let value = Utils.toSJIS(this.data[i]);
+        // For characters with Shift JIS values from 0x8140 to 0x9FFC:
+        if (value >= 0x8140 && value <= 0x9FFC) // Subtract 0x8140 from Shift JIS value
+        value -= 0x8140;
+        else if (value >= 0xE040 && value <= 0xEBBF) // Subtract 0xC140 from Shift JIS value
+        value -= 0xC140;
+        else throw new Error("Invalid SJIS character: " + this.data[i] + "\n" + "Make sure your charset is UTF-8");
+        // Multiply most significant byte of result by 0xC0
+        // and add least significant byte to product
+        value = (value >>> 8 & 0xff) * 0xC0 + (value & 0xff);
+        // Convert result to a 13-bit binary string
+        bitBuffer.put(value, 13);
+    }
+};
+module.exports = KanjiData;
+
+},{"b935cfd1cd03a1f6":"f1e9A","ca4944585cc8d12d":"iXLHI"}],"lDJz9":[function(require,module,exports) {
+"use strict";
+/******************************************************************************
  * Created 2008-08-19.
  *
  * Dijkstra path-finding functions. Adapted from the Dijkstar Python project.
@@ -642,43 +3119,494 @@ e.put(n,13)}},t.exports=i},{b935cfd1cd03a1f6:"2XDDf",ca4944585cc8d12d:"2iHLf"}],
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- *****************************************************************************/var r={single_source_shortest_paths:function(e,t,n){// Predecessor map for each node that has been encountered.
-// node ID => predecessor node ID
-var o,i,a,l,s,d,c,u={},f={};f[t]=0;// Costs of shortest paths from s to all nodes encountered; differs from
-// `costs` in that it provides easy access to the node that currently has
-// the known shortest path from s.
-// XXX: Do we actually need both `costs` and `open`?
-var g=r.PriorityQueue.make();for(g.push(t,0);!g.empty();)// ...and explore the edges that connect u to those nodes, updating
-// the cost of the shortest paths to any or all of those nodes as
-// necessary. v is the node across the current edge from u.
-for(a in i=// In the nodes remaining in graph that have a known cost from s,
-// find the node, u, that currently has the shortest path from s.
-(o=g.pop()).value,l=o.cost,// Get nodes adjacent to u...
-s=e[i]||{})s.hasOwnProperty(a)&&(// Cost of s to u plus the cost of u to v across e--this is *a*
-// cost from s to v that may or may not be less than the current
-// known cost to v.
-d=l+s[a],// If we haven't visited v yet OR if the current known cost from s to
-// v is greater than the new cost we just found (cost of s to u plus
-// cost of u to v across e), update v's cost in the cost list and
-// update v's predecessor in the predecessor list (it's now u).
-c=f[a],(void 0===f[a]||c>d)&&(f[a]=d,g.push(a,d),u[a]=i));if(void 0!==n&&void 0===f[n])throw Error(["Could not find a path from ",t," to ",n,"."].join(""));return u},extract_shortest_path_from_predecessor_list:function(e,t){for(var n=[],r=t;r;)n.push(r),e[r],r=e[r];return n.reverse(),n},find_path:function(e,t,n){var o=r.single_source_shortest_paths(e,t,n);return r.extract_shortest_path_from_predecessor_list(o,n)},/**
+ *****************************************************************************/ var dijkstra = {
+    single_source_shortest_paths: function(graph, s, d) {
+        // Predecessor map for each node that has been encountered.
+        // node ID => predecessor node ID
+        var predecessors = {};
+        // Costs of shortest paths from s to all nodes encountered.
+        // node ID => cost
+        var costs = {};
+        costs[s] = 0;
+        // Costs of shortest paths from s to all nodes encountered; differs from
+        // `costs` in that it provides easy access to the node that currently has
+        // the known shortest path from s.
+        // XXX: Do we actually need both `costs` and `open`?
+        var open = dijkstra.PriorityQueue.make();
+        open.push(s, 0);
+        var closest, u, v, cost_of_s_to_u, adjacent_nodes, cost_of_e, cost_of_s_to_u_plus_cost_of_e, cost_of_s_to_v, first_visit;
+        while(!open.empty()){
+            // In the nodes remaining in graph that have a known cost from s,
+            // find the node, u, that currently has the shortest path from s.
+            closest = open.pop();
+            u = closest.value;
+            cost_of_s_to_u = closest.cost;
+            // Get nodes adjacent to u...
+            adjacent_nodes = graph[u] || {};
+            // ...and explore the edges that connect u to those nodes, updating
+            // the cost of the shortest paths to any or all of those nodes as
+            // necessary. v is the node across the current edge from u.
+            for(v in adjacent_nodes)if (adjacent_nodes.hasOwnProperty(v)) {
+                // Get the cost of the edge running from u to v.
+                cost_of_e = adjacent_nodes[v];
+                // Cost of s to u plus the cost of u to v across e--this is *a*
+                // cost from s to v that may or may not be less than the current
+                // known cost to v.
+                cost_of_s_to_u_plus_cost_of_e = cost_of_s_to_u + cost_of_e;
+                // If we haven't visited v yet OR if the current known cost from s to
+                // v is greater than the new cost we just found (cost of s to u plus
+                // cost of u to v across e), update v's cost in the cost list and
+                // update v's predecessor in the predecessor list (it's now u).
+                cost_of_s_to_v = costs[v];
+                first_visit = typeof costs[v] === "undefined";
+                if (first_visit || cost_of_s_to_v > cost_of_s_to_u_plus_cost_of_e) {
+                    costs[v] = cost_of_s_to_u_plus_cost_of_e;
+                    open.push(v, cost_of_s_to_u_plus_cost_of_e);
+                    predecessors[v] = u;
+                }
+            }
+        }
+        if (typeof d !== "undefined" && typeof costs[d] === "undefined") {
+            var msg = [
+                "Could not find a path from ",
+                s,
+                " to ",
+                d,
+                "."
+            ].join("");
+            throw new Error(msg);
+        }
+        return predecessors;
+    },
+    extract_shortest_path_from_predecessor_list: function(predecessors, d) {
+        var nodes = [];
+        var u = d;
+        var predecessor;
+        while(u){
+            nodes.push(u);
+            predecessor = predecessors[u];
+            u = predecessors[u];
+        }
+        nodes.reverse();
+        return nodes;
+    },
+    find_path: function(graph, s, d) {
+        var predecessors = dijkstra.single_source_shortest_paths(graph, s, d);
+        return dijkstra.extract_shortest_path_from_predecessor_list(predecessors, d);
+    },
+    /**
    * A very naive priority queue implementation.
-   */PriorityQueue:{make:function(e){var t,n=r.PriorityQueue,o={};for(t in e=e||{},n)n.hasOwnProperty(t)&&(o[t]=n[t]);return o.queue=[],o.sorter=e.sorter||n.default_sorter,o},default_sorter:function(e,t){return e.cost-t.cost},/**
+   */ PriorityQueue: {
+        make: function(opts) {
+            var T = dijkstra.PriorityQueue, t = {}, key;
+            opts = opts || {};
+            for(key in T)if (T.hasOwnProperty(key)) t[key] = T[key];
+            t.queue = [];
+            t.sorter = opts.sorter || T.default_sorter;
+            return t;
+        },
+        default_sorter: function(a, b) {
+            return a.cost - b.cost;
+        },
+        /**
      * Add a new item to the queue and ensure the highest priority element
      * is at the front of the queue.
-     */push:function(e,t){this.queue.push({value:e,cost:t}),this.queue.sort(this.sorter)},/**
+     */ push: function(value, cost) {
+            var item = {
+                value: value,
+                cost: cost
+            };
+            this.queue.push(item);
+            this.queue.sort(this.sorter);
+        },
+        /**
      * Return the highest priority element in the queue.
-     */pop:function(){return this.queue.shift()},empty:function(){return 0===this.queue.length}}};t.exports=r},{}],i1BDL:[function(e,t,n){let r=e("5b3f7c513802d6c7");n.render=function(e,t,n){var o;let i=n,a=t;void 0!==i||t&&t.getContext||(i=t,t=void 0),t||(a=function(){try{return document.createElement("canvas")}catch(e){throw Error("You need to specify a canvas element")}}()),i=r.getOptions(i);let l=r.getImageWidth(e.modules.size,i),s=a.getContext("2d"),d=s.createImageData(l,l);return r.qrToImageData(d.data,e,i),o=a,s.clearRect(0,0,o.width,o.height),o.style||(o.style={}),o.height=l,o.width=l,o.style.height=l+"px",o.style.width=l+"px",s.putImageData(d,0,0),a},n.renderToDataURL=function(e,t,r){let o=r;void 0!==o||t&&t.getContext||(o=t,t=void 0),o||(o={});let i=n.render(e,t,o),a=o.type||"image/png",l=o.rendererOpts||{};return i.toDataURL(a,l.quality)}},{"5b3f7c513802d6c7":"3YBlJ"}],"3YBlJ":[function(e,t,n){function r(e){if("number"==typeof e&&(e=e.toString()),"string"!=typeof e)throw Error("Color should be defined as hex string");let t=e.slice().replace("#","").split("");if(t.length<3||5===t.length||t.length>8)throw Error("Invalid hex color: "+e);(3===t.length||4===t.length)&&(t=Array.prototype.concat.apply([],t.map(function(e){return[e,e]}))),6===t.length&&t.push("F","F");let n=parseInt(t.join(""),16);return{r:n>>24&255,g:n>>16&255,b:n>>8&255,a:255&n,hex:"#"+t.slice(0,6).join("")}}n.getOptions=function(e){e||(e={}),e.color||(e.color={});let t=void 0===e.margin||null===e.margin||e.margin<0?4:e.margin,n=e.width&&e.width>=21?e.width:void 0,o=e.scale||4;return{width:n,scale:n?4:o,margin:t,color:{dark:r(e.color.dark||"#000000ff"),light:r(e.color.light||"#ffffffff")},type:e.type,rendererOpts:e.rendererOpts||{}}},n.getScale=function(e,t){return t.width&&t.width>=e+2*t.margin?t.width/(e+2*t.margin):t.scale},n.getImageWidth=function(e,t){let r=n.getScale(e,t);return Math.floor((e+2*t.margin)*r)},n.qrToImageData=function(e,t,r){let o=t.modules.size,i=t.modules.data,a=n.getScale(o,r),l=Math.floor((o+2*r.margin)*a),s=r.margin*a,d=[r.color.light,r.color.dark];for(let t=0;t<l;t++)for(let n=0;n<l;n++){let c=(t*l+n)*4,u=r.color.light;if(t>=s&&n>=s&&t<l-s&&n<l-s){let e=Math.floor((t-s)/a),r=Math.floor((n-s)/a);u=d[i[e*o+r]?1:0]}e[c++]=u.r,e[c++]=u.g,e[c++]=u.b,e[c]=u.a}}},{}],"8CcR1":[function(e,t,n){let r=e("c36bbcf663291acc");function o(e,t){let n=e.a/255,r=t+'="'+e.hex+'"';return n<1?r+" "+t+'-opacity="'+n.toFixed(2).slice(1)+'"':r}function i(e,t,n){let r=e+t;return void 0!==n&&(r+=" "+n),r}n.render=function(e,t,n){let a=r.getOptions(t),l=e.modules.size,s=e.modules.data,d=l+2*a.margin,c=a.color.light.a?"<path "+o(a.color.light,"fill")+' d="M0 0h'+d+"v"+d+'H0z"/>':"",u="<path "+o(a.color.dark,"stroke")+' d="'+function(e,t,n){let r="",o=0,a=!1,l=0;for(let s=0;s<e.length;s++){let d=Math.floor(s%t),c=Math.floor(s/t);d||a||(a=!0),e[s]?(l++,s>0&&d>0&&e[s-1]||(r+=a?i("M",d+n,.5+c+n):i("m",o,0),o=0,a=!1),d+1<t&&e[s+1]||(r+=i("h",l),l=0)):o++}return r}(s,l,a.margin)+'"/>',f=a.width?'width="'+a.width+'" height="'+a.width+'" ':"",g='<svg xmlns="http://www.w3.org/2000/svg" '+f+('viewBox="0 0 '+d)+" "+d+'" shape-rendering="crispEdges">'+c+u+"</svg>\n";return"function"==typeof n&&n(null,g),g}},{c36bbcf663291acc:"3YBlJ"}],"1tOWF":[function(e,t,n){var r=e("@parcel/transformer-js/src/esmodule-helpers.js");function o(){firebase.auth().signOut().then(()=>{console.log("User signed out"),authUser.current=null,user.current=null,userId=null,localStorage.removeItem("sessionUser"),localStorage.removeItem("idToken"),localStorage.removeItem("authUserId"),localStorage.removeItem("authUser"),deleteCookie("maiAuth"),location.href="/"}).catch(e=>{errorHandler.report(e),console.log(e)})}r.defineInteropFlag(n),r.export(n,"signOut",()=>o),r.export(n,"BACKEND_API_URL",()=>i),// Function to call web api backend function, with or without auth
-r.export(n,"callBackendApi",()=>a),r.export(n,"setFormAddressFields",()=>s),r.export(n,"getFormAddressFields",()=>d),// Validate Swedish Social Security Number (personnummer) using checksum
+     */ pop: function() {
+            return this.queue.shift();
+        },
+        empty: function() {
+            return this.queue.length === 0;
+        }
+    }
+};
+module.exports = dijkstra;
+
+},{}],"2oGFV":[function(require,module,exports) {
+const Utils = require("5b3f7c513802d6c7");
+function clearCanvas(ctx, canvas, size) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (!canvas.style) canvas.style = {};
+    canvas.height = size;
+    canvas.width = size;
+    canvas.style.height = size + "px";
+    canvas.style.width = size + "px";
+}
+function getCanvasElement() {
+    try {
+        return document.createElement("canvas");
+    } catch (e) {
+        throw new Error("You need to specify a canvas element");
+    }
+}
+exports.render = function render(qrData, canvas, options) {
+    let opts = options;
+    let canvasEl = canvas;
+    if (typeof opts === "undefined" && (!canvas || !canvas.getContext)) {
+        opts = canvas;
+        canvas = undefined;
+    }
+    if (!canvas) canvasEl = getCanvasElement();
+    opts = Utils.getOptions(opts);
+    const size = Utils.getImageWidth(qrData.modules.size, opts);
+    const ctx = canvasEl.getContext("2d");
+    const image = ctx.createImageData(size, size);
+    Utils.qrToImageData(image.data, qrData, opts);
+    clearCanvas(ctx, canvasEl, size);
+    ctx.putImageData(image, 0, 0);
+    return canvasEl;
+};
+exports.renderToDataURL = function renderToDataURL(qrData, canvas, options) {
+    let opts = options;
+    if (typeof opts === "undefined" && (!canvas || !canvas.getContext)) {
+        opts = canvas;
+        canvas = undefined;
+    }
+    if (!opts) opts = {};
+    const canvasEl = exports.render(qrData, canvas, opts);
+    const type = opts.type || "image/png";
+    const rendererOpts = opts.rendererOpts || {};
+    return canvasEl.toDataURL(type, rendererOpts.quality);
+};
+
+},{"5b3f7c513802d6c7":"6rMWz"}],"6rMWz":[function(require,module,exports) {
+function hex2rgba(hex) {
+    if (typeof hex === "number") hex = hex.toString();
+    if (typeof hex !== "string") throw new Error("Color should be defined as hex string");
+    let hexCode = hex.slice().replace("#", "").split("");
+    if (hexCode.length < 3 || hexCode.length === 5 || hexCode.length > 8) throw new Error("Invalid hex color: " + hex);
+    // Convert from short to long form (fff -> ffffff)
+    if (hexCode.length === 3 || hexCode.length === 4) hexCode = Array.prototype.concat.apply([], hexCode.map(function(c) {
+        return [
+            c,
+            c
+        ];
+    }));
+    // Add default alpha value
+    if (hexCode.length === 6) hexCode.push("F", "F");
+    const hexValue = parseInt(hexCode.join(""), 16);
+    return {
+        r: hexValue >> 24 & 255,
+        g: hexValue >> 16 & 255,
+        b: hexValue >> 8 & 255,
+        a: hexValue & 255,
+        hex: "#" + hexCode.slice(0, 6).join("")
+    };
+}
+exports.getOptions = function getOptions(options) {
+    if (!options) options = {};
+    if (!options.color) options.color = {};
+    const margin = typeof options.margin === "undefined" || options.margin === null || options.margin < 0 ? 4 : options.margin;
+    const width = options.width && options.width >= 21 ? options.width : undefined;
+    const scale = options.scale || 4;
+    return {
+        width: width,
+        scale: width ? 4 : scale,
+        margin: margin,
+        color: {
+            dark: hex2rgba(options.color.dark || "#000000ff"),
+            light: hex2rgba(options.color.light || "#ffffffff")
+        },
+        type: options.type,
+        rendererOpts: options.rendererOpts || {}
+    };
+};
+exports.getScale = function getScale(qrSize, opts) {
+    return opts.width && opts.width >= qrSize + opts.margin * 2 ? opts.width / (qrSize + opts.margin * 2) : opts.scale;
+};
+exports.getImageWidth = function getImageWidth(qrSize, opts) {
+    const scale = exports.getScale(qrSize, opts);
+    return Math.floor((qrSize + opts.margin * 2) * scale);
+};
+exports.qrToImageData = function qrToImageData(imgData, qr, opts) {
+    const size = qr.modules.size;
+    const data = qr.modules.data;
+    const scale = exports.getScale(size, opts);
+    const symbolSize = Math.floor((size + opts.margin * 2) * scale);
+    const scaledMargin = opts.margin * scale;
+    const palette = [
+        opts.color.light,
+        opts.color.dark
+    ];
+    for(let i = 0; i < symbolSize; i++)for(let j = 0; j < symbolSize; j++){
+        let posDst = (i * symbolSize + j) * 4;
+        let pxColor = opts.color.light;
+        if (i >= scaledMargin && j >= scaledMargin && i < symbolSize - scaledMargin && j < symbolSize - scaledMargin) {
+            const iSrc = Math.floor((i - scaledMargin) / scale);
+            const jSrc = Math.floor((j - scaledMargin) / scale);
+            pxColor = palette[data[iSrc * size + jSrc] ? 1 : 0];
+        }
+        imgData[posDst++] = pxColor.r;
+        imgData[posDst++] = pxColor.g;
+        imgData[posDst++] = pxColor.b;
+        imgData[posDst] = pxColor.a;
+    }
+};
+
+},{}],"7Akrj":[function(require,module,exports) {
+const Utils = require("c36bbcf663291acc");
+function getColorAttrib(color, attrib) {
+    const alpha = color.a / 255;
+    const str = attrib + '="' + color.hex + '"';
+    return alpha < 1 ? str + " " + attrib + '-opacity="' + alpha.toFixed(2).slice(1) + '"' : str;
+}
+function svgCmd(cmd, x, y) {
+    let str = cmd + x;
+    if (typeof y !== "undefined") str += " " + y;
+    return str;
+}
+function qrToPath(data, size, margin) {
+    let path = "";
+    let moveBy = 0;
+    let newRow = false;
+    let lineLength = 0;
+    for(let i = 0; i < data.length; i++){
+        const col = Math.floor(i % size);
+        const row = Math.floor(i / size);
+        if (!col && !newRow) newRow = true;
+        if (data[i]) {
+            lineLength++;
+            if (!(i > 0 && col > 0 && data[i - 1])) {
+                path += newRow ? svgCmd("M", col + margin, 0.5 + row + margin) : svgCmd("m", moveBy, 0);
+                moveBy = 0;
+                newRow = false;
+            }
+            if (!(col + 1 < size && data[i + 1])) {
+                path += svgCmd("h", lineLength);
+                lineLength = 0;
+            }
+        } else moveBy++;
+    }
+    return path;
+}
+exports.render = function render(qrData, options, cb) {
+    const opts = Utils.getOptions(options);
+    const size = qrData.modules.size;
+    const data = qrData.modules.data;
+    const qrcodesize = size + opts.margin * 2;
+    const bg = !opts.color.light.a ? "" : "<path " + getColorAttrib(opts.color.light, "fill") + ' d="M0 0h' + qrcodesize + "v" + qrcodesize + 'H0z"/>';
+    const path = "<path " + getColorAttrib(opts.color.dark, "stroke") + ' d="' + qrToPath(data, size, opts.margin) + '"/>';
+    const viewBox = 'viewBox="0 0 ' + qrcodesize + " " + qrcodesize + '"';
+    const width = !opts.width ? "" : 'width="' + opts.width + '" height="' + opts.width + '" ';
+    const svgTag = '<svg xmlns="http://www.w3.org/2000/svg" ' + width + viewBox + ' shape-rendering="crispEdges">' + bg + path + "</svg>\n";
+    if (typeof cb === "function") cb(null, svgTag);
+    return svgTag;
+};
+
+},{"c36bbcf663291acc":"6rMWz"}],"lWrRo":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "signOut", ()=>signOut);
+parcelHelpers.export(exports, "BACKEND_API_URL", ()=>BACKEND_API_URL);
+// Function to call web api backend function, with or without auth
+parcelHelpers.export(exports, "callBackendApi", ()=>callBackendApi);
+parcelHelpers.export(exports, "setFormAddressFields", ()=>setFormAddressFields);
+parcelHelpers.export(exports, "getFormAddressFields", ()=>getFormAddressFields);
+// Validate Swedish Social Security Number (personnummer) using checksum
 //   Note: this is somewhat simplified because it does not take into account
 //   that the date of the number is valid (e.g. "000000-0000" does return as true)
-r.export(n,"isValidSwedishSsn",()=>c),r.export(n,"formatPersonalId",()=>u),r.export(n,"itemCoverImage",()=>f),r.export(n,"shareCode",()=>g);let i="https://europe-west1-second-hand-helper.cloudfunctions.net/webApi";async function a(e,{data:t,method:n,requiresAuth:r,timeoutSec:o=20}={}){// const { data, method, requiresAuth, timeoutSec = 20 } = opts;
-let a=new AbortController,s=setTimeout(()=>a.abort(),1e3*o),d="",c=n||(t?"POST":"GET");(r||"GET"!==c)&&(d=await l());try{let n=await fetch(`${i}${e}`,{method:c,headers:{"Content-Type":"application/json",Authorization:`Bearer ${d}`},...t?{body:JSON.stringify(t)}:{},signal:a.signal});if("0"===n.headers.get("content-length"))return{data:void 0};let r=await n.json();return r.data?r:{data:r}}catch(e){throw console.error(e),errorHandler.report(`Failure calling backend function ${JSON.stringify(e)}`),e}finally{clearTimeout(s)}}async function l(){let e=localStorage.getItem("idToken");if(!e){if(firebase.auth().currentUser){let e=await result.getIdToken();localStorage.setItem("idToken",e),authUser.current=firebase.auth().currentUser,localStorage.setItem("authUser",JSON.stringify(authUser.current))}else throw Error("User not authenticated")}return e}function s(e){document.getElementById("addressFirstName").value=e.addressFirstName||"",document.getElementById("addressFirstName").dispatchEvent(new Event("input")),document.getElementById("addressLastName").value=e.addressLastName||"",document.getElementById("addressLastName").dispatchEvent(new Event("input")),document.getElementById("addressStreetAddress").value=e.addressStreetAddress||"",document.getElementById("addressStreetAddress").dispatchEvent(new Event("input")),document.getElementById("addressCO").value=e.addressCO||"",document.getElementById("addressCO").dispatchEvent(new Event("input")),document.getElementById("addressPostalCode").value=e.addressPostalCode||"",document.getElementById("addressPostalCode").dispatchEvent(new Event("input")),document.getElementById("addressCity").value=e.addressCity||"",document.getElementById("addressCity").dispatchEvent(new Event("input")),document.getElementById("addressDoorCode").value=e.addressDoorCode||"",document.getElementById("addressDoorCode").dispatchEvent(new Event("input"))}function d(){let e=document.getElementById("addressFirstName").value,t=document.getElementById("addressLastName").value,n=document.getElementById("addressStreetAddress").value,r=document.getElementById("addressCO").value,o=document.getElementById("addressPostalCode").value,i=document.getElementById("addressCity").value,a=document.getElementById("addressDoorCode").value;return e=e?e.trim().charAt(0).toUpperCase()+e.trim().slice(1):"",t=t?t.trim().charAt(0).toUpperCase()+t.trim().slice(1):"",n=n?n.trim().charAt(0).toUpperCase()+n.trim().slice(1):"",r=r?r.trim():"",{addressFirstName:e,addressLastName:t,addressStreetAddress:n,addressCO:r,addressPostalCode:o=o?o.trim().replace(/\D/g,""):"",addressCity:i=i?i.trim().charAt(0).toUpperCase()+i.trim().slice(1):"",addressDoorCode:a=a?a.trim():""}}function c(e){// verify we got 10 digits, otherwise it is invalid
-if(10!==(e=e.replace(/\D/g,"")// strip out all but digits
-.split("")// convert string to array
-.reverse()// reverse order for Luhn
-.slice(0,10)).length)return!1;let t=e.map(e=>Number(e)).reduce((e,t,n)=>(n%2&&(t*=2),t>9&&(t-=9),e+t));return 0==t%10}function u(e){let t=e.replace("-","");return(12!==t.length&&("19"!==t.substring(0,2)||"20"!==t.substring(0,2))&&(t=99>=Number(t.substring(0,2))&&Number(t.substring(0,2))>25?"19"+t:"20"+t),12===t.length)?t:null}function f(e){let t=e.images;return t.modelImage?t.modelImageSmall||t.modelImage:t.coverImage?t.coverImageSmall||t.coverImage:t.enhancedFrontImage?t.enhancedFrontImageSmall||t.enhancedFrontImage:t.frontImageSmall||t.frontImage}function g(){let e=user.current.referralData.referralCode,t=`Hej! F\xf6lj min personliga l\xe4nk s\xe5 s\xe4ljer Mai ditt f\xf6rsta plagg kostnadsfritt! Mai sk\xf6ter f\xf6rs\xe4ljningen av dina kl\xe4der, inklusive v\xe4rdering, l\xe4gger ut p\xe5 flera plattformar samtidigt, har kontakten med k\xf6pare och ordnar med frakt n\xe4r det blir s\xe5lt. Man f\xe5r sj\xe4lv beh\xe5lla 80% av vinsten, och blir det inte s\xe5lt kostar det ingenting.
+parcelHelpers.export(exports, "isValidSwedishSsn", ()=>isValidSwedishSsn);
+parcelHelpers.export(exports, "formatPersonalId", ()=>formatPersonalId);
+parcelHelpers.export(exports, "itemCoverImage", ()=>itemCoverImage);
+parcelHelpers.export(exports, "shareCode", ()=>shareCode);
+function signOut() {
+    firebase.auth().signOut().then(()=>{
+        console.log("User signed out");
+        authUser.current = null;
+        user.current = null;
+        userId = null;
+        localStorage.removeItem("sessionUser");
+        localStorage.removeItem("idToken");
+        localStorage.removeItem("authUserId");
+        localStorage.removeItem("authUser");
+        deleteCookie("maiAuth");
+        location.href = "/";
+    }).catch((error)=>{
+        errorHandler.report(error);
+        console.log(error);
+    });
+}
+const BACKEND_API_URL = "https://europe-west1-second-hand-helper.cloudfunctions.net/webApi";
+async function callBackendApi(path, { data, method, requiresAuth = true, timeoutSec = 20 } = {}) {
+    // const { data, method, requiresAuth, timeoutSec = 20 } = opts;
+    const controller = new AbortController();
+    const timeout = setTimeout(()=>controller.abort(), timeoutSec * 1000);
+    let idToken = "";
+    const useMethod = method || (data ? "POST" : "GET");
+    if (requiresAuth === true || requiresAuth !== false && useMethod !== "GET") idToken = await getIdToken();
+    try {
+        const response = await fetch(`${BACKEND_API_URL}${path}`, {
+            method: useMethod,
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`
+            },
+            ...data ? {
+                body: JSON.stringify(data)
+            } : {},
+            signal: controller.signal
+        });
+        if (response.headers.get("content-length") === "0") return {
+            data: undefined
+        };
+        const json = await response.json();
+        return json.data ? json : {
+            data: json
+        };
+    } catch (e) {
+        console.error(e);
+        errorHandler.report(`Failure calling backend function ${JSON.stringify(e)}`);
+        throw e;
+    } finally{
+        clearTimeout(timeout);
+    }
+}
+async function getIdToken() {
+    const idToken = localStorage.getItem("idToken");
+    if (!idToken) {
+        if (firebase.auth().currentUser) {
+            const idToken = await result.getIdToken();
+            localStorage.setItem("idToken", idToken);
+            authUser.current = firebase.auth().currentUser;
+            localStorage.setItem("authUser", JSON.stringify(authUser.current));
+        } else throw new Error("User not authenticated");
+    }
+    return idToken;
+}
+function setFormAddressFields(user1) {
+    document.getElementById("addressFirstName").value = user1.addressFirstName || "";
+    document.getElementById("addressFirstName").dispatchEvent(new Event("input"));
+    document.getElementById("addressLastName").value = user1.addressLastName || "";
+    document.getElementById("addressLastName").dispatchEvent(new Event("input"));
+    document.getElementById("addressStreetAddress").value = user1.addressStreetAddress || "";
+    document.getElementById("addressStreetAddress").dispatchEvent(new Event("input"));
+    document.getElementById("addressCO").value = user1.addressCO || "";
+    document.getElementById("addressCO").dispatchEvent(new Event("input"));
+    document.getElementById("addressPostalCode").value = user1.addressPostalCode || "";
+    document.getElementById("addressPostalCode").dispatchEvent(new Event("input"));
+    document.getElementById("addressCity").value = user1.addressCity || "";
+    document.getElementById("addressCity").dispatchEvent(new Event("input"));
+    document.getElementById("addressDoorCode").value = user1.addressDoorCode || "";
+    document.getElementById("addressDoorCode").dispatchEvent(new Event("input"));
+}
+function getFormAddressFields() {
+    let addressFirstName = document.getElementById("addressFirstName").value;
+    let addressLastName = document.getElementById("addressLastName").value;
+    let addressStreetAddress = document.getElementById("addressStreetAddress").value;
+    let addressCO = document.getElementById("addressCO").value;
+    let addressPostalCode = document.getElementById("addressPostalCode").value;
+    let addressCity = document.getElementById("addressCity").value;
+    let addressDoorCode = document.getElementById("addressDoorCode").value;
+    addressFirstName = addressFirstName ? addressFirstName.trim().charAt(0).toUpperCase() + addressFirstName.trim().slice(1) : "";
+    addressLastName = addressLastName ? addressLastName.trim().charAt(0).toUpperCase() + addressLastName.trim().slice(1) : "";
+    addressStreetAddress = addressStreetAddress ? addressStreetAddress.trim().charAt(0).toUpperCase() + addressStreetAddress.trim().slice(1) : "";
+    addressCO = addressCO ? addressCO.trim() : "";
+    addressPostalCode = addressPostalCode ? addressPostalCode.trim().replace(/\D/g, "") : "";
+    addressCity = addressCity ? addressCity.trim().charAt(0).toUpperCase() + addressCity.trim().slice(1) : "";
+    addressDoorCode = addressDoorCode ? addressDoorCode.trim() : "";
+    return {
+        addressFirstName,
+        addressLastName,
+        addressStreetAddress,
+        addressCO,
+        addressPostalCode,
+        addressCity,
+        addressDoorCode
+    };
+}
+function isValidSwedishSsn(ssn) {
+    ssn = ssn.replace(/\D/g, "") // strip out all but digits
+    .split("") // convert string to array
+    .reverse() // reverse order for Luhn
+    .slice(0, 10); // keep only 10 digits (i.e. 1977 becomes 77)
+    // verify we got 10 digits, otherwise it is invalid
+    if (ssn.length !== 10) return false;
+    const sum = ssn.map((n)=>Number(n)).reduce((previous, current, index)=>{
+        if (index % 2) current *= 2;
+        if (current > 9) current -= 9;
+        return previous + current;
+    });
+    return 0 === sum % 10;
+}
+function formatPersonalId(personalIdInput) {
+    let personalId = personalIdInput.replace("-", "");
+    if (personalId.length !== 12 && (personalId.substring(0, 2) !== "19" || personalId.substring(0, 2) !== "20")) {
+        if (Number(personalId.substring(0, 2)) <= 99 && Number(personalId.substring(0, 2)) > 25) personalId = "19" + personalId;
+        else personalId = "20" + personalId;
+    }
+    if (personalId.length === 12) return personalId;
+    return null;
+}
+function itemCoverImage(item) {
+    const images = item.images;
+    if (images.modelImage) return images.modelImageSmall || images.modelImage;
+    if (images.coverImage) return images.coverImageSmall || images.coverImage;
+    if (images.enhancedFrontImage) return images.enhancedFrontImageSmall || images.enhancedFrontImage;
+    return images.frontImageSmall || images.frontImage;
+}
+function shareCode() {
+    const code = user.current.referralData.referralCode;
+    //const text = `Hej, jag vill tipsa om Mai för att rensa ur garderoben. Mai är en tjänst som hjälper dig att sälja dina kläder på ett enkelt sätt. Man tar bara bilder på sina plagg, sedan sköter Mai resten - såsom värdering, annonsering på flera plattformar, kontakt med köpare och frakt när det blir sålt. Man får själv behålla 80% av vinsten, och blir det inte sålt kostar det ingenting.\n\nOm du registrerar dig med min kod (följ länken) och provar sälja ett plagg inom 7 dagar får du behålla 100% av vinsten för det första plagget (istället för 80%). Min kod: ${code}\n\nLäs mer och använd min kod här:`;
+    const text = `Hej! Följ min personliga länk så säljer Mai ditt första plagg kostnadsfritt! Mai sköter försäljningen av dina kläder, inklusive värdering, lägger ut på flera plattformar samtidigt, har kontakten med köpare och ordnar med frakt när det blir sålt. Man får själv behålla 80% av vinsten, och blir det inte sålt kostar det ingenting.\n\nOm du registrerar dig med min kod (följ länken) och provar sälja ett plagg inom 7 dagar får du behålla 100% av vinsten för det första plagget (istället för 80%). Min kod: ${code}`;
+    if (navigator.share) navigator.share({
+        text: text,
+        url: `https://maiapp.se/?invite=${code}`
+    }).then(()=>{
+        console.log("Thanks for sharing!");
+    }).catch((e)=>{
+        console.error(e);
+        errorHandler.report(e);
+    });
+    else {
+        console.log("Browser doesn't support navigator.share => Copy to clipboard!");
+        const shareText = text + "\n" + `https://maiapp.se/?invite=${code}`;
+        navigator.clipboard.writeText(shareText);
+        linkCopiedBanner.style.display = "flex";
+        setTimeout(function() {
+            linkCopiedBanner.style.display = "none";
+        }, 1500);
+    }
+}
 
-Om du registrerar dig med min kod (f\xf6lj l\xe4nken) och provar s\xe4lja ett plagg inom 7 dagar f\xe5r du beh\xe5lla 100% av vinsten f\xf6r det f\xf6rsta plagget (ist\xe4llet f\xf6r 80%). Min kod: ${e}`;if(navigator.share)navigator.share({text:t,url:`https://maiapp.se/?invite=${e}`}).then(()=>{console.log("Thanks for sharing!")}).catch(e=>{console.error(e),errorHandler.report(e)});else{console.log("Browser doesn't support navigator.share => Copy to clipboard!");let n=t+"\n"+`https://maiapp.se/?invite=${e}`;navigator.clipboard.writeText(n),linkCopiedBanner.style.display="flex",setTimeout(function(){linkCopiedBanner.style.display="none"},1500)}}},{"@parcel/transformer-js/src/esmodule-helpers.js":"bNgzC"}],bNgzC:[function(e,t,n){n.interopDefault=function(e){return e&&e.__esModule?e:{default:e}},n.defineInteropFlag=function(e){Object.defineProperty(e,"__esModule",{value:!0})},n.exportAll=function(e,t){return Object.keys(e).forEach(function(n){"default"===n||"__esModule"===n||t.hasOwnProperty(n)||Object.defineProperty(t,n,{enumerable:!0,get:function(){return e[n]}})}),t},n.export=function(e,t,n){Object.defineProperty(e,t,{enumerable:!0,get:n})}},{}]},["2mRjC"],"2mRjC","parcelRequire81ca")//# sourceMappingURL=lwl.js.map
-;
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
+exports.interopDefault = function(a) {
+    return a && a.__esModule ? a : {
+        default: a
+    };
+};
+exports.defineInteropFlag = function(a) {
+    Object.defineProperty(a, "__esModule", {
+        value: true
+    });
+};
+exports.exportAll = function(source, dest) {
+    Object.keys(source).forEach(function(key) {
+        if (key === "default" || key === "__esModule" || dest.hasOwnProperty(key)) return;
+        Object.defineProperty(dest, key, {
+            enumerable: true,
+            get: function() {
+                return source[key];
+            }
+        });
+    });
+    return dest;
+};
+exports.export = function(dest, destName, get) {
+    Object.defineProperty(dest, destName, {
+        enumerable: true,
+        get: get
+    });
+};
+
+},{}]},["3meYV","8V3ht"], "8V3ht", "parcelRequire81ca")
+
 //# sourceMappingURL=lwl.js.map

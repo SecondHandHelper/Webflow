@@ -55,7 +55,7 @@
   function identify(authenticatedUser, dbUser) {
     const now = new Date().toISOString();
     let createdAt = new Date(authenticatedUser.metadata.creationTime).toISOString();
-    let latestLogin = new Date(authenticatedUser.metadata.lastSignInTime).toISOString();
+    let latestLogin = new Date(authenticatedUser.metadata.lastSignInTime || authenticatedUser.metadata.creationTime).toISOString();
     let signInMethod = authenticatedUser.providerData[0].providerId;
     const firstName = dbUser.addressFirstName ? dbUser.addressFirstName : null;
     const lastName = dbUser.addressLastName ? dbUser.addressLastName : null;
