@@ -8,7 +8,10 @@ import {
 async function updateUserAddress() {
     try {
         loadOnSavePressed()
-        await callBackendApi('/api/users', { data: getFormAddressFields() })
+        await callBackendApi('/api/users', {
+          data: getFormAddressFields(),
+          method: 'PUT'
+        })
         await onUpdateComplete()
     } catch (e) {
         errorHandler.report(e);
@@ -25,14 +28,20 @@ async function updateShippingPreference() {
             shippingMethod = radioButtons[x].value; // "Service point" or "Pickup"
         }
     }
-    await callBackendApi('/api/users', { data: { preferences: { shippingMethod } } })
+    await callBackendApi('/api/users', {
+      data: { preferences: { shippingMethod } },
+      method: 'PUT'
+    })
     await onUpdateComplete()
 }
 
 async function updateContactNumbers(isSwish) {
     try {
         loadOnSavePressed()
-        await callBackendApi('/api/users',{ data: getCleanedNumber(isSwish) })
+        await callBackendApi('/api/users',{
+          data: getCleanedNumber(isSwish),
+          method: 'PUT'
+        })
         await onUpdateComplete()
     } catch (e) {
       errorHandler.report(e);
@@ -42,8 +51,10 @@ async function updateContactNumbers(isSwish) {
 async function updateUserPersonId() {
     try {
         loadOnSavePressed()
-        await callBackendApi('/api/users',
-          { data: { personalId: formatPersonalId(personalId.value.trim().replace(/\D/g, '')) }})
+        await callBackendApi('/api/users', {
+          data: { personalId: formatPersonalId(personalId.value.trim().replace(/\D/g, '')) },
+          method: 'PUT'
+        })
         await onUpdateComplete()
     } catch (e) {
         errorHandler.report(e);

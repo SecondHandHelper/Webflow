@@ -23,9 +23,10 @@ const pageSetUp = async () => {
     personalId.setCustomValidity(personalIdError);
     if (document.getElementById('wf-form-User-Details').reportValidity()) {
       try {
-        await callBackendApi('/api/users',
-          { phoneNumber: formatPhoneNumber(phoneNumber.value), personalId: formatPersonalId(personalId.value) }
-        );
+        await callBackendApi('/api/users', {
+          data: { phoneNumber: formatPhoneNumber(phoneNumber.value), personalId: formatPersonalId(personalId.value) },
+          method: 'PUT'
+        });
       } catch (e) {
         console.error('Failed saving user contact info', e);
       }

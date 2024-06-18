@@ -512,7 +512,10 @@ async function getShippingMethod() {
   let shippingMethod = 'Service point';
   if (!user.current?.preferences?.shippingMethod) {
     if (authUser.current) {
-      await callBackendApi('/api/users', { data: { preferences: { shippingMethod } }});
+      await callBackendApi('/api/users', {
+        data: { preferences: { shippingMethod } },
+        method: 'PUT'
+      });
     } else {
       sessionStorage.setItem('shippingMethod', shippingMethod);
     }
