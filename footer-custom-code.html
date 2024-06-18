@@ -110,6 +110,9 @@
   }
 
   async function onAuthStateChangedPromise() {
+    if (firebase.auth().currentUser) {
+      return new Promise.resolve(firebase.auth().currentUser);
+    }
     return new Promise((resolve, reject) => {
       let isResolved = false;
       firebase.auth().onAuthStateChanged(result => {
