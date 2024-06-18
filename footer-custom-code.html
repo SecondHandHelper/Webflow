@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.2.119';
+  const JS_VERSION = 'v1.2.120';
   errorHandler = new StackdriverErrorReporter();
   const environment = location.href.includes('maiapp.se') ? 'web-prod' : 'web-test';
   errorHandler.start({
@@ -109,6 +109,21 @@
     return idToken;
   }
 
+  async function onAuthStateChangedPromise() {
+    return new Promise((resolve, reject) => {
+      let isResolved = false;
+      firebase.auth().onAuthStateChanged(result => {
+        isResolved = true;
+        resolve(result)
+      })
+      setTimeout(() => {
+        if (!isResolved) {
+          reject('Timed out waiting for user auth');
+        }
+      }, 10*1000)
+    })
+  }
+
   // Function to call web api backend function, with or without auth
   async function callBackendApi(path, { data, method, requiresAuth, timeoutSec = 20 } = {}) {
     const controller = new AbortController()
@@ -130,17 +145,22 @@
         signal: controller.signal
       })
       if (useAuth && response.status === 401) {
-        // Try the call again with a refreshed idToken
-        await getIdToken(true);
-        response = await fetch(`${BACKEND_API_URL}${path}`, {
-          method: useMethod,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${idToken}`
-          },
-          ...(data ? { body: JSON.stringify(data) } : {}),
-          signal: controller.signal
-        });
+        // Try the call again with a refreshed idToken when the firebase user is authenticated
+        console.log('Waiting for onAuthStateChangedPromise to try again');
+        const result = await onAuthStateChangedPromise();
+        console.log('trying again');
+        if (result) {
+          idToken = await getIdToken(true);
+          response = await fetch(`${BACKEND_API_URL}${path}`, {
+            method: useMethod,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${idToken}`
+            },
+            ...(data ? {body: JSON.stringify(data)} : {}),
+            signal: controller.signal
+          });
+        }
       }
       if (!response.ok || response.headers.get('content-length') === '0') {
         return { data: undefined }
