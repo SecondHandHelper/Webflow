@@ -1,5 +1,6 @@
 import {autocomplete, brands} from "./autocomplete-brands";
 import {fieldLabelToggle, initializeCategorySelect} from "./sellItemHelpers";
+import {callBackendApi} from "./general";
 
 
 async function getValuation(itemBrand, itemCategory) {
@@ -26,7 +27,8 @@ async function getValuation(itemBrand, itemCategory) {
   document.getElementById('howItWorksDiv').style.display = 'none';
   document.getElementById('valuationInfoButton').style.display = 'none';
   try {
-    const valuationRes = await firebase.app().functions("europe-west1").httpsCallable('partialMlValuation')({ brand, category });
+    const valuationRes = await callBackendApi('/api/valuation?partial=true',
+      { data: { brand, category }});
     const {
       minPrice, maxPrice, decline, newBrand, valuatedBrandItems, fewBrand, valuatedBrandCategoryItems,
       brandCategoryAccuracy, brandAccuracy, highPriceVarBrandCategory, brandShareSold, humanCheckExplanation,

@@ -31,9 +31,7 @@ async function showDeclineValuation(item) {
         window.location.href = '/private';
     });
     if (item.id) {
-        await callFirebaseFunction("europe-west1", 'markItemRejected', {
-            itemId: item.id, userDecline: false
-        });
+        await callBackendApi(`/api/valuation/${itemId}/reject`, { data: { userDecline: false }});
     }
 }
 
@@ -172,11 +170,13 @@ async function saveValuationStatus(itemId, minPrice, maxPrice) {
         sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify(savedItem));
         return window.location.href = '/sign-in';
     } else {
-        await callFirebaseFunction("europe-west1", 'saveValuationStatus', {
+        await callBackendApi(`/api/valuation/${itemId}`, {
+          method: 'PUT',
+          data: {
             itemId, minPrice, maxPrice, adjustmentMin: adjustedMin, adjustmentMax: adjustedMax,
             userProposalMotivation: document.getElementById('userProposalMotivation').value,
             adjustmentRequiresReview: !adjustmentOk(minPrice, maxPrice)
-        });
+        }});
         const params = getParamsObject();
         if (localStorage.getItem('latestItemCreated') && !params.id) {
             const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
@@ -222,9 +222,7 @@ const initialPageSetup = (item) => {
 
 const rejectValuation = async (item) => {
     if (item.id) {
-        await callFirebaseFunction("europe-west1", 'markItemRejected', {
-            itemId: item.id, userDecline: true
-        });
+      await callBackendApi(`/api/valuation/${itemId}/reject`, { data: { userDecline: true }});
     }
     sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
     const params = getParamsObject();

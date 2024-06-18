@@ -1,4 +1,5 @@
 import {
+  callBackendApi,
   formatPersonalId,
   getFormAddressFields,
   isValidSwedishSsn,
@@ -8,7 +9,7 @@ import {
 async function updateUserAddress() {
     try {
         loadOnSavePressed()
-        await callFirebaseFunction("europe-west1", 'updateFirebaseUser', { ...getFormAddressFields() })
+        await callBackendApi('/api/users', { data: getFormAddressFields() })
         await onUpdateComplete()
     } catch (e) {
         errorHandler.report(e);
@@ -25,14 +26,14 @@ async function updateShippingPreference() {
             shippingMethod = radioButtons[x].value; // "Service point" or "Pickup"
         }
     }
-    await callFirebaseFunction("europe-west1", 'updateFirebaseUser', { preferences: { shippingMethod } })
+    await callBackendApi('/api/users', { data: { preferences: { shippingMethod } } })
     await onUpdateComplete()
 }
 
 async function updateContactNumbers(isSwish) {
     try {
         loadOnSavePressed()
-        await callFirebaseFunction("europe-west1", 'updateFirebaseUser',{ ...getCleanedNumber(isSwish) })
+        await callBackendApi('/api/users',{ data: getCleanedNumber(isSwish) })
         await onUpdateComplete()
     } catch (e) {
       errorHandler.report(e);
@@ -42,8 +43,8 @@ async function updateContactNumbers(isSwish) {
 async function updateUserPersonId() {
     try {
         loadOnSavePressed()
-        await callFirebaseFunction("europe-west1", 'updateFirebaseUser',
-          { personalId: formatPersonalId(personalId.value.trim().replace(/\D/g, '')) })
+        await callBackendApi('/api/users',
+          { data: { personalId: formatPersonalId(personalId.value.trim().replace(/\D/g, '')) }})
         await onUpdateComplete()
     } catch (e) {
         errorHandler.report(e);
@@ -57,7 +58,7 @@ let pageHeader = document.getElementById('pageTitleText');
 
 async function getUserInfo(onUpdate) {
   try {
-    const response = await callFirebaseFunction("europe-west1", 'getUserInfo');
+    const response = await callBackendApi('/api/users', { requiresAuth: true });
     data = response.data;
     await displayPersonalId(data.personalId);
     console.log('data', data);

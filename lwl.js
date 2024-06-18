@@ -1,4 +1,5 @@
 import QRCode from "qrcode";
+import {callBackendApi} from "./general";
 
 const WS_SERVER = 'wss://lwl-to-mai-22-heypmjzjfq-lz.a.run.app';
 const params = getParamsObject();
@@ -14,7 +15,7 @@ if (params.createDrafts === 'true') {
     const draftItems = JSON.parse(localStorage.getItem('lwlItemDrafts'));
     authUser.whenSet(async () => {
         await Promise.all(draftItems.map(item =>
-          callFirebaseFunction("europe-west1", 'createItem', {id: item.id, item})
+          callBackendApi(`/api/items/${item.id}`, { data: { item } })
         ));
         localStorage.removeItem('lwlItemDrafts');
         location.href = '/private#wardrobe';
@@ -97,10 +98,11 @@ document.getElementById('doneButton').addEventListener('click', () => {
         webSocket.close();
         return;
       }
-      const draftItemResponse = await firebase.app().functions("europe-west3").httpsCallable('createItemDraftsFromLwl', {timeout: 240 * 1000})({
-        itemData: message.data,
-        url: lwlThreadUrl.value,
-      }, 240);
+      const draftItemResponse = await callBackendApi('/api/items/lwl', {
+        data: {
+          itemData: message.data,
+          url: lwlThreadUrl.value,
+        }, timeoutSec: 240 });
       if (authUser.current) {
         location.href = '/private#wardrobe';
       } else {

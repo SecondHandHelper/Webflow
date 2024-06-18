@@ -232,18 +232,19 @@ async function saveReclaim(itemId) {
     document.getElementById('doneButtonText').style.display = 'none';
     // Save reclaim
     console.log('Will update: ', { itemId, reclaim });
-    await callBackendApi(`/api/items/${itemId}/reclaim`, { reclaim }, 'POST', true);
+    await callBackendApi(`/api/items/${itemId}/reclaim`, { data: { reclaim }});
     await uploadAndSaveImages(itemId);
     return true
 }
 
 async function uploadAndSaveImages(itemId) {
     const images = getFormImages();
-    // Uploads files
-    await Promise.all(images.map(async (image, index) => {
+    // Uploads files and add the new imageUrls to the changes object
+    const imageUrls = await Promise.all(images.map(async (image, index) => {
         const { url: imageUrl } = await uploadTempImage(image, `reclaim_${itemId}_${index}`);
-        await callBackendApi(`/api/items/${itemId}/reclaim`, { imageUrl }, 'PUT', true);
+        return url;
     }));
+    await callBackendApi(`/api/items/${itemId}/reclaim`, { data: { imageUrls }});
 }
 
 const getItem = async (itemId) => {

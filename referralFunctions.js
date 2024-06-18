@@ -1,3 +1,5 @@
+import {callBackendApi} from "./general";
+
 async function showReferralSection() {
   if (user.current?.referralData?.referralCode) {
     document.getElementById("myReferralCodeText").innerHTML = user.current.referralData.referralCode;
@@ -21,7 +23,7 @@ async function showBonusSection() {
   if (referralData && referralData?.referredBy && !referralData?.referredByBonusPaid && !referralData?.referredByDiscountUsed) {
     // Get inviters first name
     const inviter = referralData?.referredBy;
-    const res = await callFirebaseFunction("europe-west3", 'referrerName', { referrerId: inviter });
+    const res = await callBackendApi(`/api/users/${inviter}/referrerInfo`);
     console.log('referrerName result', res);
     await showActivatedBonus(res?.data?.name, res?.data?.code);
     bonusSection.style.display = 'block';
@@ -54,7 +56,7 @@ async function showActivatedBonus(referrerName, referrerCode) {
 
 async function createReferralCode() {
   if (!user.current?.referralData?.referralCode) {
-    const referralCode = await callFirebaseFunction("europe-west3", 'setUserReferralCode');
+    const referralCode = await callBackendApi(`/api/users/referralCode`, { method: 'PUT' });
     console.log("New referral code stored: ", referralCode?.data?.referralCode);
     user.current.referralData = { ...user.current.referralData, referralCode: referralCode?.data?.referralCode };
     await showReferralSection();
@@ -82,7 +84,7 @@ async function connectReferralUsers(inputCode) {
 
   // Find user with matching referral code and connect users
   try {
-    const res = await callFirebaseFunction("europe-west3", 'connectReferralUser', { code: inputCode })
+    const res = await callBackendApi('/api/users/referredBy', { data: { code: inputCode }, method: 'PUT' });
     deleteCookie('invite');
     console.log('connecReferralUser response: ', res);
     if (res?.data?.code === 400) { //User already used a referral

@@ -127,19 +127,19 @@ async function updateItem(itemId, changedImages) {
         infoRequestImagesText.style.display = 'block';
         infoRequestImagesDiv.style.display = 'none';
         const { url: imageUrl } = await uploadTempImage(value, imageName);
-        await callBackendApi(`/api/items/${itemId}/images`, {
+        await callBackendApi(`/api/items/${itemId}/images`, { data: {
           fileName: imageName,
           url: imageUrl
-        }, 'POST', true);
+        } });
       }));
       if (changedImages.indexOf('frontImage') > -1) {
         // Front image was changed, also save the enhancedFrontImage in the right place
         const item = await callBackendApi(`/api/items/${itemId}`);
         const itemData = item.data;
-        await callBackendApi(`/api/items/${itemId}/images`, {
+        await callBackendApi(`/api/items/${itemId}/images`, { data: {
           fileName: `enhancedFrontImage`,
           url: `${sessionStorage.getItem('enhancedFrontImage')}`
-        }, 'POST', true);
+        }});
         changes[`images.versionsStatus.enhancedFrontImage`] = '';
         if (itemData.images.coverImage === itemData.images.enhancedFrontImage) {
           changes['images.coverImage'] = '';
@@ -448,6 +448,7 @@ function setUpEventListeners() {
 
 
   cancelConfirmButton.addEventListener('click', async () => {
+    const itemId = params.id;
     let reason = '';
     const radioButtons = document.getElementsByName('cancelReason');
     for (var i = 0; i < radioButtons.length; i++) {
@@ -460,9 +461,8 @@ function setUpEventListeners() {
       cancelButtonSpinner.style.display = 'flex';
       cancelConfirmButton.style.display = 'none';
       // Call endpoint to remove item
-      await callFirebaseFunction("europe-west1", 'archiveItem', {
-        itemId: params.id, archivedReason: reason
-      });
+      await callBackendApi(`/api/items/${itemId}/archive`,
+        { method: 'PUT', data: { archivedReason: reason } });
       // Show confirmation
       if (reason === 'Seller sold elsewhere') { cancelSoldElsewhereWarning.style.display = 'flex'; }
       crossFade(cancelConfirmation);

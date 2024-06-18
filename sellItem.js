@@ -111,7 +111,10 @@ async function sellItemMainAuthenticated() {
       await createItemAfterSignIn();
       const shippingMethod = sessionStorage.getItem('shippingMethod');
       if (shippingMethod) {
-        await callFirebaseFunction("europe-west1", 'updateFirebaseUser', { preferences: { shippingMethod } });
+        await callBackendApi('/api/users', {
+          data: { preferences: { shippingMethod } },
+          method: 'PUT'
+        });
       }
       const userPhoneSet = user.current?.phoneNumber?.length;
       return location.href = userPhoneSet ? '/item-confirmation' : '/user-contact';
@@ -134,6 +137,7 @@ async function sellItemMain() {
   sessionStorage.removeItem('itemValuation');
 
   if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
+    console.log(`showing spinner and waiting for item to be created when user is set ${user.current?.email}`);
     // ... if we are redirected here from the sign-in page and have a saved item that should be created
     document.getElementById('loadingDiv').style.display = 'flex';
     document.getElementById('creatingItemText').style.display = 'block';
@@ -302,7 +306,7 @@ async function saveValuationInStorageOrBackend(valuationData, itemId) {
       item: { ...item.item, ...valuationData }
     }));
   } else {
-    await callFirebaseFunction("europe-west1", 'saveItemValuationFields', { itemId, ...valuationData });
+    await callBackendApi(`/api/valuation/${itemId}`, { data: valuationData, requiresAuth: false });
     const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
     localStorage.setItem('latestItemCreated', JSON.stringify({ ...latestItemCreated, ...valuationData }));
   }
@@ -381,13 +385,13 @@ async function getAndSaveValuation(itemId, item) {
     return '/item-confirmation';
   }
   if (params.id && params.type !== 'draft') {
-    const getItemResponse = await firebase.app().functions("europe-west1").httpsCallable('getItem')({ itemId: params.id });
+    const getItemResponse = await callBackendApi(`/api/items/${params.id}`);
     const resellItem = getItemResponse.data;
     await setValuationFromResellItem(resellItem, item, itemId);
     return '/item-valuation';
   }
   try {
-    const res = await firebase.app().functions("europe-west1").httpsCallable('itemMlValuation')({ itemId, item });
+    const res = await callBackendApi('/api/valuation', { data: { itemId, item }, requiresAuth: false});
     const { minPrice, maxPrice, decline } = res.data || {};
     await saveItemValuation(itemId, res.data);
     return nextStepAfterValuation(minPrice && maxPrice, decline, needsHumanCheck(res.data));
@@ -508,7 +512,7 @@ async function getShippingMethod() {
   let shippingMethod = 'Service point';
   if (!user.current?.preferences?.shippingMethod) {
     if (authUser.current) {
-      await callFirebaseFunction("europe-west1", 'updateFirebaseUser', { preferences: { shippingMethod } });
+      await callBackendApi('/api/users', { data: { preferences: { shippingMethod } }});
     } else {
       sessionStorage.setItem('shippingMethod', shippingMethod);
     }
@@ -532,7 +536,7 @@ async function addItemInner(id, status = 'New') {
   if (!authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
-    const createItemResponse = await callBackendApi(`/api/items/${id}`, { item }, 'POST', true);
+    const createItemResponse = await callBackendApi(`/api/items/${id}`, { data: { item }});
 
     await trackUserActivated();
     await setCampaignCoupon();
@@ -645,7 +649,7 @@ function isElementInView(el) {
 async function setCampaignCoupon() {
   const campaignDateOk = new Intl.DateTimeFormat('se-SV').format(new Date()) <= '2024-03-10';
   if (campaignDateOk && getCookie('noCommissionCampaignCookie') === 'noCommission' && (await userItemsCount()) === 1) {
-    await callFirebaseFunction("europe-west1", 'setNoCommissionCoupon');
+    await callBackendApi('/api/users/noCommissionCoupon', { method: 'PUT' });
   }
 }
 
@@ -653,7 +657,7 @@ async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
   sessionStorage.removeItem('newItemId');
-  await callBackendApi('/api/items', itemFromStorage, 'POST', true);
+  await callBackendApi(`/api/items/${itemFromStorage.id}`, { data: itemFromStorage });
   await trackUserActivated();
   await setCampaignCoupon()
   localStorage.removeItem('newItem');
@@ -667,7 +671,6 @@ function rememberUnsavedChanges() {
   if (!shouldSaveState()) {
     return;
   }
-  console.log('rememberUnsavedChanges');
   const {
     user, createdAt, status, shippingStatus, modelVariantFields, ...itemToSave
   } = collect();
@@ -744,7 +747,7 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
       ]);
       itemDraft = item;
     }
-    const atItem = atItemResponse?.data;
+    const atItem = atItemResponse?.data || {};
     const data = item.data;
     const images = data.images || {};
     let originalPrice = data.originalPrice;
@@ -883,9 +886,7 @@ function selectFieldValue(field, value) {
 }
 
 async function checkAndDisplayShareSold(value) {
-  const response = await firebase.app().functions("europe-west1").httpsCallable(
-    'fetchBrandShareSoldInfo',
-  )({ cleanedBrandName: value });
+  const response = await callBackendApi(`/api/brands/shareSold?brand=${value}`);
 
   if (response.data && response.data.cleanedBrand) {
     console.log('data.shareSold', response.data.shareSold, 'data.cleanedBrand', response.data.cleanedBrand);
@@ -1352,7 +1353,8 @@ export const isNoBgImage = async (source) => {
   }
 };
 
+// Call sellItemMainAuthenticated after/when a user has logged in
+user.whenSet(sellItemMainAuthenticated);
+
 // Call sellItemMain directly
 sellItemMain();
-// and call sellItemMainAuthenticated after/when a user has logged in
-user.whenSet(sellItemMainAuthenticated);

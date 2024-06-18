@@ -21,9 +21,10 @@
       return this.value;
     },
     set current(newVal) {
-      const oldAtId = this.value?.airtableRecordID;
+      const oldEmail = this.value?.email;
+      const oldPhone = this.value?.phoneNumber;
       this.value = newVal;
-      if (newVal && newVal.airtableRecordID !== oldAtId) {
+      if (newVal && (newVal.email != oldEmail || newVal.phoneNumber != oldPhone)) {
         this.callbacks.forEach((cb) => {
           typeof cb === 'function' && cb(newVal)
         });

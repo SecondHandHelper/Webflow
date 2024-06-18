@@ -1,9 +1,3 @@
 <script>
-  async function showOrderBagsButton() {
-    const maxBags = await callFirebaseFunction("europe-west1", 'maxNumBags');
-    if (maxBags?.data?.maxOrderBags > 0) {
-      document.getElementById('orderBagsButton').style.display = 'flex';
-    }
-  }
-  showOrderBagsButton();
+  urlDependentLoadJs('howShippingWorks.js');
 </script>

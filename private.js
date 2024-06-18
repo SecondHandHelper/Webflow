@@ -1,6 +1,7 @@
-import {itemCoverImage, shareCode, signOut} from "./general";
+import {callBackendApi, itemCoverImage, shareCode, signOut} from "./general";
 import {loadInfoRequests} from "./infoRequestsFunctions";
 import {loadItemCards} from "./loadItemCards";
+import {requestUniqueId} from "./sellItemHelpers";
 
 var userId;
 var email;
@@ -98,9 +99,13 @@ if (sessionUser) {
 
 
 async function showOrderBagsSection() {
-  const maxBags = await callFirebaseFunction("europe-west1", 'maxNumBags');
-  if (maxBags?.data?.maxOrderBags > 0) {
-    document.getElementById('orderBagsSection').style.display = 'block';
+  try {
+    const maxBags = await callBackendApi('/api/bags/orders/allowed', { requiresAuth: true });
+    if (maxBags?.data?.maxOrderBags > 0) {
+      document.getElementById('orderBagsSection').style.display = 'block';
+    }
+  } catch (e) {
+    console.log(e);
   }
 }
 
@@ -271,7 +276,7 @@ async function privateMain() {
   });
   */
 
-  const items = (await callFirebaseFunction("europe-west1", 'getUserItems'))?.data;
+  const items = (await callBackendApi('/api/items', { requiresAuth: true }))?.data;
   showInviteToast(items);
 
   const inviteCode = checkCookie("invite");
@@ -365,7 +370,7 @@ function inSeason(category) {
 }
 
 async function showInactiveItemsSection() {
-  const unsoldItems = await callFirebaseFunction("europe-west1", 'getUserUnsoldItems');
+  const unsoldItems = await callBackendApi('/api/items/unsold', { requiresAuth: true });
   if (!unsoldItems.data?.length) {
     return;
   }
@@ -424,7 +429,7 @@ async function showInactiveItemsSection() {
 }
 
 async function showInYourWardrobeSection() {
-  const wardrobeItems = await callFirebaseFunction("europe-west1", 'getUserWardrobeItems');
+  const wardrobeItems = await callBackendApi('/api/items/wardrobe', { requiresAuth: true });
   if (!wardrobeItems.data?.length) {
     return;
   }
@@ -493,14 +498,17 @@ function setupBottomMenuPopupListeners() {
       if (!visibleChildren) {
         document.getElementById('inactiveItemsDiv').style.display = 'none';
       }
-      await callFirebaseFunction("europe-west1", 'hideUserUnsoldItem', { itemId: itemMoreMenu.dataset.itemId });
+      await callBackendApi(`/api/items/unsold/${itemMoreMenu.dataset.itemId}`, { method: 'DELETE' });
     } else {
       const itemList = document.getElementById('wardrobeItemList');
       const visibleChildren = Array.from(itemList.children).find(it => it.style.display !== 'none')
       if (!visibleChildren) {
         document.getElementById('wardrobeItemsDiv').style.display = 'none';
       }
-      await callFirebaseFunction("europe-west1", 'hideUserWardrobeItem', { itemId: itemMoreMenu.dataset.itemId });
+      await callBackendApi(`/api/items/wardrobe/${itemMoreMenu.dataset.itemId}`, {
+        method: 'DELETE',
+        data: {itemId: itemMoreMenu.dataset.itemId}
+      });
     }
   });
 }
@@ -567,7 +575,8 @@ async function fetchAndShowRecommendedItems(items) {
   try {
     const ids = [];
     items.forEach(item => ids.push(item.id));
-    const response = await callFirebaseFunction("europe-west1", 'itemRecommendations', { items: ids.slice(0, 10), number: 20 })
+    const query = ids.slice(0, 10).map(id => `items=${ id }`).join('&') + '&number=20';
+    const response = await callBackendApi(`/api/items/recommendations?${query}`, { requiresAuth: true });
     if (!response.data.length) {
       return;
     }
