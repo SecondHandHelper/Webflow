@@ -309,7 +309,7 @@ async function privateMain() {
   showBonusSection();
   prepareMenu(user.current);
   loadInfoRequests(items);
-  //showHolidayModeDiv(items);
+  showHolidayModeDiv(items);
 
   // Create refCode
   if (user.current && user.current.addressFirstName && user.current.addressLastName && !user.current?.referralData?.referralCode) {
@@ -319,12 +319,10 @@ async function privateMain() {
 
 function showHolidayModeDiv(items) {
   if (items) {
-    items.forEach((doc) => { // Items is a global variable that equals to querySnapshot from loadCardLists.js
-      var itemId = doc.id;
-      var i = doc.data();
-      let publishedDate = i.publishedDate;
-      const status = i.status;
-      const archived = i.archived;
+    items.forEach((item) => {
+      let publishedDate = item.publishedDate;
+      const status = item.status;
+      const archived = item.archived;
 
       if (!archived && status === 'Published' && publishedDate) {
         if (publishedDate) {
@@ -333,6 +331,7 @@ function showHolidayModeDiv(items) {
           const daysDiff = Math.floor((nowDate.getTime() - publishedDate.getTime()) / (1000 * 3600 * 24));
           if (daysDiff <= 45) {
             document.getElementById('holidayModeDiv').style.display = 'block';
+            document.getElementById('openHolidayChat').onclick = () => Intercom('showNewMessage', 'När reser du iväg, och när är du tillbaka?\n\n');
           }
         }
       }
@@ -712,8 +711,7 @@ function onLoadHandler() {
     Intercom('update', {
       "hide_default_launcher": false
     });
-  });
-  document.getElementById('christmasHolidayDiv').onclick = () => Intercom('showNewMessage', 'När reser du iväg, och när är du tillbaka?\n\n');
+  }); 
 }
 if (localStorage.getItem('lwlItemDrafts')) {
   location.href = '/lwl?createDrafts=true';
