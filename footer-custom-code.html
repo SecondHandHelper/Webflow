@@ -142,7 +142,7 @@
         method: useMethod,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`
+          ...(idToken?.length ? { 'Authorization': `Bearer ${idToken}`} : {})
         },
         ...(data ? { body: JSON.stringify(data) } : {}),
         signal: controller.signal
