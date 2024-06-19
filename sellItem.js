@@ -1036,7 +1036,10 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
       // Don't do anything if both brand and material already filled in
       return;
     }
-    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemBrandAndMaterialAndSize')({ imageUrl });
+    const response = await callBackendApi('/api/images/detectInfo', {
+      data: { imageUrl },
+      requiresAuth: false,
+    });
     if (!document.querySelector('#itemBrand').value.length && response.data?.brand) {
       document.querySelector('#itemBrand').value = response.data.brand;
       document.querySelector('#itemBrand').setCustomValidity('Bekräfta eller ändra märket');
@@ -1072,7 +1075,7 @@ async function detectAndFillColor(imageUrl) {
     return;
   }
   try {
-    const response = await firebase.app().functions("europe-west1").httpsCallable('detectItemColor')({ imageUrl });
+    const response = await callBackendApi('/api/images/detectColor', { data: { imageUrl }, requiresAuth: false });
     if (!response.data?.colors || !response.data.colors.length) {
       console.log("Unable to detect product color");
       return;

@@ -84,7 +84,10 @@ export async function enhanceFrontImage(imageUrl, saveState = true) {
 
 async function createEnhancedImage(imageUrl) {
   try {
-    const response = await firebase.app().functions("europe-west1").httpsCallable('enhanceFrontImage')({ imageUrl });
+    const response = await callBackendApi('/api/images/enhance', {
+      data: { imageUrl },
+      requiresAuth: false
+    });
     sessionStorage.setItem('enhancedFrontImage', response.data.url)
     return response.data;
   } catch (ex) {

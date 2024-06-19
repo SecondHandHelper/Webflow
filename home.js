@@ -42,9 +42,7 @@ function loadRecentlySold() {
 
 async function fetchAndLoadRecentlyAddedItems() {
   try {
-    const response = await firebase.app().functions("europe-west1").httpsCallable(
-      'fetchMaiShopRecentlyAddedItems',
-    )()
+    const response = await callBackendApi('/api/shopify/recentlyAddedItems');
     const itemList = document.getElementById('ItemListRecentlyAddedItems');
     const itemListDesktop = document.getElementById('ItemListRecentlyAddedItemsDesktop');
     itemList.innerHTML = "";
