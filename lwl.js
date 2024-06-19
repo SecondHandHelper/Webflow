@@ -101,7 +101,10 @@ document.getElementById('doneButton').addEventListener('click', () => {
         data: {
           itemData: message.data,
           url: lwlThreadUrl.value,
-        }, timeoutSec: 240 });
+        },
+        timeoutSec: 240,
+        requiresAuth: false
+      });
       if (authUser.current) {
         location.href = '/private#wardrobe';
       } else {
