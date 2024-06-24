@@ -9,7 +9,7 @@ async function updateUserAddress() {
     try {
         loadOnSavePressed()
         await callBackendApi('/api/users', {
-          data: getFormAddressFields(),
+          data: { data: getFormAddressFields() },
           method: 'PUT'
         })
         await onUpdateComplete()
@@ -29,7 +29,7 @@ async function updateShippingPreference() {
         }
     }
     await callBackendApi('/api/users', {
-      data: { preferences: { shippingMethod } },
+      data: { data: { preferences: { shippingMethod } } },
       method: 'PUT'
     })
     await onUpdateComplete()
@@ -39,7 +39,7 @@ async function updateContactNumbers(isSwish) {
     try {
         loadOnSavePressed()
         await callBackendApi('/api/users',{
-          data: getCleanedNumber(isSwish),
+          data: { data: getCleanedNumber(isSwish) },
           method: 'PUT'
         })
         await onUpdateComplete()
@@ -52,7 +52,7 @@ async function updateUserPersonId() {
     try {
         loadOnSavePressed()
         await callBackendApi('/api/users', {
-          data: { personalId: formatPersonalId(personalId.value.trim().replace(/\D/g, '')) },
+          data: { data: { personalId: formatPersonalId(personalId.value.trim().replace(/\D/g, '')) } },
           method: 'PUT'
         })
         await onUpdateComplete()
