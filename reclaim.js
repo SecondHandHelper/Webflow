@@ -27,8 +27,9 @@ function initializePage(item) {
       thankYouDiv.style.display = 'none';
       itemBanner.style.display = 'block';
       qrCodeImage.style.backgroundImage = `url('${item.returnQrCode}')`;
-      postnordQrCodeDiv.href = item.returnQrCodePage;
+      postnordQrCodeLink.href = item.returnQrCodePage;
       postnordQrCodeDiv.style.display = 'flex';
+      shippingText.innerText = `När det skickats så återbetalar vi dig och skickar bekräftelse till din email ${contact}`;
     } else if (item?.reclaim?.status){
       // Om reclaim redan finns -> Gå direkt till Tack!
       hideAllButtons();
