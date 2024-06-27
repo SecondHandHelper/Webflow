@@ -19,13 +19,23 @@ function initializePage(item) {
     discount10PercentText.innerText = `Behålla plagget och få ${compensation} kr återbetalt`;
     const contact = item.buyer.Email || item.buyer.PhoneNumber;
     thankYouText.innerText = `Vi tittar på ärendet och skickar svar ${contact.includes('@') ? `till din email ${contact}` : `på SMS till ditt telefonnummer ${contact}`}`;
-    // Om reclaim redan finns -> Gå direkt till Tack!
-    if (item?.reclaim?.status){
-        hideAllButtons();
-        toMaiButton.style.display = 'flex';
-        introDiv.style.display = 'none';
-        thankYouDiv.style.display = 'block';
-        itemBanner.style.display = 'block';
+    // Om postnord qr code finns -> Visa den
+    if (item?.returnQrCode) {
+      hideAllButtons();
+      toMaiButton.style.display = 'flex';
+      introDiv.style.display = 'none';
+      thankYouDiv.style.display = 'none';
+      itemBanner.style.display = 'block';
+      qrCodeImage.style.backgroundImage = `url('${item.returnQrCode}')`;
+      postnordQrCodeDiv.href = item.returnQrCodePage;
+      postnordQrCodeDiv.style.display = 'flex';
+    } else if (item?.reclaim?.status){
+      // Om reclaim redan finns -> Gå direkt till Tack!
+      hideAllButtons();
+      toMaiButton.style.display = 'flex';
+      introDiv.style.display = 'none';
+      thankYouDiv.style.display = 'block';
+      itemBanner.style.display = 'block';
     }
 }
 
