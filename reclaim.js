@@ -243,7 +243,10 @@ async function saveReclaim(itemId) {
     // Save reclaim
     console.log('Will update: ', { itemId, reclaim });
     reclaim.images = await uploadImages(itemId);
-    await callBackendApi(`/api/items/${itemId}/reclaim`, { data: { reclaim }});
+    await callBackendApi(`/api/items/${itemId}/reclaim`, {
+      data: { reclaim },
+      requiresAuth: false,
+    });
     return true
 }
 
