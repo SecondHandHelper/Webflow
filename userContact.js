@@ -24,7 +24,7 @@ const pageSetUp = async () => {
     if (document.getElementById('wf-form-User-Details').reportValidity()) {
       try {
         await callBackendApi('/api/users', {
-          data: { phoneNumber: formatPhoneNumber(phoneNumber.value), personalId: formatPersonalId(personalId.value) },
+          data: { data: { phoneNumber: formatPhoneNumber(phoneNumber.value), personalId: formatPersonalId(personalId.value) } },
           method: 'PUT'
         });
       } catch (e) {

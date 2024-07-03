@@ -112,7 +112,7 @@ async function sellItemMainAuthenticated() {
       const shippingMethod = sessionStorage.getItem('shippingMethod');
       if (shippingMethod) {
         await callBackendApi('/api/users', {
-          data: { preferences: { shippingMethod } },
+          data: { data: { preferences: { shippingMethod } } },
           method: 'PUT'
         });
       }
