@@ -5,8 +5,8 @@ function initializePage(item) {
     document.getElementById('itemTitle').innerText = itemTitle;
     document.getElementById('itemTitleBanner').innerText = itemTitle;
     const soldDate = new Date(item.soldDate).toLocaleDateString('sv-SE', { day: 'numeric', month: 'long', year: 'numeric' });
-    const subtitleText = `${item.soldPrice} kr, ${soldDate}`;
-    document.getElementById('itemSubtitle').innerText = 'Köptes för ' + subtitleText;
+    const subtitleText = `Köptes ${soldDate}${item.soldPlatform && item.soldPlatform !== 'Other'? ` via ${item.soldPlatform}`: ''}`;
+    document.getElementById('itemSubtitle').innerText = subtitleText;
     document.getElementById('itemSubtitleBanner').innerText = subtitleText;
     const imageUrl = window.innerWidth <= 400 ?
         item?.images?.modelImage || item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || item?.images?.frontImageSmall || item?.images?.frontImage :
