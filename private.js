@@ -388,7 +388,7 @@ async function showInactiveItemsSection() {
     return 0;
   });
   const inactiveItemsDiv = document.querySelector('#inactiveItemsDiv');
-  inactiveItemsDiv.style.display = 'block'
+  inactiveItemsDiv.style.display = 'block';
   const itemCard = inactiveItemsDiv.querySelector('#inactiveItemCard');
   const itemList = inactiveItemsDiv.querySelector('#inactiveItemList');
   itemList.innerHTML = '';

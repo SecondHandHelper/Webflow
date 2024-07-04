@@ -173,8 +173,10 @@ function hideAllButtons() {
 
 function getFormImages() {
     let elements = document.querySelectorAll("input").values();
+    var elementsArr = [...elements];
     let images = [];
-    elements.forEach(elem => {
+    console.log('elementsArr', elementsArr);
+    elementsArr.forEach(elem => {
         if (elem.id.includes("Image") && elem.files[0]) {
             images.push(elem.files[0]);
         }
