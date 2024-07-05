@@ -449,11 +449,15 @@ async function showInYourWardrobeSection() {
       location.href = `/sell-item?id=${item.id}&type=${item.status === 'Draft' ? 'draft' : 'resell'}`;
     });
     newItemCard.querySelector('.resell-button').href = `/sell-item?id=${item.id}&type=${item.status === 'Draft' ? 'draft' : 'resell'}`;
+    
     newItemCard.querySelector('.resell-item-title').innerText = `${item.cleanedBrand || item.brand?.trim()}`;
     newItemCard.querySelector('.resell-subtext').innerText = `${[item.category, item.maiSize].filter(i => i).join(', ')}`;
     const draftSource = (item.soldPlatform || item.draftSource === 'Mai purchase') ? `Köpt via Mai` :
       (item.draftSource === 'Digital receipt' ? 'Från digitalt kvitto' : (item.draftSource === 'lwl' ? 'Från LWL' : ''));
     newItemCard.querySelector('.resell-sub-subtext').innerText = draftSource;
+    const buttonId = (item.soldPlatform || item.draftSource === 'Mai purchase') ? 'resellPurchaseButton' :
+      (item.draftSource === 'Digital receipt' ? 'resellDigitalReceiptButton' : (item.draftSource === 'lwl' ? 'resellLwlButton' : ''));
+    newItemCard.querySelector('.resell-button').id = buttonId;
     newItemCard.querySelector('#wardrobeDotsButton').addEventListener('click', async (e) => {
       itemMoreMenu.style.display = 'block';
       setTimeout(() => itemMoreMenu.classList.add('sticky-bottom-show'), 0);
