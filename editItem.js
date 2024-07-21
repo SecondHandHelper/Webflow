@@ -209,7 +209,7 @@ async function fillForm(itemId) {
     }
     console.log("Item data:", data);
     const itemDetailsCollapsed = document.getElementById('itemDetailsCollapsed');
-    let collapsedText = [data.category, data.size, data.material, data.brand].join(', ').substring(0, 30) + '...';
+    let collapsedText = [data.category, data.size, data.material, data.brand].join(', ')/*.substring(0, 30) + '...'*/;
     itemDetailsCollapsed.innerText = collapsedText;
     document.getElementById('itemDetailsCollapsedDiv').style.display = 'flex';
     document.getElementById('itemDetailsCollapsedDiv').addEventListener('click', () => {
