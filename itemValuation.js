@@ -29,7 +29,7 @@ async function showDeclineValuation(item) {
         window.location.href = '/private';
     });
     if (item.id) {
-        await callBackendApi(`/api/valuation/${itemId}/reject`, { data: { userDecline: false }});
+        await callBackendApi(`/api/valuation/${item.id}/reject`, { data: { userDecline: false }});
     }
 }
 
@@ -220,7 +220,7 @@ const initialPageSetup = (item) => {
 
 const rejectValuation = async (item) => {
     if (item.id) {
-      await callBackendApi(`/api/valuation/${itemId}/reject`, { data: { userDecline: true }});
+      await callBackendApi(`/api/valuation/${item.id}/reject`, { data: { userDecline: true }});
     }
     sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
     const params = getParamsObject();
