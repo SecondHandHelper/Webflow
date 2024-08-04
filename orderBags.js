@@ -76,6 +76,7 @@ document.getElementById('userAddressForm').addEventListener("submit", async () =
   const userRef = db.collection('users').doc(authUser.current.uid);
   await userRef.update(addressFields);
   document.getElementById('orderBagsConfirmation').style.display = 'block';
+  analytics.track("Element Viewed", { elementID: "orderBagsConfirmation" });
   document.getElementById('addressFormDiv').style.display = 'none';
 });
 
@@ -128,6 +129,7 @@ document.getElementById('orderBags').addEventListener('click', async function ()
     const userDocRef = await db.collection('users').doc(authUser.current.uid).get();
     const userDoc = userDocRef.data();
     document.getElementById('addressFormDiv').style.display = 'block';
+    analytics.track("Element Viewed", { elementID: "addressFormDiv" });
     setFormAddressFields(userDoc);
   }
 });
