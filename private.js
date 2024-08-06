@@ -462,7 +462,7 @@ async function showInYourWardrobeSection() {
       itemMoreMenu.style.display = 'block';
       setTimeout(() => itemMoreMenu.classList.add('sticky-bottom-show'), 0);
       itemMoreMenu.dataset.itemId = item.id;
-      itemMoreMenu.dataset.section = 'inactive';
+      itemMoreMenu.dataset.section = 'wardrobe';
       e.preventDefault();
       e.stopPropagation();
     });
@@ -498,7 +498,10 @@ function setupBottomMenuPopupListeners() {
       if (!visibleChildren) {
         document.getElementById('inactiveItemsDiv').style.display = 'none';
       }
-      await callBackendApi(`/api/items/unsold/${itemMoreMenu.dataset.itemId}`, { method: 'DELETE' });
+      await callBackendApi(`/api/items/unsold/${itemMoreMenu.dataset.itemId}`, { 
+        method: 'DELETE',
+        data: {itemId: itemMoreMenu.dataset.itemId}
+      });
     } else {
       const itemList = document.getElementById('wardrobeItemList');
       const visibleChildren = Array.from(itemList.children).find(it => it.style.display !== 'none')
