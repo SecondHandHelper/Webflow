@@ -106,13 +106,20 @@ function noCommissionCampaign() {
   const cookie = getCookie(cookieName);
   const random = Math.random();
   const dateNow = new Intl.DateTimeFormat('se-SV').format(new Date());
-  const campaignDateOk = dateNow >= '2024-03-04' && dateNow <= '2024-03-10';
+  const campaignDateOk = dateNow >= '2024-08-12' && dateNow <= '2024-08-18';
+  if (campaignDateOk) {
+    showNoCommissionCampaign();
+    setCookie(cookieName, 'noCommission', 7);
+  }
+  /*
+  //A/B test code
   if (campaignDateOk && (cookie === 'noCommission' || (!cookie.length && random > 0.5))) {
     showNoCommissionCampaign();
     setCookie(cookieName, 'noCommission', 7);
   } else if (campaignDateOk && !cookie.length && random <= 0.5) {
     setCookie(cookieName, 'commission', 7);
   }
+  */
 }
 
 authUser.whenSet(signedInNextStep);

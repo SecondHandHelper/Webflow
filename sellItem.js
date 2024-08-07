@@ -650,7 +650,7 @@ function isElementInView(el) {
 }
 
 async function setCampaignCoupon() {
-  const campaignDateOk = new Intl.DateTimeFormat('se-SV').format(new Date()) <= '2024-03-10';
+  const campaignDateOk = new Intl.DateTimeFormat('se-SV').format(new Date()) <= '2024-08-18';
   if (campaignDateOk && getCookie('noCommissionCampaignCookie') === 'noCommission' && (await userItemsCount()) === 1) {
     await callBackendApi('/api/users/noCommissionCoupon', { method: 'PUT' });
   }

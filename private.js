@@ -1,7 +1,7 @@
-import {itemCoverImage, shareCode, signOut} from "./general";
-import {loadInfoRequests} from "./infoRequestsFunctions";
-import {loadItemCards} from "./loadItemCards";
-import {requestUniqueId} from "./sellItemHelpers";
+import { itemCoverImage, shareCode, signOut } from "./general";
+import { loadInfoRequests } from "./infoRequestsFunctions";
+import { loadItemCards } from "./loadItemCards";
+import { requestUniqueId } from "./sellItemHelpers";
 
 var userId;
 var email;
@@ -69,7 +69,7 @@ function prepareMenu(u) {
   } else if (u.signInMethod === 'password' && u.email) {
     identifier = u.email;
     signInMethodText = 'Inloggad med email';
-  } else if (u.signInMethod === 'google.com' && u.email){
+  } else if (u.signInMethod === 'google.com' && u.email) {
     identifier = u.email;
     signInMethodText = 'Inloggad med Google';
   }
@@ -119,7 +119,7 @@ function showInviteToast(items) {
   // Last viewed
   let inviteToastViews = user.current?.elementViews ? user.current.elementViews.filter(e => e.elementID === 'inviteToast') : [];
   const daysSinceToastViewsArray = inviteToastViews.length ? Array.from(inviteToastViews, (e) =>
-    parseInt(Math.floor((nowDate.getTime() - (e.timestamp.seconds*1000)) / (1000 * 3600 * 24)))) : [];
+    parseInt(Math.floor((nowDate.getTime() - (e.timestamp.seconds * 1000)) / (1000 * 3600 * 24)))) : [];
   const daysSinceToastLastViewed = daysSinceToastViewsArray.length ? Math.min(...daysSinceToastViewsArray) : null;
   let viewedToastBefore = !!inviteToastViews.length;
 
@@ -307,6 +307,7 @@ async function privateMain() {
   fetchAndShowRecommendedItems(items);
   showReferralSection();
   showBonusSection();
+  showCommissionFreeBonus(items);
   prepareMenu(user.current);
   loadInfoRequests(items);
   showHolidayModeDiv(items);
@@ -317,6 +318,24 @@ async function privateMain() {
   }
 }
 
+function showCommissionFreeBonus(items) {
+  const cookieName = 'noCommissionCampaignCookie';
+  const cookie = getCookie(cookieName);
+  const dateNow = new Intl.DateTimeFormat('se-SV').format(new Date());
+  const campaignDateOk = dateNow >= '2024-08-12' && dateNow <= '2024-08-18';
+  const itemsCount = items.filter(i => i?.status !== 'Draft').length;
+  if (cookie === 'noCommission' && campaignDateOk && itemsCount < 1 && (bonusActivatedState.style.display === 'none' || bonusActivatedState.style.display === '')) {
+    if (document.getElementById("bonusSection")) {
+      document.getElementById("bonusName").innerHTML = 'KAMPANJ - T.o.m sön 18/8';
+      document.getElementById("bonusTitle").innerHTML = 'Sälj första gratis';
+      document.getElementById("bonusText").innerHTML = 'Lägg upp ett plagg senast söndag 18 augusti så får du behålla 100% av vinsten för ditt första sålda plagg (istället för 80%).';
+      document.getElementById("bonusActivatedState").style.display = 'block';
+      document.getElementById("enterCodeState").style.display = 'none';
+      bonusSection.style.display = 'block';
+    }
+  }
+}
+
 function showHolidayModeDiv(items) {
   if (items) {
     items.forEach((item) => {
@@ -324,14 +343,14 @@ function showHolidayModeDiv(items) {
       const archived = item.archived;
 
       if (!archived && status === 'Published' && item.publishedDate) {
-          const date = new Date(item.publishedDate);
-          const nowDate = new Date();
-          const daysDiff = Math.floor((nowDate.getTime() - date.getTime()) / (1000 * 3600 * 24));
-          if (daysDiff <= 45) {
-            document.getElementById('holidayModeDiv').style.display = 'block';
-            document.getElementById('openHolidayChat').onclick = () => Intercom('showNewMessage', 'När reser du iväg, och när är du tillbaka?\n\n');
-          }
+        const date = new Date(item.publishedDate);
+        const nowDate = new Date();
+        const daysDiff = Math.floor((nowDate.getTime() - date.getTime()) / (1000 * 3600 * 24));
+        if (daysDiff <= 45) {
+          document.getElementById('holidayModeDiv').style.display = 'block';
+          document.getElementById('openHolidayChat').onclick = () => Intercom('showNewMessage', 'När reser du iväg, och när är du tillbaka?\n\n');
         }
+      }
     });
   }
 }
@@ -449,7 +468,7 @@ async function showInYourWardrobeSection() {
       location.href = `/sell-item?id=${item.id}&type=${item.status === 'Draft' ? 'draft' : 'resell'}`;
     });
     newItemCard.querySelector('.resell-button').href = `/sell-item?id=${item.id}&type=${item.status === 'Draft' ? 'draft' : 'resell'}`;
-    
+
     newItemCard.querySelector('.resell-item-title').innerText = `${item.cleanedBrand || item.brand?.trim()}`;
     newItemCard.querySelector('.resell-subtext').innerText = `${[item.category, item.maiSize].filter(i => i).join(', ')}`;
     const draftSource = (item.soldPlatform || item.draftSource === 'Mai purchase') ? `Köpt via Mai` :
@@ -498,9 +517,9 @@ function setupBottomMenuPopupListeners() {
       if (!visibleChildren) {
         document.getElementById('inactiveItemsDiv').style.display = 'none';
       }
-      await callBackendApi(`/api/items/unsold/${itemMoreMenu.dataset.itemId}`, { 
+      await callBackendApi(`/api/items/unsold/${itemMoreMenu.dataset.itemId}`, {
         method: 'DELETE',
-        data: {itemId: itemMoreMenu.dataset.itemId}
+        data: { itemId: itemMoreMenu.dataset.itemId }
       });
     } else {
       const itemList = document.getElementById('wardrobeItemList');
@@ -510,7 +529,7 @@ function setupBottomMenuPopupListeners() {
       }
       await callBackendApi(`/api/items/wardrobe/${itemMoreMenu.dataset.itemId}`, {
         method: 'DELETE',
-        data: {itemId: itemMoreMenu.dataset.itemId}
+        data: { itemId: itemMoreMenu.dataset.itemId }
       });
     }
   });
@@ -541,7 +560,7 @@ async function showNpsSurvey(items) {
 
   // Last viewed
   const x = user.current?.elementViews ? user.current.elementViews.reverse().find(e => e.elementID === 'npsSurvey') : null;
-  const surveyLastViewed = x ? new Date(x.timestamp.seconds*1000) : null;
+  const surveyLastViewed = x ? new Date(x.timestamp.seconds * 1000) : null;
   const daysSinceSurveyLastViewed = surveyLastViewed ? Math.floor((nowDate.getTime() - surveyLastViewed.getTime()) / (1000 * 3600 * 24)) : null;
 
   if (items) {
@@ -578,7 +597,7 @@ async function fetchAndShowRecommendedItems(items) {
   try {
     const ids = [];
     items.forEach(item => ids.push(item.id));
-    const query = ids.slice(0, 10).map(id => `items=${ id }`).join('&') + '&number=20';
+    const query = ids.slice(0, 10).map(id => `items=${id}`).join('&') + '&number=20';
     const response = await callBackendApi(`/api/items/recommendations?${query}`, { requiresAuth: true });
     if (!response.data.length) {
       return;
@@ -715,7 +734,7 @@ function onLoadHandler() {
     Intercom('update', {
       "hide_default_launcher": false
     });
-  }); 
+  });
 }
 if (localStorage.getItem('lwlItemDrafts')) {
   location.href = '/lwl?createDrafts=true';
