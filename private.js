@@ -310,7 +310,7 @@ async function privateMain() {
   showCommissionFreeBonus(items);
   prepareMenu(user.current);
   loadInfoRequests(items);
-  showHolidayModeDiv(items);
+  //showHolidayModeDiv(items);
 
   // Create refCode
   if (user.current && user.current.addressFirstName && user.current.addressLastName && !user.current?.referralData?.referralCode) {
