@@ -24,8 +24,13 @@ export const showSelectedModel = (model) => {
   }
   if (model['gender']) {
     document.getElementById('findModelBoxGender').style.display = 'block';
-    const genders = { 'Woman': 'Dam', 'Man': 'Herr' }
-    document.getElementById('findModelBoxGender').innerText = `${genders[model['gender']] || model['gender']}`;
+    const allGenderModels = allModelsMatching(model);
+    if (allGenderModels.length === 2) {
+      document.getElementById('findModelBoxGender').innerText = `Dam / Herr`;
+    } else {
+      const genders = { 'Woman': 'Dam', 'Man': 'Herr' }
+      document.getElementById('findModelBoxGender').innerText = `${genders[model['gender']] || model['gender']}`;
+    }
   } else {
     document.getElementById('findModelBoxGender').style.display = 'none';
   }
