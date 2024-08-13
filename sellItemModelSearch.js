@@ -1,5 +1,5 @@
 import {rememberUnsavedChanges} from "./sellItem";
-import {capitalizeFirstLetter} from "./sellItemHelpers";
+import {capitalizeFirstLetter, colorName} from "./sellItemHelpers";
 
 export const setFieldValue = (fieldId, value) => {
   document.getElementById(fieldId).value = value || '';
@@ -18,13 +18,14 @@ export const showSelectedModel = (model) => {
   document.getElementById('findModelBoxName').innerText = `${model['maiName']}`;
   if (model['color']) {
     document.getElementById('findModelBoxColor').style.display = 'block';
-    document.getElementById('findModelBoxColor').innerText = `${capitalizeFirstLetter(model['color'])}`;
+    document.getElementById('findModelBoxColor').innerText = `${colorName(capitalizeFirstLetter(model['color']))}`;
   } else {
     document.getElementById('findModelBoxColor').style.display = 'none';
   }
   if (model['gender']) {
     document.getElementById('findModelBoxGender').style.display = 'block';
-    document.getElementById('findModelBoxGender').innerText = `${model['gender']}`;
+    const genders = { 'Woman': 'Dam', 'Man': 'Herr' }
+    document.getElementById('findModelBoxGender').innerText = `${genders[model['gender']] || model['gender']}`;
   } else {
     document.getElementById('findModelBoxGender').style.display = 'none';
   }
@@ -133,7 +134,7 @@ const showModelItems = (models) => {
     const sameModelOtherGender = models.find(m => m.maiName === model.maiName && m.color === model.color &&
       m.category === model.category && m.gender !== model.gender);
     if (sameModelOtherGender) {
-      model.multiGender = 'Man / Woman';
+      model.multiGender = 'Dam / Herr';
     }
     return !sameModelOtherGender || model.gender === 'Woman';
   })
@@ -153,12 +154,13 @@ const showModelItems = (models) => {
     document.getElementById(`brandNameCategory_${idx}`).innerText = `${[model['brand'], model['category']].filter(e => e).join(', ')}`;
     document.getElementById(`modelName_${idx}`).innerText = `${model['maiName']}`;
     if (model['color']) {
-      document.getElementById(`modelColor_${idx}`).innerText = `${capitalizeFirstLetter(model['color'])}`;
+      document.getElementById(`modelColor_${idx}`).innerText = `${colorName(capitalizeFirstLetter(model['color']))}`;
     } else {
       document.getElementById(`modelColor_${idx}`).style.display = 'none';
     }
     if (model['multiGender'] || model['gender']) {
-      document.getElementById(`modelGender_${idx}`).innerText = `${model['multiGender'] || model['gender']}`;
+      const genders = { 'Woman': 'Dam', 'Man': 'Herr' };
+      document.getElementById(`modelGender_${idx}`).innerText = `${model['multiGender'] || genders[model['gender']] || model['gender']}`;
     } else {
       document.getElementById(`modelGender_${idx}`).style.display = 'none';
     }

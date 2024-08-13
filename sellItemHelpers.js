@@ -373,3 +373,12 @@ export function fieldLabelToggle(labelId) {
     document.getElementById(labelId).style.display = event.target.value.length > 0 ? 'inline-block' : 'none'
   }
 }
+
+export function colorName(color) {
+  const mapping = {
+    Beige: 'Beige', Blue: 'Blå', Brown: 'Brun', Green: 'Grön', Grey: 'Grå', Yellow: 'Gul', Gold: 'Guld',
+    Purple: 'Lila', Navy: 'Navy', Orange: 'Orange', Pink: 'Rosa', Red: 'Röd', Silver: 'Silver', Black: 'Svart',
+    Turquoise: 'Turkos', Burgundy: 'Vinröd', White: 'Vit', Multicolour: 'Flerfärgad'
+  };
+  return mapping[color] || color;
+}
