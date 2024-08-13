@@ -472,12 +472,7 @@ function collect() {
   const modelBoxFilled = document.getElementById('findModelBoxFilled');
   let modelVariantFields = {};
   if (modelBoxFilled.style.display === 'flex') {
-    // There is a current model selected grab the cover image and id from it
-    const modelData = JSON.parse(modelBoxFilled.getAttribute('data-model'));
-    modelVariantFields = {
-      modelCoverImageUrl: modelData['coverImage'],
-      atModelVariantId: modelData['atVariantId'],
-    }
+    modelVariantFields = JSON.parse(modelBoxFilled.getAttribute('data-model'));
   }
 
   const images = JSON.parse(localStorage.getItem('newItem') || '{}').images
@@ -502,7 +497,7 @@ function collect() {
     userComment,
     acceptPrice,
     preferences: { userValuationApproval: true },
-    ...modelVariantFields,
+    modelVariantFields,
     images,
   };
 }
@@ -526,7 +521,7 @@ async function getShippingMethod() {
 }
 
 async function addItemInner(id, status = 'New') {
-  const { modelCoverImageUrl, images, ...pageData } = collect();
+  const { modelVariantFields: { coverImage: modelCoverImageUrl, atVariantId }, images, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
   if (modelCoverImageUrl) {
     images['modelImage'] = modelCoverImageUrl;
@@ -534,7 +529,7 @@ async function addItemInner(id, status = 'New') {
   const createdFromItem = (params.id && params.type !== 'draft') ? { createdFromItem: params.id } : {};
   const isCreatedFromItem = Object.keys(createdFromItem).length ? true : false;
   const draftSource = status === 'Draft' ? { draftSource: isCreatedFromItem ? 'Mai purchase' : 'Sell item' } : {};
-  const item = { ...pageData, status, ...draftSource, shippingMethod, images, ...createdFromItem, version: "2" };
+  const item = { ...pageData, status, ...draftSource, shippingMethod, images, ...createdFromItem, atVariantId, version: "2" };
 
   if (!authUser.current) {
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
@@ -670,16 +665,16 @@ async function createItemAfterSignIn() {
 
 const shouldSaveState = () => !(localStorage.getItem('latestItemCreated') || itemDraftSaved || params.id);
 
-function rememberUnsavedChanges() {
+export function rememberUnsavedChanges() {
   if (!shouldSaveState()) {
     return;
   }
   const {
-    user, createdAt, status, shippingStatus, modelVariantFields, ...itemToSave
+    user, createdAt, status, shippingStatus, ...itemToSave
   } = collect();
   // Replace '' with null values
   const item = Object.keys(itemToSave).reduce((acc, key) => {
-    acc[key] = itemToSave[key] === '' ? null : itemToSave[key];
+    acc[key] = itemToSave[key] === '' || jQuery.isEmptyObject(itemToSave[key]) ? null : itemToSave[key];
     return acc;
   }, {});
   item.defects = item.defects ? item.defects : [];
@@ -800,12 +795,8 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
     itemBrand.value = data.brand || '';
     data.brand ? displayFindModelDiv(data.brand).then(
       () => {
-        if (sessionStorage.getItem('models') && data.atModelVariantId) {
-          const models = JSON.parse(sessionStorage.getItem('models'));
-          const model = models.find(m => m.atVariantId === data.atModelVariantId);
-          if (model) {
-            showSelectedModel(JSON.stringify(model));
-          }
+        if (sessionStorage.getItem('models') && data.modelVariantFields) {
+          showSelectedModel(data.modelVariantFields);
         }
       }
     ) : null;
