@@ -172,9 +172,25 @@ const showModelItems = (models) => {
   }
 }
 
+const mostPopularEytysModels = [ "mother ", "odessa ", "benz ", "doja ", "angel ",
+  "fugu ", "naomi ", "cypress ", "titan ", "laguna ", "aphex ", "jet turbo ", "maze ", "ortega ", "raven ",
+  "alexia ", "carmen ", "ferris ", "halo ", "jade ", "jet ", "michigan ", "olympia ", "sonic " ];
+
 function modelCompare(a, b) {
   const nameA = a["maiName"].toLowerCase();
   const nameB = b["maiName"].toLowerCase();
+  const popIdx = (name) => mostPopularEytysModels.find(e => name.startsWith(e)) ? mostPopularEytysModels.findIndex(e => name.startsWith(e)) : 100
+  const nameAPopIdx = popIdx(nameA);
+  const nameBPopIdx = popIdx(nameB);
+  if (nameAPopIdx < 100 || nameBPopIdx < 100) {
+    if (nameAPopIdx < 100 && nameBPopIdx < 100) {
+      return 0
+    } else if (nameAPopIdx < 100) {
+      return -1;
+    } else if (nameBPopIdx < 100) {
+      return 1;
+    }
+  }
   if (nameA > nameB) {
     return 1;
   }
@@ -213,12 +229,12 @@ function showFindModelPage() {
       if (modelDb) {
         clearInterval(timerId);
         document.getElementById('modelSpinner').style.display = 'none';
-        showModelItems(JSON.parse(modelDb).sort(modelCompare));
+        showModelItems(JSON.parse(modelDb).sort(modelCompare).slice(0, 500));
       }
     }, 1000);
   } else {
     document.getElementById('modelSpinner').style.display = 'none';
-    showModelItems(JSON.parse(modelDb).sort(modelCompare));
+    showModelItems(JSON.parse(modelDb).sort(modelCompare).slice(0, 500));
   }
 }
 
@@ -248,7 +264,7 @@ export const setupModelSearchEventListeners = () => {
       const searchResult = fuse.search(modelSearchString.replace(', ', ' '));
       showModelItems(searchResult.map(r => r.item));
     } else {
-      showModelItems(modelDb.sort(modelCompare));
+      showModelItems(modelDb.sort(modelCompare).slice(0, 500));
     }
   })
 
