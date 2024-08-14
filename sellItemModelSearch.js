@@ -16,9 +16,9 @@ export const showSelectedModel = (model) => {
   document.getElementById('findModelBoxImage').style.backgroundImage = `url('${model["coverImageSmall"]}')`;
   document.getElementById('findModelBoxNameCategory').innerText = `${model['brand']}, ${model['category']}`;
   document.getElementById('findModelBoxName').innerText = `${model['maiName']}`;
-  if (model['color']) {
+  if (model['maiColor']) {
     document.getElementById('findModelBoxColor').style.display = 'block';
-    document.getElementById('findModelBoxColor').innerText = `${colorName(capitalizeFirstLetter(model['color']))}`;
+    document.getElementById('findModelBoxColor').innerText = `${colorName(capitalizeFirstLetter(model['maiColor']))}`;
   } else {
     document.getElementById('findModelBoxColor').style.display = 'none';
   }
@@ -55,8 +55,8 @@ const selectSize = (model) => (event) => {
     document.getElementById('itemCategory').value = model['category'];
     $('#itemCategory').trigger('change');
   }
-  if (document.getElementById('itemColor').querySelector('[value="' + capitalizeFirstLetter(model['color']) + '"]')) {
-    document.getElementById('itemColor').value = model['color'];
+  if (document.getElementById('itemColor').querySelector('[value="' + capitalizeFirstLetter(model['maiColor']) + '"]')) {
+    document.getElementById('itemColor').value = model['maiColor'];
     $('#itemColor').trigger('change');
   }
 }
@@ -158,8 +158,8 @@ const showModelItems = (models) => {
     document.getElementById(`modelImage_${idx}`).src = model['coverImageSmall'];
     document.getElementById(`brandNameCategory_${idx}`).innerText = `${[model['brand'], model['category']].filter(e => e).join(', ')}`;
     document.getElementById(`modelName_${idx}`).innerText = `${model['maiName']}`;
-    if (model['color']) {
-      document.getElementById(`modelColor_${idx}`).innerText = `${colorName(capitalizeFirstLetter(model['color']))}`;
+    if (model['maiColor']) {
+      document.getElementById(`modelColor_${idx}`).innerText = `${colorName(capitalizeFirstLetter(model['maiColor']))}`;
     } else {
       document.getElementById(`modelColor_${idx}`).style.display = 'none';
     }
@@ -183,12 +183,10 @@ function modelCompare(a, b) {
   const nameAPopIdx = popIdx(nameA);
   const nameBPopIdx = popIdx(nameB);
   if (nameAPopIdx < 100 || nameBPopIdx < 100) {
-    if (nameAPopIdx < 100 && nameBPopIdx < 100) {
-      return 0
-    } else if (nameAPopIdx < 100) {
+    if (nameAPopIdx > nameBPopIdx) {
+      return 1
+    } else if (nameAPopIdx < nameBPopIdx) {
       return -1;
-    } else if (nameBPopIdx < 100) {
-      return 1;
     }
   }
   if (nameA > nameB) {
@@ -285,12 +283,8 @@ export const displayFindModelDiv = async (value) => {
       findModelDiv.style.display = 'block';
       let models = sessionStorage.getItem('models') ? JSON.parse(sessionStorage.getItem('models')) : undefined;
       if (!models) {
-        let response = await fetch('https://getbrandmodels-heypmjzjfq-ew.a.run.app?brand=Eytys', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        });
-        models = await response.json();
-        sessionStorage.setItem('models', JSON.stringify(models));
+        let response = await callBackendApi(`/api/models?brand=${value}`);
+        sessionStorage.setItem('models', JSON.stringify(response.data));
       }
     } else {
       findModelDiv.style.display = 'none';
