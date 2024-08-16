@@ -99,23 +99,23 @@ function openServicePointToast(itemId, soldDate) {
   triggerServicePointToastOpen.click();
 }
 
-function openYouGetInfoBox(soldPrice, sellerGets) {  
+function openYouGetInfoBox(soldPrice, sellerGets) {
   priceAfterPlatformFee.innerHTML = soldPrice;
   const commission = soldPrice - sellerGets;
-  commissionAmount.innerHTML = commission === 0 ? '-' : '-'+commission;
-  if ((commission/soldPrice) > 0.9 && (commission/soldPrice) < 0.11) {
+  commissionAmount.innerHTML = commission === 0 ? '-' : '-' + commission;
+  if ((commission / soldPrice) > 0.9 && (commission / soldPrice) < 0.11) {
     commissionTitle.innerHTML = `Rabatterad kommission (10%)`;
   }
-  if ((commission/soldPrice) > 0.19 && (commission/soldPrice) < 0.21) {
+  if ((commission / soldPrice) > 0.19 && (commission / soldPrice) < 0.21) {
     commissionTitle.innerHTML = `Kommission (20%)`;
   }
-  if ((commission/soldPrice) > 0.29 && (commission/soldPrice) < 0.31 && commission !== 50 && commission !== 500) {
+  if ((commission / soldPrice) > 0.29 && (commission / soldPrice) < 0.31 && commission !== 50 && commission !== 500) {
     commissionTitle.innerHTML = `Kommission (30%)`;
   }
   if (commission < 1) {
     commissionTitle.innerHTML = `Fri kommission (0%)`;
   }
-  
+
   youGetAmount.innerHTML = sellerGets;
   youGetInfoBox.style.display = 'flex';
   darkOverlay.style.display = 'block';
@@ -431,6 +431,7 @@ export function loadItemCards(items) {
         var userActionDiv = '';
         var shippingInfoDiv = '';
         let changeShippingMethod = '';
+        let removeItemButton = '';
         let shipper = '';
         var text1 = `Du får ${sellerGets}`;
         var text2 = '';
@@ -511,6 +512,21 @@ export function loadItemCards(items) {
           userActionDiv = getResellButton(itemId);
           text1 = 'Köparen avbröt köpet';
           text2 = 'Skickades ej inom 7 dagar';
+          removeItemButton += `
+          <a id="removeItemButton-${itemId}" href="#" class="link-block-87">
+              <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/65269f37a18d8c128d29ed1c_trash-can%20(1).svg" class="image-154">
+              <div class="text-block-373">Ta bort plagg</div>
+          </a>`;
+          setTimeout(() => {
+            document.getElementById(`removeItemButton-${itemId}`).addEventListener('click', () => {
+              itemMoreMenu.style.display = 'block';
+              setTimeout(() => itemMoreMenu.classList.add('sticky-bottom-show'), 0);
+              itemMoreMenu.dataset.itemId = itemId;
+              itemMoreMenu.dataset.section = 'sold-not-sent';
+              e.preventDefault();
+              e.stopPropagation();
+            })
+          }, 0)
         }
 
 
@@ -520,12 +536,13 @@ export function loadItemCards(items) {
           `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><a id="itemLinkFromSoldNotSentSection" href="${itemPageUrl}"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></a></div></div></div><div class="div-block-46">
           <a id="youGetLink-${itemId}" href="#" class="you-get-link">
               <div class="text-block-43">${text1}</div>
-              ${text1 !== 'Köparen avbröt köpet'? '<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="you-get-info-icon"></img>':''}
+              ${text1 !== 'Köparen avbröt köpet' ? '<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="you-get-info-icon"></img>' : ''}
           </a>
           <div class="text-block-44">${text2}</div>
                       ${userActionDiv}
                       ${shippingInfoDiv}
                       ${changeShippingMethod}
+                      ${removeItemButton}
                   </div></div></div></div>`;
 
         setTimeout(() => {

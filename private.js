@@ -510,8 +510,8 @@ function setupBottomMenuPopupListeners() {
   document.getElementById('stickyBottomDelete').addEventListener('click', async () => {
     itemMoreMenu.classList.remove('sticky-bottom-show');
     setTimeout(() => itemMoreMenu.style.display = 'none', 500);
-    document.getElementById(itemMoreMenu.dataset.itemId).style.display = 'none';
     if (itemMoreMenu.dataset.section === 'inactive') {
+      document.getElementById(itemMoreMenu.dataset.itemId).style.display = 'none';
       const itemList = document.getElementById('inactiveItemList');
       const visibleChildren = Array.from(itemList.children).find(it => it.style.display !== 'none')
       if (!visibleChildren) {
@@ -521,7 +521,12 @@ function setupBottomMenuPopupListeners() {
         method: 'DELETE',
         data: { itemId: itemMoreMenu.dataset.itemId }
       });
+    } if (itemMoreMenu.dataset.section === 'sold-not-sent') {
+      //TODO: Archive item and reload page
+      console.log('Will remove item here through an endpoint and reload page');
+      //location.reload();
     } else {
+      document.getElementById(itemMoreMenu.dataset.itemId).style.display = 'none';
       const itemList = document.getElementById('wardrobeItemList');
       const visibleChildren = Array.from(itemList.children).find(it => it.style.display !== 'none')
       if (!visibleChildren) {
