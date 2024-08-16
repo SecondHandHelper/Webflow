@@ -70,7 +70,7 @@ const modelDb = () => {
   return modelDbModels;
 };
 
-const allModelsMatching = (model) => modelDb().filter(m => m.maiName === model.maiName && m.color === model.color &&
+const allModelsMatching = (model) => modelDb().filter(m => m.maiName === model.maiName && m.maiColor === model.maiColor &&
     m.category === model.category)
 
 const showModelSizes = (modelClicked) => {
@@ -136,7 +136,7 @@ const showModelItems = (models) => {
     modelResultList.removeChild(modelResultList.lastChild);
   }
   const modelsToShow = models.filter(model => {
-    const sameModelOtherGender = models.find(m => m.maiName === model.maiName && m.color === model.color &&
+    const sameModelOtherGender = models.find(m => m.maiName === model.maiName && m.maiColor === model.maiColor &&
       m.category === model.category && m.gender !== model.gender);
     if (sameModelOtherGender) {
       model.multiGender = 'Dam / Herr';
