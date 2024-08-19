@@ -297,7 +297,6 @@ export const displayFindModelDiv = async (value) => {
   if (featureIsEnabled('modelDB')) {
     if (value === 'Eytys') {
       findModelDiv.style.display = 'block';
-      itemModel.parentElement.style.display = 'none';
       let models = sessionStorage.getItem('models') ? JSON.parse(sessionStorage.getItem('models')) : undefined;
       if (!models) {
         let response = await callBackendApi(`/api/models?brand=${value}`);
@@ -306,7 +305,6 @@ export const displayFindModelDiv = async (value) => {
       return true;
     } else {
       findModelDiv.style.display = 'none';
-      itemModel.parentElement.style.display = 'block';
     }
   }
   return false;
