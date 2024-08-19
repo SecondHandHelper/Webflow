@@ -41,13 +41,24 @@ const selectSize = (model) => (event) => {
   showSelectedModel(model);
 
   // Fill form with attributes from selected model
-  document.getElementById(model['gender'])?.parentElement?.click();
-  setFieldValue('itemSize', event.target.innerText);
+  setFormValuesFromModel(model, event.target.innerText);
+}
+
+export const setFormValuesFromModel = (model, size, skipGender = false) => {
+  if (!skipGender) {
+    document.getElementById(model['gender'])?.parentElement?.click();
+  }
+  if (size) {
+    setFieldValue('itemSize', size);
+  }
   setFieldValue('itemMaterial', model['material']);
   setFieldValue('itemModel', model['maiName']);
   setFieldValue('itemOriginalPrice', model['originalPriceSek']);
-  if (model['collectionYear'] + 1 >= new Date().getFullYear()) {
-    document.getElementById('itemAge').selectedIndex = 1;
+  if (model['collectionYear']) {
+    const yearDiff = new Date().getFullYear() - model['collectionYear'];
+    // Depending on yearDiff value we translate to a itemAge selectedIndex using this ageIndex array
+    const ageIndex = [1, 1, 2, 3, 4, 4, 5, 5, 5];
+    document.getElementById('itemAge').selectedIndex = ageIndex[yearDiff] || 6;
     document.getElementById('itemAge').style.color = 'rgb(51, 51, 51)';
     document.getElementById('itemAge').dispatchEvent(new Event('input'));
   }
@@ -267,27 +278,36 @@ export const setupModelSearchEventListeners = () => {
   })
 
   document.getElementById('removeModelIcon').addEventListener('click', (event) => {
-    document.getElementById('findModelBoxEmpty').style.display = 'flex';
-    document.getElementById('findModelBoxFilled').style.display = 'none';
-    document.getElementById('findModelDescription').style.display = 'block';
-    document.getElementById('findNewModel').style.display = 'none';
+    removeSelectedModel()
     event.stopPropagation();
     event.preventDefault();
     rememberUnsavedChanges();
   });
 }
 
+export const removeSelectedModel = () => {
+  document.getElementById('itemModel').value = '';
+  document.getElementById('findModelBoxEmpty').style.display = 'flex';
+  document.getElementById('findModelBoxFilled').style.display = 'none';
+  document.getElementById('findModelDescription').style.display = 'block';
+  document.getElementById('findNewModel').style.display = 'none';
+}
+
 export const displayFindModelDiv = async (value) => {
   if (featureIsEnabled('modelDB')) {
     if (value === 'Eytys') {
       findModelDiv.style.display = 'block';
+      itemModel.parentElement.style.display = 'none';
       let models = sessionStorage.getItem('models') ? JSON.parse(sessionStorage.getItem('models')) : undefined;
       if (!models) {
         let response = await callBackendApi(`/api/models?brand=${value}`);
         sessionStorage.setItem('models', JSON.stringify(response.data));
       }
+      return true;
     } else {
       findModelDiv.style.display = 'none';
+      itemModel.parentElement.style.display = 'block';
     }
   }
+  return false;
 }

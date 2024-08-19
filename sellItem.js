@@ -1,21 +1,24 @@
 import {
-  capitalizeFirstLetter, checkBlockedOrLowShareSoldBrand,
-  enhanceFrontImage, initializeCategorySelect,
+  capitalizeFirstLetter,
+  checkBlockedOrLowShareSoldBrand,
+  enhanceFrontImage,
+  fieldLabelToggle,
+  initializeCategorySelect,
   rememberNewItemImageField,
   requestUniqueId,
   showDeleteImageIcon,
   showImagePreview,
   showImageState,
   showLoadingIcon,
-  uploadImageAndShowPreview,
-  fieldLabelToggle
+  uploadImageAndShowPreview
 } from "./sellItemHelpers";
 import QRCode from "qrcode";
-import {formatPersonalId, getFormAddressFields, isValidSwedishSsn} from "./general";
-import { autocomplete, brands } from "./autocomplete-brands";
+import {formatPersonalId, getFormAddressFields, isValidSwedishSsn, setFormAddressFields} from "./general";
+import {autocomplete, brands} from "./autocomplete-brands";
 import {
   displayFindModelDiv,
-  setFieldValue,
+  removeSelectedModel,
+  setFieldValue, setFormValuesFromModel,
   setupModelSearchEventListeners,
   showSelectedModel
 } from "./sellItemModelSearch";
@@ -228,10 +231,11 @@ async function sellItemMain() {
   })
 
   initializeCategorySelect();
-  await initializeColorConfirm();
-  await initializeBrandConfirm();
-  await initializeMaterialConfirm();
-  await initializeSizeConfirm();
+  initializeColorConfirm();
+  initializeBrandConfirm();
+  initializeModelConfirm();
+  initializeMaterialConfirm();
+  initializeSizeConfirm();
   initializeSuggestButtonsSaveState();
   initializeClearFormButton();
   initializeSaveFormButton();
@@ -689,6 +693,10 @@ export function rememberUnsavedChanges() {
       item[`${inputName}Confirm`] = true;
     }
   })
+  const modelSuggestButtons = document.getElementById('modelSuggestButtons');
+  if (modelSuggestButtons?.style?.display === 'flex') {
+    item['itemModelConfirm'] = true;
+  }
   if (!isDefaultFormState(item)) {
     localStorage.setItem('newItem', JSON.stringify(item));
   } else {
@@ -793,21 +801,26 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
 
     // Populate text input fields
     itemBrand.value = data.brand || '';
-    data.brand ? displayFindModelDiv(data.brand).then(
-      () => {
-        if (sessionStorage.getItem('models') && data.modelVariantFields) {
-          showSelectedModel(data.modelVariantFields);
-        }
-      }
-    ) : null;
     showSuggestButtons('itemBrand', restoreSavedState, data.itemBrandConfirm);
     // Don't use the setFieldValue for the brand since that triggers a dropdown to open
     document.getElementById('itemBrandLabel').style.display = data.brand ? 'inline-block' : 'none';
+
+    const modelDivShown = await displayFindModelDiv(data.brand);
+    if (modelDivShown && sessionStorage.getItem('models') && data.modelVariantFields) {
+      showSelectedModel(data.modelVariantFields);
+      if (restoreSavedState && data.itemModelConfirm) {
+        modelSuggestButtons.style.display = 'flex';
+        removeModelIcon.style.display = 'none';
+      } else {
+        modelSuggestButtons.style.display = 'none';
+        removeModelIcon.style.display = 'flex';
+      }
+    }
+    setFieldValue('itemModel', data.model || atItem?.model);
     setFieldValue('itemSize', data.size);
     showSuggestButtons('itemSize', restoreSavedState, data.itemSizeConfirm);
     setFieldValue('itemMaterial', data.material);
     showSuggestButtons('itemMaterial', restoreSavedState, data.itemMaterialConfirm);
-    setFieldValue('itemModel', data.model || atItem?.model);
     setFieldValue('itemOriginalPrice', originalPrice || atItem?.originalPrice);
 
     if (restoreSavedState) {
@@ -952,7 +965,7 @@ async function frontImageChangeHandler(event) {
       return;
     }
     const promises = [];
-    promises.push(detectAndFillColor(imageUrl), detectAndFillBrandAndMaterialAndSize(imageUrl), enhanceFrontImage(imageUrl));
+    promises.push(detectAndFillColor(imageUrl), detectAndFillBrandModelMaterialAndSize(imageUrl), enhanceFrontImage(imageUrl));
     await Promise.all(promises);
     rememberUnsavedChanges();
   }
@@ -964,7 +977,7 @@ async function brandTagImageChangeHandler(event) {
     event.stopPropagation();
     const imageUrl = await uploadImageAndShowPreview(input, 'brandTagImage');
     showDeleteImageIcon('brandTagImage')
-    await detectAndFillBrandAndMaterialAndSize(imageUrl);
+    await detectAndFillBrandModelMaterialAndSize(imageUrl);
     rememberUnsavedChanges();
   }
 }
@@ -975,7 +988,7 @@ async function productImageChangeHandler(event) {
     event.stopPropagation();
     const imageUrl = await uploadImageAndShowPreview(input, 'productImage');
     showDeleteImageIcon('productImage')
-    await detectAndFillBrandAndMaterialAndSize(imageUrl);
+    await detectAndFillBrandModelMaterialAndSize(imageUrl);
     rememberUnsavedChanges();
   }
 }
@@ -986,7 +999,7 @@ async function defectImageChangeHandler(event) {
     event.stopPropagation();
     const imageUrl = await uploadImageAndShowPreview(input, 'defectImage');
     showDeleteImageIcon('defectImage')
-    await detectAndFillBrandAndMaterialAndSize(imageUrl);
+    await detectAndFillBrandModelMaterialAndSize(imageUrl);
     rememberUnsavedChanges();
   }
 }
@@ -997,7 +1010,7 @@ async function materialTagImageChangeHandler(event) {
     event.stopPropagation();
     const imageUrl = await uploadImageAndShowPreview(input, 'materialTagImage');
     showDeleteImageIcon('materialTagImage')
-    await detectAndFillBrandAndMaterialAndSize(imageUrl);
+    await detectAndFillBrandModelMaterialAndSize(imageUrl);
     rememberUnsavedChanges();
   }
 }
@@ -1008,7 +1021,7 @@ async function extraImageChangeHandler(event) {
     event.stopPropagation();
     const imageUrl = await uploadImageAndShowPreview(input, 'extraImage');
     showDeleteImageIcon('extraImage')
-    await detectAndFillBrandAndMaterialAndSize(imageUrl);
+    await detectAndFillBrandModelMaterialAndSize(imageUrl);
     rememberUnsavedChanges();
   }
 }
@@ -1020,10 +1033,10 @@ function clearConfirmButtonValidity(event) {
   suggestButtons.style.display = 'none';
 }
 
-async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
+async function detectAndFillBrandModelMaterialAndSize(imageUrl) {
   try {
     if (document.querySelector('#itemBrand').value.length && document.querySelector('#itemMaterial').value.length
-      && document.querySelector('#itemSize').value.length) {
+      && document.querySelector('#itemSize').value.length && document.querySelector('#itemModel').value.length) {
       // Don't do anything if both brand and material already filled in
       return;
     }
@@ -1037,6 +1050,7 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
       document.getElementById('itemBrandLabel').style.display = 'inline-block';
       document.querySelector('#brandSuggestButtons').style.display = 'block';
       document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
+      await displayFindModelDiv(data.brand)
       analytics.track("Element Viewed", { elementID: "brandSuggestButtons" });
     }
     if (!document.querySelector('#itemMaterial').value.length && response.data?.materials) {
@@ -1054,6 +1068,16 @@ async function detectAndFillBrandAndMaterialAndSize(imageUrl) {
       document.querySelector('#sizeSuggestButtons').style.display = 'block';
       document.querySelector('#itemSize').dispatchEvent(new Event('change'));
       analytics.track("Element Viewed", { elementID: "sizeSuggestButtons" });
+    }
+    if (!document.getElementById('itemModel').value.length && response.data?.model) {
+      console.log(response.data.model);
+      document.getElementById('findModelTitle').innerText = 'Är det denna modell?';
+      document.getElementById('findNewModel').style.display = 'flex';
+      showSelectedModel(response.data.model, false);
+      document.getElementById('removeModelIcon').style.display = 'none';
+      document.getElementById('modelSuggestButtons').style.display = 'flex'
+      document.getElementById('rejectModel').style.opacity = '100';
+      document.getElementById('confirmModel').style.opacity = '100';
     }
   } catch (e) {
     errorHandler.report(e);
@@ -1089,7 +1113,7 @@ async function detectAndFillColor(imageUrl) {
   }
 }
 
-async function initializeMaterialConfirm() {
+function initializeMaterialConfirm() {
   document.getElementById('rejectMaterial').addEventListener('click', () => {
     document.querySelector('#itemMaterial').value = '';
     document.querySelector('#materialSuggestButtons').style.display = 'none';
@@ -1101,7 +1125,7 @@ async function initializeMaterialConfirm() {
   })
 }
 
-async function initializeBrandConfirm() {
+function initializeBrandConfirm() {
   document.getElementById('rejectBrand').addEventListener('click', () => {
     document.querySelector('#itemBrand').value = '';
     document.querySelector('#brandSuggestButtons').style.display = 'none';
@@ -1111,6 +1135,22 @@ async function initializeBrandConfirm() {
   document.getElementById('confirmBrand').addEventListener('click', () => {
     document.querySelector('#itemBrand').setCustomValidity('');
     document.querySelector('#itemBrand').setCustomValidity('');
+  })
+}
+
+function initializeModelConfirm() {
+  document.getElementById('rejectModel').addEventListener('click', () => {
+    document.getElementById('modelSuggestButtons').style.display = 'none';
+    removeSelectedModel();
+    document.getElementById('findModelTitle').innerText = 'Modell (Beta)';
+    rememberUnsavedChanges();
+  });
+  document.getElementById('confirmModel').addEventListener('click', () => {
+    const model = JSON.parse(document.getElementById('findModelBoxFilled').getAttribute("data-model"));
+    document.getElementById('modelSuggestButtons').style.display = 'none';
+    document.getElementById('findModelTitle').innerText = 'Modell (Beta)';
+    document.getElementById('removeModelIcon').style.display = 'flex';
+    setFormValuesFromModel(model, null,true);
   })
 }
 
@@ -1195,7 +1235,7 @@ function initializeRestoreOnNavigation() {
   });
 }
 
-async function initializeSizeConfirm() {
+function initializeSizeConfirm() {
   document.getElementById('rejectSize').addEventListener('click', () => {
     document.querySelector('#itemSize').value = '';
     document.querySelector('#sizeSuggestButtons').style.display = 'none';
@@ -1219,7 +1259,7 @@ function initializeSuggestButtonsSaveState() {
   )
 }
 
-async function initializeColorConfirm() {
+function initializeColorConfirm() {
   document.getElementById('rejectColor').addEventListener('click', () => {
     document.querySelector('#itemColor').value = '';
     document.querySelector('#colorSuggestButtons').style.display = 'none';
