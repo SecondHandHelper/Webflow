@@ -127,6 +127,8 @@
     })
   }
 
+  export const AUTH_IF_AVAILABLE = 'IF_AVAILABLE';
+
   // Function to call web api backend function, with or without auth
   async function callBackendApi(path, { data, method, requiresAuth, timeoutSec = 20 } = {}) {
     const controller = new AbortController()
@@ -134,8 +136,15 @@
     let idToken = '';
     const useMethod = method || (data ? 'POST' : 'GET');
     const useAuth = requiresAuth === true || (requiresAuth !== false && useMethod !== 'GET');
-    if (useAuth) {
-      idToken = await getIdToken();
+    if (useAuth || requiresAuth === AUTH_IF_AVAILABLE) {
+      try {
+        idToken = await getIdToken();
+      } catch (e) {
+        if (useAuth) {
+          // For requiresAuth === AUTH_IF_AVAILABLE we don't throw here
+          throw e;
+        }
+      }
     }
     try {
       let response = await fetch(`${BACKEND_API_URL}${path}`, {

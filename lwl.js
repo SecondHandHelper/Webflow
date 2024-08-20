@@ -103,7 +103,7 @@ document.getElementById('doneButton').addEventListener('click', () => {
           url: lwlThreadUrl.value,
         },
         timeoutSec: 240,
-        requiresAuth: false
+        requiresAuth: AUTH_IF_AVAILABLE,
       });
       if (authUser.current) {
         location.href = '/private#wardrobe';
