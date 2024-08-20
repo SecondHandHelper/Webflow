@@ -522,9 +522,25 @@ function setupBottomMenuPopupListeners() {
         data: { itemId: itemMoreMenu.dataset.itemId }
       });
     } if (itemMoreMenu.dataset.section === 'sold-not-sent') {
-      //TODO: Archive item and reload page
-      console.log('Will remove item here through an endpoint and reload page');
-      //location.reload();
+      await callBackendApi(`/api/items/unsold/${itemMoreMenu.dataset.itemId}`, {
+        method: 'DELETE',
+        data: { itemId: itemMoreMenu.dataset.itemId }
+      });
+      // hide the element from the list
+      const removeButton = document.getElementById(`removeItemButton-${itemMoreMenu.dataset.itemId}`);
+      let parent = removeButton.parentElement;
+      while (parent && !parent.classList.contains('div-block-45')) {
+        parent = parent.parentElement;
+      }
+      if (parent) {
+        parent.style.display = 'none';
+      }
+      // Also hide the full 'Sold - to be sent' list if this was the only item in it
+      const soldNotSentItems = document.querySelectorAll('#itemListSoldNotSent .div-block-45')
+      const visibleChildren = Array.from(soldNotSentItems).filter(child => child.style.display !== 'none');
+      if (visibleChildren.length === 0) {
+        document.getElementById('soldNotSentDiv').style.display='none';
+      }
     } else {
       document.getElementById(itemMoreMenu.dataset.itemId).style.display = 'none';
       const itemList = document.getElementById('wardrobeItemList');
