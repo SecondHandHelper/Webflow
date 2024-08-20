@@ -676,9 +676,9 @@ export function rememberUnsavedChanges() {
   const {
     user, createdAt, status, shippingStatus, ...itemToSave
   } = collect();
-  // Replace '' with null values
+  // Replace '' and {} with null values
   const item = Object.keys(itemToSave).reduce((acc, key) => {
-    acc[key] = itemToSave[key] === '' || jQuery.isEmptyObject(itemToSave[key]) ? null : itemToSave[key];
+    acc[key] = itemToSave[key] === '' || (isNaN(itemToSave[key]) && jQuery.isEmptyObject(itemToSave[key])) ? null : itemToSave[key];
     return acc;
   }, {});
   item.defects = item.defects ? item.defects : [];
