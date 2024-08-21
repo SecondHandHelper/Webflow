@@ -1050,7 +1050,7 @@ async function detectAndFillBrandModelMaterialAndSize(imageUrl) {
       document.getElementById('itemBrandLabel').style.display = 'inline-block';
       document.querySelector('#brandSuggestButtons').style.display = 'block';
       document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
-      await displayFindModelDiv(data.brand)
+      await displayFindModelDiv(response.data.brand);
       analytics.track("Element Viewed", { elementID: "brandSuggestButtons" });
     }
     if (!document.querySelector('#itemMaterial').value.length && response.data?.materials) {
