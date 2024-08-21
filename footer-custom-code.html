@@ -135,12 +135,12 @@
     const timeout = setTimeout(() => controller.abort(), timeoutSec*1000);
     let idToken = '';
     const useMethod = method || (data ? 'POST' : 'GET');
-    const useAuth = requiresAuth === true || (requiresAuth !== false && useMethod !== 'GET');
-    if (useAuth || requiresAuth === AUTH_IF_AVAILABLE) {
+    const useAuth = requiresAuth === true || (requiresAuth !== false && useMethod !== 'GET') || requiresAuth === AUTH_IF_AVAILABLE;
+    if (useAuth) {
       try {
         idToken = await getIdToken();
       } catch (e) {
-        if (useAuth) {
+        if (requiresAuth !== AUTH_IF_AVAILABLE ) {
           // For requiresAuth === AUTH_IF_AVAILABLE we don't throw here
           throw e;
         }
