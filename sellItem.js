@@ -17,7 +17,7 @@ import {formatPersonalId, getFormAddressFields, isValidSwedishSsn, setFormAddres
 import {autocomplete, brands} from "./autocomplete-brands";
 import {
   displayFindModelDiv,
-  removeSelectedModel,
+  removeSelectedModel, selectFieldValue,
   setFieldValue, setFormValuesFromModel,
   setupModelSearchEventListeners,
   showSelectedModel
@@ -875,21 +875,6 @@ function whenLoadingDivHidden(cb) {
   const observer = new MutationObserver(cb);
   const elm = document.getElementById('loadingDiv');
   observer.observe(elm, { attributeFilter: ['style'] })
-}
-
-function selectFieldValue(field, value) {
-  const selectIndex = Array.from(field.options)
-    .map(elm => elm.attributes.value.value)
-    .indexOf(value);
-  if (selectIndex > 0) {
-    field.selectedIndex = selectIndex;
-    field.style.color = "#333";
-  } else {
-    field.selectedIndex = 0;
-    field.style.color = '#929292';
-  }
-  field.dispatchEvent(new Event('input'));
-  field.dispatchEvent(new Event('change'));
 }
 
 async function checkAndDisplayShareSold(value) {

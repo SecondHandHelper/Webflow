@@ -44,6 +44,21 @@ const selectSize = (model) => (event) => {
   setFormValuesFromModel(model, event.target.innerText);
 }
 
+export function selectFieldValue(field, value) {
+  const selectIndex = Array.from(field.options)
+    .map(elm => elm.attributes.value.value.toLowerCase())
+    .indexOf(value?.toLowerCase());
+  if (selectIndex > 0) {
+    field.selectedIndex = selectIndex;
+    field.style.color = "#333";
+  } else {
+    field.selectedIndex = 0;
+    field.style.color = '#929292';
+  }
+  field.dispatchEvent(new Event('input'));
+  field.dispatchEvent(new Event('change'));
+}
+
 export const setFormValuesFromModel = (model, size, skipGender = false) => {
   if (!skipGender) {
     document.getElementById(model['gender'])?.parentElement?.click();
@@ -58,17 +73,18 @@ export const setFormValuesFromModel = (model, size, skipGender = false) => {
     const yearDiff = new Date().getFullYear() - model['collectionYear'];
     // Depending on yearDiff value we translate to a itemAge selectedIndex using this ageIndex array
     const ageIndex = [1, 1, 2, 3, 4, 4, 5, 5, 5];
-    document.getElementById('itemAge').selectedIndex = ageIndex[yearDiff] || 6;
-    document.getElementById('itemAge').style.color = 'rgb(51, 51, 51)';
-    document.getElementById('itemAge').dispatchEvent(new Event('input'));
+    const ageField = document.getElementById('itemAge');
+    ageField.selectedIndex = ageIndex[yearDiff] || 6;
+    ageField.style.color = 'rgb(51, 51, 51)';
+    ageField.dispatchEvent(new Event('input'));
+    ageField.dispatchEvent(new Event('change'));
   }
   if (model['category']) {
     document.getElementById('itemCategory').value = model['category'];
     $('#itemCategory').trigger('change');
   }
   if (document.getElementById('itemColor').querySelector('[value="' + capitalizeFirstLetter(model['maiColor']) + '"]')) {
-    document.getElementById('itemColor').value = model['maiColor'];
-    $('#itemColor').trigger('change');
+    selectFieldValue(document.getElementById('itemColor'), model['maiColor']);
   }
 }
 
