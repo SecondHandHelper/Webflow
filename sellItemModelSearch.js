@@ -6,12 +6,27 @@ export const setFieldValue = (fieldId, value) => {
   document.getElementById(fieldId).dispatchEvent(new Event('input'));
 }
 
+export const showModelSuggestion = (model) => {
+  document.getElementById('findModelTitle').innerText = 'Är det denna modell?';
+  document.getElementById('findNewModel').style.display = 'flex';
+  showSelectedModel(model, false);
+  document.getElementById('removeModelIcon').style.display = 'none';
+  document.getElementById('modelSuggestButtons').style.display = 'flex'
+  document.getElementById('rejectModel').style.opacity = '100';
+  document.getElementById('confirmModel').style.opacity = '100';
+}
+
 export const showSelectedModel = (model) => {
   // Show selected model in search box
   document.getElementById('findModelDescription').style.display = 'none';
   document.getElementById('findNewModel').style.display = 'flex';
   document.getElementById('findModelBoxEmpty').style.display = 'none';
   document.getElementById('findModelBoxFilled').style.display = 'flex';
+
+  document.getElementById('modelSuggestButtons').style.display = 'none';
+  document.getElementById('findModelTitle').innerText = 'Modell';
+  document.getElementById('removeModelIcon').style.display = 'flex';
+
   document.getElementById('findModelBoxFilled').setAttribute("data-model", JSON.stringify(model))
   document.getElementById('findModelBoxImage').style.backgroundImage = `url('${model["coverImageSmall"]}')`;
   document.getElementById('findModelBoxNameCategory').innerText = `${model['brand']}, ${model['category']}`;
@@ -313,6 +328,13 @@ export const displayFindModelDiv = async (value) => {
   if (featureIsEnabled('modelDB')) {
     if (value === 'Eytys') {
       findModelDiv.style.display = 'block';
+      if (localStorage.getItem('detectedModel')) {
+        let detectedModel = JSON.parse(localStorage.getItem('detectedModel'));
+        if (detectedModel.brand === 'Eytys' && itemBrand.value === 'Eytys') {
+          showModelSuggestion(detectedModel);
+        }
+        localStorage.removeItem('detectedModel');
+      }
       let models = sessionStorage.getItem('models') ? JSON.parse(sessionStorage.getItem('models')) : undefined;
       if (!models) {
         let response = await callBackendApi(`/api/models?brand=${value}`);

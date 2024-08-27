@@ -19,7 +19,7 @@ import {
   displayFindModelDiv,
   removeSelectedModel, selectFieldValue,
   setFieldValue, setFormValuesFromModel,
-  setupModelSearchEventListeners,
+  setupModelSearchEventListeners, showModelSuggestion,
   showSelectedModel
 } from "./sellItemModelSearch";
 
@@ -252,6 +252,7 @@ async function sellItemMain() {
     // Fill form if the user comes from a prefill link (re-sell item or continue with draft item)
     sessionStorage.removeItem('newItemId');
     localStorage.removeItem('newItem');
+    localStorage.removeItem('detectedModel');
     authUser.whenSet(function (user) {
       if (!user) { document.getElementById('maiIntro').style.display = 'block'; }
     });
@@ -536,13 +537,14 @@ async function addItemInner(id, status = 'New') {
   const item = { ...pageData, status, ...draftSource, shippingMethod, images, ...createdFromItem, atVariantId, version: "2" };
 
   if (!authUser.current) {
+    localStorage.removeItem('detectedModel');
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
     const createItemResponse = await callBackendApi(`/api/items/${id}`, { data: { item }});
-
     await trackUserActivated();
     await setCampaignCoupon();
     localStorage.removeItem('newItem');
+    localStorage.removeItem('detectedModel');
     sessionStorage.removeItem('newItemId');
     localStorage.setItem('latestItemCreated', JSON.stringify(createItemResponse.data));
 
@@ -807,11 +809,12 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
 
     const modelDivShown = await displayFindModelDiv(data.brand);
     if (modelDivShown && sessionStorage.getItem('models') && data.modelVariantFields) {
-      showSelectedModel(data.modelVariantFields);
       if (restoreSavedState && data.itemModelConfirm) {
         modelSuggestButtons.style.display = 'flex';
         removeModelIcon.style.display = 'none';
+        showModelSuggestion(data.modelVariantFields);
       } else {
+        showSelectedModel(data.modelVariantFields);
         modelSuggestButtons.style.display = 'none';
         removeModelIcon.style.display = 'flex';
       }
@@ -1022,11 +1025,11 @@ async function detectAndFillBrandModelMaterialAndSize(imageUrl) {
   try {
     if (document.querySelector('#itemBrand').value.length && document.querySelector('#itemMaterial').value.length
       && document.querySelector('#itemSize').value.length && document.querySelector('#itemModel').value.length) {
-      // Don't do anything if both brand and material already filled in
+      // Don't do anything if brand, material, size and model already filled in
       return;
     }
     const response = await callBackendApi('/api/images/detectInfo', {
-      data: { imageUrl },
+      data: { imageUrl, brand: itemBrand.value },
       requiresAuth: false,
     });
     if (!document.querySelector('#itemBrand').value.length && response.data?.brand) {
@@ -1056,13 +1059,11 @@ async function detectAndFillBrandModelMaterialAndSize(imageUrl) {
     }
     if (!document.getElementById('itemModel').value.length && response.data?.model) {
       console.log(response.data.model);
-      document.getElementById('findModelTitle').innerText = 'Är det denna modell?';
-      document.getElementById('findNewModel').style.display = 'flex';
-      showSelectedModel(response.data.model, false);
-      document.getElementById('removeModelIcon').style.display = 'none';
-      document.getElementById('modelSuggestButtons').style.display = 'flex'
-      document.getElementById('rejectModel').style.opacity = '100';
-      document.getElementById('confirmModel').style.opacity = '100';
+      if (document.getElementById('itemBrand').value === 'Eytys' && response.data.model.brand === 'Eytys') {
+        showModelSuggestion(response.data.model);
+      } else {
+        localStorage.setItem('detectedModel', JSON.stringify(response.data.model));
+      }
     }
   } catch (e) {
     errorHandler.report(e);
@@ -1127,13 +1128,13 @@ function initializeModelConfirm() {
   document.getElementById('rejectModel').addEventListener('click', () => {
     document.getElementById('modelSuggestButtons').style.display = 'none';
     removeSelectedModel();
-    document.getElementById('findModelTitle').innerText = 'Modell (Beta)';
+    document.getElementById('findModelTitle').innerText = 'Modell';
     rememberUnsavedChanges();
   });
   document.getElementById('confirmModel').addEventListener('click', () => {
     const model = JSON.parse(document.getElementById('findModelBoxFilled').getAttribute("data-model"));
     document.getElementById('modelSuggestButtons').style.display = 'none';
-    document.getElementById('findModelTitle').innerText = 'Modell (Beta)';
+    document.getElementById('findModelTitle').innerText = 'Modell';
     document.getElementById('removeModelIcon').style.display = 'flex';
     setFormValuesFromModel(model, null,true);
   })
@@ -1257,6 +1258,9 @@ function initializeColorConfirm() {
 }
 
 function clearFormFields() {
+  localStorage.removeItem('detectedModel');
+  removeSelectedModel();
+  document.getElementById('findModelDiv').style.display = 'none';
   document.getElementById('clearItemForm').style.display = 'none';
   imageElements().forEach(imageName => {
     document.getElementById(`${imageName}Preview`).style.backgroundImage = '';

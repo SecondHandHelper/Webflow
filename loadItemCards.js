@@ -99,6 +99,31 @@ function openServicePointToast(itemId, soldDate) {
   triggerServicePointToastOpen.click();
 }
 
+function openConvertToGiftCard(itemId, itemImage, soldPrice) {
+  document.getElementById('convertGiftCardInfoBox').style.display = 'block';
+  document.querySelector('.window-shade').style.display = 'block';
+  document.getElementById('giftCardItemImage').src = itemImage;
+  document.getElementById('giftCardText').innerText = `Vill du få 100% av vinsten (${soldPrice} kr) som gåvokort att handla för på EYTYS.com istället?`;
+  document.getElementById('closeGiftCardBox').addEventListener('click', () => {
+    document.getElementById('convertGiftCardInfoBox').style.display = 'none';
+    document.querySelector('.window-shade').style.display = 'none';
+  });
+  document.getElementById('closeGiftCardBoxButton').addEventListener('click', () => {
+    document.getElementById('convertGiftCardInfoBox').style.display = 'none';
+    document.querySelector('.window-shade').style.display = 'none';
+  });
+  document.getElementById('convertToGiftCardButton').addEventListener('click', async () => {
+    await callBackendApi(`/api/items/${itemId}`, {
+      data: { payoutType: 'Brand Gift Card' },
+      method: 'PUT'
+    })
+    document.getElementById('convertGiftCardInfoBox').style.display = 'none';
+    document.querySelector('.window-shade').style.display = 'none';
+    document.querySelector(`convertToGiftCardDiv-${itemId}`).style.display = 'none';
+  });
+
+}
+
 function openYouGetInfoBox(soldPrice, sellerGets) {
   priceAfterPlatformFee.innerHTML = soldPrice;
   const commission = soldPrice - sellerGets;
@@ -433,23 +458,29 @@ export function loadItemCards(items) {
         let changeShippingMethod = '';
         let removeItemButton = '';
         let shipper = '';
-        var text1 = `Du får ${sellerGets}`;
-        var text2 = '';
+        let text1 = `Du får ${sellerGets} kr${item.payoutType === 'Brand Gift Card' ? ' i gåvokort' : ''}`;
+        let text2 = '';
+        let text3 = '';
 
         if (!isCanceled) {
           if (buyerFirstName != null && buyerAddressCity != null && soldPrice) {
-            const str = `Såld till ${buyerFirstName} i ${buyerAddressCity} för ${soldPrice} kr`;
-
-            // Split sentence into two equally long rows
-            let output = '';
-            const words = str.split(' ');
-            words.forEach(function (word) {
-              if (output.trim().length > str.length / 2 && !output.includes('<br>')) {
-                output += '<br>';
-              }
-              output += word + ' ';
-            });
-            text2 = output.trim();
+            const brandCollab = item.brand === 'Eytys' && featureIsEnabled('modelDB');
+            const str = `Såld till ${buyerFirstName} i ${buyerAddressCity}${brandCollab ? '' : ('för ' + soldPrice + ' kr')}`;
+            if (!brandCollab) {
+              // Split sentence into two equally long rows
+              let output = '';
+              const words = str.split(' ');
+              words.forEach(function (word) {
+                if (output.trim().length > str.length / 2 && !output.includes('<br>')) {
+                  output += '<br>';
+                }
+                output += word + ' ';
+              });
+              text2 = output.trim();
+            } else {
+              text2 = str.trim();
+            }
+            text3 = brandCollab && item.payoutType !== 'Brand Gift Card' ? `Ändra till ${soldPrice} kr i gåvokort?` : '';
           }
 
           // Add a user action, such as 'show QR button', 'show barcode' or 'bag received checkbox'
@@ -539,6 +570,7 @@ export function loadItemCards(items) {
               ${text1 !== 'Köparen avbröt köpet' ? '<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="you-get-info-icon"></img>' : ''}
           </a>
           <div class="text-block-44">${text2}</div>
+          <div class="text-block-44" id="convertToGiftCardDiv-${itemId}" style="margin-top: 5px"><a style="text-decoration: underline" id="convertToGiftCard-${itemId}">${text3}</a></div>
                       ${userActionDiv}
                       ${shippingInfoDiv}
                       ${changeShippingMethod}
@@ -549,6 +581,10 @@ export function loadItemCards(items) {
           document.getElementById(`youGetLink-${itemId}`).addEventListener('click', () => {
             console.log(`clicked youGetLink-${itemId}`);
             openYouGetInfoBox(soldPrice, sellerGets);
+          });
+          document.getElementById(`convertToGiftCard-${itemId}`)?.addEventListener('click', () => {
+            const itemImage = item?.images?.modelImage || item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || item?.images?.frontImageSmall || item?.images?.frontImage;
+            openConvertToGiftCard(itemId, itemImage, soldPrice);
           });
         }, 0)
         itemListSoldNotSent.innerHTML += soldNotSentCardHTML;
