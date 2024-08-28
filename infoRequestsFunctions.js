@@ -107,6 +107,8 @@ async function storePriceResponse(itemId, max, min, response, status) {
         });
     }
 }
+let acceptNewPriceHandler;
+let denyNewPriceHandler;
 
 async function openNewPriceToast(itemId, status, max, min, brand, description, category, type, currentMax, currentMin) {
     console.log("openNewPriceToast", itemId, status, max, min, brand, description, category, type, currentMax, currentMin);
@@ -150,14 +152,15 @@ async function openNewPriceToast(itemId, status, max, min, brand, description, c
         newPriceText.innerHTML = description;
         descriptionDiv.style.display = 'block';
     }
-    acceptNewPriceButton.addEventListener('click', (event) => {
-      event.stopImmediatePropagation();
-      storePriceResponse(itemId, max, min, 'Accepted', status);
-    })
-    denyNewPriceButton.addEventListener('click', (event) => {
-      event.stopImmediatePropagation();
-      storePriceResponse(itemId, max, min, 'Denied', status);
-    })
+    acceptNewPriceButton.removeEventListener("click", acceptNewPriceHandler);
+    const acceptNewPrice = () => { storePriceResponse(itemId, max, min, 'Accepted', status); }
+    acceptNewPriceButton.addEventListener('click', acceptNewPrice);
+    acceptNewPriceHandler = acceptNewPrice
+    denyNewPriceButton.removeEventListener("click", denyNewPriceHandler);
+    const denyNewPrice = () => { storePriceResponse(itemId, max, min, 'Denied', status); }
+    denyNewPriceButton.addEventListener('click', denyNewPrice);
+    denyNewPriceHandler = denyNewPrice;
+
 
     // Open toast
     triggerNewPriceToastOpen.click();
