@@ -1,5 +1,36 @@
 import { formatPersonalId, isValidSwedishSsn } from "./general";
 
+async function verifyUserCode() {
+  const verificationCodeError = !verificationCode.value?.length || !/^[0-9]+$/.test(verificationCode.value) ?
+    'Koden ska bestå av siffror' : '';
+  verificationCode.setCustomValidity(verificationCodeError);
+  if (document.getElementById('wf-form-Verify-phonenumber').reportValidity()) {
+    verifyCheckButtonText.style.display = 'none';
+    verifyCheckButtonSpinner.style.display = 'block';
+    try {
+      const res = await callBackendApi('/api/users/verifyPhoneNumber', {
+        data: {data: {phoneNumber: formatPhoneNumber(phoneNumber.value), verificationCode: verificationCode.value}},
+        method: 'POST'
+      });
+      console.log('Result: ', res);
+      if (res.data?.phoneNumberVerified) {
+        verifyCheckButtonSpinner.style.display = 'none';
+        verifyCheckButtonCheckMark.style.display = 'block';
+        setTimeout(() => {
+          location.href = `/item-confirmation`;
+        }, 200);
+      } else {
+        verificationCode.setCustomValidity('Fel kod angiven');
+        document.getElementById('wf-form-Verify-phonenumber').reportValidity();
+        verifyCheckButtonText.style.display = 'block';
+        verifyCheckButtonSpinner.style.display = 'none';
+      }
+    } catch (e) {
+      console.error('Wrong verification code', e);
+    }
+  }
+}
+
 const pageSetUp = async () => {
   const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'))?.item ||
     JSON.parse(localStorage.getItem('latestItemCreated'));
@@ -49,36 +80,9 @@ const pageSetUp = async () => {
       }
     }
   });
-  verifyCheckButton.addEventListener('click', async () => {
-    const verificationCodeError = !verificationCode.value?.length || !/^[0-9]+$/.test(verificationCode.value) ? 
-      'Koden ska bestå av siffror' : '';
-    verificationCode.setCustomValidity(verificationCodeError);
-    if (document.getElementById('wf-form-Verify-phonenumber').reportValidity()) {
-      verifyCheckButtonText.style.display = 'none';
-      verifyCheckButtonSpinner.style.display = 'block';
-      try {
-        const res = await callBackendApi('/api/users/verifyPhoneNumber', {
-          data: { data: { phoneNumber: formatPhoneNumber(phoneNumber.value), verificationCode: verificationCode.value } },
-          method: 'POST'
-        });
-        console.log('Result: ', res);
-        if (res.data?.phoneNumberVerified) {
-          verifyCheckButtonSpinner.style.display = 'none';
-          verifyCheckButtonCheckMark.style.display = 'block';
-          setTimeout(() => {
-            location.href = `/item-confirmation`;
-          }, 200);          
-        } else {
-          verificationCode.setCustomValidity('Fel kod angiven');
-          document.getElementById('wf-form-Verify-phonenumber').reportValidity();
-          verifyCheckButtonText.style.display = 'block';
-          verifyCheckButtonSpinner.style.display = 'none';
-        }
-      } catch (e) {
-        console.error('Wrong verification code', e);
-      }
-    }
-  });
+  verifyCheckButton.addEventListener('click', verifyUserCode);
+  document.getElementById('wf-form-Verify-phonenumber').addEventListener('submit', verifyUserCode);
+
   backButton.addEventListener('click', async () => {
     saveUserDetailsButtonText.style.display = 'block';
     saveUserDetailsButtonSpinner.style.display = 'none';
