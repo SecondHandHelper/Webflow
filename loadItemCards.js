@@ -465,7 +465,7 @@ export function loadItemCards(items) {
         if (!isCanceled) {
           if (buyerFirstName != null && buyerAddressCity != null && soldPrice) {
             const brandCollab = item.brand === 'Eytys' && featureIsEnabled('modelDB');
-            const str = `Såld till ${buyerFirstName} i ${buyerAddressCity}${brandCollab ? '' : ('för ' + soldPrice + ' kr')}`;
+            const str = `Såld till ${buyerFirstName} i ${buyerAddressCity}${brandCollab ? '' : (' för ' + soldPrice + ' kr')}`;
             if (!brandCollab) {
               // Split sentence into two equally long rows
               let output = '';
