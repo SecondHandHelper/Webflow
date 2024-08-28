@@ -150,10 +150,12 @@ async function openNewPriceToast(itemId, status, max, min, brand, description, c
         newPriceText.innerHTML = description;
         descriptionDiv.style.display = 'block';
     }
-    acceptNewPriceButton.addEventListener('click', () => {
+    acceptNewPriceButton.addEventListener('click', (event) => {
+      event.stopImmediatePropagation();
       storePriceResponse(itemId, max, min, 'Accepted', status);
     })
-    denyNewPriceButton.addEventListener('click', () => {
+    denyNewPriceButton.addEventListener('click', (event) => {
+      event.stopImmediatePropagation();
       storePriceResponse(itemId, max, min, 'Denied', status);
     })
 
