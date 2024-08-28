@@ -7,9 +7,9 @@ export const setFieldValue = (fieldId, value) => {
 }
 
 export const showModelSuggestion = (model) => {
+  showSelectedModel(model, false);
   document.getElementById('findModelTitle').innerText = 'Är det denna modell?';
   document.getElementById('findNewModel').style.display = 'flex';
-  showSelectedModel(model, false);
   document.getElementById('removeModelIcon').style.display = 'none';
   document.getElementById('modelSuggestButtons').style.display = 'flex'
   document.getElementById('rejectModel').style.opacity = '100';

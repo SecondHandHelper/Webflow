@@ -528,13 +528,14 @@ async function getShippingMethod() {
 async function addItemInner(id, status = 'New') {
   const { modelVariantFields: { coverImage: modelCoverImageUrl, atVariantId }, images, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
-  if (modelCoverImageUrl) {
+  const modelConfirmed = modelSuggestButtons?.style?.display === 'none';
+    if (modelConfirmed && modelCoverImageUrl) {
     images['modelImage'] = modelCoverImageUrl;
   }
   const createdFromItem = (params.id && params.type !== 'draft') ? { createdFromItem: params.id } : {};
   const isCreatedFromItem = Object.keys(createdFromItem).length ? true : false;
   const draftSource = status === 'Draft' ? { draftSource: isCreatedFromItem ? 'Mai purchase' : 'Sell item' } : {};
-  const item = { ...pageData, status, ...draftSource, shippingMethod, images, ...createdFromItem, atVariantId, version: "2" };
+  const item = { ...pageData, status, ...draftSource, shippingMethod, images, ...createdFromItem, ...(modelConfirmed && { atVariantId }), version: "2" };
 
   if (!authUser.current) {
     localStorage.removeItem('detectedModel');
@@ -1058,7 +1059,6 @@ async function detectAndFillBrandModelMaterialAndSize(imageUrl) {
       analytics.track("Element Viewed", { elementID: "sizeSuggestButtons" });
     }
     if (!document.getElementById('itemModel').value.length && response.data?.model) {
-      console.log(response.data.model);
       if (document.getElementById('itemBrand').value === 'Eytys' && response.data.model.brand === 'Eytys') {
         showModelSuggestion(response.data.model);
       } else {
