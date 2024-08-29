@@ -1030,7 +1030,7 @@ async function detectAndFillBrandModelMaterialAndSize(imageUrl) {
       return;
     }
     const response = await callBackendApi('/api/images/detectInfo', {
-      data: { imageUrl, brand: itemBrand.value },
+      data: { imageUrl, brand: itemBrand.value, color: itemColor.value },
       requiresAuth: false,
     });
     if (!document.querySelector('#itemBrand').value.length && response.data?.brand) {
@@ -1136,7 +1136,7 @@ function initializeModelConfirm() {
     document.getElementById('modelSuggestButtons').style.display = 'none';
     document.getElementById('findModelTitle').innerText = 'Modell';
     document.getElementById('removeModelIcon').style.display = 'flex';
-    setFormValuesFromModel(model, null,true);
+    setFormValuesFromModel(model, null, true);
   })
 }
 

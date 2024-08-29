@@ -37,14 +37,13 @@ export const showSelectedModel = (model) => {
   } else {
     document.getElementById('findModelBoxColor').style.display = 'none';
   }
-  if (model['gender']) {
+  if (model.gender) {
     document.getElementById('findModelBoxGender').style.display = 'block';
-    const allGenderModels = allModelsMatching(model);
-    if (allGenderModels.length === 2) {
+    if (model.gender === 'Unisex' || model.multiGender || allModelsMatching(model).length === 2) {
       document.getElementById('findModelBoxGender').innerText = `Dam / Herr`;
     } else {
       const genders = { 'Woman': 'Dam', 'Man': 'Herr' }
-      document.getElementById('findModelBoxGender').innerText = `${genders[model['gender']] || model['gender']}`;
+      document.getElementById('findModelBoxGender').innerText = `${genders[model.gender] || model.gender}`;
     }
   } else {
     document.getElementById('findModelBoxGender').style.display = 'none';
@@ -74,9 +73,13 @@ export function selectFieldValue(field, value) {
   field.dispatchEvent(new Event('change'));
 }
 
-export const setFormValuesFromModel = (model, size, skipGender = false) => {
-  if (!skipGender) {
-    document.getElementById(model['gender'])?.parentElement?.click();
+export const setFormValuesFromModel = (model, size, optionalGender = false) => {
+  if (optionalGender) {
+    if (!model.multiGender && model.gender !== 'Unisex') {
+      document.getElementById(model.gender)?.parentElement?.click();
+    }
+  } else {
+    document.getElementById(model.gender)?.parentElement?.click();
   }
   if (size) {
     setFieldValue('itemSize', size);
