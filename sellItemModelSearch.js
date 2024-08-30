@@ -144,6 +144,7 @@ const showModelSizes = (modelClicked) => {
     document.getElementById('modelSizeListHeading').style.display = 'block';
     document.getElementById('modelSizeList2Heading').style.display = 'block';
   } else {
+    document.getElementById('modelSizeList').style.display = 'none';
     document.getElementById('modelSizeListHeading').style.display = 'none';
     document.getElementById('modelSizeList2Heading').style.display = 'none';
   }
@@ -152,7 +153,7 @@ const showModelSizes = (modelClicked) => {
       const newNode = templateSize.cloneNode(true);
       newNode.id = `${templateSize.id}_${idx}`;
       newNode.addEventListener('click', linkClickTracker);
-      newNode.style.display = 'block';
+      newNode.style.display = 'flex';
       newNode.addEventListener('click', function clickHandler(event) {
         selectSize(genderModel)(event);
         this.removeEventListener('click', clickHandler);
@@ -170,6 +171,7 @@ const selectModel = (event) => {
   document.getElementById('modelList').style.display = 'none';
   document.getElementById('modelSizeSelect').style.display = 'block';
   document.getElementById('modelSelectTitle').innerText = 'Välj storlek';
+  document.getElementById('modelSelectTitle').style.marginLeft = '42%';
   showModelSizes(event.currentTarget);
 }
 
