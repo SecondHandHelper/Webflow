@@ -140,29 +140,36 @@ const showModelSizes = (modelClicked) => {
   const otherModelSizes = genderModels[1]?.sizes.slice()?.sort();
   const differentSizes = otherModelSizes && (otherModelSizes?.length !== modelSizes.length ||
     !modelSizes.every((size, index) => size === otherModelSizes[index]));
-  if (differentSizes) {
-    document.getElementById('modelSizeListHeading').style.display = 'block';
-    document.getElementById('modelSizeList2Heading').style.display = 'block';
-  } else {
-    document.getElementById('modelSizeList').style.display = 'none';
-    document.getElementById('modelSizeListHeading').style.display = 'none';
-    document.getElementById('modelSizeList2Heading').style.display = 'none';
+  document.getElementById('modelSizeListHeading').style.display = differentSizes ? 'block' : 'none';
+  document.getElementById('modelSizeList2Heading').style.display = differentSizes ? 'block' : 'none';
+  const createSizeNode = (idx, genderModel, sizeList, size) => {
+    const newNode = templateSize.cloneNode(true);
+    newNode.id = `${templateSize.id}_${idx}`;
+    newNode.addEventListener('click', linkClickTracker);
+    newNode.style.display = 'flex';
+    newNode.addEventListener('click', function clickHandler(event) {
+      selectSize(genderModel)(event);
+      this.removeEventListener('click', clickHandler);
+    });
+    for (const child of Array.from(newNode.getElementsByTagName('*'))) {
+      child.id = `${child.id}_${genderModel.gender}_${idx}`;
+    }
+    sizeList.appendChild(newNode);
+    document.getElementById(`modelSize_${genderModel.gender}_${idx}`).innerText = size;
   }
+
   for (const genderModel of (differentSizes ? genderModels : genderModels.slice(0, 1))) {
+    modelSizeList.parentElement.style.display = (!differentSizes && genderModel.gender !== 'Woman')  ? 'none' : 'block';
     for (const [idx, size] of genderModel.sizes.sort(sizeCompare).entries()) {
-      const newNode = templateSize.cloneNode(true);
-      newNode.id = `${templateSize.id}_${idx}`;
-      newNode.addEventListener('click', linkClickTracker);
-      newNode.style.display = 'flex';
-      newNode.addEventListener('click', function clickHandler(event) {
-        selectSize(genderModel)(event);
-        this.removeEventListener('click', clickHandler);
-      });
-      for (const child of Array.from(newNode.getElementsByTagName('*'))) {
-        child.id = `${child.id}_${genderModel.gender}_${idx}`;
+      const sizeSplits = size.split('-');
+      createSizeNode(idx, genderModel, genderModel.gender === 'Woman' ? modelSizeList : modelSizeList2, sizeSplits.pop());
+      if (genderModel.gender === 'Unisex' && sizeSplits.length === 2) {
+        // We have some models with Unisex and ['xxs-xs', 'xs-s', 's-m'] sizes, split them up and show as Woman-Man sizes
+        document.getElementById('modelSizeListHeading').style.display = 'block';
+        document.getElementById('modelSizeList2Heading').style.display = 'block';
+        createSizeNode(`${idx}u`, genderModel, modelSizeList2, sizeSplits[0]);
+        modelSizeList.parentElement.style.display = 'block';
       }
-      (genderModel.gender === 'Woman' ? modelSizeList : modelSizeList2).appendChild(newNode);
-      document.getElementById(`modelSize_${genderModel.gender}_${idx}`).innerText = size;
     }
   }
 }
