@@ -601,7 +601,7 @@ export function loadItemCards(items) {
 
         // SOLD BEFORE
       } else {
-        const voucher =  item.payoutType === 'Brand Gift Card' ? ' i presentkort' : '';
+        const voucher =  item.payoutType === 'Brand Gift Card' ? '<br> (Presentkort)' : '';
         var soldItemCardHTML = `<div class="item-card-small"><div class="ratio-box _16-9"><div class="conten-block with-image"><a id="itemLinkFromSoldBeforeSection" href="${itemPageUrl}"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></a></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>Du fick ${sellerGets} kr${voucher}</div></div>`;
         itemListSold.innerHTML += soldItemCardHTML;
 
