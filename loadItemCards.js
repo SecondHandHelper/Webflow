@@ -103,7 +103,7 @@ function openConvertToGiftCard(itemId, itemImage, soldPrice) {
   document.getElementById('convertGiftCardInfoBox').style.display = 'block';
   document.querySelector('.window-shade').style.display = 'block';
   document.getElementById('giftCardItemImage').src = itemImage;
-  document.getElementById('giftCardText').innerText = `Vill du få 100% av vinsten (${soldPrice} kr) som gåvokort att handla för på EYTYS.com istället?`;
+  document.getElementById('giftCardText').innerText = `Vill du få ${soldPrice} kr (100% av vinsten) att handla för på EYTYS.com istället?`;
   document.getElementById('closeGiftCardBox').addEventListener('click', () => {
     document.getElementById('convertGiftCardInfoBox').style.display = 'none';
     document.querySelector('.window-shade').style.display = 'none';
@@ -480,7 +480,7 @@ export function loadItemCards(items) {
             } else {
               text2 = str.trim();
             }
-            text3 = brandCollab && item.payoutType !== 'Brand Gift Card' ? `Ändra till ${soldPrice} kr i gåvokort?` : '';
+            text3 = brandCollab && item.payoutType !== 'Brand Gift Card' ? `Ändra till ${soldPrice} kr i presentkort?` : '';
           }
 
           // Add a user action, such as 'show QR button', 'show barcode' or 'bag received checkbox'
@@ -570,7 +570,7 @@ export function loadItemCards(items) {
               ${text1 !== 'Köparen avbröt köpet' ? '<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="you-get-info-icon"></img>' : ''}
           </a>
           <div class="text-block-44">${text2}</div>
-          <div class="text-block-44" id="convertToGiftCardDiv-${itemId}" style="margin-top: 5px"><a style="text-decoration: underline" id="convertToGiftCard-${itemId}">${text3}</a></div>
+          <div class="change-to-gift-card-text" id="convertToGiftCardDiv-${itemId}"><a id="convertToGiftCard-${itemId}">${text3}</a></div>
                       ${userActionDiv}
                       ${shippingInfoDiv}
                       ${changeShippingMethod}
