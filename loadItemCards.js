@@ -99,8 +99,8 @@ function openServicePointToast(itemId, soldDate) {
   triggerServicePointToastOpen.click();
 }
 
-function openConvertToGiftCard(itemId, itemImage, soldPrice) {
-  document.getElementById('convertGiftCardInfoBox').style.display = 'block';
+function openConvertToGiftCard(itemId, itemImage, soldPrice, brand) {
+  document.getElementById('convertGiftCardInfoBox').style.display = 'flex';
   document.querySelector('.window-shade').style.display = 'block';
   document.getElementById('giftCardItemImage').src = itemImage;
   document.getElementById('giftCardText').innerText = `Vill du få ${soldPrice} kr (100% av vinsten) att handla för på EYTYS.com istället?`;
@@ -119,7 +119,8 @@ function openConvertToGiftCard(itemId, itemImage, soldPrice) {
     })
     document.getElementById('convertGiftCardInfoBox').style.display = 'none';
     document.querySelector('.window-shade').style.display = 'none';
-    document.querySelector(`convertToGiftCardDiv-${itemId}`).style.display = 'none';
+    document.getElementById(`convertToGiftCardDiv-${itemId}`).style.display = 'none';
+    document.getElementById(`text2-${itemId}`).innerHTML = `(${brand}-presentkort)<br>` + document.getElementById(`text2-${itemId}`).innerHTML;
   });
 
 }
@@ -458,7 +459,8 @@ export function loadItemCards(items) {
         let changeShippingMethod = '';
         let removeItemButton = '';
         let shipper = '';
-        let text1 = `Du får ${sellerGets} kr${item.payoutType === 'Brand Gift Card' ? ' i gåvokort' : ''}`;
+        //let text1 = `Du får ${sellerGets} kr${item.payoutType === 'Brand Gift Card' ? ' i presentkort' : ''}`;
+        let text1 = `Du får ${sellerGets} kr`;
         let text2 = '';
         let text3 = '';
 
@@ -480,6 +482,7 @@ export function loadItemCards(items) {
             } else {
               text2 = str.trim();
             }
+            text2 = item.payoutType === 'Brand Gift Card' ? `(${item.brand.toUpperCase()}-presentkort)<br>` + text2 : text2;
             text3 = brandCollab && item.payoutType !== 'Brand Gift Card' ? `Ändra till ${soldPrice} kr i presentkort?` : '';
           }
 
@@ -569,13 +572,13 @@ export function loadItemCards(items) {
               <div class="text-block-43">${text1}</div>
               ${text1 !== 'Köparen avbröt köpet' ? '<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="you-get-info-icon"></img>' : ''}
           </a>
-          <div class="text-block-44">${text2}</div>
+          <div class="text-block-44" id="text2-${itemId}">${text2}</div>
           <div class="change-to-gift-card-text" id="convertToGiftCardDiv-${itemId}"><a id="convertToGiftCard-${itemId}">${text3}</a></div>
-                      ${userActionDiv}
-                      ${shippingInfoDiv}
-                      ${changeShippingMethod}
-                      ${removeItemButton}
-                  </div></div></div></div>`;
+          ${userActionDiv}
+          ${shippingInfoDiv}
+          ${changeShippingMethod}
+          ${removeItemButton}
+          </div></div></div></div>`;
 
         setTimeout(() => {
           document.getElementById(`youGetLink-${itemId}`).addEventListener('click', () => {
@@ -584,7 +587,7 @@ export function loadItemCards(items) {
           });
           document.getElementById(`convertToGiftCard-${itemId}`)?.addEventListener('click', () => {
             const itemImage = item?.images?.modelImage || item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || item?.images?.frontImageSmall || item?.images?.frontImage;
-            openConvertToGiftCard(itemId, itemImage, soldPrice);
+            openConvertToGiftCard(itemId, itemImage, soldPrice, item.brand);
           });
         }, 0)
         itemListSoldNotSent.innerHTML += soldNotSentCardHTML;
