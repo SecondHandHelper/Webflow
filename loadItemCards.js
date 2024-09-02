@@ -125,9 +125,9 @@ function openConvertToGiftCard(itemId, itemImage, soldPrice, brand) {
 
 }
 
-function openYouGetInfoBox(soldPrice, sellerGets) {
+function openYouGetInfoBox(soldPrice, sellerGetsValue) {
   priceAfterPlatformFee.innerHTML = soldPrice;
-  const commission = soldPrice - sellerGets;
+  const commission = soldPrice - sellerGetsValue;
   commissionAmount.innerHTML = commission === 0 ? '-' : '-' + commission;
   if ((commission / soldPrice) > 0.9 && (commission / soldPrice) < 0.11) {
     commissionTitle.innerHTML = `Rabatterad kommission (10%)`;
@@ -142,7 +142,7 @@ function openYouGetInfoBox(soldPrice, sellerGets) {
     commissionTitle.innerHTML = `Fri kommission (0%)`;
   }
 
-  youGetAmount.innerHTML = sellerGets;
+  youGetAmount.innerHTML = sellerGetsValue;
   youGetInfoBox.style.display = 'flex';
   darkOverlay.style.display = 'block';
   closeYouGetInfoBox.addEventListener('click', () => {
@@ -372,6 +372,8 @@ export function loadItemCards(items) {
     var brand = item.brand;
     var soldPrice = item.soldPrice;
     var sellerGets = item.sellerGets ? Math.ceil(item.sellerGets) : item.sellerGets;
+    var giftCardValue = item.giftCardValue;
+    var sellerGetsValue = item.payoutType === 'Brand Gift Card' && giftCardValue ? giftCardValue : sellerGets;
     var buyerFirstName = item.buyer?.FirstName || item.buyerFirstName;
     var buyerAddressCity = item.buyer?.City || item.buyerAddressCity;
     var minPriceEstimate = item.minPriceEstimate;
@@ -459,8 +461,7 @@ export function loadItemCards(items) {
         let changeShippingMethod = '';
         let removeItemButton = '';
         let shipper = '';
-        //let text1 = `Du får ${sellerGets} kr${item.payoutType === 'Brand Gift Card' ? ' i presentkort' : ''}`;
-        let text1 = `Du får ${sellerGets} kr`;
+        let text1 = `Du får ${sellerGetsValue} kr`;
         let text2 = '';
         let text3 = '';
 
@@ -583,7 +584,7 @@ export function loadItemCards(items) {
         setTimeout(() => {
           document.getElementById(`youGetLink-${itemId}`).addEventListener('click', () => {
             console.log(`clicked youGetLink-${itemId}`);
-            openYouGetInfoBox(soldPrice, sellerGets);
+            openYouGetInfoBox(soldPrice, sellerGetsValue);
           });
           document.getElementById(`convertToGiftCard-${itemId}`)?.addEventListener('click', () => {
             const itemImage = item?.images?.modelImage || item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || item?.images?.frontImageSmall || item?.images?.frontImage;
@@ -602,14 +603,14 @@ export function loadItemCards(items) {
         // SOLD BEFORE
       } else {
         const voucher =  item.payoutType === 'Brand Gift Card' ? '<br> (Presentkort)' : '';
-        var soldItemCardHTML = `<div class="item-card-small"><div class="ratio-box _16-9"><div class="conten-block with-image"><a id="itemLinkFromSoldBeforeSection" href="${itemPageUrl}"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></a></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>Du fick ${sellerGets} kr${voucher}</div></div>`;
+        var soldItemCardHTML = `<div class="item-card-small"><div class="ratio-box _16-9"><div class="conten-block with-image"><a id="itemLinkFromSoldBeforeSection" href="${itemPageUrl}"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></a></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>Du fick ${sellerGetsValue} kr${voucher}</div></div>`;
         itemListSold.innerHTML += soldItemCardHTML;
 
         // Display list, hide empty state
         soldItemsDiv.style.display = "block";
         itemListSoldContainer.style.display = "block";
         sellButtonText.innerHTML = "Sälj ett plagg";
-        youEarned = youEarned + sellerGets;
+        youEarned = youEarned + sellerGetsValue;
         youEarnedDiv.innerHTML = `Du har tjänat ${Math.round(youEarned).toLocaleString('en-US').replaceAll(',', ' ')} kr`;
       }
     }
