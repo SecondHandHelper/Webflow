@@ -40,7 +40,7 @@ export const showSelectedModel = (model) => {
   if (model.gender) {
     document.getElementById('findModelBoxGender').style.display = 'block';
     if (model.gender === 'Unisex' || model.multiGender || allModelsMatching(model).length === 2) {
-      document.getElementById('findModelBoxGender').innerText = `Dam / Herr`;
+      document.getElementById('findModelBoxGender').innerText = `Unisex`;
     } else {
       const genders = { 'Woman': 'Dam', 'Man': 'Herr' }
       document.getElementById('findModelBoxGender').innerText = `${genders[model.gender] || model.gender}`;
@@ -161,13 +161,13 @@ const showModelSizes = (modelClicked) => {
   for (const genderModel of (differentSizes ? genderModels : genderModels.slice(0, 1))) {
     modelSizeList.parentElement.style.display = (!differentSizes && genderModel.gender !== 'Woman')  ? 'none' : 'block';
     for (const [idx, size] of genderModel.sizes.sort(sizeCompare).entries()) {
-      const sizeSplits = size.split('-');
+      const sizeSplits = size.split("-");
       createSizeNode(idx, genderModel, genderModel.gender === 'Woman' ? modelSizeList : modelSizeList2, sizeSplits.pop());
-      if (genderModel.gender === 'Unisex' && sizeSplits.length === 2) {
+      if (genderModel.gender === 'Unisex' && sizeSplits.length === 1) { // 1 left after pop() means size is a XXS-XS size
         // We have some models with Unisex and ['xxs-xs', 'xs-s', 's-m'] sizes, split them up and show as Woman-Man sizes
         document.getElementById('modelSizeListHeading').style.display = 'block';
         document.getElementById('modelSizeList2Heading').style.display = 'block';
-        createSizeNode(`${idx}u`, genderModel, modelSizeList2, sizeSplits[0]);
+        createSizeNode(`${idx}u`, genderModel, modelSizeList, sizeSplits[0]);
         modelSizeList.parentElement.style.display = 'block';
       }
     }
@@ -193,7 +193,7 @@ const showModelItems = (models) => {
     const sameModelOtherGender = models.find(m => m.maiName === model.maiName && m.maiColor === model.maiColor &&
       m.category === model.category && m.gender !== model.gender);
     if (sameModelOtherGender) {
-      model.multiGender = 'Dam / Herr';
+      model.multiGender = 'Unisex';
     }
     return !sameModelOtherGender || model.gender === 'Woman';
   })
@@ -349,8 +349,10 @@ export const displayFindModelDiv = async (value) => {
       }
       let models = sessionStorage.getItem('models') ? JSON.parse(sessionStorage.getItem('models')) : undefined;
       if (!models) {
-        let response = await callBackendApi(`/api/models?brand=${value}`);
-        sessionStorage.setItem('models', JSON.stringify(response.data));
+        callBackendApi(`/api/models?brand=${value}`).then(response => {
+          console.log(`Got model response ${response.data.length}`);
+          sessionStorage.setItem('models', JSON.stringify(response.data));
+        });
       }
       return true;
     } else {

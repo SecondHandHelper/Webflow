@@ -503,7 +503,7 @@ function collect() {
     acceptPrice,
     preferences: { userValuationApproval: true },
     modelVariantFields,
-    images,
+    images: images || [],
   };
 }
 
@@ -526,16 +526,16 @@ async function getShippingMethod() {
 }
 
 async function addItemInner(id, status = 'New') {
-  const { modelVariantFields: { coverImage: modelCoverImageUrl, atVariantId }, images, ...pageData } = collect();
+  const { modelVariantFields: { coverImage: modelCoverImageUrl, atVariantId: atModelVariantId, id: modelId }, images, ...pageData } = collect();
   const shippingMethod = await getShippingMethod();
   const modelConfirmed = modelSuggestButtons?.style?.display === 'none';
-    if (modelConfirmed && modelCoverImageUrl) {
+  if (modelConfirmed && modelCoverImageUrl) {
     images['modelImage'] = modelCoverImageUrl;
   }
   const createdFromItem = (params.id && params.type !== 'draft') ? { createdFromItem: params.id } : {};
-  const isCreatedFromItem = Object.keys(createdFromItem).length ? true : false;
+  const isCreatedFromItem = !!Object.keys(createdFromItem).length;
   const draftSource = status === 'Draft' ? { draftSource: isCreatedFromItem ? 'Mai purchase' : 'Sell item' } : {};
-  const item = { ...pageData, status, ...draftSource, shippingMethod, images, ...createdFromItem, ...(modelConfirmed && { atVariantId }), version: "2" };
+  const item = { ...pageData, status, ...draftSource, shippingMethod, images, ...createdFromItem, ...(modelConfirmed && { atModelVariantId, modelId }), version: "2" };
 
   if (!authUser.current) {
     localStorage.removeItem('detectedModel');
@@ -809,15 +809,26 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
     document.getElementById('itemBrandLabel').style.display = data.brand ? 'inline-block' : 'none';
 
     const modelDivShown = await displayFindModelDiv(data.brand);
-    if (modelDivShown && sessionStorage.getItem('models') && data.modelVariantFields) {
-      if (restoreSavedState && data.itemModelConfirm) {
-        modelSuggestButtons.style.display = 'flex';
-        removeModelIcon.style.display = 'none';
-        showModelSuggestion(data.modelVariantFields);
-      } else {
-        showSelectedModel(data.modelVariantFields);
-        modelSuggestButtons.style.display = 'none';
-        removeModelIcon.style.display = 'flex';
+    if (modelDivShown) {
+      const models = JSON.parse(sessionStorage.getItem('models'));
+      let model = models?.find(m => m.id === data.modelId);
+      if (!data.modelVariantFields && !model) {
+        const response = await callBackendApi(`/api/models/${data.modelId}`);
+        const { maiName, gender, maiCategory = '', collectionYear, brand } = response.data;
+        const { maiColor, coverImage, coverImageSmall } = response.data.variants[0];
+        model = { maiName, gender, category: maiCategory, maiColor, coverImageSmall: coverImageSmall || coverImage,
+          brand, coverImage, collectionYear };
+      }
+      if (model || data.modelVariantFields) {
+        if (restoreSavedState && data.itemModelConfirm) {
+          modelSuggestButtons.style.display = 'flex';
+          removeModelIcon.style.display = 'none';
+          showModelSuggestion(model || data.modelVariantFields);
+        } else {
+          showSelectedModel(model || data.modelVariantFields);
+          modelSuggestButtons.style.display = 'none';
+          removeModelIcon.style.display = 'flex';
+        }
       }
     }
     setFieldValue('itemModel', data.model || atItem?.model);
