@@ -183,6 +183,7 @@ const selectModel = (event) => {
 }
 
 const showModelItems = (models) => {
+  document.getElementById('modelSelectTitle').style.marginLeft = '0%';
   window.scrollTo({ top: 0 });
   const templateCard = document.getElementById('modelCardTemplate');
   const modelResultList = document.getElementById('modelResultList');
