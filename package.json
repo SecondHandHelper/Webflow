@@ -8,7 +8,7 @@
     "not dead"
   ],
   "config": {
-    "files": "itemConfirmation.js sellItem.js itemValuation.js itemPage.js editItem.js referral.js general.js infoRequestsFunctions.js autocomplete-brands.js loadItemCards.js sellItemModelSearch.js private.js settings.js bookPhotoShoot.js feedbackNps.js home.js orderBags.js personalIdForm.js shipItem.js userContact.js userManagement.js 2023withmai.js signInHelpers.js quickValuation.js emailSignUp.js lwl.js reclaim.js howShippingWorks.js brand.js"
+    "files": "itemConfirmation.js sellItem.js itemValuation.js itemPage.js editItem.js referral.js general.js infoRequestsFunctions.js autocomplete-brands.js loadItemCards.js sellItemModelSearch.js private.js settings.js bookPhotoShoot.js feedbackNps.js home.js orderBags.js personalIdForm.js shipItem.js userContact.js userManagement.js 2023withmai.js signInHelpers.js quickValuation.js emailSignUp.js lwl.js reclaim.js howShippingWorks.js brand.js partner.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
