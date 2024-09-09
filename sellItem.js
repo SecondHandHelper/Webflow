@@ -503,7 +503,7 @@ function collect() {
     acceptPrice,
     preferences: { userValuationApproval: true },
     modelVariantFields,
-    images: images || [],
+    images: images || {},
   };
 }
 

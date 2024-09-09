@@ -37,7 +37,7 @@ export const showSelectedModel = (model) => {
   } else {
     document.getElementById('findModelBoxColor').style.display = 'none';
   }
-  if (model.gender) {
+  if (model.brand !== 'Eytys' && model.gender) {
     document.getElementById('findModelBoxGender').style.display = 'block';
     if (model.gender === 'Unisex' || model.multiGender || allModelsMatching(model).length === 2) {
       document.getElementById('findModelBoxGender').innerText = `Unisex`;
@@ -120,6 +120,8 @@ const allModelsMatching = (model) => modelDb().filter(m => m.maiName === model.m
 
 const showModelSizes = (modelClicked) => {
   window.scrollTo({ top: 0 });
+  document.getElementById('chooseModelHeader').classList.add('stickyHeader');
+
   const templateSize = document.getElementById('modelSizeTemplate');
   const modelSizeList = document.getElementById('modelSizeList');
   const modelSizeList2 = document.getElementById('modelSizeList2');
@@ -184,6 +186,8 @@ const selectModel = (event) => {
 
 const showModelItems = (models) => {
   document.getElementById('modelSelectTitle').style.marginLeft = '0%';
+  document.getElementById('chooseModelHeader').classList.remove('stickyHeader');
+
   window.scrollTo({ top: 0 });
   const templateCard = document.getElementById('modelCardTemplate');
   const modelResultList = document.getElementById('modelResultList');
