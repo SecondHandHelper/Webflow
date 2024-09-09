@@ -174,6 +174,8 @@ const showModelSizes = (modelClicked) => {
       }
     }
   }
+  modelSizeList.parentElement.style.display = modelSizeList.children.length ? 'block' : 'none';
+  modelSizeList2.parentElement.style.display = modelSizeList2.children.length ? 'block' : 'none';
 }
 
 const selectModel = (event) => {
