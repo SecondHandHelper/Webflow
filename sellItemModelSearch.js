@@ -222,7 +222,7 @@ const showModelItems = (models) => {
     } else {
       document.getElementById(`modelColor_${idx}`).style.display = 'none';
     }
-    if (model['multiGender'] || model['gender']) {
+    if (model.brand !== 'Eytys' && (model['multiGender'] || model['gender'])) {
       const genders = { 'Woman': 'Dam', 'Man': 'Herr' };
       document.getElementById(`modelGender_${idx}`).innerText = `${model['multiGender'] || genders[model['gender']] || model['gender']}`;
     } else {
