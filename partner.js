@@ -49,44 +49,8 @@ checkCookie("utm_medium");
 checkCookie("utm_term");
 checkCookie("utm_content");
 
-/*
-window.intercomSettings = {
-  app_id: "klyy0le5"
-};
-(function () {
-  var w = window;
-  var ic = w.Intercom;
-  if (typeof ic === "function") {
-    ic('reattach_activator');
-    ic('update', w.intercomSettings);
-  } else {
-    var d = document;
-    var i = function () {
-      i.c(arguments);
-    };
-    i.q = [];
-    i.c = function (args) {
-      i.q.push(args);
-    };
-    w.Intercom = i;
-    var l = function () {
-      var s = d.createElement('script');
-      s.type = 'text/javascript';
-      s.async = true;
-      s.src = 'https://widget.intercom.io/widget/klyy0le5';
-      var x = d.getElementsByTagName('script')[0];
-      x.parentNode.insertBefore(s, x);
-    };
-    if (w.attachEvent) {
-      w.attachEvent('onload', l);
-    } else {
-      w.addEventListener('load', l, false);
-    }
-  }
-})();
-*/
-
 async function submitForm() {
+  if (!email.value && !phone.value) { return }
   contactForm.style.display = 'none';
   loadingFormSent.style.display = 'flex';
   const webhookUrl = 'https://hook.eu1.make.com/gy7flvqvrn72ofm61xah3hnhwbficinw';
