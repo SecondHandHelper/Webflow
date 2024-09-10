@@ -49,13 +49,7 @@ checkCookie("utm_medium");
 checkCookie("utm_term");
 checkCookie("utm_content");
 
-// Set invite code cookie
-const inviteCode = checkCookie("invite");
-if (inviteCode) {
-  referralCodeText.innerHTML = inviteCode;
-  activeCode.style.display = 'flex';
-}
-
+/*
 window.intercomSettings = {
   app_id: "klyy0le5"
 };
@@ -90,6 +84,39 @@ window.intercomSettings = {
     }
   }
 })();
+*/
+
+async function submitForm() {
+  contactForm.style.display = 'none';
+  loadingFormSent.style.display = 'flex';
+  const webhookUrl = 'https://hook.eu1.make.com/gy7flvqvrn72ofm61xah3hnhwbficinw';
+  const data = {
+    name: fullName.value || '',
+    email: email.value || '',
+    phone: phone.value || '',
+    company: company.value || ''
+  };
+  fetch(webhookUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+    .then(response => response.text())
+    .then(result => {
+      console.log('Success:', result);
+      loadingFormSent.style.display = 'none';
+      contactConfirmation.style.display = 'block';
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+}
+
+function fieldLabelToggle(field) {
+  document.getElementById(`${field.id}Label`).style.display = field.value.length > 0 ? 'inline-block' : 'none'
+}
 
 function onLoadHandler() {
   closePartnerContactForm.addEventListener('click', function () {
@@ -101,9 +128,14 @@ function onLoadHandler() {
       partnerContactForm.style.display = 'block';
     });
   });
-  partnerContactDoneButton.addEventListener('click', function () {
-    contactForm.style.display = 'none';
-    contactConfirmation.style.display = 'block';
+  partnerContactDoneButton.addEventListener('click', async function () {
+    await submitForm();
+  });
+  const inputFields = document.querySelectorAll('input');
+  inputFields.forEach(field => {
+    field.addEventListener('input', function () {
+      fieldLabelToggle(this);
+    });
   });
 }
 
