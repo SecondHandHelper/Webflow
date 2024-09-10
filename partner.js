@@ -1,4 +1,4 @@
-import {itemCoverImage} from "./general";
+import { itemCoverImage } from "./general";
 
 function loadRecentlySold() {
   const recentlySoldItems = callBackendApi('/api/items/recentlySold?highValue=true');
@@ -9,7 +9,6 @@ function loadRecentlySold() {
       itemListRecentlySoldStartPage.innerHTML = "";
       const itemListRecentlySoldStartPageDesktop = document.getElementById('itemListRecentlySoldStartPageDesktop');
       itemListRecentlySoldStartPageDesktop.innerHTML = "";
-      console.log('i got CONTACT');
 
       for (const item of result.data) {
         const brand = item.brand;
@@ -41,23 +40,7 @@ function loadRecentlySold() {
   // [END fb_functions_call_add_message_error]
 }
 
-const trackHowItWorksInteractions = () => {
-  const howItWorksDiv = document.getElementById('howItWorksDiv');
-  new IntersectionObserver((entries, observer) => {
-    if (!entries[0].isIntersecting) return;
-    analytics.track("Element Viewed", { elementID: "howItWorksSlide1" });
-    observer.disconnect();
-  }, {rootMargin: '0px 0px -600px 0px'}).observe(howItWorksDiv);
-  new MutationObserver((mutationList) => {
-    const mutatedElement = mutationList.find(rec => rec.type === 'attributes' &&  rec.attributeName === 'aria-hidden');
-    if (mutatedElement && mutatedElement.oldValue && !mutatedElement.target['aria-hidden']) {
-      analytics.track("Element Viewed", { elementID: `howItWorksSlide${mutatedElement.target.ariaLabel.slice(0,1)}` });
-    }
-  }).observe(howItWorksDiv, { attributeFilter: ['aria-hidden'], attributeOldValue: true, subtree: true });
-}
-
 loadRecentlySold();
-trackHowItWorksInteractions();
 
 // Set attribution cookies (could be put on any campaign page)
 checkCookie("utm_campaign");
@@ -68,7 +51,7 @@ checkCookie("utm_content");
 
 // Set invite code cookie
 const inviteCode = checkCookie("invite");
-if (inviteCode){
+if (inviteCode) {
   referralCodeText.innerHTML = inviteCode;
   activeCode.style.display = 'flex';
 }
@@ -107,3 +90,21 @@ window.intercomSettings = {
     }
   }
 })();
+
+function onLoadHandler() {
+  closePartnerContactForm.addEventListener('click', function () {
+    partnerContactForm.style.display = 'none';
+  });
+  const elements = document.querySelectorAll('[id*="partnerCtaBtn"]');
+  elements.forEach(element => {
+    element.addEventListener('click', function () {
+      partnerContactForm.style.display = 'block';
+    });
+  });
+  partnerContactDoneButton.addEventListener('click', function () {
+    contactForm.style.display = 'none';
+    contactConfirmation.style.display = 'block';
+  });
+}
+
+window.addEventListener('load', onLoadHandler);
