@@ -1,5 +1,5 @@
-import {rememberUnsavedChanges} from "./sellItem";
-import {capitalizeFirstLetter, colorName} from "./sellItemHelpers";
+import { rememberUnsavedChanges } from "./sellItem";
+import { capitalizeFirstLetter, colorName } from "./sellItemHelpers";
 
 export const setFieldValue = (fieldId, value) => {
   document.getElementById(fieldId).value = value || '';
@@ -116,7 +116,7 @@ const modelDb = () => {
 };
 
 const allModelsMatching = (model) => modelDb().filter(m => m.maiName === model.maiName && m.maiColor === model.maiColor &&
-    m.category === model.category)
+  m.category === model.category)
 
 const showModelSizes = (modelClicked) => {
   window.scrollTo({ top: 0 });
@@ -133,7 +133,7 @@ const showModelSizes = (modelClicked) => {
   }
   const model = JSON.parse(modelClicked.getAttribute("data-model"));
   if (model.sizes.length === 1) {
-    return selectSize(model)({ target: { innerText: model.sizes[0] }});
+    return selectSize(model)({ target: { innerText: model.sizes[0] } });
   }
 
   const genderModels = allModelsMatching(model);
@@ -161,7 +161,7 @@ const showModelSizes = (modelClicked) => {
   }
 
   for (const genderModel of (differentSizes ? genderModels : genderModels.slice(0, 1))) {
-    modelSizeList.parentElement.style.display = (!differentSizes && genderModel.gender !== 'Woman')  ? 'none' : 'block';
+    modelSizeList.parentElement.style.display = (!differentSizes && genderModel.gender !== 'Woman') ? 'none' : 'block';
     for (const [idx, size] of genderModel.sizes.sort(sizeCompare).entries()) {
       const sizeSplits = size.split("-");
       createSizeNode(idx, genderModel, genderModel.gender === 'Woman' ? modelSizeList : modelSizeList2, sizeSplits.pop());
@@ -233,9 +233,9 @@ const showModelItems = (models) => {
   }
 }
 
-const mostPopularEytysModels = [ "mother ", "odessa ", "benz ", "doja ", "angel ",
+const mostPopularEytysModels = ["mother ", "odessa ", "benz ", "doja ", "angel ",
   "fugu ", "naomi ", "cypress ", "titan ", "laguna ", "aphex ", "jet turbo ", "maze ", "ortega ", "raven ",
-  "alexia ", "carmen ", "ferris ", "halo ", "jade ", "jet ", "michigan ", "olympia ", "sonic " ];
+  "alexia ", "carmen ", "ferris ", "halo ", "jade ", "jet ", "michigan ", "olympia ", "sonic "];
 
 function modelCompare(a, b) {
   const nameA = a["maiName"].toLowerCase();
@@ -344,27 +344,25 @@ export const removeSelectedModel = () => {
 }
 
 export const displayFindModelDiv = async (value) => {
-  if (featureIsEnabled('modelDB')) {
-    if (value === 'Eytys') {
-      findModelDiv.style.display = 'block';
-      if (localStorage.getItem('detectedModel')) {
-        let detectedModel = JSON.parse(localStorage.getItem('detectedModel'));
-        if (detectedModel.brand === 'Eytys' && itemBrand.value === 'Eytys') {
-          showModelSuggestion(detectedModel);
-        }
-        localStorage.removeItem('detectedModel');
+  if (value === 'Eytys') {
+    findModelDiv.style.display = 'block';
+    if (localStorage.getItem('detectedModel')) {
+      let detectedModel = JSON.parse(localStorage.getItem('detectedModel'));
+      if (detectedModel.brand === 'Eytys' && itemBrand.value === 'Eytys') {
+        showModelSuggestion(detectedModel);
       }
-      let models = sessionStorage.getItem('models') ? JSON.parse(sessionStorage.getItem('models')) : undefined;
-      if (!models) {
-        callBackendApi(`/api/models?brand=${value}`).then(response => {
-          console.log(`Got model response ${response.data.length}`);
-          sessionStorage.setItem('models', JSON.stringify(response.data));
-        });
-      }
-      return true;
-    } else {
-      findModelDiv.style.display = 'none';
+      localStorage.removeItem('detectedModel');
     }
+    let models = sessionStorage.getItem('models') ? JSON.parse(sessionStorage.getItem('models')) : undefined;
+    if (!models) {
+      callBackendApi(`/api/models?brand=${value}`).then(response => {
+        console.log(`Got model response ${response.data.length}`);
+        sessionStorage.setItem('models', JSON.stringify(response.data));
+      });
+    }
+    return true;
+  } else {
+    findModelDiv.style.display = 'none';
   }
   return false;
 }
