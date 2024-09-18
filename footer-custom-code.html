@@ -251,6 +251,9 @@
   }
   document.querySelectorAll("a").forEach(link => link.addEventListener('click', linkClickTracker) );
   document.querySelectorAll('[type=submit]').forEach(link => link.addEventListener('click', linkClickTracker) );
+  document.getElementById('footerContactDesktop').addEventListener('click', function () {
+    Intercom('show');
+  });
 
   // FUNCTIONS PRIVATE PAGE
   function formatPhoneNumber(str) {
