@@ -39,23 +39,35 @@ function loadRecentlySold() {
   // [END fb_functions_call_add_message_error]
 }
 
-const trackHowItWorksInteractions = () => {
-  const howItWorksDiv = document.getElementById('howItWorksDiv');
-  new IntersectionObserver((entries, observer) => {
-    if (!entries[0].isIntersecting) return;
-    analytics.track("Element Viewed", { elementID: "howItWorksSlide1" });
-    observer.disconnect();
-  }, {rootMargin: '0px 0px -600px 0px'}).observe(howItWorksDiv);
-  new MutationObserver((mutationList) => {
-    const mutatedElement = mutationList.find(rec => rec.type === 'attributes' &&  rec.attributeName === 'aria-hidden');
-    if (mutatedElement && mutatedElement.oldValue && !mutatedElement.target['aria-hidden']) {
-      analytics.track("Element Viewed", { elementID: `howItWorksSlide${mutatedElement.target.ariaLabel.slice(0,1)}` });
+async function fetchAndLoadRecentlyAddedItems() {
+  try {
+    const response = await callBackendApi('/api/shopify/recentlyAddedItems?brand=Eytys');
+    const itemList = document.getElementById('ItemListRecentlyAddedItems');
+    const itemListDesktop = document.getElementById('ItemListRecentlyAddedItemsDesktop');
+    itemList.innerHTML = "";
+    itemListDesktop.innerHTML = "";
+
+    for (const item of response.data) {
+      const itemCardHTML = `<div class="div-block-14-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
+                        <div class="img-container" style="background-image: url('${item.image}')"></div></div></div>
+                        <div class="recently-added-text-block">
+                            <div class="recent-added-items-subheader">${item.brand}</div>
+                            <div class="recent-added-items-subheader-category">${item.category}</div>
+                            <div class="recently-added-price">${item.currentPrice} kr</div>
+                            <div class="recently-added-brands-link-text">Mai Shop</div>
+                        </div><a/></div>`;
+      itemList.innerHTML += itemCardHTML;
+      const desktopCardHTML = itemCardHTML.replace("14-big", "14-big-desktop");
+      itemListDesktop.innerHTML += desktopCardHTML;
     }
-  }).observe(howItWorksDiv, { attributeFilter: ['aria-hidden'], attributeOldValue: true, subtree: true });
+  } catch (e) {
+    errorHandler.report(e);
+    console.log('error', e)
+  }
 }
 
 loadRecentlySold();
-trackHowItWorksInteractions();
+fetchAndLoadRecentlyAddedItems();
 
 // Set attribution cookies (could be put on any campaign page)
 checkCookie("utm_campaign");
