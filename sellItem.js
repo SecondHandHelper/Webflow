@@ -814,10 +814,12 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
       let model = models?.find(m => m.id === data.modelId);
       if (!data.modelVariantFields && !model) {
         const response = await callBackendApi(`/api/models/${data.modelId}`);
-        const { maiName, gender, maiCategory = '', collectionYear, brand } = response.data;
-        const { maiColor, coverImage, coverImageSmall } = response.data.variants[0];
-        model = { maiName, gender, category: maiCategory, maiColor, coverImageSmall: coverImageSmall || coverImage,
-          brand, coverImage, collectionYear };
+        if (response.data) {
+          const { maiName, gender, maiCategory = '', collectionYear, brand } = response.data;
+          const { maiColor, coverImage, coverImageSmall } = response.data.variants[0];
+          model = { maiName, gender, category: maiCategory, maiColor, coverImageSmall: coverImageSmall || coverImage,
+            brand, coverImage, collectionYear };
+        }
       }
       if (model || data.modelVariantFields) {
         if (restoreSavedState && data.itemModelConfirm) {

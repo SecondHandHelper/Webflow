@@ -364,5 +364,4 @@ export const displayFindModelDiv = async (value) => {
   } else {
     findModelDiv.style.display = 'none';
   }
-  return false;
 }
