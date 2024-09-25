@@ -103,7 +103,7 @@ function openConvertToGiftCard(itemId, itemImage, soldPrice, brand) {
   document.getElementById('convertGiftCardInfoBox').style.display = 'flex';
   document.querySelector('.window-shade').style.display = 'block';
   document.getElementById('giftCardItemImage').src = itemImage;
-  document.getElementById('giftCardText').innerText = `Vill du få ${soldPrice} kr (100% av vinsten) att handla för på EYTYS.com istället?`;
+  document.getElementById('giftCardText').innerText = `Vill du få ${soldPrice} kr (100% av vinsten) att handla för på ${brand.toUpperCase()}.com istället?`;
   document.getElementById('closeGiftCardBox').addEventListener('click', () => {
     document.getElementById('convertGiftCardInfoBox').style.display = 'none';
     document.querySelector('.window-shade').style.display = 'none';
@@ -467,7 +467,7 @@ export function loadItemCards(items) {
 
         if (!isCanceled) {
           if (buyerFirstName != null && buyerAddressCity != null && soldPrice) {
-            const brandCollab = item.brand === 'Eytys';
+            const brandCollab = ['Eytys', 'Blankens'].includes(item.brand);
             const str = `Såld till ${buyerFirstName} i ${buyerAddressCity}${brandCollab ? '' : (' för ' + soldPrice + ' kr')}`;
             if (!brandCollab) {
               // Split sentence into two equally long rows
@@ -574,7 +574,7 @@ export function loadItemCards(items) {
               ${text1 !== 'Köparen avbröt köpet' ? '<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="you-get-info-icon"></img>' : ''}
           </a>
           <div class="text-block-44" id="text2-${itemId}">${text2}</div>
-          <div class="change-to-gift-card-text" id="convertToGiftCardDiv-${itemId}"><a id="convertToGiftCard-${itemId}">${text3}</a></div>
+          ${text3 ? `<div class="change-to-gift-card-text" id="convertToGiftCardDiv-${itemId}"><a id="convertToGiftCard-${itemId}">${text3}</a></div>` : ''}
           ${userActionDiv}
           ${shippingInfoDiv}
           ${changeShippingMethod}

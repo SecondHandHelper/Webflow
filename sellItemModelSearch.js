@@ -344,7 +344,7 @@ export const removeSelectedModel = () => {
 }
 
 export const displayFindModelDiv = async (value) => {
-  if (value === 'Eytys') {
+  if (['Eytys', 'Blankens'].includes(value)) {
     findModelDiv.style.display = 'block';
     if (localStorage.getItem('detectedModel')) {
       let detectedModel = JSON.parse(localStorage.getItem('detectedModel'));
@@ -355,7 +355,7 @@ export const displayFindModelDiv = async (value) => {
     }
     let models = sessionStorage.getItem('models') ? JSON.parse(sessionStorage.getItem('models')) : undefined;
     if (!models) {
-      callBackendApi(`/api/models?brand=${value}`).then(response => {
+      callBackendApi(`/api/models?brand=${value}&includeDrafts=true`).then(response => {
         console.log(`Got model response ${response.data.length}`);
         sessionStorage.setItem('models', JSON.stringify(response.data));
       });
