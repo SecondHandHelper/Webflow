@@ -484,7 +484,7 @@ export function loadItemCards(items) {
             } else {
               text2 = str.trim();
             }
-            text2 = item.payoutType === 'Brand Gift Card' ? `(${item.brand.toUpperCase()}-presentkort)<br>` + text2 : text2;
+            text2 = item.payoutType === 'Brand Gift Card' ? `(${capitalizeFirstLetter(item.brand.toLowerCase())}-presentkort)<br>` + text2 : text2;
             text3 = brandCollab && item.payoutType !== 'Brand Gift Card' ? `Ändra till ${soldPrice} kr i presentkort?` : '';
           }
 
