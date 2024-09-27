@@ -120,7 +120,7 @@ export function showImagePreview(imageName, url) {
 }
 
 export function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 export async function uploadImageAndShowPreview(input, imageName, saveState = true) {

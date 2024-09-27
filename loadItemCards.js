@@ -1,5 +1,6 @@
 import { itemCoverImage } from "./general";
 import { closePickupToast } from "./private";
+import { capitalizeFirstLetter } from "./sellItemHelpers";
 
 /**
  * @param {String} HTML representing a single element.
@@ -103,7 +104,7 @@ function openConvertToGiftCard(itemId, itemImage, soldPrice, brand) {
   document.getElementById('convertGiftCardInfoBox').style.display = 'flex';
   document.querySelector('.window-shade').style.display = 'block';
   document.getElementById('giftCardItemImage').src = itemImage;
-  document.getElementById('giftCardText').innerText = `Vill du få ${soldPrice} kr (100% av vinsten) att handla för på ${capitalizeFirstLetter(brand)}.com istället?`;
+  document.getElementById('giftCardText').innerText = `Vill du få ${soldPrice} kr (100% av vinsten) att handla för på ${capitalizeFirstLetter(brand.toLowerCase())}.com istället?`;
   document.getElementById('closeGiftCardBox').addEventListener('click', () => {
     document.getElementById('convertGiftCardInfoBox').style.display = 'none';
     document.querySelector('.window-shade').style.display = 'none';
@@ -120,7 +121,7 @@ function openConvertToGiftCard(itemId, itemImage, soldPrice, brand) {
     document.getElementById('convertGiftCardInfoBox').style.display = 'none';
     document.querySelector('.window-shade').style.display = 'none';
     document.getElementById(`convertToGiftCardDiv-${itemId}`).style.display = 'none';
-    document.getElementById(`text2-${itemId}`).innerHTML = `(${capitalizeFirstLetter(brand)}-presentkort)<br>` + document.getElementById(`text2-${itemId}`).innerHTML;
+    document.getElementById(`text2-${itemId}`).innerHTML = `(${capitalizeFirstLetter(brand.toLowerCase())}-presentkort)<br>` + document.getElementById(`text2-${itemId}`).innerHTML;
   });
 
 }
