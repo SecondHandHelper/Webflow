@@ -115,7 +115,7 @@ const modelDb = () => {
   return modelDbModels;
 };
 
-const allModelsMatching = (model) => modelDb().filter(m => m.maiName === model.maiName && m.maiColor === model.maiColor &&
+const allModelsMatching = (model) => modelDb()?.filter(m => m.maiName === model.maiName && m.maiColor === model.maiColor &&
   m.category === model.category)
 
 const showModelSizes = (modelClicked) => {
