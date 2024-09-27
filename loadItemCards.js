@@ -373,7 +373,7 @@ export function loadItemCards(items) {
     var brand = item.brand;
     var soldPrice = item.soldPrice;
     var sellerGets = item.sellerGets ? Math.ceil(item.sellerGets) : item.sellerGets;
-    var sellerGetsValue = item.payoutType === 'Brand Gift Card' && giftCardValue ? soldPrice : sellerGets;
+    var sellerGetsValue = item.payoutType === 'Brand Gift Card' ? soldPrice : sellerGets;
     var buyerFirstName = item.buyer?.FirstName || item.buyerFirstName;
     var buyerAddressCity = item.buyer?.City || item.buyerAddressCity;
     var minPriceEstimate = item.minPriceEstimate;
