@@ -55,14 +55,14 @@ async function loadItem(itemId) {
     statusText = `Såld!`;
     itemStatusText.style.fontSize = "18px";
     itemStatusText.style.fontWeight = "500";
-    text1 = data.payoutStatus === "Payed" ? "" : "Utbetalning kommer via Swish inom en dag";
+    text1 = data.payoutStatus === "Payed" ? "" : (data.payoutType === 'Brand Gift Card' ? "Presentkortet skapas inom en dag" : "Utbetalning kommer via Swish inom en dag");
     if (data.shippingStatus === "Not sent") {
-      text1 = "Utbetalning sker när du skickat plagget"
+      text1 = data.payoutType === 'Brand Gift Card' ? "Presentkortet skapas när du skickat plagget" : "Utbetalning sker när du skickat plagget";
       toShipItemLink.href = window.location.origin + `/ship-item?id=${itemId}`;
       toShipItemLink.style.display = "flex";
     }
     sellerGetsTitle.innerHTML = data.payoutStatus === "Payed" ? "Du fick" : "Du får";
-    sellerGetsText.innerHTML = `${(data.sellerGets)} kr`
+    sellerGetsText.innerHTML = `${data.payoutType === 'Brand Gift Card' ? data.soldPrice : data.sellerGets} kr`
     sellerGetsDiv.style.display = "flex";
   }
 
