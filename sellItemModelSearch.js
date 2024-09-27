@@ -238,23 +238,38 @@ const mostPopularEytysModels = ["mother ", "odessa ", "benz ", "doja ", "angel "
   "alexia ", "carmen ", "ferris ", "halo ", "jade ", "jet ", "michigan ", "olympia ", "sonic "];
 
 function modelCompare(a, b) {
-  const nameA = a["maiName"].toLowerCase();
-  const nameB = b["maiName"].toLowerCase();
-  const popIdx = (name) => mostPopularEytysModels.find(e => name.startsWith(e)) ? mostPopularEytysModels.findIndex(e => name.startsWith(e)) : 100
-  const nameAPopIdx = popIdx(nameA);
-  const nameBPopIdx = popIdx(nameB);
-  if (nameAPopIdx < 100 || nameBPopIdx < 100) {
-    if (nameAPopIdx > nameBPopIdx) {
-      return 1
-    } else if (nameAPopIdx < nameBPopIdx) {
+  // For Blankens, jewelry should come last
+  if (a.brand === 'Blankens' && b.brand === 'Blankens') {
+    const jewelryCategories = ['Armband', 'Örhänge', 'Halsband', 'Ring'];
+    const isAJewelry = jewelryCategories.includes(a.category);
+    const isBJewelry = jewelryCategories.includes(b.category);
+
+    // If one is jewelry and the other isn't, put jewelry last
+    if (isAJewelry && !isBJewelry) return 1;
+    if (!isAJewelry && isBJewelry) return -1;
+    
+    // If both are jewelry or both are not, maintain their current order
+    return 0;
+  }
+  if (a.brand === 'Eytys' && b.brand === 'Eytys') {
+    const nameA = a["maiName"].toLowerCase();
+    const nameB = b["maiName"].toLowerCase();
+    const popIdx = (name) => mostPopularEytysModels.find(e => name.startsWith(e)) ? mostPopularEytysModels.findIndex(e => name.startsWith(e)) : 100
+    const nameAPopIdx = popIdx(nameA);
+    const nameBPopIdx = popIdx(nameB);
+    if (nameAPopIdx < 100 || nameBPopIdx < 100) {
+      if (nameAPopIdx > nameBPopIdx) {
+        return 1
+      } else if (nameAPopIdx < nameBPopIdx) {
+        return -1;
+      }
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+    if (nameA < nameB) {
       return -1;
     }
-  }
-  if (nameA > nameB) {
-    return 1;
-  }
-  if (nameA < nameB) {
-    return -1;
   }
   return 0;
 }
@@ -355,7 +370,7 @@ export const displayFindModelDiv = async (value) => {
     }
     let models = sessionStorage.getItem('models') ? JSON.parse(sessionStorage.getItem('models')) : undefined;
     if (!models) {
-      callBackendApi(`/api/models?brand=${value}&includeDrafts=true`).then(response => {
+      callBackendApi(`/api/models?brand=${value}`).then(response => {
         console.log(`Got model response ${response.data.length}`);
         sessionStorage.setItem('models', JSON.stringify(response.data));
       });
