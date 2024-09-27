@@ -369,7 +369,8 @@ export const displayFindModelDiv = async (value) => {
       localStorage.removeItem('detectedModel');
     }
     let models = sessionStorage.getItem('models') ? JSON.parse(sessionStorage.getItem('models')) : undefined;
-    if (!models) {
+    if (!models || models[0].brand !== value) {
+      sessionStorage.removeItem('models');
       callBackendApi(`/api/models?brand=${value}`).then(response => {
         console.log(`Got model response ${response.data.length}`);
         sessionStorage.setItem('models', JSON.stringify(response.data));
