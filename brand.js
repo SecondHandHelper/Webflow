@@ -1,7 +1,8 @@
 import {itemCoverImage} from "./general";
 
 function loadRecentlySold() {
-  const recentlySoldItems = callBackendApi('/api/items/recentlySold?brand=Eytys');
+  const brand =  window.location.pathname.replace(/^\/+/, '');
+  const recentlySoldItems = callBackendApi(`/api/items/recentlySold?brand=${brand}`);
   recentlySoldItems
     .then((result) => {
       // Read result of the Cloud Function.
