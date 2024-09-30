@@ -42,7 +42,8 @@ function loadRecentlySold() {
 
 async function fetchAndLoadRecentlyAddedItems() {
   try {
-    const response = await callBackendApi('/api/shopify/recentlyAddedItems?brand=Eytys');
+    const brand =  window.location.pathname.replace(/^\/+/, '');
+    const response = await callBackendApi(`/api/shopify/recentlyAddedItems?brand=${brand}`);
     const itemList = document.getElementById('ItemListRecentlyAddedItems');
     const itemListDesktop = document.getElementById('ItemListRecentlyAddedItemsDesktop');
     itemList.innerHTML = "";
