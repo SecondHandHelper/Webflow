@@ -1,7 +1,13 @@
 import {itemCoverImage} from "./general";
 
+function getBrandFromUrl() {
+  const path = window.location.pathname.replace(/^\/+/, ''); // Removes leading '/'
+  const brand = path.replace('-mai', ''); // Removes '-mai' if it exists
+  return brand;
+}
+
 function loadRecentlySold() {
-  const brand =  window.location.pathname.replace(/^\/+/, '');
+  const brand =  getBrandFromUrl();
   const recentlySoldItems = callBackendApi(`/api/items/recentlySold?brand=${brand}`);
   recentlySoldItems
     .then((result) => {
@@ -42,7 +48,7 @@ function loadRecentlySold() {
 
 async function fetchAndLoadRecentlyAddedItems() {
   try {
-    const brand =  window.location.pathname.replace(/^\/+/, '');
+    const brand = getBrandFromUrl();
     const response = await callBackendApi(`/api/shopify/recentlyAddedItems?brand=${brand}`);
     const itemList = document.getElementById('ItemListRecentlyAddedItems');
     const itemListDesktop = document.getElementById('ItemListRecentlyAddedItemsDesktop');
