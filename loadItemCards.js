@@ -121,6 +121,7 @@ function openConvertToGiftCard(itemId, itemImage, soldPrice, brand) {
     document.getElementById('convertGiftCardInfoBox').style.display = 'none';
     document.querySelector('.window-shade').style.display = 'none';
     document.getElementById(`convertToGiftCardDiv-${itemId}`).style.display = 'none';
+    document.getElementById(`text1-${itemId}`).innerHTML = document.getElementById(`text1-${itemId}`).innerHTML.replace(/\d+/, soldPrice);
     document.getElementById(`text2-${itemId}`).innerHTML = `(${capitalizeFirstLetter(brand.toLowerCase())}-presentkort)<br>` + document.getElementById(`text2-${itemId}`).innerHTML;
   });
 
@@ -570,7 +571,7 @@ export function loadItemCards(items) {
         soldNotSentCardHTML =
           `<div class="div-block-118"><div class="div-block-45"><div class="div-block-43"><div class="ratio-box _16-9"><div class="content-block with-image"><a id="itemLinkFromSoldNotSentSection" href="${itemPageUrl}"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></a></div></div></div><div class="div-block-46">
           <a id="youGetLink-${itemId}" href="#" class="you-get-link">
-              <div class="text-block-43">${text1}</div>
+              <div class="text-block-43" id="text1-${itemId}">${text1}</div>
               ${text1 !== 'Köparen avbröt köpet' ? '<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/63be70f55a4305a398cf918e_info-icon.svg" class="you-get-info-icon"></img>' : ''}
           </a>
           <div class="text-block-44" id="text2-${itemId}">${text2}</div>
