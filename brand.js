@@ -7,7 +7,7 @@ function getBrandFromUrl() {
 }
 
 function loadRecentlySold() {
-  const brand =  getBrandFromUrl();
+  const brand = getBrandFromUrl();
   const recentlySoldItems = callBackendApi(`/api/items/recentlySold?brand=${brand}`);
   recentlySoldItems
     .then((result) => {
