@@ -21,8 +21,8 @@ export async function uploadTempImage(input, fileName) {
 }
 
 async function scaleImageToMaxSize(input) {
-    if (input.size < 9 * 1024 * 1024) {
-        // Don't compress images < 9MB in size
+    if (input.size < 5 * 1024 * 1024) {
+        // Don't compress images < 5MB in size
         return Promise.resolve(input);
     }
     return new Promise((resolve, reject) => {
@@ -86,7 +86,8 @@ async function createEnhancedImage(imageUrl) {
   try {
     const response = await callBackendApi('/api/images/enhance', {
       data: { imageUrl },
-      requiresAuth: false
+      requiresAuth: false,
+      timeoutSec: 30
     });
     sessionStorage.setItem('enhancedFrontImage', response.data.url)
     return response.data;

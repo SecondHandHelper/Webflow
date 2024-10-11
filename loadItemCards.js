@@ -396,7 +396,7 @@ export function loadItemCards(items) {
     let publishedDate = item.publishedDate;
     if (publishedDate) {
       publishedDate = new Date(publishedDate);
-      let nowDate = new Date();
+      let nowDate = new Date();a
       let timeDifference = nowDate.getTime() - publishedDate.getTime();
       let daysDifference = timeDifference / (1000 * 3600 * 24);
       let sellingPeriodLength = longerPeriodAcceptedDate ? 60 : 30;
