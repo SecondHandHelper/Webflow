@@ -507,10 +507,30 @@ function rangeSlider(minPrice, maxPrice, item) {
   });
 }
 
-function sellToMai(item) {
-  /* Show spinner and call endpoint */
+async function sellToMai(item) {
   console.log('Sell item to Mai: ', item.id)
+
+  /* Show spinner and call endpoint */
+  document.getElementById('sellToMaiBtnSpinner').style.display = 'block';
+  document.getElementById('popupButtonText').style.display = 'none';
+  
+  const response = await callBackendApi(`/api/items/${item.id}`, {
+    data: { soldToMai: true },
+    method: 'PUT'
+  });
+
   /* When successful, show confirmation screen */
+  if (response?.data?.status === 'ok') {
+    console.log('Item successfully sold to Mai:', item.id);
+    document.getElementById('sellToMaiPopUpTitle').innerText = 'Såld till Mai!';
+    document.getElementById('sellToMaiPopUpText').innerText = 'Om några minuter kommer du att få ett SMS att plagget blivit sålt med länk till QR-kod för att skicka plagget till oss. Har du flera plagg du sålt till Mai så kan du skicka i samma påse.';
+    document.getElementById('sellNowPriceDiv').style.display = 'none';
+    document.getElementById('sellToMaiButton').style.display = 'none';
+    document.getElementById('closeSellToMaiPopup').style.display = 'none';
+    document.getElementById('sellToMaiOkejButton').style.display = 'flex';
+  } else {
+    throw new Error('Could not save soldToMai');
+  }
 }
 
 function showSellToMaiOption(item) {
@@ -529,11 +549,15 @@ function showSellToMaiOption(item) {
   document.getElementById('openSellToMaiPopupBtn').addEventListener('click', () => {
     document.getElementById('sellToMaiPopup').style.display = 'flex';
   });
-  document.getElementById('sellToMaiButton').addEventListener('click', () => {
+  document.getElementById('sellToMaiButton').addEventListener('click', (event) => {
+    event.stopPropagation();
     sellToMai(item);
   });
   document.getElementById('closeSellToMaiPopup').addEventListener('click', () => {
     document.getElementById('sellToMaiPopup').style.display = 'none';
+  });
+  document.getElementById('sellToMaiOkejButton').addEventListener('click', () => {
+    window.location.href = '/private';
   });
   const image = item.images?.enhancedFrontImageSmall || item.images?.enhancedFrontImage || item.images?.frontImage;
   if (image) {
