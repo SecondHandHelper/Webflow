@@ -1,47 +1,5 @@
 console.log('Check onAuthStateChanged: ', new Date());
-firebase.auth().onAuthStateChanged(async (result) => {
-  console.log("onAuthStateChanged callback: ", new Date());
-  const now = new Date().toISOString();
-  if (result) {
-    // Get and set current user
-    const authenticated = result;
-    const idToken = await result.getIdToken();
-    authUser.current = authenticated;
-    console.log("authUser:", authUser.current);
-    localStorage.setItem('authUserId', authenticated.uid);
-    localStorage.setItem('authUser', JSON.stringify(authUser.current));
-    localStorage.setItem('idToken', idToken);
-    try {
-      setPreferredLogInMethodCookie(authenticated.providerData[0].providerId);
-      const doc = await db.collection("users").doc(authenticated.uid).get();
-      if (doc.exists) {
-        identify(authenticated, doc.data());
-        console.log("user:", doc.data());
-        user.current = doc.data();
-        localStorage.setItem('sessionUser', JSON.stringify(user.current));
-      }
-    } catch (error) {
-      errorHandler.report(error);
-      console.log("Error getting document:", error);
-    }
-  } else {
-    console.log('No user');
-    user.current = null;
-    authUser.current = null;
-    localStorage.removeItem('authUserId');
-    localStorage.removeItem('sessionUser');
-    localStorage.removeItem('idToken');
-    localStorage.removeItem('authUser');
-    // Go to landing page if no user and on logged in pages
-    // Latest page view for logged out users
-    analytics.identify({ latestPageView: now });
-
-    if (window.location.pathname === "/"){
-      headerLoginLoading.style.display = 'none';
-      headerLoginButton.style.display = 'flex';
-    }
-  }
-});
+firebase.auth().onAuthStateChanged(handleAuthStateChange);
 
 // Refresh token and update localStorage
 firebase.auth().onIdTokenChanged(async (user) => {
@@ -163,5 +121,54 @@ async function signedInNextStep(fallbackRedirect) {
     location.href = '/referral';
   } else {
     location.href = './private';
+  }
+}
+
+async function handleAuthStateChange(result) {
+  console.log("onAuthStateChanged callback: ", new Date());
+  if (result) {
+    await handleUserSignIn(result);
+  } else {
+    handleUserSignOut();
+  }
+}
+
+async function handleUserSignIn(authenticated) {
+  const idToken = await authenticated.getIdToken();
+  authUser.current = authenticated;
+  console.log("authUser:", authUser.current);
+  localStorage.setItem('authUserId', authenticated.uid);
+  localStorage.setItem('authUser', JSON.stringify(authUser.current));
+  localStorage.setItem('idToken', idToken);
+  try {
+    setPreferredLogInMethodCookie(authenticated.providerData[0].providerId);
+    const doc = await db.collection("users").doc(authenticated.uid).get();
+    if (doc.exists) {
+      identify(authenticated, doc.data());
+      console.log("user:", doc.data());
+      user.current = doc.data();
+      localStorage.setItem('sessionUser', JSON.stringify(user.current));
+    }
+  } catch (error) {
+    errorHandler.report(error);
+    console.log("Error getting document:", error);
+  }
+}
+
+function handleUserSignOut() {
+  const now = new Date().toISOString();
+  console.log('No user');
+  user.current = null;
+  authUser.current = null;
+  localStorage.removeItem('authUserId');
+  localStorage.removeItem('sessionUser');
+  localStorage.removeItem('idToken');
+  localStorage.removeItem('authUser');
+  // Latest page view for logged out users
+  analytics.identify({ latestPageView: now });
+
+  if (window.location.pathname === "/"){
+    headerLoginLoading.style.display = 'none';
+    headerLoginButton.style.display = 'flex';
   }
 }
