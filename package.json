@@ -30,7 +30,6 @@
     "parcel": "^2.9.3"
   },
   "dependencies": {
-    "image-blob-reduce": "^4.1.0",
     "qrcode": "^1.5.3"
   }
 }

@@ -1,7 +1,3 @@
-import ImageBlobReduce from 'image-blob-reduce';
-
-const reduce = ImageBlobReduce();
-
 export async function uploadTempImage(input, fileName) {
   try {
     return await uploadTempImageWrapped(input, fileName);
@@ -27,7 +23,7 @@ async function uploadTempImageWrapped(input, fileName) {
     let image;
     try {
       image = await scaleImageToMaxSize(input);
-      console.log(`Resized image size: ${(image.size / 1024 / 1024).toFixed(2)} MB`);
+      console.log(`Scaled image size: ${(image.size / 1024 / 1024).toFixed(2)} MB`);
     } catch (error) {
       const resizeError = new Error('Failed to resize image');
       resizeError.name = 'ImageResizeError';
@@ -62,15 +58,127 @@ async function scaleImageToMaxSize(input) {
   const MAX_HEIGHT = 4032;
 
  
+  if ('createImageBitmap' in window) {
+    try {
+      console.log('Attempting to scale image with createImageBitmap');
+      return await imageBitmapScale(input, MAX_WIDTH, MAX_HEIGHT);
+    } catch (error) {
+      console.warn('createImageBitmap scaling method failed', error);
+    }
+  }
+
+  // If createImageBitmap is not supported or failed, try OffscreenCanvas
+  if ('OffscreenCanvas' in window) {
+    try {
+      console.log('Attempting to scale image with OffscreenCanvas');
+      return await offscreenCanvasScale(input, MAX_WIDTH, MAX_HEIGHT);
+    } catch (error) {
+      console.warn('OffscreenCanvas scaling method failed', error);
+    }
+  }
+
+  // If both modern methods fail or are not supported, fall back to the original method
   try {
-    console.log('Attempting to scale image with image-blob-reduce');
-    return await reduce.toBlob(input, {
-      max: Math.max(MAX_WIDTH, MAX_HEIGHT)
-    });
+    console.log('Attempting to scale image with original method');
+    return await canvasScale(input, MAX_WIDTH, MAX_HEIGHT);
+  } catch (error) {
+    console.error('All scaling methods failed', error);
+    throw new Error('Unable to process image');
+  }
+}
+
+async function imageBitmapScale(input, maxWidth, maxHeight) {
+  try {
+    const imageBitmap = await createImageBitmap(input);
+    const canvas = new OffscreenCanvas(maxWidth, maxHeight);
+    const ctx = canvas.getContext('2d');
+
+    let { width, height } = imageBitmap;
+    if (width > height) {
+      if (width > maxWidth) {
+        height *= maxWidth / width;
+        width = maxWidth;
+      }
+    } else {
+      if (height > maxHeight) {
+        width *= maxHeight / height;
+        height = maxHeight;
+      }
+    }
+
+    canvas.width = width;
+    canvas.height = height;
+    ctx.drawImage(imageBitmap, 0, 0, width, height);
+
+    return await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.9 });
   } catch (error) {
     console.error('Image scaling failed', error);
     throw new Error('Unable to process image');
   }
+}
+
+async function offscreenCanvasScale(input, maxWidth, maxHeight) {
+  const img = await createImageBitmap(input);
+  
+  let width = img.width;
+  let height = img.height;
+  if (width > height) {
+    if (width > maxWidth) {
+      height = height * (maxWidth / width);
+      width = maxWidth;
+    }
+  } else {
+    if (height > maxHeight) {
+      width = width * (maxHeight / height);
+      height = maxHeight;
+    }
+  }
+
+  const offscreen = new OffscreenCanvas(width, height);
+  const ctx = offscreen.getContext('2d');
+  ctx.drawImage(img, 0, 0, width, height);
+
+  return offscreen.convertToBlob({type: 'image/jpeg', quality: 0.9});
+}
+
+async function canvasScale(input, maxWidth, maxHeight) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > maxWidth) {
+          height *= maxWidth / width;
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width *= maxHeight / height;
+          height = maxHeight;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob(
+        (blob) => {
+          console.log(`Fallback resize: ${(blob.size / 1024 / 1024).toFixed(2)} MB`);
+          resolve(blob);
+        },
+        'image/jpeg',
+        0.9
+      );
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(input);
+  });
 }
 
 export async function requestUniqueId() {
