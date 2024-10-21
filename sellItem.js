@@ -294,7 +294,7 @@ async function addItem() {
     document.querySelectorAll('input[type="file"]').forEach(input => {
       if (input.files.length && !images[input.id]) {
         reUploadingImage = input;
-        uploadImageAndShowPreview(input, input.id, true);
+        uploadImageAndShowPreview(input.files[0], input.id, true);
       }
     });
   } catch (e) {
