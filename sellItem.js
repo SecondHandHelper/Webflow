@@ -10,7 +10,9 @@ import {
   showImagePreview,
   showImageState,
   showLoadingIcon,
-  uploadImageAndShowPreview
+  uploadImageAndShowPreview,
+  showImageError,
+  hideImageError
 } from "./sellItemHelpers";
 import QRCode from "qrcode";
 import {formatPersonalId, getFormAddressFields, isValidSwedishSsn, setFormAddressFields} from "./general";
@@ -285,6 +287,26 @@ async function sellItemMain() {
 
 async function addItem() {
   const id = params.type === 'draft' ? params.id : (sessionStorage.getItem('newItemId') || await requestUniqueId());
+  let reUploadingImage = null;
+  try {
+    // Check that all images are uploaded
+    const images = JSON.parse(localStorage.getItem('newItem') || '{}').images    
+    document.querySelectorAll('input[type="file"]').forEach(input => {
+      if (input.files.length && !images[input.id]) {
+        reUploadingImage = input;
+        uploadImageAndShowPreview(input, input.id, true);
+      }
+    });
+  } catch (e) {
+    if (reUploadingImage) {
+      reUploadingImage.setCustomValidity('Uppladdning av bilden misslyckades, försök igen');
+      showImageError(reUploadingImage, 'Uppladdning av bilden misslyckades, försök igen');
+      validateForm();
+    }
+    errorHandler.report(e);
+    console.error('addItem failed', e);
+    return;
+  }
   try {
     document.getElementById('addItemFormDiv').style.display = 'none';
     document.getElementById('loadingDiv').style.display = 'flex';
@@ -567,6 +589,24 @@ async function getCreatedFromItemUserId(itemId) {
   return item.data().user;
 }
 
+function validateForm() {
+  document.getElementById('wf-form-Add-Item').reportValidity();
+  const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
+  const element = invalidElements?.[0];
+  if (element && element.getBoundingClientRect().height <= 1) {
+    element.style.cssText = 'width:100% !important;height:100% !important;'
+  }
+  setTimeout(() => {
+    if (invalidElements.length > 0) {
+      if (!isElementInView(element)) {
+        const y = element.getBoundingClientRect().top + window.scrollY - 40;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+      document.getElementById('wf-form-Add-Item').reportValidity();
+    }
+  }, 300);
+}
+
 function initializeInputEventListeners() {
   itemBrand.addEventListener('input', fieldLabelToggle('itemBrandLabel'));
   itemBrand.addEventListener('input', clearConfirmButtonValidity);
@@ -616,23 +656,8 @@ function initializeInputEventListeners() {
     window.location.href = '/private#wardrobe';
   });
 
-  document.getElementById('addItemButton').addEventListener('click', () => {
-    document.getElementById('wf-form-Add-Item').reportValidity();
-    const invalidElements = document.getElementById('wf-form-Add-Item').querySelectorAll(':invalid');
-    const element = invalidElements?.[0];
-    if (element && element.getBoundingClientRect().height <= 1) {
-      element.style.cssText = 'width:100% !important;height:100% !important;'
-    }
-    setTimeout(() => {
-      if (invalidElements.length > 0) {
-        if (!isElementInView(element)) {
-          const y = element.getBoundingClientRect().top + window.scrollY - 40;
-          window.scrollTo({ top: y, behavior: 'smooth' });
-        }
-        document.getElementById('wf-form-Add-Item').reportValidity();
-      }
-    }, 300);
-  });
+
+  document.getElementById('addItemButton').addEventListener('click', validateForm);
   addItemForm.addEventListener("submit", () => addItem());
   userAddressForm.addEventListener("submit", addUserDetails);
 
@@ -1320,6 +1345,7 @@ function initializeDeleteImageListeners() {
   imageElements().forEach(imageName => {
     document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).addEventListener('click', () => {
       removeSavedImage(imageName);
+      hideImageError(imageName);
     });
   })
   document.getElementById("deleteFrontImageIcon").addEventListener('click', () => {

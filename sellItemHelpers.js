@@ -1,11 +1,41 @@
+import ImageBlobReduce from 'image-blob-reduce';
+
+const reduce = ImageBlobReduce();
+
 export async function uploadTempImage(input, fileName) {
+  try {
+    return await uploadTempImageWrapped(input, fileName);
+  } catch (ex) {
+    if (ex.name === 'ImageResizeError') {
+      console.error('Failed to resize image', ex);
+      errorHandler.report(ex);
+      throw ex; // Don't retry for resize errors
+    } else {
+      console.error('Failed to upload image', ex);
+      errorHandler.report(ex);
+      // Retry once for upload errors
+      return await uploadTempImageWrapped(input, fileName);
+    }
+  }
+}
+
+async function uploadTempImageWrapped(input, fileName) {
     if (!sessionStorage.getItem('newItemId')) {
-        sessionStorage.setItem('newItemId', await  requestUniqueId());
+        sessionStorage.setItem('newItemId', await requestUniqueId());
     }
     const tempId = sessionStorage.getItem('newItemId');
-    let image = await scaleImageToMaxSize(input);
+    let image;
+    try {
+      image = await scaleImageToMaxSize(input);
+      console.log(`Resized image size: ${(image.size / 1024 / 1024).toFixed(2)} MB`);
+    } catch (error) {
+      const resizeError = new Error('Failed to resize image');
+      resizeError.name = 'ImageResizeError';
+      resizeError.originalError = error;
+      throw resizeError;
+    }
     if (!image) {
-        throw 'Fel vid bearbetning av vald bild.';
+        throw new Error('Fel vid bearbetning av vald bild.');
     }
     const form = new FormData();
     form.append('itemId', tempId);
@@ -17,47 +47,30 @@ export async function uploadTempImage(input, fileName) {
         method: 'POST',
         body: form
     });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     return await response.json();
 }
 
 async function scaleImageToMaxSize(input) {
-    if (input.size < 5 * 1024 * 1024) {
-        // Don't compress images < 5MB in size
-        return Promise.resolve(input);
-    }
-    return new Promise((resolve, reject) => {
-        const MAX_WIDTH = 1512;
-        const MAX_HEIGHT = 2016;
-        const reader = new FileReader();
-        reader.onload = () => {
-            const img = document.createElement("img");
-            img.onload = () => {
-                let width = img.width;
-                let height = img.height;
-                if (width > height) {
-                    if (width > MAX_WIDTH) {
-                        height = height * (MAX_WIDTH / width);
-                        width = MAX_WIDTH;
-                    }
-                } else {
-                    if (height > MAX_HEIGHT) {
-                        width = width * (MAX_HEIGHT / height);
-                        height = MAX_HEIGHT;
-                    }
-                }
-                const canvas = document.createElement("canvas");
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext("2d");
-                ctx.imageSmoothingQuality = "high";
-                ctx.drawImage(img, 0, 0, width, height);
-                canvas.toBlob(resolve, 'image/jpeg')
-            }
-            img.src = reader.result;
-            reader.onerror = reject;
-        }
-        reader.readAsDataURL(input);
+  if (input.size < 5 * 1024 * 1024) {
+      // Don't compress images < 5MB in size
+      return Promise.resolve(input);
+  }
+  const MAX_WIDTH = 3024;
+  const MAX_HEIGHT = 4032;
+
+ 
+  try {
+    console.log('Attempting to scale image with image-blob-reduce');
+    return await reduce.toBlob(input, {
+      max: Math.max(MAX_WIDTH, MAX_HEIGHT)
     });
+  } catch (error) {
+    console.error('Image scaling failed', error);
+    throw new Error('Unable to process image');
+  }
 }
 
 export async function requestUniqueId() {
@@ -153,13 +166,13 @@ export async function uploadImageAndShowPreview(input, imageName, saveState = tr
     }
 }
 
-function showImageError(imageName, error) {
+export function showImageError(imageName, error) {
     const parentNode = document.getElementById(imageName).parentNode.parentNode;
     parentNode.querySelector('.w-file-upload-error').style.display = 'block';
     parentNode.querySelector('.w-file-upload-error-msg').innerText = error;
 }
 
-function hideImageError(imageName) {
+export function hideImageError(imageName) {
     const parentNode = document.getElementById(imageName).parentNode.parentNode;
     parentNode.querySelector('.w-file-upload-error').style.display = 'none';
 }
@@ -383,3 +396,4 @@ export function colorName(color) {
   };
   return mapping[color] || color;
 }
+
