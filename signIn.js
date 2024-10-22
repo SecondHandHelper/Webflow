@@ -172,3 +172,5 @@ function handleUserSignOut() {
     headerLoginButton.style.display = 'flex';
   }
 }
+
+console.log('auth functions declared!');
