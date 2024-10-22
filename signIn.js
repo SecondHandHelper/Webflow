@@ -130,7 +130,11 @@ async function handleAuthStateChange(result) {
   if (result) {
     await handleUserSignIn(result);
   } else {
-    handleUserSignOut();
+    if (!window.maiIdToken) {
+      handleUserSignOut();
+    } else {
+      localStorage.setItem('idToken', window.maiIdToken);
+    }
   }
 }
 
