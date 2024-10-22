@@ -125,6 +125,7 @@ async function signedInNextStep(fallbackRedirect) {
 }
 
 async function handleAuthStateChange(result) {
+  console.log('window.maiIdToken', window.maiIdToken);
   console.log("onAuthStateChanged callback: ", new Date());
   if (result) {
     await handleUserSignIn(result);
