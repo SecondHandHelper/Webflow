@@ -27,7 +27,7 @@ function validateAndDecrease(input) {
 
 function numOrdered() {
   return +document.getElementById('numSmall').value + +document.getElementById('numMedium').value +
-    +document.getElementById('numLarge').value
+    + document.getElementById('numLarge').value + +document.getElementById('numXLarge').value
 }
 
 function updateOrderButton() {
@@ -70,6 +70,7 @@ function addInputComponentEventListeners(minusElm, plusElm, inputElm) {
 addInputComponentEventListeners('minusSmall', 'plusSmall', 'numSmall');
 addInputComponentEventListeners('minusMedium', 'plusMedium', 'numMedium');
 addInputComponentEventListeners('minusLarge', 'plusLarge', 'numLarge');
+addInputComponentEventListeners('minusXLarge', 'plusXLarge', 'numXLarge');
 
 document.getElementById('userAddressForm').addEventListener("submit", async () => {
   const addressFields = getFormAddressFields();
@@ -111,8 +112,9 @@ document.getElementById('orderBags').addEventListener('click', async function ()
   const numSmallBags = +document.getElementById('numSmall').value;
   const numMediumBags = +document.getElementById('numMedium').value;
   const numLargeBags = +document.getElementById('numLarge').value;
+  const numXLargeBags = +document.getElementById('numXLarge').value;
   try {
-    await callBackendApi('/api/bags/order', { data: { numLargeBags, numSmallBags, numMediumBags }});
+    await callBackendApi('/api/bags/order', { data: { numXLargeBags, numLargeBags, numSmallBags, numMediumBags }});
     document.getElementById('bagsOrdered').innerText = `${numOrdered()} ${bagOrBags()} på väg!`;
   } catch (e) {
     errorHandler.report(e);
