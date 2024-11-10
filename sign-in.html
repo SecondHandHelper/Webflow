@@ -73,12 +73,12 @@
 
     submitLoadIcon.style.display = 'block';
     sendCodeButton.style.display = 'none';
-    const formPhoneNumber = signinPhoneNumber.value;
+    const formPhoneNumber = signinPhoneNumber.value.startsWith('0') ? signinPhoneNumber.value.slice(1) : signinPhoneNumber.value;
     const phoneNumber = formPhoneNumber.startsWith('+46') ? formPhoneNumber : `+46${formPhoneNumber}`;
-    const appVerifier = window.recaptchaVerifier;
-    firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
-      .then((confirmationResult) => {
-        window.confirmationResult = confirmationResult;
+    console.log('signInWithPhoneNumber', phoneNumber);
+    callBackendApi('/api/users/authStart', { data: { phoneNumber }, requiresAuth: false})
+      .then(() => {
+        window.phoneNumber = phoneNumber;
         mobileNumberDiv.style.display = 'none';
         verifyDiv.style.display = 'block';
       }).catch((error) => {
@@ -99,26 +99,37 @@
 
   function verifyCode() {
     const code = verificationCode.value;
-    console.log('Verify screen. My code: ' + code);
-    console.log('VerificationID' + confirmationResult.verificationId);
-    confirmationResult.confirm(code).then((result) => {
-      const user = result.user;
+    console.log('Verify screen. My code: ', code);
+    console.log('phone number to verify', phoneNumber);
+    let isNewUser = false;
+    callBackendApi('/api/users/phoneNumberExists', { data: { phoneNumber }, requiresAuth: false })
+      .then((result) => {
+        console.log('phoneNumberExists result', phoneNumber, JSON.stringify(result));
+        const type = result.data.exists ? 'signIn' : 'signUp';
+        isNewUser = type === 'signUp';
+        return callBackendApi('/api/users/authVerify', { data: { phoneNumber, code, type }, requiresAuth: false });
+      })
+      .then((result) => {
+        const customToken = result.data.customToken;
+        return firebase.auth().signInWithCustomToken(customToken);
+      })
+      .then((user) => {
+        if (typeof (Storage) !== "undefined") {
+          sessionStorage.setItem("userId", user.uid);
+          sessionStorage.setItem("phone", user.phoneNumber);
+        } else {
+          console.log("Sorry, your browser does not support Web Storage...");
+        }
 
-      if (typeof (Storage) !== "undefined") {
-        sessionStorage.setItem("userId", user.uid);
-        sessionStorage.setItem("phone", user.phoneNumber);
-      } else {
-        console.log("Sorry, your browser does not support Web Storage...");
-      }
-
-      if (result.additionalUserInfo.isNewUser) {
-        emailForTipsDiv.style.display = 'block';
-        verifyDiv.style.display = 'none';
-        phoneLoginDiv.style.display = 'none';
-      } else {
-        authUser.whenSet(signedInNextStep);
-      }
-    }).catch((error) => {
+        console.log("isNewUser", isNewUser);
+        if (isNewUser) {
+          emailForTipsDiv.style.display = 'block';
+          verifyDiv.style.display = 'none';
+          phoneLoginDiv.style.display = 'none';
+        } else {
+          authUser.whenSet(signedInNextStep);
+        }
+      }).catch((error) => {
       console.log('My error: ' + error.message);
       errorHandler.report(error);
     });
