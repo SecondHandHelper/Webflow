@@ -1,0 +1,26 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [ "NFNNTAHH9D.se.maiapp.app", "NFNNTAHH9D.se.maiapp.app.dev", "NFNNTAHH9D.se.maiapp.app.preview" ],
+        "components": [
+            {
+                "/": "/"
+            },
+            {
+                "/": "/private/*"
+            },
+            {
+                "/": "/item-valuation/*"
+            },
+            {
+                "/": "/item/*"
+            }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [ "NFNNTAHH9D.se.maiapp.app" ]
+  }
+}
