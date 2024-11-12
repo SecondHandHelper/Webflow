@@ -248,8 +248,8 @@ async function fillForm(itemId) {
     }
     const age = data.age;
     const condition = data.condition;
-    const defectDescription = data.defectDescription;
-    const userComment = data.userComment;
+    const defectDescription = data.defectDescription || '';
+    const userComment = data.userComment || '';
     const infoRequests = data.infoRequests;
     const images = data.images;
     let category = "";
