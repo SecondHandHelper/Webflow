@@ -360,7 +360,7 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived, s
   return div;
 }
 
-export function loadItemCards(items) {
+export function loadItemCards(items, userData = null) {
   itemListSelling.innerHTML = "";
   itemListSoldNotSent.innerHTML = "";
   itemListSold.innerHTML = "";
@@ -394,13 +394,14 @@ export function loadItemCards(items) {
     var frontImageUrl = itemCoverImage(item);
     let daysLeftText = "";
     let publishedDate = item.publishedDate;
+    let daysSincePublished;
     if (publishedDate) {
       publishedDate = new Date(publishedDate);
       let nowDate = new Date();
       let timeDifference = nowDate.getTime() - publishedDate.getTime();
-      let daysDifference = timeDifference / (1000 * 3600 * 24);
+      daysSincePublished = timeDifference / (1000 * 3600 * 24);
       let sellingPeriodLength = longerPeriodAcceptedDate ? 60 : 30;
-      let daysLeft = Math.round(sellingPeriodLength - daysDifference);
+      let daysLeft = Math.round(sellingPeriodLength - daysSincePublished);
       if (daysLeft <= 0) {
         daysLeftText = `0 dagar kvar`;
       } else {
@@ -439,8 +440,11 @@ export function loadItemCards(items) {
         }
         if (status === "Published" && minPriceEstimate && maxPriceEstimate) {
           textDiv1 = `<div class='text-block-34'>${minPriceEstimate} - ${maxPriceEstimate} kr</div>`;
-          const text2 = holidayMode ? "Pausad" : daysLeftText;
-          textDiv2 = `<div class='text-block-34'>${text2}</div>`;
+          const timeText = userData?.specialDeal 
+            ? `Live (${Math.round(daysSincePublished)} dagar)`
+            : daysLeftText;
+
+          textDiv2 = `<div class='text-block-34'>${holidayMode ? "Pausad" : timeText}</div>`;
         }
 
         let sellingItemCardHTML = `<div class="div-block-14-big"><a id="itemLinkBlock" href="${itemPageUrl}" class="link-block-18 w-inline-block"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div><div class="text-block-14">${brand}</div>${textDiv1}${textDiv2}</a></div>`;

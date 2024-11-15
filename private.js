@@ -295,7 +295,8 @@ async function privateMain() {
     showOrderBagsSection(),
     showInactiveItemsSection(),
   ]);
-  loadItemCards(items);
+  loadItemCards(items, user.current);
+  console.log('user.current', user.current);
 
   if (window.location.href.endsWith('#wardrobe')) {
     setTimeout(() => {
