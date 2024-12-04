@@ -2,7 +2,7 @@
   "applinks": {
     "details": [
       {
-        "appIDs": [ "NFNNTAHH9D.se.maiapp.app", "NFNNTAHH9D.se.maiapp.app.dev", "NFNNTAHH9D.se.maiapp.app.preview" ],
+        "appIDs": [ "NFNNTAHH9D.se.maiapp.app.prod", "NFNNTAHH9D.se.maiapp.app.dev", "NFNNTAHH9D.se.maiapp.app.preview" ],
         "components": [
             {
                 "/": "/"
@@ -27,6 +27,6 @@
     ]
   },
   "webcredentials": {
-    "apps": [ "NFNNTAHH9D.se.maiapp.app" ]
+    "apps": [ "NFNNTAHH9D.se.maiapp.app.prod" ]
   }
 }
