@@ -268,7 +268,7 @@ async function privateMain() {
       console.log('Yearly data exist!');
       document.getElementById('yearlySummaryDiv').style.display = 'block';
       document.getElementById('yearlySummaryDiv').addEventListener("click", function () {
-        location.href = `/2023withmai?id=${userId.substring(0, 10)}`;
+        location.href = `/yearly-summary?id=${userId.substring(0, 10)}&year=2024`;
       });
     } else {
       console.log('No yearly summary exist!');
@@ -565,7 +565,7 @@ async function yearlyDataExist(userId) {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ id: userId })
+    body: JSON.stringify({ id: userId, year: '2024' })
   };
   const yearlyDataResponse = await fetch(url, options);
   if (!yearlyDataResponse.ok) { throw new Error('Network response was not ok.'); }

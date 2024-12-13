@@ -1,6 +1,7 @@
 async function main() {
   const params = getParamsObject();
   mainHeading.innerText = `Tack för ${params.year}!`;
+  shareButtonText.innerText = `Dela ditt ${params.year}`;
   mainHeading.style.visibility = 'visible';
   //Get data
   const url = 'https://europe-west3-second-hand-helper.cloudfunctions.net/yearlyData';
@@ -42,14 +43,14 @@ function shareYearly() {
   const params = getParamsObject();
   if (navigator.share) {
     navigator.share({
-      url: `https://maiapp.se/2023withmai?id=${params.id}&year=${params.year}`
+      url: `https://maiapp.se/yearly-summary?id=${params.id}&year=${params.year}`
     }).then(() => { console.log('Thanks for sharing!'); }).catch((e) => {
       console.error(e);
       errorHandler.report(e);
     });
   } else {
     console.log("Browser doesn't support navigator.share => Copy to clipboard!");
-    const shareText = `https://maiapp.se/2023withmai?id=${params.id}&year=${params.year}`;
+    const shareText = `https://maiapp.se/yearly-summary?id=${params.id}&year=${params.year}`;
     navigator.clipboard.writeText(shareText);
     linkCopiedBanner.style.display = 'flex';
     setTimeout(function () { linkCopiedBanner.style.display = 'none'; }, 1500);
