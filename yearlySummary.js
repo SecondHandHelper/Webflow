@@ -1,5 +1,7 @@
 async function main() {
   const params = getParamsObject();
+  mainHeading.innerText = `Tack för ${params.year}!`;
+  mainHeading.style.visibility = 'visible';
   //Get data
   const url = 'https://europe-west3-second-hand-helper.cloudfunctions.net/yearlyData';
   const options = {
