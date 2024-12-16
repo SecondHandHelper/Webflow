@@ -24,7 +24,7 @@ async function main() {
     document.getElementById('soldItems').innerText = `${yearlyData.sold} st plagg`;
     document.getElementById('savedCo2').innerHTML = yearlyData.co2kg < 100 ? `${(parseInt(yearlyData.co2kg)).toLocaleString('sv')} kg CO<sub>2</sub>` : `${(parseInt(yearlyData.co2kg) / 1000).toLocaleString('sv')} ton CO<sub>2</sub>`;
     if (yearlyData.name) {
-      document.getElementById('letterTitle').innerHTML = yearlyData.name.charAt(0).toUpperCase() + yearlyData.name.slice(1) + ',';
+      document.getElementById('letterTitle').innerHTML = yearlyData.name.charAt(0).toUpperCase() + yearlyData.name.slice(1);
     } else {
       document.getElementById('letterTitle').style.display = 'none';
     }

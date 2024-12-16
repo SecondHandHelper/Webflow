@@ -262,7 +262,6 @@ async function privateMain() {
   setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
 
   //Yearly Summary
-  /*
   yearlyDataExist(userId).then((result) => {
     if (result) {
       console.log('Yearly data exist!');
@@ -274,7 +273,6 @@ async function privateMain() {
       console.log('No yearly summary exist!');
     }
   });
-  */
 
   const items = (await callBackendApi('/api/items', { requiresAuth: true }))?.data;
   showInviteToast(items);
