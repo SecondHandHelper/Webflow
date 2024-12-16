@@ -24,16 +24,19 @@ async function main() {
     document.getElementById('soldItems').innerText = `${yearlyData.sold} st plagg`;
     document.getElementById('savedCo2').innerHTML = yearlyData.co2kg < 100 ? `${(parseInt(yearlyData.co2kg)).toLocaleString('sv')} kg CO<sub>2</sub>` : `${(parseInt(yearlyData.co2kg) / 1000).toLocaleString('sv')} ton CO<sub>2</sub>`;
     if (yearlyData.name) {
-      document.getElementById('letterTitle').innerHTML = yearlyData.name.charAt(0).toUpperCase() + yearlyData.name.slice(1);
+      document.getElementById('letterTitle').innerHTML = yearlyData.name.charAt(0).toUpperCase() + yearlyData.name.slice(1) + `${params.year === '2023' ? ',' : ''}`;
     } else {
       document.getElementById('letterTitle').style.display = 'none';
     }
-    document.getElementById('letterBody').innerText = yearlyData.letter + "\n\nTillsammans ser vi till att plaggen får komma till användning, och vi hoppas vi får förtroendet att fortsätta sälja dina kläder under 2024!";
+    document.getElementById('letterBody').innerText = yearlyData.letter + `${params.year === '2023' ? "\n\nTillsammans ser vi till att plaggen får komma till användning, och vi hoppas vi får förtroendet att fortsätta sälja dina kläder under 2024!" : ''}`;
     document.getElementById('topStatsLoadingIcon').style.display = 'none';
     topStatsDiv.style.visibility = 'visible';
     letterDiv.style.display = 'flex';
     document.getElementById('shareYearlyHeaderButton').addEventListener('click', shareYearly);
     document.getElementById('shareYearlyButton').addEventListener('click', shareYearly);
+    if (params.year === '2024') {
+      document.getElementById('letterEnding').style.display = 'none';
+    }
   }
 }
 
