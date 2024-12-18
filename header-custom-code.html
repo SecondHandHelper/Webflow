@@ -7,10 +7,12 @@
     const protectedPages = ['/private', '/personal-id-form', '/address-form', '/item', '/ship-item', '/edit-item',
       '/order-bags', '/settings', '/user-contact'];
     const params = new URL(window.location).searchParams;
-    const hasSParam = params.has('s') && params.get('s').length >= 3;
-    const path = window.location.pathname;
-    if (protectedPages.includes(path) || (hasSParam && path === '/')) {
-      location.href = './sign-in' + window.location.search;
+    if (!params.has('app')) {
+      const hasSParam = params.has('s') && params.get('s').length >= 3;
+      const path = window.location.pathname;
+      if (protectedPages.includes(path) || (hasSParam && path === '/')) {
+        location.href = './sign-in' + window.location.search;
+      }
     }
   }
   let errorHandler;
@@ -54,9 +56,11 @@
         this.value = null;
         return;
       }
-      this.value = { uid: newVal.uid, email: newVal.email, phoneNumber: newVal.phoneNumber,
-        providerData: [ { providerId: newVal?.providerData?.[0]?.providerId }], metadata: { creationTime: newVal.metadata?.creationTime },
-        emailVerified: newVal.emailVerified, personalId: newVal.personalId };
+      this.value = {
+        uid: newVal.uid, email: newVal.email, phoneNumber: newVal.phoneNumber,
+        providerData: [{ providerId: newVal?.providerData?.[0]?.providerId }], metadata: { creationTime: newVal.metadata?.creationTime },
+        emailVerified: newVal.emailVerified, personalId: newVal.personalId
+      };
       if (newVal.uid && errorHandler) {
         errorHandler.setUser(newVal.uid);
       }
@@ -91,34 +95,40 @@
 
 <!-- Segment -->
 <script>
-  !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware"];analytics.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);t.unshift(e);analytics.push(t);return analytics}};for(var e=0;e<analytics.methods.length;e++){var key=analytics.methods[e];analytics[key]=analytics.factory(key)}analytics.load=function(key,e){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.src="https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);analytics._loadOptions=e};analytics._writeKey="voF0TJjZHNsenbBzw8VeDIYggupAmfuj";;analytics.SNIPPET_VERSION="4.15.3";
-  analytics.load("voF0TJjZHNsenbBzw8VeDIYggupAmfuj");
-  analytics.page();
-  }}();
+  !function () {
+    var analytics = window.analytics = window.analytics || []; if (!analytics.initialize) if (analytics.invoked) window.console && console.error && console.error("Segment snippet included twice."); else {
+      analytics.invoked = !0; analytics.methods = ["trackSubmit", "trackClick", "trackLink", "trackForm", "pageview", "identify", "reset", "group", "track", "ready", "alias", "debug", "page", "once", "off", "on", "addSourceMiddleware", "addIntegrationMiddleware", "setAnonymousId", "addDestinationMiddleware"]; analytics.factory = function (e) { return function () { var t = Array.prototype.slice.call(arguments); t.unshift(e); analytics.push(t); return analytics } }; for (var e = 0; e < analytics.methods.length; e++) { var key = analytics.methods[e]; analytics[key] = analytics.factory(key) } analytics.load = function (key, e) { var t = document.createElement("script"); t.type = "text/javascript"; t.async = !0; t.src = "https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js"; var n = document.getElementsByTagName("script")[0]; n.parentNode.insertBefore(t, n); analytics._loadOptions = e }; analytics._writeKey = "voF0TJjZHNsenbBzw8VeDIYggupAmfuj";; analytics.SNIPPET_VERSION = "4.15.3";
+      analytics.load("voF0TJjZHNsenbBzw8VeDIYggupAmfuj");
+      analytics.page();
+    }
+  }();
 </script>
 
 <!-- CodeCrumbs -->
 <script>
-!function(e,t){e[t]=new Proxy(e[t]||{},{get:(e,o)=>new Proxy(e[o]||function(){},{apply:(n,r,a)=>{const c=()=>e[o](...a);"complete"===document.readyState?c():document.addEventListener("readystatechange",(n=>{"complete"===n.target.readyState&&(e?.[o]?c():console.error(`${t}.${o} is not a function. Did it load correctly from the CDN? If not, did you use the correct name.`))}))}})})}(globalThis,"CodeCrumbs");
+  !function (e, t) { e[t] = new Proxy(e[t] || {}, { get: (e, o) => new Proxy(e[o] || function () { }, { apply: (n, r, a) => { const c = () => e[o](...a); "complete" === document.readyState ? c() : document.addEventListener("readystatechange", (n => { "complete" === n.target.readyState && (e?.[o] ? c() : console.error(`${t}.${o} is not a function. Did it load correctly from the CDN? If not, did you use the correct name.`)) })) } }) }) }(globalThis, "CodeCrumbs");
 </script>
 
 <!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-KWV4J65');</script>
+<script>(function (w, d, s, l, i) {
+    w[l] = w[l] || []; w[l].push({
+      'gtm.start':
+        new Date().getTime(), event: 'gtm.js'
+    }); var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+        'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+  })(window, document, 'script', 'dataLayer', 'GTM-KWV4J65');</script>
 <!-- End Google Tag Manager -->
 
 <!-- TikTok -->
 <script>
   !function (w, d, t) {
-    w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{},ttq._partner=ttq._partner||'Segment';var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
-  
+    w.TiktokAnalyticsObject = t; var ttq = w[t] = w[t] || []; ttq.methods = ["page", "track", "identify", "instances", "debug", "on", "off", "once", "ready", "alias", "group", "enableCookie", "disableCookie"], ttq.setAndDefer = function (t, e) { t[e] = function () { t.push([e].concat(Array.prototype.slice.call(arguments, 0))) } }; for (var i = 0; i < ttq.methods.length; i++)ttq.setAndDefer(ttq, ttq.methods[i]); ttq.instance = function (t) { for (var e = ttq._i[t] || [], n = 0; n < ttq.methods.length; n++)ttq.setAndDefer(e, ttq.methods[n]); return e }, ttq.load = function (e, n) { var i = "https://analytics.tiktok.com/i18n/pixel/events.js"; ttq._i = ttq._i || {}, ttq._i[e] = [], ttq._i[e]._u = i, ttq._t = ttq._t || {}, ttq._t[e] = +new Date, ttq._o = ttq._o || {}, ttq._o[e] = n || {}, ttq._partner = ttq._partner || 'Segment'; var o = document.createElement("script"); o.type = "text/javascript", o.async = !0, o.src = i + "?sdkid=" + e + "&lib=" + t; var a = document.getElementsByTagName("script")[0]; a.parentNode.insertBefore(o, a) };
+
     ttq.load('CHNLVS3C77U0O25EL6C0');
     ttq.page();
   }(window, document, 'ttq');
-  </script>
+</script>
 <!-- End TikTok -->
 
 <meta name="facebook-domain-verification" content="5l4794w9fadbt3l14enhwey0lzhzde" />
@@ -126,17 +136,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta name="facebook-domain-verification" content="ore0osqnkep3dhvgk26w1slabjrvud" />
 
 <style>
-*:focus {
+  *:focus {
     outline: 0 !important;
-}
+  }
 
-html {
-  -webkit-tap-highlight-color: rgba( 255,255,255,0.4);
-}
+  html {
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0.4);
+  }
 
-a > div {
-  -webkit-tap-highlight-color: transparent !important;
-}
+  a>div {
+    -webkit-tap-highlight-color: transparent !important;
+  }
 </style>
 
 <!-- script for FAQPage -->
