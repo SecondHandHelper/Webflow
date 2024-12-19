@@ -2,7 +2,7 @@
   "applinks": {
     "details": [
       {
-        "appIDs": [ "NFNNTAHH9D.se.maiapp.app.prod", "NFNNTAHH9D.se.maiapp.app.dev", "NFNNTAHH9D.se.maiapp.app.preview" ],
+        "appIDs": [ "NFNNTAHH9D.se.maiapp.app.prod", "NFNNTAHH9D.se.maiapp.app.dev", "NFNNTAHH9D.se.maiapp.app.preview", "FAKETEAMID.se.maiapp.dev" ],
         "components": [
             {
                 "/": "/"
@@ -24,6 +24,12 @@
             },
             {
                 "/": "/sign-in/*"
+            },
+            {
+                "/": "/sell-item/*"
+            },
+            {
+                "/": "/settings/*"
             }
         ]
       }
