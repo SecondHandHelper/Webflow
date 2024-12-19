@@ -49,6 +49,20 @@
       window.location.reload();
     })
   }
+  
+  async function addAppAuthTokenForDeeplinks() {
+    if (authUser.current && p.has('s') && !p.has('aat')) {
+      const result = await callBackendApi('/api/users/token', { method: 'POST', requiresAuth: true });
+      if (result.data && result.data.customToken) {
+        const customToken = result.data.customToken;
+        const url = new URL(window.location.href);
+        url.searchParams.set('aat', customToken);
+        window.location.href = url.toString();
+      }
+    }
+  }
+
+  addAppAuthTokenForDeeplinks();
 
   // SEGMENT IDENTIFY
   function identify(authenticatedUser, dbUser) {

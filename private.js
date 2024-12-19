@@ -1,11 +1,58 @@
 import { itemCoverImage, shareCode, signOut } from "./general";
 import { loadInfoRequests } from "./infoRequestsFunctions";
 import { loadItemCards } from "./loadItemCards";
-import { requestUniqueId } from "./sellItemHelpers";
 
 var userId;
 var email;
 var phone;
+
+function showAppDownloadBanner() {
+  if (authUser.current.uid !== '7HN9mRuTQHNZk2kip72UG1SqWi92') {
+    return;
+  }
+  const customToken = callBackendApi('/api/users/token', { method: 'POST', requiresAuth: true });
+  // addAppBannerMetaTag(customToken.data.customToken);
+  const appDownloadBanner = document.getElementById('appDownloadBanner');
+  if (appDownloadBanner) {
+    appDownloadBanner.style.display = 'block';
+  }
+  const appDownloadButton = document.getElementById('appDownloadButton');
+  if (appDownloadButton) {
+    appDownloadButton.addEventListener('click', () => {
+      console.log('trying to open app')
+      window.location.href = `maiapp-dev://?customToken=${encodeURIComponent(customToken.data.customToken)}`;
+    });
+  }
+}
+
+function addAppBannerMetaTag(customToken) {
+  try {
+      const encodedToken = encodeURIComponent(customToken);
+      const deepLink = `https://maiapp.se/private?customToken=${encodedToken}`;
+      
+      // Look for existing meta tag
+      let metaTag = document.querySelector('meta[name="apple-itunes-app"]');
+      
+      // If it doesn't exist, create it
+      if (!metaTag) {
+          metaTag = document.createElement('meta');
+          metaTag.name = 'apple-itunes-app';
+          document.head.appendChild(metaTag);
+      }
+      // Update the content
+      metaTag.content = `app-id=6443488089, app-argument=${deepLink}`;
+      console.log('Successfully updated app banner meta tag');
+  } catch (error) {
+      console.error('Error updating app banner meta tag:', error);
+      // Fallback to basic meta tag without deep linking
+      let metaTag = document.querySelector('meta[name="apple-itunes-app"]');
+      if (metaTag) {
+          metaTag.content = 'app-id=6443488089';
+      }
+  }
+}
+
+showAppDownloadBanner();
 
 export function updateIC(userId, em, ph) {
   let email = em;
