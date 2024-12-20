@@ -1,13 +1,13 @@
 <script>
-  if (localStorage.getItem('authUserId')) {
-    if (window.location.pathname === '/' || window.location.pathname === '/sign-in') {
-      location.href = '/private' + window.location.search;
-    }
-  } else {
-    const protectedPages = ['/private', '/personal-id-form', '/address-form', '/item', '/ship-item', '/edit-item',
-      '/order-bags', '/settings', '/user-contact', '/referral'];
-    const params = new URL(window.location).searchParams;
-    if (!params.has('app')) {
+  const params = new URL(window.location).searchParams;
+  if (!params.has('app')) {
+    if (localStorage.getItem('authUserId')) {
+      if (window.location.pathname === '/' || window.location.pathname === '/sign-in') {
+        location.href = '/private' + window.location.search;
+      }
+    } else {
+      const protectedPages = ['/private', '/personal-id-form', '/address-form', '/item', '/ship-item', '/edit-item',
+        '/order-bags', '/settings', '/user-contact', '/referral'];
       const hasSParam = params.has('s') && params.get('s').length >= 3;
       const path = window.location.pathname;
       if (protectedPages.includes(path) || (hasSParam && path === '/')) {
