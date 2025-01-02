@@ -1,13 +1,17 @@
-import {itemCoverImage} from "./general";
+import { itemCoverImage } from "./general";
+console.log("brand.js is succesfully running")
 
 function getBrandFromUrl() {
   const path = window.location.pathname.replace(/^\/+/, ''); // Removes leading '/'
   const brand = path.replace('-mai', ''); // Removes '-mai' if it exists
-  return brand.charAt(0).toUpperCase() + brand.slice(1).toLowerCase(); // Capitalize the first letter
+  const formattedBrand = brand.includes('filippa') ? 'Filippa K' : brand.charAt(0).toUpperCase() + brand.slice(1).toLowerCase();
+  return formattedBrand;
 }
 
 function loadRecentlySold() {
-  const recentlySoldItems = callBackendApi(`/api/items/recentlySold?brand=${getBrandFromUrl()}`);
+  const brand = getBrandFromUrl();
+  const isFilippaK = brand === 'Filippa K' ? true : false ;
+  const recentlySoldItems = callBackendApi(`/api/items/recentlySold?brand=${brand}`);
   recentlySoldItems
     .then((result) => {
       // Read result of the Cloud Function.
@@ -15,8 +19,11 @@ function loadRecentlySold() {
       itemListRecentlySoldStartPage.innerHTML = "";
       itemListRecentlySoldStartPageDesktop.innerHTML = "";
 
+      console.log(result.data[0]);
+
       for (const item of result.data) {
         const brand = item.brand;
+        const modelName = item.modelName || 'Model Name';
         const soldPrice = item.soldPrice;
         const soldDate = new Date(item.soldDate);
         const publishedDate = new Date(item.publishedDate);
@@ -24,13 +31,22 @@ function loadRecentlySold() {
         const imageUrl = itemCoverImage(item);
         const daysToSold = Math.floor((soldDate.getTime() - publishedDate.getTime()) / (1000 * 3600 * 24));
         if (soldPrice >= 180 || daysToSold <= 20) {
-          const itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="conten-block with-image">
+          let itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="conten-block with-image">
                         <div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div>
                         <div class="text-block-14">${soldPrice} kr</div>
                         <div class='text-block-34'>${brand}</div>`;
+          if (isFilippaK){
+            itemCardHTML = `<div class="div-block-14-super-big"><div class="ratio-box _16-9"><div class="conten-block with-image">
+                        <div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div>
+                        <div class="text-block-14">${modelName}</div>
+                        <div class='text-block-34'>${brand}</div>
+                        <div class='text-block-34'>${soldPrice}</div>`;
+          }
           //I cut out the "Idag / Igår" during summer, since so little is sold every day. Add this last to show it again: <div class='text-block-34'>${soldTimeText}</div></div>
           itemListRecentlySoldStartPage.innerHTML += itemCardHTML;
-          const desktopCardHTML = itemCardHTML.replace("14-big", "14-big-desktop");
+          const desktopCardHTML = itemCardHTML
+            .replace("14-big", "14-big-desktop")
+            .replace("14-super-big", "14-big-desktop");
           itemListRecentlySoldStartPageDesktop.innerHTML += desktopCardHTML;
         }
       }
@@ -84,7 +100,7 @@ checkCookie("utm_content");
 
 // Set invite code cookie
 const inviteCode = checkCookie("invite");
-if (inviteCode){
+if (inviteCode) {
   referralCodeText.innerHTML = inviteCode;
   activeCode.style.display = 'flex';
 }
