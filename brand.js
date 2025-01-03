@@ -1,5 +1,4 @@
 import { itemCoverImage } from "./general";
-console.log("brand.js is succesfully running")
 
 function getBrandFromUrl() {
   const path = window.location.pathname.replace(/^\/+/, ''); // Removes leading '/'
@@ -7,10 +6,10 @@ function getBrandFromUrl() {
   const formattedBrand = brand.includes('filippa') ? 'Filippa K' : brand.charAt(0).toUpperCase() + brand.slice(1).toLowerCase();
   return formattedBrand;
 }
+const brand = getBrandFromUrl();
+const isFilippaK = brand === 'Filippa K' ? true : false;
 
 function loadRecentlySold() {
-  const brand = getBrandFromUrl();
-  const isFilippaK = brand === 'Filippa K' ? true : false ;
   const recentlySoldItems = callBackendApi(`/api/items/recentlySold?brand=${brand}`);
   recentlySoldItems
     .then((result) => {
@@ -18,8 +17,6 @@ function loadRecentlySold() {
       const itemListRecentlySoldStartPage = document.getElementById('itemListRecentlySoldStartPage');
       itemListRecentlySoldStartPage.innerHTML = "";
       itemListRecentlySoldStartPageDesktop.innerHTML = "";
-
-      console.log(result.data[0]);
 
       for (const item of result.data) {
         const brand = item.brand;
@@ -35,7 +32,7 @@ function loadRecentlySold() {
                         <div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div>
                         <div class="text-block-14">${soldPrice} kr</div>
                         <div class='text-block-34'>${brand}</div>`;
-          if (isFilippaK){
+          if (isFilippaK) {
             itemCardHTML = `<div class="div-block-14-super-big"><div class="ratio-box _16-9"><div class="conten-block with-image">
                         <div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div>
                         <div class="text-block-14">${modelName}</div>
@@ -63,14 +60,16 @@ function loadRecentlySold() {
 
 async function fetchAndLoadRecentlyAddedItems() {
   try {
-    const response = await callBackendApi(`/api/shopify/recentlyAddedItems?brand=${getBrandFromUrl()}`);
+    console.log('brand', brand);
+    const response = await callBackendApi(`/api/shopify/recentlyAddedItems?brand=${brand}`);
     const itemList = document.getElementById('ItemListRecentlyAddedItems');
     const itemListDesktop = document.getElementById('ItemListRecentlyAddedItemsDesktop');
     itemList.innerHTML = "";
     itemListDesktop.innerHTML = "";
+    console.log('response.data[0]', response.data[0]);
 
     for (const item of response.data) {
-      const itemCardHTML = `<div class="div-block-14-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
+      let itemCardHTML = `<div class="div-block-14-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
                         <div class="img-container" style="background-image: url('${item.image}')"></div></div></div>
                         <div class="recently-added-text-block">
                             <div class="recent-added-items-subheader">${item.brand}</div>
@@ -78,8 +77,19 @@ async function fetchAndLoadRecentlyAddedItems() {
                             <div class="recently-added-price">${item.currentPrice} kr</div>
                             <div class="recently-added-brands-link-text">Mai Shop</div>
                         </div><a/></div>`;
+      if (isFilippaK) {
+        itemCardHTML = `<div class="div-block-14-super-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
+                        <div class="img-container" style="background-image: url('${item.image}')"></div></div></div>
+                        <div class="recently-added-text-block">
+                            <div class="text-block-14">${item.brand}</div>
+                            <div class='text-block-34'>${item.category}</div>
+                            <div class='text-block-34'>${item.currentPrice} kr</div>
+                        </div><a/></div>`;
+      }
       itemList.innerHTML += itemCardHTML;
-      const desktopCardHTML = itemCardHTML.replace("14-big", "14-big-desktop");
+      const desktopCardHTML = itemCardHTML
+        .replace("14-big", "14-big-desktop")
+        .replace("14-super-big", "14-big-desktop");
       itemListDesktop.innerHTML += desktopCardHTML;
     }
   } catch (e) {
