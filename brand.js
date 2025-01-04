@@ -37,7 +37,7 @@ function loadRecentlySold() {
                         <div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div>
                         <div class="text-block-14">${modelName}</div>
                         <div class='text-block-34'>${brand}</div>
-                        <div class='text-block-34'>${soldPrice}</div>`;
+                        <div class='text-block-34'>${soldPrice} kr</div>`;
           }
           //I cut out the "Idag / Igår" during summer, since so little is sold every day. Add this last to show it again: <div class='text-block-34'>${soldTimeText}</div></div>
           itemListRecentlySoldStartPage.innerHTML += itemCardHTML;
@@ -115,37 +115,39 @@ if (inviteCode) {
   activeCode.style.display = 'flex';
 }
 
-window.intercomSettings = {
-  app_id: "klyy0le5"
-};
-(function () {
-  var w = window;
-  var ic = w.Intercom;
-  if (typeof ic === "function") {
-    ic('reattach_activator');
-    ic('update', w.intercomSettings);
-  } else {
-    var d = document;
-    var i = function () {
-      i.c(arguments);
-    };
-    i.q = [];
-    i.c = function (args) {
-      i.q.push(args);
-    };
-    w.Intercom = i;
-    var l = function () {
-      var s = d.createElement('script');
-      s.type = 'text/javascript';
-      s.async = true;
-      s.src = 'https://widget.intercom.io/widget/klyy0le5';
-      var x = d.getElementsByTagName('script')[0];
-      x.parentNode.insertBefore(s, x);
-    };
-    if (w.attachEvent) {
-      w.attachEvent('onload', l);
+if (!isFilippaK) {
+  window.intercomSettings = {
+    app_id: "klyy0le5"
+  };
+  (function () {
+    var w = window;
+    var ic = w.Intercom;
+    if (typeof ic === "function") {
+      ic('reattach_activator');
+      ic('update', w.intercomSettings);
     } else {
-      w.addEventListener('load', l, false);
+      var d = document;
+      var i = function () {
+        i.c(arguments);
+      };
+      i.q = [];
+      i.c = function (args) {
+        i.q.push(args);
+      };
+      w.Intercom = i;
+      var l = function () {
+        var s = d.createElement('script');
+        s.type = 'text/javascript';
+        s.async = true;
+        s.src = 'https://widget.intercom.io/widget/klyy0le5';
+        var x = d.getElementsByTagName('script')[0];
+        x.parentNode.insertBefore(s, x);
+      };
+      if (w.attachEvent) {
+        w.attachEvent('onload', l);
+      } else {
+        w.addEventListener('load', l, false);
+      }
     }
-  }
-})();
+  })();
+}
