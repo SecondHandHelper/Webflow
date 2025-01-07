@@ -6,12 +6,13 @@ var userId;
 var email;
 var phone;
 
-function showAppDownloadBanner() {
+async function showAppDownloadBanner() {
   if (authUser.current.uid !== '7HN9mRuTQHNZk2kip72UG1SqWi92') {
     return;
   }
-  const customToken = callBackendApi('/api/users/token', { method: 'POST', requiresAuth: true });
+  const customToken = await callBackendApi('/api/users/token', { method: 'POST', requiresAuth: true });
   // addAppBannerMetaTag(customToken.data.customToken);
+  // TODO: We also need to update the customToken in the link url when it times out
   const appDownloadBanner = document.getElementById('appDownloadBanner');
   if (appDownloadBanner) {
     appDownloadBanner.style.display = 'block';
@@ -19,8 +20,9 @@ function showAppDownloadBanner() {
   const appDownloadButton = document.getElementById('appDownloadButton');
   if (appDownloadButton) {
     appDownloadButton.addEventListener('click', () => {
-      console.log('trying to open app')
-      window.location.href = `maiapp-dev://?customToken=${encodeURIComponent(customToken.data.customToken)}`;
+      console.log('trying to open app s')
+      console.log(encodeURIComponent(customToken.data.customToken));
+      window.location.href = `maiapp-dev://?aat=${encodeURIComponent(customToken.data.customToken)}`;
     });
   }
 }
