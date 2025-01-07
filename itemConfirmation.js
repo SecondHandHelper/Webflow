@@ -1,6 +1,9 @@
 import {colorName} from "./sellItemHelpers";
 
+console.log('TEST 2');
+
 function initializeFields(item) {
+  console.log('INIT FIELDS');
     const { humanCheckNeeded, maxPriceEstimate: mlMaxPriceEstimate, newMinMaxLog } = item.mlValuation || {};
     if (item.infoRequests?.price?.response === 'User proposal') {
         document.getElementById('nextStepTitle').style.display = 'block';
@@ -30,6 +33,7 @@ function initializeFields(item) {
     } else {
         document.getElementById('platformsSection').style.display = 'none';
     }
+    console.log('INIT DONE');
 }
 
 function initializePlatforms(item) {
@@ -87,7 +91,43 @@ const main = async () => {
     }
     initializeFields(item);
     triggerShowContent.click();
-
 }
 
 main();
+
+    // We have to keep this code outside the itemConfirmation.js file so that it's run before the webflow code is loaded
+    // otherwise the slider does not work.
+    function initializeSlider(item) {
+      const images = item?.images;
+      document.getElementById('slider').style.display = 'block';
+
+      const slide = document.getElementById('frontImageSlide');
+      const cloneSlide = slide.cloneNode(true);
+      const sliderMask = document.getElementById('sliderMask');
+      sliderMask.innerHTML = '';
+
+      for (const imageName of ['modelImage', 'frontImage', 'enhancedFrontImage', 'brandTagImage', 'materialTagImage', 'extraImage', 'defectImage']) {
+          if (images[imageName]) {
+              if (imageName === 'frontImage' && images['enhancedFrontImage']) {
+                  continue;
+              }
+              const newSlide = cloneSlide.cloneNode(true);
+              newSlide.id = imageName;
+              newSlide.firstChild.src = window.innerWidth <= 350 ? (images[`${imageName}Small`] || images[imageName]): images[imageName];
+              sliderMask.appendChild(newSlide);
+          }
+      }
+      console.log('SLIDER 4');
+  }
+  const params = getParamsObject();
+  if (params.id) {
+      getItem(params.id).then(initializeSlider)
+          .catch(e => location.href = '/private');
+  } else {
+      item = JSON.parse(localStorage.getItem('latestItemCreated'));
+      if (!item) {
+          console.error("No recently created item found");
+          location.href = '/private';
+      }
+      initializeSlider(item);
+  }
