@@ -238,6 +238,7 @@ const mostPopularEytysModels = ["mother ", "odessa ", "benz ", "doja ", "angel "
   "alexia ", "carmen ", "ferris ", "halo ", "jade ", "jet ", "michigan ", "olympia ", "sonic "];
 
 function modelCompare(a, b) {
+  // TODO: Add sorting for Filippa K models
   // For Blankens, jewelry should come last
   if (a.brand === 'Blankens' && b.brand === 'Blankens') {
     const jewelryCategories = ['Armband', 'Örhänge', 'Halsband', 'Ring'];
@@ -359,19 +360,20 @@ export const removeSelectedModel = () => {
 }
 
 export const displayFindModelDiv = async (value) => {
-  if (['Eytys', 'Blankens'].includes(value)) {
+  if (brandCollabPartners.includes(value)) {
     findModelDiv.style.display = 'block';
     if (localStorage.getItem('detectedModel')) {
       let detectedModel = JSON.parse(localStorage.getItem('detectedModel'));
-      if (detectedModel.brand === 'Eytys' && itemBrand.value === 'Eytys') {
+      if (detectedModel.brand === itemBrand.value) {
         showModelSuggestion(detectedModel);
       }
       localStorage.removeItem('detectedModel');
     }
     let models = sessionStorage.getItem('models') ? JSON.parse(sessionStorage.getItem('models')) : undefined;
-    if (!models || models[0].brand !== value) {
+    if (!models || models[0]?.brand !== value) {
       sessionStorage.removeItem('models');
-      callBackendApi(`/api/models?brand=${value}`).then(response => {
+      // TODO: Remove includeDrafts when Filippa K are active
+      callBackendApi(`/api/models?brand=${value}&includeDrafts=true`).then(response => {
         console.log(`Got model response ${response.data.length}`);
         sessionStorage.setItem('models', JSON.stringify(response.data));
       });

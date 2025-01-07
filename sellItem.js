@@ -1068,7 +1068,8 @@ async function detectAndFillBrandModelMaterialAndSize(imageUrl) {
       return;
     }
     const response = await callBackendApi('/api/images/detectInfo', {
-      data: { imageUrl, brand: itemBrand.value, color: itemColor.value },
+      // TODO: Remove includeDrafts when Filippa K are active
+      data: { imageUrl, brand: itemBrand.value, color: itemColor.value, includeDrafts: true },
       requiresAuth: false,
     });
     if (!document.querySelector('#itemBrand').value.length && response.data?.brand) {
@@ -1097,7 +1098,8 @@ async function detectAndFillBrandModelMaterialAndSize(imageUrl) {
       analytics.track("Element Viewed", { elementID: "sizeSuggestButtons" });
     }
     if (!document.getElementById('itemModel').value.length && response.data?.model) {
-      if (document.getElementById('itemBrand').value === 'Eytys' && response.data.model.brand === 'Eytys') {
+      const formBrandValue = document.getElementById('itemBrand').value;
+      if (brandCollabPartners.includes(formBrandValue) && response.data.model.brand === formBrandValue) {
         showModelSuggestion(response.data.model);
       } else {
         localStorage.setItem('detectedModel', JSON.stringify(response.data.model));

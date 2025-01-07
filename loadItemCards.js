@@ -472,7 +472,7 @@ export function loadItemCards(items, userData = null) {
 
         if (!isCanceled) {
           if (buyerFirstName != null && buyerAddressCity != null && soldPrice) {
-            const brandCollab = ['Eytys', 'Blankens'].includes(item.brand);
+            const brandCollab = brandCollabPartners.includes(item.brand);
             const str = `Såld till ${buyerFirstName} i ${buyerAddressCity}${brandCollab ? '' : (' för ' + soldPrice + ' kr')}`;
             if (!brandCollab) {
               // Split sentence into two equally long rows

@@ -78,6 +78,8 @@
     },
   };
 
+  const brandCollabPartners = ['Filippa K', 'Blankens', 'Eytys'];
+
   if (!authUser.current && localStorage.getItem('authUser') && localStorage.getItem('idToken')) {
     const p = new URL(window.location).searchParams
     const savedUser = localStorage.getItem('sessionUser') ? JSON.parse(localStorage.getItem('sessionUser')) : undefined;
