@@ -1068,8 +1068,7 @@ async function detectAndFillBrandModelMaterialAndSize(imageUrl) {
       return;
     }
     const response = await callBackendApi('/api/images/detectInfo', {
-      // TODO: Remove includeDrafts when Filippa K are active
-      data: { imageUrl, brand: itemBrand.value, color: itemColor.value, includeDrafts: true },
+      data: { imageUrl, brand: itemBrand.value, color: itemColor.value },
       requiresAuth: false,
     });
     if (!document.querySelector('#itemBrand').value.length && response.data?.brand) {
