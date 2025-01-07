@@ -17,8 +17,13 @@ function loadRecentlySold() {
       const itemListRecentlySoldStartPage = document.getElementById('itemListRecentlySoldStartPage');
       itemListRecentlySoldStartPage.innerHTML = "";
       itemListRecentlySoldStartPageDesktop.innerHTML = "";
+      console.log("Items fetched: ", result.data.length);
+      let itemsDisplayed = 0;
 
       for (const item of result.data) {
+        if (isFilippaK && !item.frontImageOkForPublish){
+          continue
+        }
         const brand = item.brand;
         const cardSubtitle = item.brand;
         let cardTitle = item.category;
@@ -50,8 +55,10 @@ function loadRecentlySold() {
             .replace("14-big", "14-big-desktop")
             .replace("14-super-big", "14-big-desktop");
           itemListRecentlySoldStartPageDesktop.innerHTML += desktopCardHTML;
+          itemsDisplayed++;
         }
       }
+      console.log("Items displayed: ", itemsDisplayed);
     })
     .catch((error) => {
       errorHandler.report(error);
