@@ -1,9 +1,6 @@
 import {colorName} from "./sellItemHelpers";
 
-console.log('TEST 2');
-
 function initializeFields(item) {
-  console.log('INIT FIELDS');
     const { humanCheckNeeded, maxPriceEstimate: mlMaxPriceEstimate, newMinMaxLog } = item.mlValuation || {};
     if (item.infoRequests?.price?.response === 'User proposal') {
         document.getElementById('nextStepTitle').style.display = 'block';
@@ -33,7 +30,6 @@ function initializeFields(item) {
     } else {
         document.getElementById('platformsSection').style.display = 'none';
     }
-    console.log('INIT DONE');
 }
 
 function initializePlatforms(item) {
@@ -95,39 +91,110 @@ const main = async () => {
 
 main();
 
-    // We have to keep this code outside the itemConfirmation.js file so that it's run before the webflow code is loaded
-    // otherwise the slider does not work.
-    function initializeSlider(item) {
-      const images = item?.images;
-      document.getElementById('slider').style.display = 'block';
 
-      const slide = document.getElementById('frontImageSlide');
-      const cloneSlide = slide.cloneNode(true);
-      const sliderMask = document.getElementById('sliderMask');
-      sliderMask.innerHTML = '';
+//SLIDER INITIALIZATION AND FUNCTIONALITY
+const wrapper = document.querySelector('.carousel-wrapper');
+const track = document.querySelector('.carousel-track');
+const nextButton = document.querySelector('.next-button');
+const prevButton = document.querySelector('.previous-button');
+let currentSlide = 0;
 
-      for (const imageName of ['modelImage', 'frontImage', 'enhancedFrontImage', 'brandTagImage', 'materialTagImage', 'extraImage', 'defectImage']) {
-          if (images[imageName]) {
-              if (imageName === 'frontImage' && images['enhancedFrontImage']) {
-                  continue;
-              }
-              const newSlide = cloneSlide.cloneNode(true);
-              newSlide.id = imageName;
-              newSlide.firstChild.src = window.innerWidth <= 350 ? (images[`${imageName}Small`] || images[imageName]): images[imageName];
-              sliderMask.appendChild(newSlide);
+const updateCarousel = () => {
+  const slideWidth = wrapper.offsetWidth;
+  const totalSlides = document.querySelectorAll('.carousel-slide').length;
+
+  // Hide/show arrows based on position
+  prevButton.style.display = currentSlide === 0 ? 'none' : 'flex';
+  nextButton.style.display = currentSlide === totalSlides - 1 ? 'none' : 'flex';
+
+  // Update carousel position
+  track.style.transition = 'transform 0.3s ease-in-out';
+  track.style.transform = `translateX(-${currentSlide * slideWidth}px)`;
+};
+
+function initializeSlider(item) {
+  const images = item?.images;
+  const slides = document.querySelectorAll('.carousel-slide');
+  const slide = document.getElementById('slide1');
+  const cloneSlide = slide.cloneNode(true);
+  track.innerHTML = '';
+
+  for (const imageName of ['modelImage', 'frontImage', 'enhancedFrontImage', 'brandTagImage', 'materialTagImage', 'extraImage', 'defectImage']) {
+      if (images[imageName]) {
+          if (imageName === 'frontImage' && images['enhancedFrontImage']) {
+              continue;
           }
+          const newSlide = cloneSlide.cloneNode(true);
+          newSlide.id = imageName;
+          newSlide.firstChild.src = window.innerWidth <= 350 ? (images[`${imageName}Small`] || images[imageName]): images[imageName];
+          track.appendChild(newSlide);
       }
-      console.log('SLIDER 4');
   }
-  const params = getParamsObject();
-  if (params.id) {
-      getItem(params.id).then(initializeSlider)
-          .catch(e => location.href = '/private');
-  } else {
-      item = JSON.parse(localStorage.getItem('latestItemCreated'));
-      if (!item) {
-          console.error("No recently created item found");
-          location.href = '/private';
-      }
-      initializeSlider(item);
+
+  // Next button functionality
+  nextButton.addEventListener('click', () => {
+    currentSlide = (currentSlide + 1) % slides.length;
+    updateCarousel();
+  });
+
+  // Previous button functionality
+  prevButton.addEventListener('click', () => {
+    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+    updateCarousel();
+  });
+
+  // Swipe functionality
+  let startX = 0;
+  let currentX = 0;
+  let isDragging = false;
+
+  wrapper.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    isDragging = true;
+  });
+
+  wrapper.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    currentX = e.touches[0].clientX;
+    const deltaX = currentX - startX;
+
+    // Move the track temporarily for feedback
+    const slideWidth = slides[0].offsetWidth;
+    const offset = -currentSlide * slideWidth + deltaX;
+    track.style.transform = `translateX(${offset}px)`;
+  });
+
+  wrapper.addEventListener('touchend', () => {
+    if (!isDragging) return;
+    isDragging = false;
+
+    const deltaX = currentX - startX;
+
+    // Determine if the swipe is significant enough to change slides
+    if (deltaX > 50) {
+      // Swipe right (previous slide)
+      currentSlide = Math.max(currentSlide - 1, 0);
+    } else if (deltaX < -50) {
+      // Swipe left (next slide)
+      currentSlide = Math.min(currentSlide + 1, slides.length - 1);
+    }
+
+    updateCarousel();
+  });
+
+  // Initialize carousel
+  updateCarousel();
+}
+
+const params = getParamsObject();
+if (params.id) {
+  getItem(params.id).then(initializeSlider)
+      .catch(e => location.href = '/private' );
+} else {
+  item = JSON.parse(localStorage.getItem('latestItemCreated'));
+  if (!item) {
+      console.error("No recently created item found");
+      location.href = '/private';
   }
+  initializeSlider(item);
+}
