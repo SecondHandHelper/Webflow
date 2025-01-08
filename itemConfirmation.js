@@ -99,7 +99,6 @@ const nextButton = document.querySelector('.next-button');
 const prevButton = document.querySelector('.previous-button');
 let totalSlides = 0;
 let currentSlide = 0;
-console.log('Initial currentSlide:', currentSlide);
 
 const updateCarousel = () => {
   const slideWidth = wrapper.offsetWidth;
@@ -112,21 +111,15 @@ const updateCarousel = () => {
   // Update carousel position
   track.style.transition = 'transform 0.3s ease-in-out';
   track.style.transform = `translateX(-${currentSlide * slideWidth}px)`;
-  console.log('currentSlide after update: ', currentSlide);
 };
 
 const handleNextClick = () => {
-  console.log('currentSlide rigth before click next', currentSlide);
   currentSlide = (currentSlide + 1) % totalSlides;
-  console.log('currentSlide rigth after click next', currentSlide);
   updateCarousel();
 };
 
 const handlePrevClick = () => {
-  console.log('Prev button clicked!');
-  console.log('Number of slides:', totalSlides);
   currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-  console.log('currentSlide after prev:', currentSlide);
   updateCarousel();
 };
 
