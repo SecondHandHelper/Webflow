@@ -94,14 +94,16 @@ main();
 
 //SLIDER INITIALIZATION AND FUNCTIONALITY
 const wrapper = document.querySelector('.carousel-wrapper');
-const track = document.querySelector('.carousel-track');
+let track = document.querySelector('.carousel-track');
 const nextButton = document.querySelector('.next-button');
 const prevButton = document.querySelector('.previous-button');
+let totalSlides = 0;
 let currentSlide = 0;
+console.log('Initial currentSlide:', currentSlide);
 
 const updateCarousel = () => {
   const slideWidth = wrapper.offsetWidth;
-  const totalSlides = document.querySelectorAll('.carousel-slide').length;
+  totalSlides = document.querySelectorAll('.carousel-slide').length;
 
   // Hide/show arrows based on position
   prevButton.style.display = currentSlide === 0 ? 'none' : 'flex';
@@ -110,51 +112,73 @@ const updateCarousel = () => {
   // Update carousel position
   track.style.transition = 'transform 0.3s ease-in-out';
   track.style.transform = `translateX(-${currentSlide * slideWidth}px)`;
+  console.log('currentSlide after update: ', currentSlide);
+};
+
+const handleNextClick = () => {
+  console.log('currentSlide rigth before click next', currentSlide);
+  currentSlide = (currentSlide + 1) % totalSlides;
+  console.log('currentSlide rigth after click next', currentSlide);
+  updateCarousel();
+};
+
+const handlePrevClick = () => {
+  console.log('Prev button clicked!');
+  console.log('Number of slides:', totalSlides);
+  currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+  console.log('currentSlide after prev:', currentSlide);
+  updateCarousel();
 };
 
 function initializeSlider(item) {
+  currentSlide = 0;  // Reset at initialization
+  console.log('After initialization:', currentSlide);
+
   const images = item?.images;
-  const slides = document.querySelectorAll('.carousel-slide');
-  const slide = document.getElementById('slide1');
-  const cloneSlide = slide.cloneNode(true);
   track.innerHTML = '';
+  console.log('images', images)
 
   for (const imageName of ['modelImage', 'frontImage', 'enhancedFrontImage', 'brandTagImage', 'materialTagImage', 'extraImage', 'defectImage']) {
       if (images[imageName]) {
           if (imageName === 'frontImage' && images['enhancedFrontImage']) {
               continue;
           }
-          const newSlide = cloneSlide.cloneNode(true);
-          newSlide.id = imageName;
-          newSlide.firstChild.src = window.innerWidth <= 350 ? (images[`${imageName}Small`] || images[imageName]): images[imageName];
-          track.appendChild(newSlide);
+          console.log('imageName', imageName);
+          const imageUrl = window.innerWidth <= 350 
+            ? (images[`${imageName}Small`] || images[imageName])
+            : images[imageName];
+
+          const newSlideHtml = `
+            <div class='carousel-slide'>
+              <img class='slider-image' src='${imageUrl}' id='${imageName}' />
+            </div>
+          `;
+          track.innerHTML += newSlideHtml;
+          console.log(track);
       }
   }
+  const slides = document.querySelectorAll('.carousel-slide');
 
   // Next button functionality
-  nextButton.addEventListener('click', () => {
-    currentSlide = (currentSlide + 1) % slides.length;
-    updateCarousel();
-  });
-
-  // Previous button functionality
-  prevButton.addEventListener('click', () => {
-    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-    updateCarousel();
-  });
+  nextButton.removeEventListener('click', handleNextClick);
+  prevButton.removeEventListener('click', handlePrevClick);
+  nextButton.addEventListener('click', handleNextClick);
+  prevButton.addEventListener('click', handlePrevClick);
 
   // Swipe functionality
-  let startX = 0;
-  let currentX = 0;
+  let startX = null;
+  let currentX = null;
   let isDragging = false;
 
   wrapper.addEventListener('touchstart', (e) => {
+    if (!e.touches) return;
     startX = e.touches[0].clientX;
+    currentX = startX;
     isDragging = true;
   });
 
   wrapper.addEventListener('touchmove', (e) => {
-    if (!isDragging) return;
+    if (!e.touches || !isDragging) return;
     currentX = e.touches[0].clientX;
     const deltaX = currentX - startX;
 
@@ -168,17 +192,23 @@ function initializeSlider(item) {
     if (!isDragging) return;
     isDragging = false;
 
-    const deltaX = currentX - startX;
-
     // Determine if the swipe is significant enough to change slides
-    if (deltaX > 50) {
-      // Swipe right (previous slide)
-      currentSlide = Math.max(currentSlide - 1, 0);
-    } else if (deltaX < -50) {
-      // Swipe left (next slide)
-      currentSlide = Math.min(currentSlide + 1, slides.length - 1);
+    if (startX !== null && currentX !== null) {
+      const deltaX = currentX - startX;
+  
+      if (Math.abs(deltaX) > 50) {  // Only process if it's a significant swipe
+        if (deltaX > 50) {
+          currentSlide = Math.max(currentSlide - 1, 0);
+        } else if (deltaX < -50) {
+          currentSlide = Math.min(currentSlide + 1, slides.length - 1);
+        }
+      }
     }
-
+    
+    // Reset the coordinates
+    startX = null;
+    currentX = null;
+  
     updateCarousel();
   });
 
@@ -189,7 +219,9 @@ function initializeSlider(item) {
 const params = getParamsObject();
 if (params.id) {
   getItem(params.id).then(initializeSlider)
-      .catch(e => location.href = '/private' );
+      .catch(e => //location.href = '/private' 
+        console.log('failed')  
+      );
 } else {
   item = JSON.parse(localStorage.getItem('latestItemCreated'));
   if (!item) {
