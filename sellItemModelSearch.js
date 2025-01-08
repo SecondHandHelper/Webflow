@@ -1,5 +1,5 @@
 import { rememberUnsavedChanges } from "./sellItem";
-import { capitalizeFirstLetter, colorName } from "./sellItemHelpers";
+import { capitalizeFirstLetter, colorName, swedishColorToEnglish } from "./sellItemHelpers";
 
 export const setFieldValue = (fieldId, value) => {
   document.getElementById(fieldId).value = value || '';
@@ -116,7 +116,7 @@ const modelDb = () => {
 };
 
 const allModelsMatching = (model) => modelDb()?.filter(m => m.maiName === model.maiName && m.maiColor === model.maiColor &&
-  m.category === model.category)
+  m.category === model.category && m.color === model.color)
 
 const showModelSizes = (modelClicked) => {
   window.scrollTo({ top: 0 });
@@ -331,17 +331,29 @@ export const setupModelSearchEventListeners = () => {
   document.getElementById('modelSearchInput').addEventListener('input', () => {
     const modelSearchString = document.getElementById('modelSearchInput').value;
     const modelDb = JSON.parse(sessionStorage.getItem('models'));
-    if (modelSearchString && modelSearchString.length > 0) {
+    if (modelSearchString && modelSearchString.length > 1) {
+      const keys = ["maiName", "category", "color", "maiColor", "articleNumber", "name", "gender"];
       const fuse = new Fuse(modelDb, {
         includeScore: true,
-        keys: ["maiName", "category", "color", "maiColor", "articleNumber", "name"]
+        minMatchCharLength: 2,
+        keys
       });
-      const searchResult = fuse.search(modelSearchString.replace(', ', ' '));
+      const searchTerms = modelSearchString.replace(', ', ' ').split(' ')
+        .map(swedishColorToEnglish).map(swedishGenderToEnglish);
+      const searchObjects = searchTerms.flatMap(str => 
+          keys.map(key => ({ [key]: str }))
+      );
+      const searchResult = fuse.search({ $or: searchObjects });
       showModelItems(searchResult.map(r => r.item));
     } else {
       showModelItems(modelDb.sort(modelCompare).slice(0, 500));
     }
   })
+
+  const swedishGenderToEnglish = (gender) => {
+    const genders = { 'dam': 'woman', 'herr': 'man' };
+    return genders[gender?.toLowerCase()] || gender;
+  }
 
   document.getElementById('removeModelIcon').addEventListener('click', (event) => {
     removeSelectedModel()

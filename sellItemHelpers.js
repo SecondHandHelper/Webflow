@@ -496,12 +496,17 @@ export function fieldLabelToggle(labelId) {
   }
 }
 
+const colorMapping = {
+  Beige: 'Beige', Blue: 'Blå', Brown: 'Brun', Green: 'Grön', Grey: 'Grå', Yellow: 'Gul', Gold: 'Guld',
+  Purple: 'Lila', Navy: 'Navy', Orange: 'Orange', Pink: 'Rosa', Red: 'Röd', Silver: 'Silver', Black: 'Svart',
+  Turquoise: 'Turkos', Burgundy: 'Vinröd', White: 'Vit', Multicolour: 'Flerfärgad'
+};
+
 export function colorName(color) {
-  const mapping = {
-    Beige: 'Beige', Blue: 'Blå', Brown: 'Brun', Green: 'Grön', Grey: 'Grå', Yellow: 'Gul', Gold: 'Guld',
-    Purple: 'Lila', Navy: 'Navy', Orange: 'Orange', Pink: 'Rosa', Red: 'Röd', Silver: 'Silver', Black: 'Svart',
-    Turquoise: 'Turkos', Burgundy: 'Vinröd', White: 'Vit', Multicolour: 'Flerfärgad'
-  };
-  return mapping[color] || color;
+  return colorMapping[color] || color;
+}
+
+export function swedishColorToEnglish(color) {
+  return Object.entries(colorMapping).find(([key, value]) => value.toLowerCase() === color.toLowerCase())?.[0] || color;
 }
 
