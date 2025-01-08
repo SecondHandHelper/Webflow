@@ -78,7 +78,9 @@
     },
   };
 
-  const brandCollabPartners = ['Filippa K', 'Blankens', 'Eytys'];
+  const brandCollabPartners = window.location.hostname !== 'www.maiapp.se' 
+    ? ['Filippa K', 'Blankens', 'Eytys']
+    : ['Blankens', 'Eytys'];
 
   if (!authUser.current && localStorage.getItem('authUser') && localStorage.getItem('idToken')) {
     const p = new URL(window.location).searchParams
