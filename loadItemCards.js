@@ -489,7 +489,7 @@ export function loadItemCards(items, userData = null) {
               text2 = str.trim();
             }
             text2 = item.payoutType === 'Brand Gift Card' ? `(${capitalizeFirstLetter(item.brand.toLowerCase())}-presentkort)<br>` + text2 : text2;
-            text3 = brandCollab && item.payoutType !== 'Brand Gift Card' ? `Ändra till ${soldPrice} kr i presentkort?` : '';
+            text3 = brandCollab && item.payoutType !== 'Brand Gift Card' && item.brand !== 'Filippa K' ? `Ändra till ${soldPrice} kr i presentkort?` : '';
           }
 
           // Add a user action, such as 'show QR button', 'show barcode' or 'bag received checkbox'
