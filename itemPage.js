@@ -1,5 +1,13 @@
 import {itemCoverImage} from "./general";
 
+const params = getParamsObject();
+if (params.app) {
+  const goBackButtons = document.querySelectorAll('.goback');
+  goBackButtons.forEach(button => {
+    button.style.visibility = 'hidden';
+  });
+}
+
 async function loadItem(itemId) {
   const item = await callBackendApi(`/api/items/${itemId}`);
   if (!item.data) {
@@ -220,6 +228,5 @@ itemText2.addEventListener('click', toEditItem);
 itemCurrentPrice.addEventListener('click', toEditItem);
 
 // Load item
-const params = getParamsObject();
 loadItem(params.id);
 loadItemEvents(params.id);

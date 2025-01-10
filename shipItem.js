@@ -1,5 +1,13 @@
 import { itemCoverImage } from "./general";
 
+const params = getParamsObject();
+if (params.app) {
+  const goBackButtons = document.querySelectorAll('.goback');
+  goBackButtons.forEach(button => {
+    button.style.visibility = 'hidden';
+  });
+}
+
 function loadItem(itemId) {
   console.log(`loadItem(${itemId})`);
   db.collection("items").doc(itemId)
@@ -102,5 +110,4 @@ function loadItem(itemId) {
 }
 
 // Load item
-const params = getParamsObject();
 loadItem(params.id);
