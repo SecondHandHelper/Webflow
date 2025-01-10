@@ -236,9 +236,22 @@ const showModelItems = (models) => {
 const mostPopularEytysModels = ["mother ", "odessa ", "benz ", "doja ", "angel ",
   "fugu ", "naomi ", "cypress ", "titan ", "laguna ", "aphex ", "jet turbo ", "maze ", "ortega ", "raven ",
   "alexia ", "carmen ", "ferris ", "halo ", "jade ", "jet ", "michigan ", "olympia ", "sonic "];
+const mostPopularFilippaKModels = ["alexa", "mika yak funnelneck sweater", "sammy sammy shirt",
+   "terry cropped trousers", "karlie trousers"];
 
 function modelCompare(a, b) {
   // TODO: Add sorting for Filippa K models
+  if (a.brand === 'Filippa K' && b.brand === 'Filippa K') {
+    const nameA = a["maiName"].toLowerCase();
+    const nameB = b["maiName"].toLowerCase();
+    const nameAPopIdx = mostPopularFilippaKModels.findIndex(e => nameA.startsWith(e));
+    const nameBPopIdx = mostPopularFilippaKModels.findIndex(e => nameB.startsWith(e));
+    if (nameAPopIdx > nameBPopIdx) {
+      return 1
+    } else if (nameAPopIdx < nameBPopIdx) {
+      return -1;
+    }
+  }
   // For Blankens, jewelry should come last
   if (a.brand === 'Blankens' && b.brand === 'Blankens') {
     const jewelryCategories = ['Armband', 'Örhänge', 'Halsband', 'Ring'];
