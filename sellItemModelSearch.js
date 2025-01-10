@@ -372,7 +372,7 @@ export const removeSelectedModel = () => {
 }
 
 export const displayFindModelDiv = async (value) => {
-  if (brandCollabPartners.includes(value)) {
+  if (isBrandPartner(value)) {
     findModelDiv.style.display = 'block';
     if (localStorage.getItem('detectedModel')) {
       let detectedModel = JSON.parse(localStorage.getItem('detectedModel'));

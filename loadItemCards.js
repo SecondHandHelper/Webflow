@@ -104,7 +104,7 @@ function openConvertToGiftCard(itemId, itemImage, soldPrice, brand) {
   document.getElementById('convertGiftCardInfoBox').style.display = 'flex';
   document.querySelector('.window-shade').style.display = 'block';
   document.getElementById('giftCardItemImage').src = itemImage;
-  document.getElementById('giftCardText').innerText = `Vill du få ${soldPrice} kr (100% av vinsten) att handla för på ${capitalizeFirstLetter(brand.toLowerCase())}.com istället?`;
+  document.getElementById('giftCardText').innerText = `Vill du få ${soldPrice} kr (100% av vinsten) att handla för på ${brandPartners[brand].url} istället?`;
   document.getElementById('closeGiftCardBox').addEventListener('click', () => {
     document.getElementById('convertGiftCardInfoBox').style.display = 'none';
     document.querySelector('.window-shade').style.display = 'none';
@@ -122,7 +122,7 @@ function openConvertToGiftCard(itemId, itemImage, soldPrice, brand) {
     document.querySelector('.window-shade').style.display = 'none';
     document.getElementById(`convertToGiftCardDiv-${itemId}`).style.display = 'none';
     document.getElementById(`text1-${itemId}`).innerHTML = document.getElementById(`text1-${itemId}`).innerHTML.replace(/\d+/, soldPrice);
-    document.getElementById(`text2-${itemId}`).innerHTML = `(${capitalizeFirstLetter(brand.toLowerCase())}-presentkort)<br>` + document.getElementById(`text2-${itemId}`).innerHTML;
+    document.getElementById(`text2-${itemId}`).innerHTML = `(${brandPartners[brand].name}-presentkort)<br>` + document.getElementById(`text2-${itemId}`).innerHTML;
   });
 
 }
@@ -472,7 +472,7 @@ export function loadItemCards(items, userData = null) {
 
         if (!isCanceled) {
           if (buyerFirstName != null && buyerAddressCity != null && soldPrice) {
-            const brandCollab = brandCollabPartners.includes(item.brand);
+            const brandCollab = isBrandPartner(item.brand);
             const str = `Såld till ${buyerFirstName} i ${buyerAddressCity}${brandCollab ? '' : (' för ' + soldPrice + ' kr')}`;
             if (!brandCollab) {
               // Split sentence into two equally long rows
@@ -488,7 +488,7 @@ export function loadItemCards(items, userData = null) {
             } else {
               text2 = str.trim();
             }
-            text2 = item.payoutType === 'Brand Gift Card' ? `(${capitalizeFirstLetter(item.brand.toLowerCase())}-presentkort)<br>` + text2 : text2;
+            text2 = item.payoutType === 'Brand Gift Card' ? `(${brandPartners[item.brand].name}-presentkort)<br>` + text2 : text2;
             text3 = brandCollab && item.payoutType !== 'Brand Gift Card' ? `Ändra till ${soldPrice} kr i presentkort?` : '';
           }
 

@@ -1098,7 +1098,7 @@ async function detectAndFillBrandModelMaterialAndSize(imageUrl) {
     }
     if (!document.getElementById('itemModel').value.length && response.data?.model) {
       const formBrandValue = document.getElementById('itemBrand').value;
-      if (brandCollabPartners.includes(formBrandValue) && response.data.model.brand === formBrandValue) {
+      if (isBrandPartner(formBrandValue) && response.data.model.brand === formBrandValue) {
         showModelSuggestion(response.data.model);
       } else {
         localStorage.setItem('detectedModel', JSON.stringify(response.data.model));

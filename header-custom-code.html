@@ -78,9 +78,32 @@
     },
   };
 
-  const brandCollabPartners = window.location.hostname !== 'www.maiapp.se' 
-    ? ['Filippa K', 'Blankens', 'Eytys']
-    : ['Filippa K', 'Blankens', 'Eytys'];
+  const brandPartners = {
+    'Filippa K': {
+      url: 'filippa-k.com',
+      name: 'Filippa K',
+      featureEnabled: true
+    },
+    'Blankens': {
+      url: 'blankens.com',
+      name: 'Blankens',
+      featureEnabled: true
+    },
+    'Eytys': {
+      url: 'eytys.com',
+      name: 'EYTYS',
+      featureEnabled: true
+    }
+  };
+
+  const isBrandPartner = (brandName) => {
+    return Object.values(brandPartners)
+      .some(partner => 
+        partner.name.toUpperCase() === brandName.toUpperCase() && 
+        partner.featureEnabled === true
+      );
+  };
+  
 
   if (!authUser.current && localStorage.getItem('authUser') && localStorage.getItem('idToken')) {
     const p = new URL(window.location).searchParams
