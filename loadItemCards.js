@@ -122,9 +122,8 @@ function openConvertToGiftCard(itemId, itemImage, soldPrice, brand) {
     document.querySelector('.window-shade').style.display = 'none';
     document.getElementById(`convertToGiftCardDiv-${itemId}`).style.display = 'none';
     document.getElementById(`text1-${itemId}`).innerHTML = document.getElementById(`text1-${itemId}`).innerHTML.replace(/\d+/, soldPrice);
-    document.getElementById(`text2-${itemId}`).innerHTML = `(${brandPartners[brand].name}-presentkort)<br>` + document.getElementById(`text2-${itemId}`).innerHTML;
+    document.getElementById(`text2-${itemId}`).innerHTML = `(${brandPartners[brand].name}-presentkort)<br>`;
   });
-
 }
 
 function openYouGetInfoBox(soldPrice, sellerGetsValue) {
