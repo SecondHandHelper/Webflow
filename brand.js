@@ -37,12 +37,12 @@ function loadRecentlySold() {
         const imageUrl = itemCoverImage(item);
         const daysToSold = Math.floor((soldDate.getTime() - publishedDate.getTime()) / (1000 * 3600 * 24));
         if (soldPrice >= 180 || daysToSold <= 20) {
-          let itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="conten-block with-image">
+          let itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="content-block with-image">
                         <div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div>
                         <div class="text-block-14">${soldPrice} kr</div>
                         <div class='text-block-34'>${brand}</div>`;
           if (isFilippaK) {
-            itemCardHTML = `<div class="div-block-14-super-big"><div class="ratio-box _16-9"><div class="conten-block with-image">
+            itemCardHTML = `<div class="div-block-14-super-big"><div class="ratio-box _16-9"><div class="content-block with-image">
                         <div class="img-container" style="background-image: url('${imageUrl}');">
                         <div class="sold-tag">Sold</div></div></div></div>
                         <div class="text-block-14">${soldPrice} kr</div>
@@ -58,7 +58,11 @@ function loadRecentlySold() {
           itemsDisplayed++;
         }
       }
-      console.log("Items displayed: ", itemsDisplayed);
+      if (isFilippaK) {
+        itemListRecentlySoldStartPage.innerHTML += `<div class="div-block-14-super-big"><div class="ratio-box _16-9"><div class="content-block with-image">
+                        <a href="https://shop.maiapp.se/collections/filippa-k" class="see-more-items-button">Till Mai Shop</a>  
+                        </div></div>`;
+      }
     })
     .catch((error) => {
       errorHandler.report(error);
@@ -103,6 +107,11 @@ async function fetchAndLoadRecentlyAddedItems() {
         .replace("14-big", "14-big-desktop")
         .replace("14-super-big", "14-big-desktop");
       itemListDesktop.innerHTML += desktopCardHTML;
+    }
+    if (isFilippaK) {
+      itemList.innerHTML += `<div class="div-block-14-super-big"><div class="ratio-box _16-9"><div class="content-block with-image">
+                        <a href="https://shop.maiapp.se/collections/filippa-k" class="see-more-items-button">Upptäck mer</a>  
+                        </div></div>`;
     }
   } catch (e) {
     errorHandler.report(e);
