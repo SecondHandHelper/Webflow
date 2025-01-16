@@ -10,7 +10,7 @@ async function showAppDownloadBanner() {
   if (environment !== 'web-test') {
     return;
   }
-  document.getElementById('holidayModeDiv').style.display = 'block';
+  document.getElementById('appPromoSection').style.display = 'block';
   const customToken = await callBackendApi('/api/users/token', { method: 'POST', requiresAuth: true });
   document.getElementById('openAppAndSignIn').href = 'maiapp-dev://?aat=' + encodeURIComponent(customToken.data.customToken);
 }
