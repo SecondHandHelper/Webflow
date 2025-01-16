@@ -236,16 +236,16 @@ const showModelItems = (models) => {
 const mostPopularEytysModels = ["mother ", "odessa ", "benz ", "doja ", "angel ",
   "fugu ", "naomi ", "cypress ", "titan ", "laguna ", "aphex ", "jet turbo ", "maze ", "ortega ", "raven ",
   "alexia ", "carmen ", "ferris ", "halo ", "jade ", "jet ", "michigan ", "olympia ", "sonic "];
-const mostPopularFilippaKModels = ["alexa", "mika yak funnelneck sweater", "sammy sammy shirt",
+const mostPopularFilippaKModels = ["alexa ", "mika yak funnelneck sweater", "sammy shirt",
    "terry cropped trousers", "karlie trousers"];
+const popIdx = (popularModels, name) => popularModels.find(e => name.startsWith(e)) ? popularModels.findIndex(e => name.startsWith(e)) : 100
 
 function modelCompare(a, b) {
-  // TODO: Add sorting for Filippa K models
   if (a.brand === 'Filippa K' && b.brand === 'Filippa K') {
     const nameA = a["maiName"].toLowerCase();
     const nameB = b["maiName"].toLowerCase();
-    const nameAPopIdx = mostPopularFilippaKModels.findIndex(e => nameA.startsWith(e));
-    const nameBPopIdx = mostPopularFilippaKModels.findIndex(e => nameB.startsWith(e));
+    const nameAPopIdx = popIdx(mostPopularFilippaKModels, nameA);
+    const nameBPopIdx = popIdx(mostPopularFilippaKModels, nameB);
     if (nameAPopIdx > nameBPopIdx) {
       return 1
     } else if (nameAPopIdx < nameBPopIdx) {
@@ -268,9 +268,8 @@ function modelCompare(a, b) {
   if (a.brand === 'Eytys' && b.brand === 'Eytys') {
     const nameA = a["maiName"].toLowerCase();
     const nameB = b["maiName"].toLowerCase();
-    const popIdx = (name) => mostPopularEytysModels.find(e => name.startsWith(e)) ? mostPopularEytysModels.findIndex(e => name.startsWith(e)) : 100
-    const nameAPopIdx = popIdx(nameA);
-    const nameBPopIdx = popIdx(nameB);
+    const nameAPopIdx = popIdx(mostPopularEytysModels, nameA);
+    const nameBPopIdx = popIdx(mostPopularEytysModels, nameB);
     if (nameAPopIdx < 100 || nameBPopIdx < 100) {
       if (nameAPopIdx > nameBPopIdx) {
         return 1

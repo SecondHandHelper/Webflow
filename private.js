@@ -1,11 +1,22 @@
 import { itemCoverImage, shareCode, signOut } from "./general";
 import { loadInfoRequests } from "./infoRequestsFunctions";
 import { loadItemCards } from "./loadItemCards";
-import { requestUniqueId } from "./sellItemHelpers";
 
 var userId;
 var email;
 var phone;
+
+async function showAppDownloadBanner() {
+  if (environment !== 'web-test') {
+    return;
+  }
+  document.getElementById('holidayModeDiv').style.display = 'block';
+  const customToken = await callBackendApi('/api/users/token', { method: 'POST', requiresAuth: true });
+  document.getElementById('openAppAndSignIn').href = 'maiapp-dev://?aat=' + encodeURIComponent(customToken.data.customToken);
+}
+
+showAppDownloadBanner();
+setInterval(showAppDownloadBanner, 10 * 60 * 1000);
 
 export function updateIC(userId, em, ph) {
   let email = em;
