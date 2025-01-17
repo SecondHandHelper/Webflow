@@ -6,17 +6,13 @@ var userId;
 var email;
 var phone;
 
-async function showAppDownloadBanner() {
-  if (environment !== 'web-test') {
-    return;
-  }
-  document.getElementById('appPromoSection').style.display = 'block';
+async function initAppDownloadBanner() {
   const customToken = await callBackendApi('/api/users/token', { method: 'POST', requiresAuth: true });
   document.getElementById('openAppAndSignIn').href = 'maiapp-dev://?aat=' + encodeURIComponent(customToken.data.customToken);
 }
 
-showAppDownloadBanner();
-setInterval(showAppDownloadBanner, 10 * 60 * 1000);
+initAppDownloadBanner();
+setInterval(initAppDownloadBanner, 10 * 60 * 1000);
 
 export function updateIC(userId, em, ph) {
   let email = em;
