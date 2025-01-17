@@ -8,7 +8,7 @@ var phone;
 
 async function initAppDownloadBanner() {
   const customToken = await callBackendApi('/api/users/token', { method: 'POST', requiresAuth: true });
-  document.getElementById('openAppAndSignIn').href = 'maiapp-dev://?aat=' + encodeURIComponent(customToken.data.customToken);
+  document.getElementById('openAppAndSignIn').href = 'maiapp://?aat=' + encodeURIComponent(customToken.data.customToken);
 }
 
 initAppDownloadBanner();
