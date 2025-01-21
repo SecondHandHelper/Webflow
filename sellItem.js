@@ -15,8 +15,8 @@ import {
   hideImageError
 } from "./sellItemHelpers";
 import QRCode from "qrcode";
-import {formatPersonalId, getFormAddressFields, isValidSwedishSsn, setFormAddressFields} from "./general";
-import {autocomplete, brands} from "./autocomplete-brands";
+import { formatPersonalId, getFormAddressFields, isValidSwedishSsn, setFormAddressFields } from "./general";
+import { autocomplete, brands } from "./autocomplete-brands";
 import {
   displayFindModelDiv,
   removeSelectedModel, selectFieldValue,
@@ -290,7 +290,7 @@ async function addItem() {
   let reUploadingImage = null;
   try {
     // Check that all images are uploaded
-    const images = JSON.parse(localStorage.getItem('newItem') || '{}').images    
+    const images = JSON.parse(localStorage.getItem('newItem') || '{}').images
     document.querySelectorAll('input[type="file"]').forEach(input => {
       if (input.files.length && !images[input.id]) {
         reUploadingImage = input;
@@ -418,7 +418,7 @@ async function getAndSaveValuation(itemId, item) {
     return '/item-valuation';
   }
   try {
-    const res = await callBackendApi('/api/valuation', { data: { itemId, item }, requiresAuth: false});
+    const res = await callBackendApi('/api/valuation', { data: { itemId, item }, requiresAuth: false });
     const { minPrice, maxPrice, decline } = res.data || {};
     await saveItemValuation(itemId, res.data);
     return nextStepAfterValuation(minPrice && maxPrice, decline, needsHumanCheck(res.data));
@@ -557,20 +557,22 @@ async function addItemInner(id, status = 'New') {
   const createdFromItem = (params.id && params.type !== 'draft') ? { createdFromItem: params.id } : {};
   const isCreatedFromItem = !!Object.keys(createdFromItem).length;
   const draftSource = status === 'Draft' ? { draftSource: isCreatedFromItem ? 'Mai purchase' : 'Sell item' } : {};
+
   const item = { ...pageData, status, ...draftSource, shippingMethod, images, ...createdFromItem, ...(modelConfirmed && { atModelVariantId, modelId }), version: "2" };
 
   if (!authUser.current) {
     localStorage.removeItem('detectedModel');
     sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
   } else {
-    const createItemResponse = await callBackendApi(`/api/items/${id}`, { data: { item }});
+    const createItemResponse = await callBackendApi(`/api/items/${id}`, { data: { item } });
     await trackUserActivated();
     await setCampaignCoupon();
-    localStorage.removeItem('newItem');
-    localStorage.removeItem('detectedModel');
-    sessionStorage.removeItem('newItemId');
-    localStorage.setItem('latestItemCreated', JSON.stringify(createItemResponse.data));
-
+    if (status !== 'Draft') {
+      localStorage.removeItem('newItem');
+      localStorage.removeItem('detectedModel');
+      sessionStorage.removeItem('newItemId');
+      localStorage.setItem('latestItemCreated', JSON.stringify(createItemResponse.data));
+    }
     //Archive if "createdFromItem" is same seller
     if (isCreatedFromItem) {
       const createdFromItemUserId = await getCreatedFromItemUserId(params.id);
@@ -842,8 +844,10 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
         if (response.data) {
           const { maiName, gender, maiCategory = '', collectionYear, brand } = response.data;
           const { maiColor, coverImage, coverImageSmall } = response.data.variants[0];
-          model = { maiName, gender, category: maiCategory, maiColor, coverImageSmall: coverImageSmall || coverImage,
-            brand, coverImage, collectionYear };
+          model = {
+            maiName, gender, category: maiCategory, maiColor, coverImageSmall: coverImageSmall || coverImage,
+            brand, coverImage, collectionYear
+          };
         }
       }
       if (model || data.modelVariantFields) {
