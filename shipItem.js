@@ -1,14 +1,12 @@
 import { itemCoverImage } from "./general";
 
 const params = getParamsObject();
-/* //TODO: Slå på när appen är släppt och alla power sellers har den
 if (params.app) {
   const goBackButtons = document.querySelectorAll('.goback');
   goBackButtons.forEach(button => {
     button.style.visibility = 'hidden';
   });
 }
-*/
 
 function loadItem(itemId) {
   console.log(`loadItem(${itemId})`);

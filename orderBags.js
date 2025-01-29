@@ -1,5 +1,13 @@
 import {getFormAddressFields, setFormAddressFields} from "./general";
 
+const params = getParamsObject();
+if (params.app) {
+  const goBackButtons = document.querySelectorAll('.goback');
+  goBackButtons.forEach(button => {
+    button.style.visibility = 'hidden';
+  });
+}
+
 var maxNumBags = 10;
 async function getMaxNumBags() {
   const maxBags = await callBackendApi('/api/bags/orders/allowed', { requiresAuth: true });
