@@ -111,7 +111,6 @@ async function saveFeedback(itemId) {
     if (!rating) { return false }
 
     let buyerFeedback = {
-        submittedAt: now,
         rating,
         comment,
     }
