@@ -1,6 +1,6 @@
 function initializePage(item) {
-    document.getElementById('itemId').value = item.id || 'tsFDKftTtL';
-    document.getElementById('systemRole').value = 'You are an expert at valuating second hand apparel and setting prices';
+    document.getElementById('itemId').value = item.id || '';
+    document.getElementById('systemRole').value = 'As a seasoned appraiser specializing in pre-owned apparel, you possess extensive expertise in evaluating second-hand clothing and determining appropriate pricing strategies.';
     document.getElementById('prompt').value = `Your goal is to give me the resale value in USD of a specific item with the below characteristics, give an upper and lower bound. Conduct these four steps:
 
 1. Scrape sold prices on the brand + category on platforms where we sell (Tradera, Vestiare, Grailed). Do a web search.
@@ -11,18 +11,16 @@ function initializePage(item) {
 Now execute step 1-4 to deliver the goal.
 
 Characteristics:
-- Orignal price: ${item.originalPrice}
-- Brand: ${item.cleanedBrand}
-- Condition: ${item.condition}
-- Age: ${item.age}
-- User comment: ${item.userComment}
-- Defects: ${item.defects}
-- Defect description: ${item.defectDescription}
-- Size: ${item.size}
-- Material: ${item.material}
-- Model: ${item.model}
-- Color: ${item.color}
-- Category: ${item.category}`;
+- Original price: SEK ${item.originalPrice || '${originalPrice}'}
+- Brand: ${item.cleanedBrand || '${cleanedBrand}'}
+- Condition: ${item.condition || '${condition}'}
+- Age: ${item.age || '${age}'}
+- User comment: ${item.userComment || '${userComment}'}${item.defects ? `\n- Defects: ${item.defects}` : '\n- Defects: ${defects}'}${item.defectDescription ? `\n- Defects description: ${item.defectDescription}` : '\n- Defects description: ${defectDescription}'}
+- Size: ${item.size || '${size}'}
+- Material: ${item.material || '${material}'}
+- Model: ${item.model || '${model}'}
+- Color: ${item.color || '${color}'}
+- Category: ${item.category || '${category}'}`;
 }
 
 function addEventListeners() {
@@ -57,10 +55,10 @@ async function validateInput() {
           element.setCustomValidity(element.value ? '' : 'Required');
         });
 
-        const formIsValid = !document.getElementById('formInner')
-            .checkValidity();
+        const form = document.getElementById('promptForm');
+        const formIsValid = !form.checkValidity();
             
-        document.getElementById('formInner').reportValidity();
+        form.reportValidity();
         resolve(!formIsValid);
     });
 }
@@ -70,13 +68,12 @@ async function collectAndRun() {
 
     // Collect form data
     const body = {
-        itemId: document.getElementById('itemId').value,
         systemRole: document.getElementById('systemRole').value,
         prompt: document.getElementById('prompt').value
     };
 
     // Call endpoint
-    console.log('Body: ', { itemId, body });
+    console.log('Body: ', { body });
     const res = await callBackendApi(`/api/items/${itemId}/getValuation`, {
       data: { body },
       requiresAuth: false,
@@ -92,10 +89,6 @@ const getItem = async (itemId) => {
 const main = async () => {
     const params = getParamsObject();
     const item = params.id ? await getItem(params.id) : '';
-    if (!item) {
-        console.error("Invalid item id param");
-        location.href = '/';
-    }
     initializePage(item);
     addEventListeners();
 }
