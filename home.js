@@ -122,6 +122,10 @@ function noCommissionCampaign() {
   */
 }
 
+document.getElementById('sellItemCtaButton').addEventListener('click', function () {
+  document.getElementById('channelBottomSheet').classList.toggle('active');
+});
+
 authUser.whenSet(signedInNextStep);
 loadRecentlySold();
 fetchAndLoadRecentlyAddedItems();
