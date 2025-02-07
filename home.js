@@ -130,7 +130,15 @@ function showChannelBottomSheet(){
 }
 
 document.getElementById('sellItemCtaButton').addEventListener('click', function () {
-  if (isIOS || window.location.hostname.includes('webflow')) {
+  if (isIOS) {
+    showChannelBottomSheet()
+  } else {
+    window.location.href = '/sell-item';
+  }
+});
+
+document.getElementById('stickySellItemButton').addEventListener('click', function () {
+  if (isIOS) {
     showChannelBottomSheet()
   } else {
     window.location.href = '/sell-item';
@@ -138,7 +146,7 @@ document.getElementById('sellItemCtaButton').addEventListener('click', function 
 });
 
 document.getElementById('headerLoginButton').addEventListener('click', function () {
-  if (isIOS || window.location.hostname.includes('webflow')) {
+  if (isIOS) {
     showChannelBottomSheet()
   } else {
     window.location.href = '/sign-in';
