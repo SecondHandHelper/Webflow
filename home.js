@@ -123,16 +123,16 @@ function noCommissionCampaign() {
 }
 
 // Channel bottom sheet
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-function showChannelBottomSheet(){
+function showChannelBottomSheet(webpath){
+  document.getElementById('continueOnWebBottomSheet').href = window.location.origin + webpath;
   document.getElementById('darkOverlay').classList.add('active');
   document.getElementById('channelBottomSheet').classList.add('active');
 }
 
 function channelRouter(webpath){
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   if (isIOS) {
-    showChannelBottomSheet()
-    document.getElementById('continueOnWebBottomSheet').href = window.location.origin + webpath;
+    showChannelBottomSheet(webpath)
   } else {
     window.location.href = webpath;
   }
