@@ -129,29 +129,18 @@ function showChannelBottomSheet(){
   document.getElementById('channelBottomSheet').classList.add('active');
 }
 
-document.getElementById('sellItemCtaButton').addEventListener('click', function () {
+function channelRouter(webpath){
   if (isIOS) {
     showChannelBottomSheet()
+    document.getElementById('continueOnWebBottomSheet').href = window.location.origin + webpath;
   } else {
-    window.location.href = '/sell-item';
+    window.location.href = webpath;
   }
-});
+}
 
-document.getElementById('stickySellItemButton').addEventListener('click', function () {
-  if (isIOS) {
-    showChannelBottomSheet()
-  } else {
-    window.location.href = '/sell-item';
-  }
-});
-
-document.getElementById('headerLoginButton').addEventListener('click', function () {
-  if (isIOS) {
-    showChannelBottomSheet()
-  } else {
-    window.location.href = '/sign-in';
-  }
-});
+document.getElementById('sellItemCtaButton').addEventListener('click', ()=> channelRouter('/sell-item'));
+document.getElementById('stickySellItemButton').addEventListener('click', ()=> channelRouter('/sell-item'));
+document.getElementById('headerLoginButton').addEventListener('click', ()=> channelRouter('/sign-in'));
 
 function hideChannelBottomSheet(){
   document.getElementById('darkOverlay').classList.remove('active');
