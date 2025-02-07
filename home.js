@@ -122,23 +122,37 @@ function noCommissionCampaign() {
   */
 }
 
+// Channel bottom sheet
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+function showChannelBottomSheet(){
+  document.getElementById('darkOverlay').classList.add('active');
+  document.getElementById('channelBottomSheet').classList.add('active');
+}
+
 document.getElementById('sellItemCtaButton').addEventListener('click', function () {
-  // Check if device is iOS (iPhone or iPad)
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  
-  if (isIOS) {
-    console.log('iOS device - showing bottom sheet');
-    document.getElementById('channelBottomSheet').classList.toggle('active');
+  if (isIOS || window.location.hostname.includes('webflow')) {
+    showChannelBottomSheet()
   } else {
-    console.log('Non-iOS device - redirecting to sell page');
     window.location.href = '/sell-item';
   }
 });
 
-document.getElementById('closeChannelBottomSheet').addEventListener('click', function () {
-  console.log('clicking close channelpicker');
-  document.getElementById('channelBottomSheet').classList.remove('active');
+document.getElementById('headerLoginButton').addEventListener('click', function () {
+  if (isIOS || window.location.hostname.includes('webflow')) {
+    showChannelBottomSheet()
+  } else {
+    window.location.href = '/sign-in';
+  }
 });
+
+function hideChannelBottomSheet(){
+  document.getElementById('darkOverlay').classList.remove('active');
+  document.getElementById('channelBottomSheet').classList.remove('active');
+}
+
+document.getElementById('darkOverlay').addEventListener('click', hideChannelBottomSheet);
+document.getElementById('closeChannelBottomSheet').addEventListener('click', hideChannelBottomSheet);
+
 
 authUser.whenSet(signedInNextStep);
 loadRecentlySold();
