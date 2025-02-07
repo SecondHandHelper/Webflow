@@ -123,7 +123,21 @@ function noCommissionCampaign() {
 }
 
 document.getElementById('sellItemCtaButton').addEventListener('click', function () {
-  document.getElementById('channelBottomSheet').classList.toggle('active');
+  // Check if device is iOS (iPhone or iPad)
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  
+  if (isIOS) {
+    console.log('iOS device - showing bottom sheet');
+    document.getElementById('channelBottomSheet').classList.toggle('active');
+  } else {
+    console.log('Non-iOS device - redirecting to sell page');
+    window.location.href = '/sell-item';
+  }
+});
+
+document.getElementById('closeChannelBottomSheet').addEventListener('click', function () {
+  console.log('clicking close channelpicker');
+  document.getElementById('channelBottomSheet').classList.remove('active');
 });
 
 authUser.whenSet(signedInNextStep);
