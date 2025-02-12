@@ -7,7 +7,7 @@ function getBrandFromUrl() {
   return formattedBrand;
 }
 const brand = getBrandFromUrl();
-const isFilippaK = brand === 'Filippa K' ? true : false;
+const isLook2Brand = ['Filippa K', 'Flattered'].includes(brand) ? true : false;
 
 function loadRecentlySold() {
   const recentlySoldItems = callBackendApi(`/api/items/recentlySold?brand=${brand}`);
@@ -21,14 +21,14 @@ function loadRecentlySold() {
       let itemsDisplayed = 0;
 
       for (const item of result.data) {
-        if (isFilippaK && !item.frontImageOkForPublish){
+        if (isLook2Brand && !item.frontImageOkForPublish){
           continue
         }
         const brand = item.brand;
         const cardSubtitle = item.brand;
         let cardTitle = item.category;
         if (item.cleanedModel){
-          cardTitle = `${item.cleanedModel}${item.category ? `, ${item.category}` : ''}`;
+          cardTitle = `${item.cleanedModel}${item.category && brand === 'Filippa K' ? `, ${item.category}` : ''}`;
         }
         const soldPrice = item.soldPrice;
         const soldDate = new Date(item.soldDate);
@@ -41,8 +41,8 @@ function loadRecentlySold() {
                         <div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div>
                         <div class="text-block-14">${soldPrice} kr</div>
                         <div class='text-block-34'>${brand}</div>`;
-          if (isFilippaK) {
-            itemCardHTML = `<div class="div-block-14-super-big"><div class="ratio-box _16-9"><div class="content-block with-image">
+          if (isLook2Brand) {
+            itemCardHTML = `<div class="div-block-14-${brand === 'Filippa K' ? 'super-': ''}big"><div class="ratio-box _16-9"><div class="content-block with-image">
                         <div class="img-container" style="background-image: url('${imageUrl}');">
                         <div class="sold-tag">Sold</div></div></div></div>
                         <div class="text-block-14">${soldPrice} kr</div>
@@ -58,9 +58,9 @@ function loadRecentlySold() {
           itemsDisplayed++;
         }
       }
-      if (isFilippaK) {
+      if (isLook2Brand) {
         itemListRecentlySoldStartPage.innerHTML += `<div class="div-block-14-super-big"><div class="ratio-box _16-9"><div class="content-block with-image">
-                        <a href="https://shop.maiapp.se/collections/filippa-k" class="see-more-items-button">Till Mai Shop</a>  
+                        <a href="https://shop.maiapp.se/collections${brandPartners[brand].maiShopPath}" class="see-more-items-button">Till Mai Shop</a>  
                         </div></div>`;
       }
     })
@@ -93,7 +93,7 @@ async function fetchAndLoadRecentlyAddedItems() {
                             <div class="recently-added-price">${item.currentPrice} kr</div>
                             <div class="recently-added-brands-link-text">Mai Shop</div>
                         </div><a/></div>`;
-      if (isFilippaK) {
+      if (isLook2Brand) {
         itemCardHTML = `<div class="div-block-14-super-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
                         <div class="img-container" style="background-image: url('${item.image}')"></div></div></div>
                         <div class="recently-added-text-block">
@@ -108,9 +108,9 @@ async function fetchAndLoadRecentlyAddedItems() {
         .replace("14-super-big", "14-big-desktop");
       itemListDesktop.innerHTML += desktopCardHTML;
     }
-    if (isFilippaK) {
+    if (isLook2Brand) {
       itemList.innerHTML += `<div class="div-block-14-super-big"><div class="ratio-box _16-9"><div class="content-block with-image">
-                        <a href="https://shop.maiapp.se/collections/filippa-k" class="see-more-items-button">Upptäck mer</a>  
+                        <a href="https://shop.maiapp.se/collections/${brandPartners[brand].maiShopPath}" class="see-more-items-button">Upptäck mer</a>  
                         </div></div>`;
     }
   } catch (e) {
@@ -136,7 +136,7 @@ if (inviteCode) {
   activeCode.style.display = 'flex';
 }
 
-if (!isFilippaK) {
+if (!isLook2Brand) {
   window.intercomSettings = {
     app_id: "klyy0le5"
   };

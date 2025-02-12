@@ -14,7 +14,7 @@ Characteristics:
 - Brand: ${item.cleanedBrand || '{cleanedBrand}'}
 - Condition: ${item.condition || '{condition}'}
 - Age: ${item.age || '{age}'}
-- User comment: ${item.userComment || '{userComment}'}${item.defects ? `\n- Defects: ${item.defects}` : '\n- Defects: ${defects}'}${item.defectDescription ? `\n- Defects description: ${item.defectDescription}` : '\n- Defects description: {defectDescription}'}
+- User comment: ${item.userComment || '{userComment}'}${item.defects ? `\n- Defects: ${item.defects}` : '\n- Defects: {defects}'}${item.defectDescription ? `\n- Defects description: ${item.defectDescription}` : '\n- Defects description: {defectDescription}'}
 - Size: ${item.size || '{size}'}
 - Material: ${item.material || '{material}'}
 - Model: ${item.model || '{model}'}
@@ -26,6 +26,7 @@ function addEventListeners() {
     document.getElementById('runButton').addEventListener('click', async function () {
         // Collect form and call endpoint
         const data = await collectAndRun();
+        console.log('DATA: ', data);
         if (data) {
             // Show result
             const formatValue = (value) => {
@@ -87,12 +88,13 @@ async function collectAndRun() {
 
     // Call endpoint
     console.log('Body: ', { body });
-    const res = await callBackendApi(`/api/chatGptValuationApi/${itemId}`, {
+    const res = await callBackendApi(`/api/chatGptValuation/${itemId}`, {
+      method: 'POST',
       data: { body },
       requiresAuth: false,
     });
     console.log('RES: ', res);
-    return { ...(res?.data || {}), id: itemId };
+    return { ...(res?.data || {}) };
 }
 
 const getItem = async (itemId) => {
