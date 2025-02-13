@@ -1,5 +1,27 @@
 <script>
   const params = new URL(window.location).searchParams;
+
+  // A/B tests
+  if (window.location.pathname === '/flattered' && !params.has('variant')) {
+    var variants = [
+      { weight: 50, variantParam: 'variant=A' },
+      { weight: 50, variantParam: 'variant=B' }
+    ];
+
+    var totalWeight = variants.reduce((sum, variant) => sum + variant.weight, 0);
+    var random = Math.random() * totalWeight;
+    var weightSum = 0;
+
+    for (var i = 0; i < variants.length; i++) {
+      weightSum += variants[i].weight;
+      if (random <= weightSum) {
+        location.href = location.href + (params.size === 0 ? '?' : '&') + variants[i].variantParam;
+        break;
+      }
+    }
+  }
+
+  // App webview
   if (!params.has('app')) {
     if (localStorage.getItem('authUserId')) {
       if (window.location.pathname === '/' || window.location.pathname === '/sign-in') {
@@ -107,12 +129,12 @@
 
   const isBrandPartner = (brandName) => {
     return Object.values(brandPartners)
-      .some(partner => 
-        partner.name.toUpperCase() === brandName.toUpperCase() && 
+      .some(partner =>
+        partner.name.toUpperCase() === brandName.toUpperCase() &&
         partner.featureEnabled === true
       );
   };
-  
+
 
   if (!authUser.current && localStorage.getItem('authUser') && localStorage.getItem('idToken')) {
     const p = new URL(window.location).searchParams
