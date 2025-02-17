@@ -39,11 +39,16 @@ function addEventListeners() {
         const res = await saveFeedback(params.id);
         // Show confirmation
         if (res) {
+            console.log('Im here');
             feedbackForm.style.display = 'none';
             hideAllButtons();
             toMaiButton.style.display = 'flex';
             introDiv.style.display = 'none';
             thankYouDiv.style.display = 'block';
+            
+            const lowRating = parseInt(document.querySelector('input[name="rating"]:checked').value) <= 2;
+            reclaimLink.href = lowRating ? window.location.origin + `/reclaim/?id=${params.id}` : '#';
+            reclaimText.style.display = lowRating ? 'block' : 'none';
         }
     });
 
