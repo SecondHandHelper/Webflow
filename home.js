@@ -149,7 +149,7 @@ function hideChannelBottomSheet(){
 
 document.getElementById('darkOverlay').addEventListener('click', hideChannelBottomSheet);
 document.getElementById('closeChannelBottomSheet').addEventListener('click', hideChannelBottomSheet);
-
+// End of channel bottom sheet
 
 authUser.whenSet(signedInNextStep);
 loadRecentlySold();

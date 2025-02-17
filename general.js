@@ -105,7 +105,6 @@ export function itemCoverImage(item) {
     return images.frontImageSmall || images.frontImage
 }
 
-
 export function shareCode() {
     const code = user.current.referralData.referralCode;
     //const text = `Hej, jag vill tipsa om Mai för att rensa ur garderoben. Mai är en tjänst som hjälper dig att sälja dina kläder på ett enkelt sätt. Man tar bara bilder på sina plagg, sedan sköter Mai resten - såsom värdering, annonsering på flera plattformar, kontakt med köpare och frakt när det blir sålt. Man får själv behålla 80% av vinsten, och blir det inte sålt kostar det ingenting.\n\nOm du registrerar dig med min kod (följ länken) och provar sälja ett plagg inom 7 dagar får du behålla 100% av vinsten för det första plagget (istället för 80%). Min kod: ${code}\n\nLäs mer och använd min kod här:`;
@@ -126,3 +125,25 @@ export function shareCode() {
         setTimeout(function () { linkCopiedBanner.style.display = 'none'; }, 1500);
     }
 }
+
+// Channel bottom sheet
+export function channelRouter(webpath){
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS) {
+    showChannelBottomSheet(webpath)
+  } else {
+    window.location.href = webpath;
+  }
+}
+
+function showChannelBottomSheet(webpath){
+  document.getElementById('continueOnWebBottomSheet').href = window.location.origin + webpath;
+  document.getElementById('darkOverlay').classList.add('active');
+  document.getElementById('channelBottomSheet').classList.add('active');
+}
+
+export function hideChannelBottomSheet(){
+  document.getElementById('darkOverlay').classList.remove('active');
+  document.getElementById('channelBottomSheet').classList.remove('active');
+}
+// End of channel bottom sheet

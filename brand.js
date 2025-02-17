@@ -1,4 +1,5 @@
 import { itemCoverImage } from "./general";
+import { channelRouter, hideChannelBottomSheet } from "./general";
 
 function getBrandFromUrl() {
   const path = window.location.pathname.replace(/^\/+/, ''); // Removes leading '/'
@@ -118,6 +119,14 @@ async function fetchAndLoadRecentlyAddedItems() {
     console.log('error', e)
   }
 }
+
+// Channel bottom sheet
+document.getElementById('sellItemCtaButton').addEventListener('click', ()=> channelRouter('/sell-item'));
+document.getElementById('sellWithMaiCarouselButton').addEventListener('click', ()=> channelRouter('/sell-item'));
+document.getElementById('sellStickyHeaderButton').addEventListener('click', ()=> channelRouter('/sell-item'));
+document.getElementById('darkOverlay').addEventListener('click', ()=> hideChannelBottomSheet());
+document.getElementById('closeChannelBottomSheet').addEventListener('click', ()=> hideChannelBottomSheet());
+// End of channel bottom sheet
 
 loadRecentlySold();
 fetchAndLoadRecentlyAddedItems();
