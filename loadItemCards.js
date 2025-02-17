@@ -102,29 +102,39 @@ function openServicePointToast(itemId, soldDate) {
 
 function openConvertToGiftCard(itemId, itemImage, soldPrice, brand) {
   document.getElementById('convertGiftCardInfoBox').style.display = 'flex';
-  document.querySelector('.window-shade').style.display = 'block';
+  document.querySelector('.dark-overlay').style.display = 'block';
   document.getElementById('giftCardItemImage').src = itemImage;
-  document.getElementById('giftCardText').innerText = `Vill du få ${soldPrice} kr (100% av vinsten) att handla för på ${brandPartners[brand].url} istället?`;
+  document.getElementById('giftCardText').innerText = `Vill du få ${soldPrice}kr (100% av vinsten) att handla för på ${brandPartners[brand].url} istället?`;
   document.getElementById('closeGiftCardBox').addEventListener('click', () => {
     document.getElementById('convertGiftCardInfoBox').style.display = 'none';
-    document.querySelector('.window-shade').style.display = 'none';
+    document.querySelector('.dark-overlay').style.display = 'none';
   });
   document.getElementById('closeGiftCardBoxButton').addEventListener('click', () => {
     document.getElementById('convertGiftCardInfoBox').style.display = 'none';
-    document.querySelector('.window-shade').style.display = 'none';
+    document.querySelector('.dark-overlay').style.display = 'none';
   });
-  document.getElementById('convertToGiftCardButton').addEventListener('click', async () => {
-    await callBackendApi(`/api/items/${itemId}`, {
-      data: { payoutType: 'Brand Gift Card' },
-      method: 'PUT'
-    })
-    document.getElementById('convertGiftCardInfoBox').style.display = 'none';
-    document.querySelector('.window-shade').style.display = 'none';
-    document.getElementById(`convertToGiftCardDiv-${itemId}`).style.display = 'none';
-    document.getElementById(`text1-${itemId}`).innerHTML = document.getElementById(`text1-${itemId}`).innerHTML.replace(/\d+/, soldPrice);
-    document.getElementById(`text2-${itemId}`).innerHTML = `(${brandPartners[brand].name}-presentkort)<br>`;
-  });
+
+  // This is updating the dataset with the itemId, brand and soldPrice, to be used when the user clicks the button
+  document.getElementById('convertToGiftCardButton').dataset.currentItemId = itemId;
+  document.getElementById('convertToGiftCardButton').dataset.currentBrand = brand;
+  document.getElementById('convertToGiftCardButton').dataset.currentSoldPrice = soldPrice;
 }
+
+document.getElementById('convertToGiftCardButton').addEventListener('click', async () => {
+  const itemId = document.getElementById('convertToGiftCardButton').dataset.currentItemId;
+  const brand = document.getElementById('convertToGiftCardButton').dataset.currentBrand;
+  const soldPrice = document.getElementById('convertToGiftCardButton').dataset.currentSoldPrice;
+
+  await callBackendApi(`/api/items/${itemId}`, {
+    data: { payoutType: 'Brand Gift Card' },
+    method: 'PUT'
+  })
+  document.getElementById('convertGiftCardInfoBox').style.display = 'none';
+  document.querySelector('.dark-overlay').style.display = 'none';
+  document.getElementById(`convertToGiftCardDiv-${itemId}`).style.display = 'none';
+  document.getElementById(`text1-${itemId}`).innerHTML = document.getElementById(`text1-${itemId}`).innerHTML.replace(/\d+/, soldPrice);
+  document.getElementById(`text2-${itemId}`).innerHTML = `(${brandPartners[brand].name}-presentkort)<br>`;
+});
 
 function openYouGetInfoBox(soldPrice, sellerGetsValue) {
   priceAfterPlatformFee.innerHTML = soldPrice;
