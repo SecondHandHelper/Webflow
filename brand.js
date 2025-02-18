@@ -8,7 +8,24 @@ function getBrandFromUrl() {
   return formattedBrand;
 }
 const brand = getBrandFromUrl();
-const isLook2Brand = ['Filippa K', 'Flattered'].includes(brand) ? true : false;
+const isBrandLook2 = ['Filippa K', 'Flattered'].includes(brand) ? true : false;
+
+// A/B Flattered test
+const params = getParamsObject();
+if (brand === 'Flattered') {
+  if (params.variant === 'A') {
+    console.log('A: Filippa K');
+    heroTitle.innerHTML = 'Låt dina plagg från Flattered leva vidare';
+    heroText.innerHTML = 'Flattered är rotad i skandinavisk kvalitet och hantverk, varje produkt är skapad för att hålla över tid. Sälj vidare det som du inte längre använder och få 100% av vinsten i presentkort på flattered.com eller 80% via Swish.';
+
+    sellButtonText.innerHTML = 'Sälj med Mai';
+    sellBtnMaiLogo.style.display = 'block';
+    sellBtnPlusIcon.style.display = 'none';
+    platformsSection.style.display = 'none';
+  } else {
+    console.log('B: Do nothing');
+  }
+}
 
 function loadRecentlySold() {
   const recentlySoldItems = callBackendApi(`/api/items/recentlySold?brand=${brand}`);
@@ -22,7 +39,7 @@ function loadRecentlySold() {
       let itemsDisplayed = 0;
 
       for (const item of result.data) {
-        if (isLook2Brand && !item.frontImageOkForPublish){
+        if (isBrandLook2 && !item.frontImageOkForPublish){
           continue
         }
         const brand = item.brand;
@@ -42,7 +59,7 @@ function loadRecentlySold() {
                         <div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div>
                         <div class="text-block-14">${soldPrice} kr</div>
                         <div class='text-block-34'>${brand}</div>`;
-          if (isLook2Brand) {
+          if (isBrandLook2) {
             itemCardHTML = `<div class="div-block-14-${brand === 'Filippa K' ? 'super-': ''}big"><div class="ratio-box _16-9"><div class="content-block with-image">
                         <div class="img-container" style="background-image: url('${imageUrl}');">
                         <div class="sold-tag">Sold</div></div></div></div>
@@ -59,7 +76,7 @@ function loadRecentlySold() {
           itemsDisplayed++;
         }
       }
-      if (isLook2Brand) {
+      if (isBrandLook2) {
         itemListRecentlySoldStartPage.innerHTML += `<div class="div-block-14-super-big"><div class="ratio-box _16-9"><div class="content-block with-image">
                         <a href="https://shop.maiapp.se/collections${brandPartners[brand].maiShopPath}" class="see-more-items-button">Till Mai Shop</a>  
                         </div></div>`;
@@ -94,7 +111,7 @@ async function fetchAndLoadRecentlyAddedItems() {
                             <div class="recently-added-price">${item.currentPrice} kr</div>
                             <div class="recently-added-brands-link-text">Mai Shop</div>
                         </div><a/></div>`;
-      if (isLook2Brand) {
+      if (isBrandLook2) {
         itemCardHTML = `<div class="div-block-14-super-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
                         <div class="img-container" style="background-image: url('${item.image}')"></div></div></div>
                         <div class="recently-added-text-block">
@@ -109,7 +126,7 @@ async function fetchAndLoadRecentlyAddedItems() {
         .replace("14-super-big", "14-big-desktop");
       itemListDesktop.innerHTML += desktopCardHTML;
     }
-    if (isLook2Brand) {
+    if (isBrandLook2) {
       itemList.innerHTML += `<div class="div-block-14-super-big"><div class="ratio-box _16-9"><div class="content-block with-image">
                         <a href="https://shop.maiapp.se/collections/${brandPartners[brand].maiShopPath}" class="see-more-items-button">Upptäck mer</a>  
                         </div></div>`;
@@ -145,7 +162,7 @@ if (inviteCode) {
   activeCode.style.display = 'flex';
 }
 
-if (!isLook2Brand) {
+if (!isBrandLook2) {
   window.intercomSettings = {
     app_id: "klyy0le5"
   };
