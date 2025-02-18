@@ -10,23 +10,6 @@ function getBrandFromUrl() {
 const brand = getBrandFromUrl();
 const isBrandLook2 = ['Filippa K', 'Flattered'].includes(brand) ? true : false;
 
-// A/B Flattered test
-const params = getParamsObject();
-if (brand === 'Flattered') {
-  if (params.variant === 'A') {
-    console.log('A: Filippa K');
-    heroTitle.innerHTML = 'Låt dina plagg från Flattered leva vidare';
-    heroText.innerHTML = 'Flattered är rotad i skandinavisk kvalitet och hantverk, varje produkt är skapad för att hålla över tid. Sälj vidare det som du inte längre använder och få 100% av vinsten i presentkort på flattered.com eller 80% via Swish.';
-
-    sellButtonText.innerHTML = 'Sälj med Mai';
-    sellBtnMaiLogo.style.display = 'block';
-    sellBtnPlusIcon.style.display = 'none';
-    platformsSection.style.display = 'none';
-  } else {
-    console.log('B: Do nothing');
-  }
-}
-
 function loadRecentlySold() {
   const recentlySoldItems = callBackendApi(`/api/items/recentlySold?brand=${brand}`);
   recentlySoldItems

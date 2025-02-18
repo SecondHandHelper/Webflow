@@ -1,54 +1,5 @@
 import { itemCoverImage } from "./general";
 
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-if (isMobile && window.location.hostname.includes('webflow')) {
-  let variant = new URLSearchParams(window.location.search).get('variant') || '';
-  console.log('variant before: ', variant);
-
-  // Set random variant if none exists
-  if (!variant) {
-    // A: Blabla
-    // B: Blabla
-    // C: Control (As is)
-    const variants = ['A', 'B', 'C'];
-    const randomVariant = variants[Math.floor(Math.random() * variants.length)];
-
-    // Update URL without page reload
-    const newUrl = new URL(window.location);
-    newUrl.searchParams.set('variant', randomVariant);
-    history.replaceState({}, '', newUrl);
-
-    // Update our variant constant
-    variant = randomVariant;
-    console.log('variant after: ', variant);
-  }
-
-  // Apply variant-specific changes
-  if (variant === 'A') {
-    document.querySelectorAll('.hero-image').forEach(el => el.remove());
-    document.querySelectorAll('.hero-image-b').forEach(el => el.remove());
-    heroTitle.innerHTML = 'Sälj garderoben smidigt med AI';
-    heroText.innerHTML = 'Mai gör allt jobb åt dig för att få dina kläder sålda på Tradera, Vestiare Collective med flera samtidigt. Slipp jobbet att sälja, och behåll 80% av värdet. Kom igång på några klick.';
-    heroTitle.style.fontSize = '40px';
-    document.querySelectorAll('.login-btn').forEach(el => {
-      el.style.border = '1px solid rgba(128, 128, 128, 0.3)';
-    });
-    document.querySelectorAll('.black-logo').forEach(el => { el.style.display = 'block'; });
-    document.querySelectorAll('.white-logo').forEach(el => { el.style.display = 'none'; });
-    document.getElementById('header').style.marginBottom = '0px';
-  } else if (variant === 'B') {
-    heroText.innerHTML = 'B';
-    document.querySelectorAll('.hero-image-a').forEach(el => el.remove());
-    document.querySelectorAll('.hero-image').forEach(el => el.remove());
-  } else if (variant === 'C') {
-    const elements = document.querySelectorAll('.hero-image-b');
-    console.log('Found elements:', elements.length, elements);
-    document.querySelectorAll('.hero-image-a').forEach(el => el.remove());
-    document.querySelectorAll('.black-logo').forEach(el => { el.style.display = 'none'; });
-    document.querySelectorAll('.white-logo').forEach(el => { el.style.display = 'block'; });
-  }
-}
-
 function loadRecentlySold() {
   const recentlySoldItems = callBackendApi('/api/items/recentlySold');
 

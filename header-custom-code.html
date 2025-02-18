@@ -1,24 +1,113 @@
 <script>
-  const params = new URL(window.location).searchParams;
+  let params = new URL(window.location).searchParams;
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-  // A/B tests
-  if (window.location.pathname === '/flattered' && !params.has('variant')) {
-    var variants = [
-      { weight: 50, variantParam: 'variant=A' },
-      { weight: 50, variantParam: 'variant=B' }
-    ];
+  function setExperimentCookie(experimentId, variant, days) {
+    const expires = new Date(Date.now() + days * 864e5).toUTCString();
+    document.cookie = experimentId + '=' + encodeURIComponent(variant) + '; expires=' + expires + '; path=/';
+  }
 
-    var totalWeight = variants.reduce((sum, variant) => sum + variant.weight, 0);
-    var random = Math.random() * totalWeight;
-    var weightSum = 0;
+  function getExperimentCookie(experimentId) {
+    return document.cookie.split('; ').find(row => row.startsWith(experimentId + '='))?.split('=')[1];
+  }
 
-    for (var i = 0; i < variants.length; i++) {
-      weightSum += variants[i].weight;
-      if (random <= weightSum) {
-        location.href = location.href + (params.size === 0 ? '?' : '&') + variants[i].variantParam;
-        break;
-      }
+  const EXPERIMENTS = {
+    HERO: 'hero-2025feb',
+    FLATTERED: 'flat-v'
+  };
+
+  // Mobile hero A/B test
+  if (isMobile && window.location.pathname === '/' && window.location.hostname.includes('webflow')) {
+    let heroVariant = params.get(EXPERIMENTS.HERO)?.toLowerCase();
+
+    // If no URL param, check cookie or assign random
+    if (!heroVariant) {
+      heroVariant = getExperimentCookie(EXPERIMENTS.HERO) ||
+        ['control', 'a', 'b'][Math.floor(Math.random() * 3)];
+
+      // Update URL since variant came from cookie or random
+      const newUrl = new URL(window.location);
+      newUrl.searchParams.set(EXPERIMENTS.HERO, heroVariant);
+      history.replaceState({}, '', newUrl);
+      params = new URL(window.location).searchParams;
     }
+
+    // Always ensure cookie is set/refreshed
+    setExperimentCookie(EXPERIMENTS.HERO, heroVariant, 7);
+
+    // Show variant
+    document.addEventListener("DOMContentLoaded", function () {
+      function showTestImage() {
+        document.querySelectorAll('.hero-image-a').forEach(el => { el.style.display = 'block'; });
+        heroTitle.style.fontSize = '40px';
+        document.querySelectorAll('.login-btn').forEach(el => {
+          el.style.border = '1px solid rgba(128, 128, 128, 0.3)';
+        });
+        document.querySelectorAll('.black-logo').forEach(el => { el.style.display = 'block'; });
+        document.getElementById('header').style.marginBottom = '0px';
+        //Hide control hero
+        document.querySelectorAll('.hero-image').forEach(el => el.remove());
+        document.querySelectorAll('.white-logo').forEach(el => { el.style.display = 'none'; });
+      }
+
+      const currentVariant = params.get(EXPERIMENTS.HERO)?.toLowerCase();
+      if (currentVariant === 'a') {
+        heroText.innerHTML = 'Mai gör allt jobb åt dig för att få dina kläder sålda på Tradera, Vestiare Collective med flera samtidigt. Slipp jobbet att sälja, och behåll 80% av värdet. Kom igång på några klick.';
+        heroTitle.innerHTML = 'Sälj dina plagg smidigt med AI';
+        showTestImage()
+
+      } else if (currentVariant === 'b') {
+        heroText.innerHTML = 'Mai är assistenten som gör det värt att sälja vidare plaggen du inte använder. Mai säljer på olika marknadsplatser och sköter allt – du behåller 80%.';
+        heroTitle.innerHTML = 'Mai – din smarta säljhjälp';
+        showTestImage()
+      }
+
+      // Track which hero variant was shown
+      /*
+      analytics.track("Experiment Viewed", {
+        experimentID: EXPERIMENTS.HERO,
+        variantID: heroVariant
+      });
+      */
+    });
+  }
+
+  // Flattered page A/B test
+  if (isMobile && window.location.pathname === '/flattered') {
+    let flatteredVariant = params.get(EXPERIMENTS.FLATTERED)?.toLowerCase() || 
+                          params.get('variant')?.toLowerCase() || 
+                          '';
+    
+    if (!flatteredVariant) {
+      flatteredVariant = getExperimentCookie(EXPERIMENTS.FLATTERED) || 
+                        ['a', 'b'][Math.floor(Math.random() * 2)];
+      
+      // Update URL since variant came from cookie or random
+      const newUrl = new URL(window.location);
+      newUrl.searchParams.set(EXPERIMENTS.FLATTERED, flatteredVariant);
+      history.replaceState({}, '', newUrl);
+      params = new URL(window.location).searchParams;
+    }
+    
+    // Always ensure cookie is set/refreshed
+    setExperimentCookie(EXPERIMENTS.FLATTERED, flatteredVariant);
+
+    // Show variant
+    document.addEventListener("DOMContentLoaded", function () {
+      const currentVariant = params.get(EXPERIMENTS.FLATTERED).toLowerCase();
+      
+      if (currentVariant === 'a') {
+        console.log('A: Update hero');
+        heroTitle.innerHTML = 'Låt dina plagg från Flattered leva vidare';
+        heroText.innerHTML = 'Flattered är rotad i skandinavisk kvalitet och hantverk, varje produkt är skapad för att hålla över tid. Sälj vidare det som du inte längre använder och få 100% av vinsten i presentkort på flattered.com eller 80% via Swish.';
+        sellButtonText.innerHTML = 'Sälj med Mai';
+        sellBtnMaiLogo.style.display = 'block';
+        sellBtnPlusIcon.style.display = 'none';
+        platformsSection.style.display = 'none';
+      } else if (currentVariant === 'b') {
+        console.log('B: Do nothing');
+      }
+    });
   }
 
   // App webview
