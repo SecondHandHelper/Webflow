@@ -1,4 +1,46 @@
-import {itemCoverImage} from "./general";
+import { itemCoverImage } from "./general";
+
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+if (isMobile) {
+  let variant = new URLSearchParams(window.location.search).get('variant') || '';
+  console.log('variant before: ', variant);
+
+  // Set random variant if none exists
+  if (!variant) {
+    // A: Blabla
+    // B: Blabla
+    // C: Control (As is)
+    const variants = ['A', 'B', 'C'];
+    const randomVariant = variants[Math.floor(Math.random() * variants.length)];
+
+    // Update URL without page reload
+    const newUrl = new URL(window.location);
+    newUrl.searchParams.set('variant', randomVariant);
+    history.replaceState({}, '', newUrl);
+    
+    // Update our variant constant
+    variant = randomVariant;
+    console.log('variant after: ', variant);
+  }
+
+  // Apply variant-specific changes
+  if (variant === 'A') {
+    document.querySelectorAll('.image-header-section').forEach(el => el.remove());
+    document.querySelectorAll('.image-header-section-B').forEach(el => el.remove());
+    heroTitle.innerHTML = 'Sälj garderoben smidigt med AI';
+    heroText.innerHTML = 'Mai gör allt jobb åt dig för att få dina kläder sålda på Tradera, Vestiare Collective med flera samtidigt. Slipp jobbet att sälja, och behåll 80% av värdet. Kom igång på några klick.';
+    heroTitle.style.fontSize = '40px';
+  } else if (variant === 'B') {
+    heroText.innerHTML = 'B';
+    document.querySelectorAll('.image-header-section-A').forEach(el => el.remove());
+    document.querySelectorAll('.image-header-section').forEach(el => el.remove());
+  } else if (variant === 'C') {
+    heroText.innerHTML = 'C';
+    document.querySelectorAll('.image-header-section-A').forEach(el => el.remove());
+    document.querySelectorAll('.image-header-section-B').forEach(el => el.remove());
+  }
+}
 
 function loadRecentlySold() {
   const recentlySoldItems = callBackendApi('/api/items/recentlySold');
@@ -73,11 +115,11 @@ const trackHowItWorksInteractions = () => {
     if (!entries[0].isIntersecting) return;
     analytics.track("Element Viewed", { elementID: "howItWorksSlide1" });
     observer.disconnect();
-  }, {rootMargin: '0px 0px -600px 0px'}).observe(howItWorksDiv);
+  }, { rootMargin: '0px 0px -600px 0px' }).observe(howItWorksDiv);
   new MutationObserver((mutationList) => {
-    const mutatedElement = mutationList.find(rec => rec.type === 'attributes' &&  rec.attributeName === 'aria-hidden');
+    const mutatedElement = mutationList.find(rec => rec.type === 'attributes' && rec.attributeName === 'aria-hidden');
     if (mutatedElement && mutatedElement.oldValue && !mutatedElement.target['aria-hidden']) {
-      analytics.track("Element Viewed", { elementID: `howItWorksSlide${mutatedElement.target.ariaLabel.slice(0,1)}` });
+      analytics.track("Element Viewed", { elementID: `howItWorksSlide${mutatedElement.target.ariaLabel.slice(0, 1)}` });
     }
   }).observe(howItWorksDiv, { attributeFilter: ['aria-hidden'], attributeOldValue: true, subtree: true });
 }
@@ -93,12 +135,12 @@ function showNoCommissionCampaign() {
   }
   new IntersectionObserver((entries, observer) => {
     noCommissionCampaignDiv.style.top = document.getElementById('sellItemCtaButton').getBoundingClientRect().y > -47 ? '-80px' : '0px';
-  }, {rootMargin: '0px 0px -100%', root: null }).observe(document.getElementById('ctaSection'));
+  }, { rootMargin: '0px 0px -100%', root: null }).observe(document.getElementById('ctaSection'));
   new IntersectionObserver((entries, observer) => {
     if (!entries[0].isIntersecting) return;
     analytics.track("Element Viewed", { elementID: "noCommissionCampaignAd" });
     observer.disconnect();
-  }, {rootMargin: '0px 0px -370px 0px'}).observe(document.getElementById('noCommissionAd'));
+  }, { rootMargin: '0px 0px -370px 0px' }).observe(document.getElementById('noCommissionAd'));
 }
 
 function noCommissionCampaign() {
@@ -123,13 +165,13 @@ function noCommissionCampaign() {
 }
 
 // Channel bottom sheet
-function showChannelBottomSheet(webpath){
+function showChannelBottomSheet(webpath) {
   document.getElementById('continueOnWebBottomSheet').href = window.location.origin + webpath;
   document.getElementById('darkOverlay').classList.add('active');
   document.getElementById('channelBottomSheet').classList.add('active');
 }
 
-function channelRouter(webpath){
+function channelRouter(webpath) {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   if (isIOS) {
     showChannelBottomSheet(webpath)
@@ -138,11 +180,11 @@ function channelRouter(webpath){
   }
 }
 
-document.getElementById('sellItemCtaButton').addEventListener('click', ()=> channelRouter('/sell-item'));
-document.getElementById('stickySellItemButton').addEventListener('click', ()=> channelRouter('/sell-item'));
-document.getElementById('headerLoginButton').addEventListener('click', ()=> channelRouter('/sign-in'));
+document.getElementById('sellItemCtaButton').addEventListener('click', () => channelRouter('/sell-item'));
+document.getElementById('stickySellItemButton').addEventListener('click', () => channelRouter('/sell-item'));
+document.getElementById('headerLoginButton').addEventListener('click', () => channelRouter('/sign-in'));
 
-function hideChannelBottomSheet(){
+function hideChannelBottomSheet() {
   document.getElementById('darkOverlay').classList.remove('active');
   document.getElementById('channelBottomSheet').classList.remove('active');
 }
@@ -166,7 +208,7 @@ checkCookie("utm_content");
 
 // Set invite code cookie
 const inviteCode = checkCookie("invite");
-if (inviteCode){
+if (inviteCode) {
   referralCodeText.innerHTML = inviteCode;
   activeCode.style.display = 'flex';
 }
