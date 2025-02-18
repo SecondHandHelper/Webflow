@@ -139,7 +139,7 @@ async function updateItem(itemId, changedImages) {
       document.querySelectorAll('input[type=file]').forEach(fileInput => {
         if (fileInput.value?.length || fileInput.dataset.fileUrl?.length) {
           const imageName = inputNameToImageName(fileInput.id);
-          images.set(imageName, fileInput.dataset.fileUrl || fileInput.files[0]);
+          images.set(imageName, fileInput.files[0] || fileInput.dataset.fileUrl);
         }
       });
     } else {
