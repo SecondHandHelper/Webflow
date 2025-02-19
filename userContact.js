@@ -68,7 +68,7 @@ const pageSetUp = async () => {
         if (res.data) {
           console.log('All went well!');
           //Next step
-          verifyInstructionText.innerHTML = verifyInstructionText.innerHTML.replace('+46', formatPhoneNumber(phoneNumber.value));
+          verifyInstructionText.innerHTML = verifyInstructionText.innerHTML.replace(/\+46\d*/, formatPhoneNumber(phoneNumber.value));
           userDetailsFormDiv.style.display = 'none';
           verifyPhoneNumberDiv.style.display = 'block';
           setTimeout(() => {

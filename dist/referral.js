@@ -5,7 +5,7 @@
 //
 // anything defined in a previous bundle is accessed via the
 // orig method which is the require for previous bundles
-function(e,t,r,n,o){/* eslint-disable no-undef */var i="undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:"undefined"!=typeof window?window:"undefined"!=typeof global?global:{},a="function"==typeof i[n]&&i[n],s=a.cache||{},l="undefined"!=typeof module&&"function"==typeof module.require&&module.require.bind(module);function u(t,r){if(!s[t]){if(!e[t]){// if we cannot find the module within our internal map or
+function(e,t,r,n,o){/* eslint-disable no-undef */var i="undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:"undefined"!=typeof window?window:"undefined"!=typeof global?global:{},a="function"==typeof i[n]&&i[n],s=a.cache||{},l="undefined"!=typeof module&&"function"==typeof module.require&&module.require.bind(module);function d(t,r){if(!s[t]){if(!e[t]){// if we cannot find the module within our internal map or
 // cache jump to the current global require ie. the last bundle
 // that was added to the page.
 var o="function"==typeof i[n]&&i[n];if(!r&&o)return o(t,!0);// If there are other bundles on this page the require from the
@@ -13,34 +13,36 @@ var o="function"==typeof i[n]&&i[n];if(!r&&o)return o(t,!0);// If there are othe
 // many times as there are bundles until the module is found or
 // we exhaust the require chain.
 if(a)return a(t,!0);// Try the node require function if it exists.
-if(l&&"string"==typeof t)return l(t);var d=Error("Cannot find module '"+t+"'");throw d.code="MODULE_NOT_FOUND",d}f.resolve=function(r){var n=e[t][1][r];return null!=n?n:r},f.cache={};var c=s[t]=new u.Module(t);e[t][0].call(c.exports,f,c,c.exports,this)}return s[t].exports;function f(e){var t=f.resolve(e);return!1===t?{}:u(t)}}u.isParcelRequire=!0,u.Module=function(e){this.id=e,this.bundle=u,this.exports={}},u.modules=e,u.cache=s,u.parent=a,u.register=function(t,r){e[t]=[function(e,t){t.exports=r},{}]},Object.defineProperty(u,"root",{get:function(){return i[n]}}),i[n]=u;for(var d=0;d<t.length;d++)u(t[d]);if(r){// Expose entry point to Node, AMD or browser globals
+if(l&&"string"==typeof t)return l(t);var u=Error("Cannot find module '"+t+"'");throw u.code="MODULE_NOT_FOUND",u}f.resolve=function(r){var n=e[t][1][r];return null!=n?n:r},f.cache={};var c=s[t]=new d.Module(t);e[t][0].call(c.exports,f,c,c.exports,this)}return s[t].exports;function f(e){var t=f.resolve(e);return!1===t?{}:d(t)}}d.isParcelRequire=!0,d.Module=function(e){this.id=e,this.bundle=d,this.exports={}},d.modules=e,d.cache=s,d.parent=a,d.register=function(t,r){e[t]=[function(e,t){t.exports=r},{}]},Object.defineProperty(d,"root",{get:function(){return i[n]}}),i[n]=d;for(var u=0;u<t.length;u++)d(t[u]);if(r){// Expose entry point to Node, AMD or browser globals
 // Based on https://github.com/ForbesLindesay/umd/blob/master/template.js
-var c=u(r);// CommonJS
+var c=d(r);// CommonJS
 "object"==typeof exports&&"undefined"!=typeof module?module.exports=c:"function"==typeof define&&define.amd?define(function(){return c}):o&&(this[o]=c)}}({"7rA3f":[function(e,t,r){var n=e("@parcel/transformer-js/src/esmodule-helpers.js"),o=e("./general"),i=e("qrcode"),a=n.interopDefault(i);async function s(){let e=new URL(window.location).searchParams;if(!e.has("app")&&!user.current?.referralData?.referralCode)return location.href="/private";if(document.getElementById("referralCode").innerText=user.current.referralData.referralCode,user.current?.referralData?.referredUsers?.length>0){//TOP STATS
 document.getElementById("invitedFriends").innerText=user.current.referralData.referredUsers.length;let e=await callBackendApi("/api/users/referredUserStats",{requiresAuth:!0}),t=e.data;document.getElementById("soldItems").innerText=`${t.soldItems}`,// https://supermiljobloggen.se/nyheter/secondhand-200-ganger-mindre-klimatskadligt-an-nyproducerat/
 // 1 plagg orsakar 10 kg CO2 (2-17), och köpa begagnat orsakar 10/200 kg = 0.02kg så i genomsnitt 10kg sparat/plagg
 document.getElementById("savedCo2").innerText=(10*t.soldItems/1e3).toLocaleString("sv"),topStatsDiv.style.visibility="visible",triggerShowReferralTopStats.click(),//INVITE STATS
 document.getElementById("invitesRegistered").innerText=t.users?.length,document.getElementById("invitesAddedItems").innerText=t.users?.filter(e=>"activated"===e.status||"sold"===e.status).length,document.getElementById("invitesSoldItems").innerText=t.users?.filter(e=>"sold"===e.status).length;let r=document.getElementById("invitedFriendRow"),n=document.getElementById("invitedFriendStatusesDiv");for(let[e,o]of(n.innerHTML="",t.users?.entries()||[])){let t=r.cloneNode(!0);t.id=`${t.id}_${e}`,t.firstChild.innerText=o.name,t.childNodes[1].innerText=({registered:"Skapat konto",activated:"Lagt upp plagg",sold:"S\xe5lt plagg"})[o.status],n.appendChild(t)}document.getElementById("referralDetails").style.display="block",callBackendApi("/api/users/referralStats",{requiresAuth:!0}).then(e=>{let t=e.data;document.getElementById("nextFreePill").style.display=t.freeSells>t.usedFreeSells?"block":"none",document.getElementById("freeSells").innerText=t.freeSells,document.getElementById("usedFreeSells").innerText=t.usedFreeSells,document.getElementById("availableFreeSells").innerText=`/${t.freeSells}`,freeSellsStats.style.visibility="visible",freeSellsStatsLoadingIcon.style.display="none";//To add: Show airtable data...
-})}}shareReferralLinkButton.addEventListener("click",o.shareCode),document.getElementById("referralCode").innerText="";let l=JSON.parse(localStorage.getItem("sessionUser")),u=l?.referralData?.referralCode;if(document.getElementById("referralCode").innerText=u||"",l?.referralData?.referredUsers?.length>0&&(document.getElementById("topStatsLoadingIcon").style.display="block"),/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))user.whenSet(s),l||(location.href="/sign-in");else{let e=document.getElementById("qrCanvas");e&&(0,a.default).toCanvas(e,window.location.href,function(e){e&&console.error(e),console.log("success!")})}},{"./general":"1tOWF",qrcode:"6s2CO","@parcel/transformer-js/src/esmodule-helpers.js":"bNgzC"}],"1tOWF":[function(e,t,r){var n=e("@parcel/transformer-js/src/esmodule-helpers.js");function o(){firebase.auth().signOut().then(()=>{console.log("User signed out"),authUser.current=null,user.current=null,userId=null,localStorage.removeItem("sessionUser"),localStorage.removeItem("idToken"),localStorage.removeItem("authUserId"),localStorage.removeItem("authUser"),deleteCookie("maiAuth"),location.href="/"}).catch(e=>{errorHandler.report(e),console.log(e)})}function i(e){document.getElementById("addressFirstName").value=e.addressFirstName||"",document.getElementById("addressFirstName").dispatchEvent(new Event("input")),document.getElementById("addressLastName").value=e.addressLastName||"",document.getElementById("addressLastName").dispatchEvent(new Event("input")),document.getElementById("addressStreetAddress").value=e.addressStreetAddress||"",document.getElementById("addressStreetAddress").dispatchEvent(new Event("input")),document.getElementById("addressCO").value=e.addressCO||"",document.getElementById("addressCO").dispatchEvent(new Event("input")),document.getElementById("addressPostalCode").value=e.addressPostalCode||"",document.getElementById("addressPostalCode").dispatchEvent(new Event("input")),document.getElementById("addressCity").value=e.addressCity||"",document.getElementById("addressCity").dispatchEvent(new Event("input")),document.getElementById("addressDoorCode").value=e.addressDoorCode||"",document.getElementById("addressDoorCode").dispatchEvent(new Event("input"))}function a(){let e=document.getElementById("addressFirstName").value,t=document.getElementById("addressLastName").value,r=document.getElementById("addressStreetAddress").value,n=document.getElementById("addressCO").value,o=document.getElementById("addressPostalCode").value,i=document.getElementById("addressCity").value,a=document.getElementById("addressDoorCode").value;return e=e?e.trim().charAt(0).toUpperCase()+e.trim().slice(1):"",t=t?t.trim().charAt(0).toUpperCase()+t.trim().slice(1):"",r=r?r.trim().charAt(0).toUpperCase()+r.trim().slice(1):"",n=n?n.trim():"",{addressFirstName:e,addressLastName:t,addressStreetAddress:r,addressCO:n,addressPostalCode:o=o?o.trim().replace(/\D/g,""):"",addressCity:i=i?i.trim().charAt(0).toUpperCase()+i.trim().slice(1):"",addressDoorCode:a=a?a.trim():""}}function s(e){// verify we got 10 digits, otherwise it is invalid
+})}}shareReferralLinkButton.addEventListener("click",o.shareCode),document.getElementById("referralCode").innerText="";let l=JSON.parse(localStorage.getItem("sessionUser")),d=l?.referralData?.referralCode;if(document.getElementById("referralCode").innerText=d||"",l?.referralData?.referredUsers?.length>0&&(document.getElementById("topStatsLoadingIcon").style.display="block"),/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))user.whenSet(s),l||(location.href="/sign-in");else{let e=document.getElementById("qrCanvas");e&&(0,a.default).toCanvas(e,window.location.href,function(e){e&&console.error(e),console.log("success!")})}},{"./general":"1tOWF",qrcode:"6s2CO","@parcel/transformer-js/src/esmodule-helpers.js":"bNgzC"}],"1tOWF":[function(e,t,r){var n=e("@parcel/transformer-js/src/esmodule-helpers.js");function o(){firebase.auth().signOut().then(()=>{console.log("User signed out"),authUser.current=null,user.current=null,userId=null,localStorage.removeItem("sessionUser"),localStorage.removeItem("idToken"),localStorage.removeItem("authUserId"),localStorage.removeItem("authUser"),deleteCookie("maiAuth"),location.href="/"}).catch(e=>{errorHandler.report(e),console.log(e)})}function i(e){document.getElementById("addressFirstName").value=e.addressFirstName||"",document.getElementById("addressFirstName").dispatchEvent(new Event("input")),document.getElementById("addressLastName").value=e.addressLastName||"",document.getElementById("addressLastName").dispatchEvent(new Event("input")),document.getElementById("addressStreetAddress").value=e.addressStreetAddress||"",document.getElementById("addressStreetAddress").dispatchEvent(new Event("input")),document.getElementById("addressCO").value=e.addressCO||"",document.getElementById("addressCO").dispatchEvent(new Event("input")),document.getElementById("addressPostalCode").value=e.addressPostalCode||"",document.getElementById("addressPostalCode").dispatchEvent(new Event("input")),document.getElementById("addressCity").value=e.addressCity||"",document.getElementById("addressCity").dispatchEvent(new Event("input")),document.getElementById("addressDoorCode").value=e.addressDoorCode||"",document.getElementById("addressDoorCode").dispatchEvent(new Event("input"))}function a(){let e=document.getElementById("addressFirstName").value,t=document.getElementById("addressLastName").value,r=document.getElementById("addressStreetAddress").value,n=document.getElementById("addressCO").value,o=document.getElementById("addressPostalCode").value,i=document.getElementById("addressCity").value,a=document.getElementById("addressDoorCode").value;return e=e?e.trim().charAt(0).toUpperCase()+e.trim().slice(1):"",t=t?t.trim().charAt(0).toUpperCase()+t.trim().slice(1):"",r=r?r.trim().charAt(0).toUpperCase()+r.trim().slice(1):"",n=n?n.trim():"",{addressFirstName:e,addressLastName:t,addressStreetAddress:r,addressCO:n,addressPostalCode:o=o?o.trim().replace(/\D/g,""):"",addressCity:i=i?i.trim().charAt(0).toUpperCase()+i.trim().slice(1):"",addressDoorCode:a=a?a.trim():""}}function s(e){// verify we got 10 digits, otherwise it is invalid
 if(10!==(e=e.replace(/\D/g,"")// strip out all but digits
 .split("")// convert string to array
 .reverse()// reverse order for Luhn
-.slice(0,10)).length)return!1;let t=e.map(e=>Number(e)).reduce((e,t,r)=>(r%2&&(t*=2),t>9&&(t-=9),e+t));return 0==t%10}function l(e){let t=e.replace("-","");return(12!==t.length&&("19"!==t.substring(0,2)||"20"!==t.substring(0,2))&&(t=99>=Number(t.substring(0,2))&&Number(t.substring(0,2))>25?"19"+t:"20"+t),12===t.length)?t:null}function u(e){let t=e.images;return t.modelImage?t.modelImageSmall||t.modelImage:t.coverImage?t.coverImageSmall||t.coverImage:t.enhancedFrontImage?t.enhancedFrontImageSmall||t.enhancedFrontImage:t.frontImageSmall||t.frontImage}function d(){let e=user.current.referralData.referralCode,t=`Hej! F\xf6lj min personliga l\xe4nk s\xe5 s\xe4ljer Mai ditt f\xf6rsta plagg kostnadsfritt! Mai sk\xf6ter f\xf6rs\xe4ljningen av dina kl\xe4der, inklusive v\xe4rdering, l\xe4gger ut p\xe5 flera plattformar samtidigt, har kontakten med k\xf6pare och ordnar med frakt n\xe4r det blir s\xe5lt. Man f\xe5r sj\xe4lv beh\xe5lla 80% av vinsten, och blir det inte s\xe5lt kostar det ingenting.
+.slice(0,10)).length)return!1;let t=e.map(e=>Number(e)).reduce((e,t,r)=>(r%2&&(t*=2),t>9&&(t-=9),e+t));return 0==t%10}function l(e){let t=e.replace("-","");return(12!==t.length&&("19"!==t.substring(0,2)||"20"!==t.substring(0,2))&&(t=99>=Number(t.substring(0,2))&&Number(t.substring(0,2))>25?"19"+t:"20"+t),12===t.length)?t:null}function d(e){let t=e.images;return t.modelImage?t.modelImageSmall||t.modelImage:t.coverImage?t.coverImageSmall||t.coverImage:t.enhancedFrontImage?t.enhancedFrontImageSmall||t.enhancedFrontImage:t.frontImageSmall||t.frontImage}function u(){let e=user.current.referralData.referralCode,t=`Hej! F\xf6lj min personliga l\xe4nk s\xe5 s\xe4ljer Mai ditt f\xf6rsta plagg kostnadsfritt! Mai sk\xf6ter f\xf6rs\xe4ljningen av dina kl\xe4der, inklusive v\xe4rdering, l\xe4gger ut p\xe5 flera plattformar samtidigt, har kontakten med k\xf6pare och ordnar med frakt n\xe4r det blir s\xe5lt. Man f\xe5r sj\xe4lv beh\xe5lla 80% av vinsten, och blir det inte s\xe5lt kostar det ingenting.
 
-Om du registrerar dig med min kod (f\xf6lj l\xe4nken) och provar s\xe4lja ett plagg inom 7 dagar f\xe5r du beh\xe5lla 100% av vinsten f\xf6r det f\xf6rsta plagget (ist\xe4llet f\xf6r 80%). Min kod: ${e}`;if(navigator.share)navigator.share({text:t,url:`https://maiapp.se/?invite=${e}`}).then(()=>{console.log("Thanks for sharing!")}).catch(e=>{console.error(e),errorHandler.report(e)});else{console.log("Browser doesn't support navigator.share => Copy to clipboard!");let r=t+"\n"+`https://maiapp.se/?invite=${e}`;navigator.clipboard.writeText(r),linkCopiedBanner.style.display="flex",setTimeout(function(){linkCopiedBanner.style.display="none"},1500)}}n.defineInteropFlag(r),n.export(r,"signOut",()=>o),n.export(r,"setFormAddressFields",()=>i),n.export(r,"getFormAddressFields",()=>a),// Validate Swedish Social Security Number (personnummer) using checksum
+Om du registrerar dig med min kod (f\xf6lj l\xe4nken) och provar s\xe4lja ett plagg inom 7 dagar f\xe5r du beh\xe5lla 100% av vinsten f\xf6r det f\xf6rsta plagget (ist\xe4llet f\xf6r 80%). Min kod: ${e}`;if(navigator.share)navigator.share({text:t,url:`https://maiapp.se/?invite=${e}`}).then(()=>{console.log("Thanks for sharing!")}).catch(e=>{console.error(e),errorHandler.report(e)});else{console.log("Browser doesn't support navigator.share => Copy to clipboard!");let r=t+"\n"+`https://maiapp.se/?invite=${e}`;navigator.clipboard.writeText(r),linkCopiedBanner.style.display="flex",setTimeout(function(){linkCopiedBanner.style.display="none"},1500)}}function c(e){let t=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;t?(document.getElementById("continueOnWebBottomSheet").href=window.location.origin+e,document.getElementById("darkOverlay").classList.add("active"),document.getElementById("channelBottomSheet").classList.add("active")):window.location.href=e}function f(){document.getElementById("darkOverlay").classList.remove("active"),document.getElementById("channelBottomSheet").classList.remove("active")}n.defineInteropFlag(r),n.export(r,"signOut",()=>o),n.export(r,"setFormAddressFields",()=>i),n.export(r,"getFormAddressFields",()=>a),// Validate Swedish Social Security Number (personnummer) using checksum
 //   Note: this is somewhat simplified because it does not take into account
 //   that the date of the number is valid (e.g. "000000-0000" does return as true)
-n.export(r,"isValidSwedishSsn",()=>s),n.export(r,"formatPersonalId",()=>l),n.export(r,"itemCoverImage",()=>u),n.export(r,"shareCode",()=>d)},{"@parcel/transformer-js/src/esmodule-helpers.js":"bNgzC"}],bNgzC:[function(e,t,r){r.interopDefault=function(e){return e&&e.__esModule?e:{default:e}},r.defineInteropFlag=function(e){Object.defineProperty(e,"__esModule",{value:!0})},r.exportAll=function(e,t){return Object.keys(e).forEach(function(r){"default"===r||"__esModule"===r||t.hasOwnProperty(r)||Object.defineProperty(t,r,{enumerable:!0,get:function(){return e[r]}})}),t},r.export=function(e,t,r){Object.defineProperty(e,t,{enumerable:!0,get:r})}},{}],"6s2CO":[function(e,t,r){let n=e("da1f68cc1fc16077"),o=e("8c6cf49ef2287430"),i=e("8a60cf7722cc14ce"),a=e("f6fcc816b915ba37");function s(e,t,r,i,a){let s=[].slice.call(arguments,1),l=s.length,u="function"==typeof s[l-1];if(!u&&!n())throw Error("Callback required as last argument");if(u){if(l<2)throw Error("Too few arguments provided");2===l?(a=r,r=t,t=i=void 0):3===l&&(t.getContext&&void 0===a?(a=i,i=void 0):(a=i,i=r,r=t,t=void 0))}else{if(l<1)throw Error("Too few arguments provided");return 1===l?(r=t,t=i=void 0):2!==l||t.getContext||(i=r,r=t,t=void 0),new Promise(function(n,a){try{let a=o.create(r,i);n(e(a,t,i))}catch(e){a(e)}})}try{let n=o.create(r,i);a(null,e(n,t,i))}catch(e){a(e)}}r.create=o.create,r.toCanvas=s.bind(null,i.render),r.toDataURL=s.bind(null,i.renderToDataURL),// only svg for now.
+n.export(r,"isValidSwedishSsn",()=>s),n.export(r,"formatPersonalId",()=>l),n.export(r,"itemCoverImage",()=>d),n.export(r,"shareCode",()=>u),// Channel bottom sheet
+n.export(r,"channelRouter",()=>c),n.export(r,"hideChannelBottomSheet",()=>f)// End of channel bottom sheet
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"bNgzC"}],bNgzC:[function(e,t,r){r.interopDefault=function(e){return e&&e.__esModule?e:{default:e}},r.defineInteropFlag=function(e){Object.defineProperty(e,"__esModule",{value:!0})},r.exportAll=function(e,t){return Object.keys(e).forEach(function(r){"default"===r||"__esModule"===r||t.hasOwnProperty(r)||Object.defineProperty(t,r,{enumerable:!0,get:function(){return e[r]}})}),t},r.export=function(e,t,r){Object.defineProperty(e,t,{enumerable:!0,get:r})}},{}],"6s2CO":[function(e,t,r){let n=e("da1f68cc1fc16077"),o=e("8c6cf49ef2287430"),i=e("8a60cf7722cc14ce"),a=e("f6fcc816b915ba37");function s(e,t,r,i,a){let s=[].slice.call(arguments,1),l=s.length,d="function"==typeof s[l-1];if(!d&&!n())throw Error("Callback required as last argument");if(d){if(l<2)throw Error("Too few arguments provided");2===l?(a=r,r=t,t=i=void 0):3===l&&(t.getContext&&void 0===a?(a=i,i=void 0):(a=i,i=r,r=t,t=void 0))}else{if(l<1)throw Error("Too few arguments provided");return 1===l?(r=t,t=i=void 0):2!==l||t.getContext||(i=r,r=t,t=void 0),new Promise(function(n,a){try{let a=o.create(r,i);n(e(a,t,i))}catch(e){a(e)}})}try{let n=o.create(r,i);a(null,e(n,t,i))}catch(e){a(e)}}r.create=o.create,r.toCanvas=s.bind(null,i.render),r.toDataURL=s.bind(null,i.renderToDataURL),// only svg for now.
 r.toString=s.bind(null,function(e,t,r){return a.render(e,r)})},{da1f68cc1fc16077:"2F9VO","8c6cf49ef2287430":"e9qY0","8a60cf7722cc14ce":"i1BDL",f6fcc816b915ba37:"8CcR1"}],"2F9VO":[function(e,t,r){// can-promise has a crash in some versions of react native that dont have
 // standard global objects
 // https://github.com/soldair/node-qrcode/issues/157
-t.exports=function(){return"function"==typeof Promise&&Promise.prototype&&Promise.prototype.then}},{}],e9qY0:[function(e,t,r){let n=e("4cf6a8173d9f3a2"),o=e("2ad62f61c352884c"),i=e("87d5a6270eb1dc26"),a=e("91abc94f777368cc"),s=e("9737c3939ab85d95"),l=e("cee3d371e219e45e"),u=e("8700c8c682afabf3"),d=e("65ad903a6ba3e"),c=e("1e8e447afb4d169c"),f=e("8a4a19af97836d80"),h=e("26720f9d94c9e268"),g=e("7b6429a248ecc51f"),p=e("1368d0fa14524351");/**
+t.exports=function(){return"function"==typeof Promise&&Promise.prototype&&Promise.prototype.then}},{}],e9qY0:[function(e,t,r){let n=e("4cf6a8173d9f3a2"),o=e("2ad62f61c352884c"),i=e("87d5a6270eb1dc26"),a=e("91abc94f777368cc"),s=e("9737c3939ab85d95"),l=e("cee3d371e219e45e"),d=e("8700c8c682afabf3"),u=e("65ad903a6ba3e"),c=e("1e8e447afb4d169c"),f=e("8a4a19af97836d80"),h=e("26720f9d94c9e268"),g=e("7b6429a248ecc51f"),m=e("1368d0fa14524351");/**
  * Add format info bits to matrix
  *
  * @param  {BitMatrix} matrix               Modules matrix
  * @param  {ErrorCorrectionLevel}    errorCorrectionLevel Error correction level
  * @param  {Number}    maskPattern          Mask pattern reference value
- */function m(e,t,r){let n,o;let i=e.size,a=h.getEncodedBits(t,r);for(n=0;n<15;n++)o=(a>>n&1)==1,n<6?e.set(n,8,o,!0):n<8?e.set(n+1,8,o,!0):e.set(i-15+n,8,o,!0),n<8?e.set(8,i-n-1,o,!0):n<9?e.set(8,15-n-1+1,o,!0):e.set(8,15-n-1,o,!0);// fixed module
+ */function p(e,t,r){let n,o;let i=e.size,a=h.getEncodedBits(t,r);for(n=0;n<15;n++)o=(a>>n&1)==1,n<6?e.set(n,8,o,!0):n<8?e.set(n+1,8,o,!0):e.set(i-15+n,8,o,!0),n<8?e.set(8,i-n-1,o,!0):n<9?e.set(8,15-n-1+1,o,!0):e.set(8,15-n-1,o,!0);// fixed module
 e.set(i-8,8,1,!0)}/**
  * QR Code
  *
@@ -50,7 +52,7 @@ e.set(i-8,8,1,!0)}/**
  * @param {String} options.errorCorrectionLevel Error correction level
  * @param {Function} options.toSJISFunc         Helper func to convert utf8 to sjis
  */r.create=function(e,t){let r,h;if(void 0===e||""===e)throw Error("No input text");let y=o.M;return void 0!==t&&(// Use higher error correction level as default
-y=o.from(t.errorCorrectionLevel,o.M),r=f.from(t.version),h=u.from(t.maskPattern),t.toSJISFunc&&n.setToSJISFunction(t.toSJISFunc)),/**
+y=o.from(t.errorCorrectionLevel,o.M),r=f.from(t.version),h=d.from(t.maskPattern),t.toSJISFunc&&n.setToSJISFunction(t.toSJISFunc)),/**
  * Build QR Code symbol
  *
  * @param  {String} data                 Input string
@@ -58,10 +60,10 @@ y=o.from(t.errorCorrectionLevel,o.M),r=f.from(t.version),h=u.from(t.maskPattern)
  * @param  {ErrorCorretionLevel} errorCorrectionLevel Error level
  * @param  {MaskPattern} maskPattern     Mask pattern
  * @return {Object}                      Object containing symbol data
- */function(e,t,r,o){let h;if(Array.isArray(e))h=p.fromArray(e);else if("string"==typeof e){let n=t;if(!n){let t=p.rawSplit(e);// Estimate best version that can contain raw splitted segments
+ */function(e,t,r,o){let h;if(Array.isArray(e))h=m.fromArray(e);else if("string"==typeof e){let n=t;if(!n){let t=m.rawSplit(e);// Estimate best version that can contain raw splitted segments
 n=f.getBestVersionForData(t,r)}// Build optimized segments
 // If estimated version is undefined, try with the highest version
-h=p.fromString(e,n||40)}else throw Error("Invalid data");// Get the min version that can contain data
+h=m.fromString(e,n||40)}else throw Error("Invalid data");// Get the min version that can contain data
 let y=f.getBestVersionForData(h,r);// If no version is found, data cannot be stored
 if(!y)throw Error("The amount of data is too big to be stored in a QR Code");// If not specified, use min version as default
 if(t){if(t<y)throw Error("\nThe chosen QR Code version cannot contain this amount of data.\nMinimum version required to store current data is: "+y+".\n")}else t=y;let E=/**
@@ -82,7 +84,7 @@ o.put(t.mode.bit,4),// Prefix data with character count indicator.
 // @see {@link Mode.getCharCountIndicator}.
 o.put(t.getLength(),g.getCharCountIndicator(t.mode,e)),// add binary data sequence to buffer
 t.write(o)});// Calculate required number of bits
-let a=n.getSymbolTotalCodewords(e),s=d.getTotalCodewordsCount(e,t),l=(a-s)*8;// If the bit string is fewer than four bits shorter, add only the number of 0s that
+let a=n.getSymbolTotalCodewords(e),s=u.getTotalCodewordsCount(e,t),l=(a-s)*8;// If the bit string is fewer than four bits shorter, add only the number of 0s that
 // are needed to reach the required number of bits.
 // After adding the terminator, if the number of bits in the string is not a multiple of 8,
 // pad the string on the right with 0s to make the string's length a multiple of 8.
@@ -90,7 +92,7 @@ for(o.getLengthInBits()+4<=l&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(0);/
 // Extend the buffer to fill the data capacity of the symbol corresponding to
 // the Version and Error Correction Level by adding the Pad Codewords 11101100 (0xEC)
 // and 00010001 (0x11) alternately.
-let u=(l-o.getLengthInBits())/8;for(let e=0;e<u;e++)o.put(e%2?17:236,8);return(/**
+let d=(l-o.getLengthInBits())/8;for(let e=0;e<d;e++)o.put(e%2?17:236,8);return(/**
  * Encode input data with Reed-Solomon and return codewords with
  * relative error correction bits
  *
@@ -99,14 +101,14 @@ let u=(l-o.getLengthInBits())/8;for(let e=0;e<u;e++)o.put(e%2?17:236,8);return(/
  * @param  {ErrorCorrectionLevel} errorCorrectionLevel Error correction level
  * @return {Uint8Array}                     Buffer containing encoded codewords
  */function(e,t,r){let o,i;// Total codewords for this QR code version (Data + Error correction)
-let a=n.getSymbolTotalCodewords(t),s=d.getTotalCodewordsCount(t,r),l=a-s,u=d.getBlocksCount(t,r),f=a%u,h=u-f,g=Math.floor(a/u),p=Math.floor(l/u),m=p+1,y=g-p,E=new c(y),b=0,v=Array(u),I=Array(u),B=0,C=new Uint8Array(e.buffer);// Divide the buffer into the required number of blocks
-for(let e=0;e<u;e++){let t=e<h?p:m;// extract a block of data from buffer
-v[e]=C.slice(b,b+t),// Calculate EC codewords for this data block
-I[e]=E.encode(v[e]),b+=t,B=Math.max(B,t)}// Create final data
+let a=n.getSymbolTotalCodewords(t),s=u.getTotalCodewordsCount(t,r),l=a-s,d=u.getBlocksCount(t,r),f=a%d,h=d-f,g=Math.floor(a/d),m=Math.floor(l/d),p=m+1,y=g-m,E=new c(y),v=0,b=Array(d),I=Array(d),B=0,C=new Uint8Array(e.buffer);// Divide the buffer into the required number of blocks
+for(let e=0;e<d;e++){let t=e<h?m:p;// extract a block of data from buffer
+b[e]=C.slice(v,v+t),// Calculate EC codewords for this data block
+I[e]=E.encode(b[e]),v+=t,B=Math.max(B,t)}// Create final data
 // Interleave the data and error correction codewords from each block
 let w=new Uint8Array(a),A=0;// Add data codewords
-for(o=0;o<B;o++)for(i=0;i<u;i++)o<v[i].length&&(w[A++]=v[i][o]);// Apped EC codewords
-for(o=0;o<y;o++)for(i=0;i<u;i++)w[A++]=I[i][o];return w}(o,e,t))}(t,r,h),b=n.getSymbolSize(t),v=new a(b);return(// Add function modules
+for(o=0;o<B;o++)for(i=0;i<d;i++)o<b[i].length&&(w[A++]=b[i][o]);// Apped EC codewords
+for(o=0;o<y;o++)for(i=0;i<d;i++)w[A++]=I[i][o];return w}(o,e,t))}(t,r,h),v=n.getSymbolSize(t),b=new a(v);return(// Add function modules
 /**
  * QRCode for JavaScript
  *
@@ -136,37 +138,37 @@ for(o=0;o<y;o++)for(i=0;i<u;i++)w[A++]=I[i][o];return w}(o,e,t))}(t,r,h),b=n.get
  *
  * @param  {BitMatrix} matrix  Modules matrix
  * @param  {Number}    version QR Code version
- */function(e,t){let r=e.size,n=l.getPositions(t);for(let t=0;t<n.length;t++){let o=n[t][0],i=n[t][1];for(let t=-1;t<=7;t++)if(!(o+t<=-1)&&!(r<=o+t))for(let n=-1;n<=7;n++)i+n<=-1||r<=i+n||(t>=0&&t<=6&&(0===n||6===n)||n>=0&&n<=6&&(0===t||6===t)||t>=2&&t<=4&&n>=2&&n<=4?e.set(o+t,i+n,!0,!0):e.set(o+t,i+n,!1,!0))}}(v,t),/**
+ */function(e,t){let r=e.size,n=l.getPositions(t);for(let t=0;t<n.length;t++){let o=n[t][0],i=n[t][1];for(let t=-1;t<=7;t++)if(!(o+t<=-1)&&!(r<=o+t))for(let n=-1;n<=7;n++)i+n<=-1||r<=i+n||(t>=0&&t<=6&&(0===n||6===n)||n>=0&&n<=6&&(0===t||6===t)||t>=2&&t<=4&&n>=2&&n<=4?e.set(o+t,i+n,!0,!0):e.set(o+t,i+n,!1,!0))}}(b,t),/**
  * Add timing pattern bits to matrix
  *
  * Note: this function must be called before {@link setupAlignmentPattern}
  *
  * @param  {BitMatrix} matrix Modules matrix
- */function(e){let t=e.size;for(let r=8;r<t-8;r++){let t=r%2==0;e.set(r,6,t,!0),e.set(6,r,t,!0)}}(v),/**
+ */function(e){let t=e.size;for(let r=8;r<t-8;r++){let t=r%2==0;e.set(r,6,t,!0),e.set(6,r,t,!0)}}(b),/**
  * Add alignment patterns bits to matrix
  *
  * Note: this function must be called after {@link setupTimingPattern}
  *
  * @param  {BitMatrix} matrix  Modules matrix
  * @param  {Number}    version QR Code version
- */function(e,t){let r=s.getPositions(t);for(let t=0;t<r.length;t++){let n=r[t][0],o=r[t][1];for(let t=-2;t<=2;t++)for(let r=-2;r<=2;r++)-2===t||2===t||-2===r||2===r||0===t&&0===r?e.set(n+t,o+r,!0,!0):e.set(n+t,o+r,!1,!0)}}(v,t),// Add temporary dummy bits for format info just to set them as reserved.
+ */function(e,t){let r=s.getPositions(t);for(let t=0;t<r.length;t++){let n=r[t][0],o=r[t][1];for(let t=-2;t<=2;t++)for(let r=-2;r<=2;r++)-2===t||2===t||-2===r||2===r||0===t&&0===r?e.set(n+t,o+r,!0,!0):e.set(n+t,o+r,!1,!0)}}(b,t),// Add temporary dummy bits for format info just to set them as reserved.
 // This is needed to prevent these bits from being masked by {@link MaskPattern.applyMask}
 // since the masking operation must be performed only on the encoding region.
 // These blocks will be replaced with correct values later in code.
-m(v,r,0),t>=7&&/**
+p(b,r,0),t>=7&&/**
  * Add version info bits to matrix
  *
  * @param  {BitMatrix} matrix  Modules matrix
  * @param  {Number}    version QR Code version
- */function(e,t){let r,n,o;let i=e.size,a=f.getEncodedBits(t);for(let t=0;t<18;t++)r=Math.floor(t/3),n=t%3+i-8-3,o=(a>>t&1)==1,e.set(r,n,o,!0),e.set(n,r,o,!0)}(v,t),// Add data codewords
+ */function(e,t){let r,n,o;let i=e.size,a=f.getEncodedBits(t);for(let t=0;t<18;t++)r=Math.floor(t/3),n=t%3+i-8-3,o=(a>>t&1)==1,e.set(r,n,o,!0),e.set(n,r,o,!0)}(b,t),// Add data codewords
 /**
  * Add encoded data bits to matrix
  *
  * @param  {BitMatrix}  matrix Modules matrix
  * @param  {Uint8Array} data   Data codewords
- */function(e,t){let r=e.size,n=-1,o=r-1,i=7,a=0;for(let s=r-1;s>0;s-=2)for(6===s&&s--;;){for(let r=0;r<2;r++)if(!e.isReserved(o,s-r)){let n=!1;a<t.length&&(n=(t[a]>>>i&1)==1),e.set(o,s-r,n),-1==--i&&(a++,i=7)}if((o+=n)<0||r<=o){o-=n,n=-n;break}}}(v,E),isNaN(o)&&(o=u.getBestMask(v,m.bind(null,v,r))),// Apply mask pattern
-u.applyMask(o,v),// Replace format info bits with correct values
-m(v,r,o),{modules:v,version:t,errorCorrectionLevel:r,maskPattern:o,segments:h})}(e,r,y,h)}},{"4cf6a8173d9f3a2":"2iHLf","2ad62f61c352884c":"kU8Fo","87d5a6270eb1dc26":"dvmjt","91abc94f777368cc":"4koKB","9737c3939ab85d95":"2m37T",cee3d371e219e45e:"9BWaM","8700c8c682afabf3":"2hy8U","65ad903a6ba3e":"ivpAq","1e8e447afb4d169c":"ixGQe","8a4a19af97836d80":"61NkN","26720f9d94c9e268":"4DCia","7b6429a248ecc51f":"2XDDf","1368d0fa14524351":"kBoY1"}],"2iHLf":[function(e,t,r){let n;let o=[0,26,44,70,100,134,172,196,242,292,346,404,466,532,581,655,733,815,901,991,1085,1156,1258,1364,1474,1588,1706,1828,1921,2051,2185,2323,2465,2611,2761,2876,3034,3196,3362,3532,3706];/**
+ */function(e,t){let r=e.size,n=-1,o=r-1,i=7,a=0;for(let s=r-1;s>0;s-=2)for(6===s&&s--;;){for(let r=0;r<2;r++)if(!e.isReserved(o,s-r)){let n=!1;a<t.length&&(n=(t[a]>>>i&1)==1),e.set(o,s-r,n),-1==--i&&(a++,i=7)}if((o+=n)<0||r<=o){o-=n,n=-n;break}}}(b,E),isNaN(o)&&(o=d.getBestMask(b,p.bind(null,b,r))),// Apply mask pattern
+d.applyMask(o,b),// Replace format info bits with correct values
+p(b,r,o),{modules:b,version:t,errorCorrectionLevel:r,maskPattern:o,segments:h})}(e,r,y,h)}},{"4cf6a8173d9f3a2":"2iHLf","2ad62f61c352884c":"kU8Fo","87d5a6270eb1dc26":"dvmjt","91abc94f777368cc":"4koKB","9737c3939ab85d95":"2m37T",cee3d371e219e45e:"9BWaM","8700c8c682afabf3":"2hy8U","65ad903a6ba3e":"ivpAq","1e8e447afb4d169c":"ixGQe","8a4a19af97836d80":"61NkN","26720f9d94c9e268":"4DCia","7b6429a248ecc51f":"2XDDf","1368d0fa14524351":"kBoY1"}],"2iHLf":[function(e,t,r){let n;let o=[0,26,44,70,100,134,172,196,242,292,346,404,466,532,581,655,733,815,901,991,1085,1156,1258,1364,1474,1588,1706,1828,1921,2051,2185,2323,2465,2611,2761,2876,3034,3196,3362,3532,3706];/**
  * Returns the QR Code size for the specified version
  *
  * @param  {Number} version QR Code version
@@ -289,7 +291,7 @@ m(v,r,o),{modules:v,version:t,errorCorrectionLevel:r,maskPattern:o,segments:h})}
 *
 * Points: N1 + i
 * i is the amount by which the number of adjacent modules of the same color exceeds 5
-*/r.getPenaltyN1=function(e){let t=e.size,r=0,o=0,i=0,a=null,s=null;for(let l=0;l<t;l++){o=i=0,a=s=null;for(let u=0;u<t;u++){let t=e.get(l,u);t===a?o++:(o>=5&&(r+=n.N1+(o-5)),a=t,o=1),(t=e.get(u,l))===s?i++:(i>=5&&(r+=n.N1+(i-5)),s=t,i=1)}o>=5&&(r+=n.N1+(o-5)),i>=5&&(r+=n.N1+(i-5))}return r},/**
+*/r.getPenaltyN1=function(e){let t=e.size,r=0,o=0,i=0,a=null,s=null;for(let l=0;l<t;l++){o=i=0,a=s=null;for(let d=0;d<t;d++){let t=e.get(l,d);t===a?o++:(o>=5&&(r+=n.N1+(o-5)),a=t,o=1),(t=e.get(d,l))===s?i++:(i>=5&&(r+=n.N1+(i-5)),s=t,i=1)}o>=5&&(r+=n.N1+(o-5)),i>=5&&(r+=n.N1+(i-5))}return r},/**
  * Find 2x2 blocks with the same color and assign a penalty value
  *
  * Points: N2 * (m - 1) * (n - 1)
@@ -402,7 +404,7 @@ for(let e=255;e<512;e++)n[e]=n[e-255]}(),/**
  * @param  {Number} x
  * @param  {Number} y
  * @return {Number}
- */r.mul=function(e,t){return 0===e||0===t?0:n[o[e]+o[t]]}},{}],"61NkN":[function(e,t,r){let n=e("f67b02cdf61cb7c6"),o=e("777da0d92c463f2e"),i=e("acd5b4fcd696edf3"),a=e("5303c314c4a688d7"),s=e("663d0e03da8b2897"),l=n.getBCHDigit(7973);function u(e,t){// Character count indicator + mode indicator bits
+ */r.mul=function(e,t){return 0===e||0===t?0:n[o[e]+o[t]]}},{}],"61NkN":[function(e,t,r){let n=e("f67b02cdf61cb7c6"),o=e("777da0d92c463f2e"),i=e("acd5b4fcd696edf3"),a=e("5303c314c4a688d7"),s=e("663d0e03da8b2897"),l=n.getBCHDigit(7973);function d(e,t){// Character count indicator + mode indicator bits
 return a.getCharCountIndicator(e,t)+4}/**
  * Returns version number from a value.
  * If value is not a valid version, returns defaultValue
@@ -420,7 +422,7 @@ return a.getCharCountIndicator(e,t)+4}/**
  * @return {Number}                      Quantity of storable data
  */r.getCapacity=function(e,t,r){if(!s.isValid(e))throw Error("Invalid QR Code version");// Use Byte mode as default
 void 0===r&&(r=a.BYTE);// Total codewords for this QR code version (Data + Error correction)
-let i=n.getSymbolTotalCodewords(e),l=o.getTotalCodewordsCount(e,t),d=(i-l)*8;if(r===a.MIXED)return d;let c=d-u(r,e);// Return max number of storable codewords
+let i=n.getSymbolTotalCodewords(e),l=o.getTotalCodewordsCount(e,t),u=(i-l)*8;if(r===a.MIXED)return u;let c=u-d(r,e);// Return max number of storable codewords
 switch(r){case a.NUMERIC:return Math.floor(c/10*3);case a.ALPHANUMERIC:return Math.floor(c/11*2);case a.KANJI:return Math.floor(c/13);case a.BYTE:default:return Math.floor(c/8)}},/**
  * Returns the minimum version needed to contain the amount of data
  *
@@ -428,7 +430,7 @@ switch(r){case a.NUMERIC:return Math.floor(c/10*3);case a.ALPHANUMERIC:return Ma
  * @param  {Number} [errorCorrectionLevel=H] Error correction level
  * @param  {Mode} mode                       Data mode
  * @return {Number}                          QR Code version
- */r.getBestVersionForData=function(e,t){let n;let o=i.from(t,i.M);if(Array.isArray(e)){if(e.length>1)return function(e,t){for(let n=1;n<=40;n++){let o=function(e,t){let r=0;return e.forEach(function(e){let n=u(e.mode,t);r+=n+e.getBitsLength()}),r}(e,n);if(o<=r.getCapacity(n,t,a.MIXED))return n}}(e,o);if(0===e.length)return 1;n=e[0]}else n=e;return function(e,t,n){for(let o=1;o<=40;o++)if(t<=r.getCapacity(o,n,e))return o}(n.mode,n.getLength(),o)},/**
+ */r.getBestVersionForData=function(e,t){let n;let o=i.from(t,i.M);if(Array.isArray(e)){if(e.length>1)return function(e,t){for(let n=1;n<=40;n++){let o=function(e,t){let r=0;return e.forEach(function(e){let n=d(e.mode,t);r+=n+e.getBitsLength()}),r}(e,n);if(o<=r.getCapacity(n,t,a.MIXED))return n}}(e,o);if(0===e.length)return 1;n=e[0]}else n=e;return function(e,t,n){for(let o=1;o<=40;o++)if(t<=r.getCapacity(o,n,e))return o}(n.mode,n.getLength(),o)},/**
  * Returns version information with relative error correction bits
  *
  * The version information is included in QR Code symbols of version 7 or larger.
@@ -519,7 +521,7 @@ switch(r){case a.NUMERIC:return Math.floor(c/10*3);case a.ALPHANUMERIC:return Ma
  */r.getEncodedBits=function(e,t){let r=e.bit<<3|t,i=r<<10;for(;n.getBCHDigit(i)-o>=0;)i^=1335<<n.getBCHDigit(i)-o;// xor final data with mask pattern in order to ensure that
 // no combination of Error Correction Level and data mask pattern
 // will result in an all-zero data string
-return(r<<10|i)^21522}},{eeca831a42e85d6c:"2iHLf"}],kBoY1:[function(e,t,r){let n=e("45f6d4bff9d2fc72"),o=e("73109cbf4f3c309d"),i=e("5320016e34c30467"),a=e("fd16f8f25b581951"),s=e("8a7b84039f1cf0d2"),l=e("79379a3a8f3c26bb"),u=e("66903ca51bd2ea1d"),d=e("3b9f47d541e7d71f");/**
+return(r<<10|i)^21522}},{eeca831a42e85d6c:"2iHLf"}],kBoY1:[function(e,t,r){let n=e("45f6d4bff9d2fc72"),o=e("73109cbf4f3c309d"),i=e("5320016e34c30467"),a=e("fd16f8f25b581951"),s=e("8a7b84039f1cf0d2"),l=e("79379a3a8f3c26bb"),d=e("66903ca51bd2ea1d"),u=e("3b9f47d541e7d71f");/**
  * Returns UTF8 byte length
  *
  * @param  {String} str Input string
@@ -537,7 +539,7 @@ return(r<<10|i)^21522}},{eeca831a42e85d6c:"2iHLf"}],kBoY1:[function(e,t,r){let n
  *
  * @param  {String} dataStr Input string
  * @return {Array}          Array of object with segments data
- */function h(e){let t,r;let o=f(l.NUMERIC,n.NUMERIC,e),i=f(l.ALPHANUMERIC,n.ALPHANUMERIC,e);u.isKanjiModeEnabled()?(t=f(l.BYTE,n.BYTE,e),r=f(l.KANJI,n.KANJI,e)):(t=f(l.BYTE_KANJI,n.BYTE,e),r=[]);let a=o.concat(i,t,r);return a.sort(function(e,t){return e.index-t.index}).map(function(e){return{data:e.data,mode:e.mode,length:e.length}})}/**
+ */function h(e){let t,r;let o=f(l.NUMERIC,n.NUMERIC,e),i=f(l.ALPHANUMERIC,n.ALPHANUMERIC,e);d.isKanjiModeEnabled()?(t=f(l.BYTE,n.BYTE,e),r=f(l.KANJI,n.KANJI,e)):(t=f(l.BYTE_KANJI,n.BYTE,e),r=[]);let a=o.concat(i,t,r);return a.sort(function(e,t){return e.index-t.index}).map(function(e){return{data:e.data,mode:e.mode,length:e.length}})}/**
  * Returns how many bits are needed to encode a string of
  * specified length with the specified mode
  *
@@ -551,8 +553,8 @@ return(r<<10|i)^21522}},{eeca831a42e85d6c:"2iHLf"}],kBoY1:[function(e,t,r){let n
  * @param  {String} data             Input data
  * @param  {Mode | String} modesHint Data mode
  * @return {Segment}                 Segment
- */function p(e,t){let r;let l=n.getBestModeForData(e);// Make sure data can be encoded
-if((r=n.from(t,l))!==n.BYTE&&r.bit<l.bit)throw Error('"'+e+'" cannot be encoded with mode '+n.toString(r)+".\n Suggested mode is: "+n.toString(l));switch(r!==n.KANJI||u.isKanjiModeEnabled()||(r=n.BYTE),r){case n.NUMERIC:return new o(e);case n.ALPHANUMERIC:return new i(e);case n.KANJI:return new s(e);case n.BYTE:return new a(e)}}/**
+ */function m(e,t){let r;let l=n.getBestModeForData(e);// Make sure data can be encoded
+if((r=n.from(t,l))!==n.BYTE&&r.bit<l.bit)throw Error('"'+e+'" cannot be encoded with mode '+n.toString(r)+".\n Suggested mode is: "+n.toString(l));switch(r!==n.KANJI||d.isKanjiModeEnabled()||(r=n.BYTE),r){case n.NUMERIC:return new o(e);case n.ALPHANUMERIC:return new i(e);case n.KANJI:return new s(e);case n.BYTE:return new a(e)}}/**
  * Builds a list of segments from an array.
  * Array can contain Strings or Objects with segment's info.
  *
@@ -566,14 +568,14 @@ if((r=n.from(t,l))!==n.BYTE&&r.bit<l.bit)throw Error('"'+e+'" cannot be encoded 
  *
  * @param  {Array} array Array of objects with segments data
  * @return {Array}       Array of Segments
- */r.fromArray=function(e){return e.reduce(function(e,t){return"string"==typeof t?e.push(p(t,null)):t.data&&e.push(p(t.data,t.mode)),e},[])},/**
+ */r.fromArray=function(e){return e.reduce(function(e,t){return"string"==typeof t?e.push(m(t,null)):t.data&&e.push(m(t.data,t.mode)),e},[])},/**
  * Builds an optimized sequence of segments from a string,
  * which will produce the shortest possible bitstream.
  *
  * @param  {String} data    Input string
  * @param  {Number} version QR Code version
  * @return {Array}          Array of segments
- */r.fromString=function(e,t){let o=h(e,u.isKanjiModeEnabled()),i=/**
+ */r.fromString=function(e,t){let o=h(e,d.isKanjiModeEnabled()),i=/**
  * Generates a list of all possible nodes combination which
  * will be used to build a segments graph.
  *
@@ -599,8 +601,8 @@ if((r=n.from(t,l))!==n.BYTE&&r.bit<l.bit)throw Error('"'+e+'" cannot be encoded 
  * @param  {Array} nodes    Array of object with segments data
  * @param  {Number} version QR Code version
  * @return {Object}         Graph of all possible segments
- */function(e,t){let r={},o={start:{}},i=["start"];for(let a=0;a<e.length;a++){let s=e[a],l=[];for(let e=0;e<s.length;e++){let u=s[e],d=""+a+e;l.push(d),r[d]={node:u,lastCount:0},o[d]={};for(let e=0;e<i.length;e++){let a=i[e];r[a]&&r[a].node.mode===u.mode?(o[a][d]=g(r[a].lastCount+u.length,u.mode)-g(r[a].lastCount,u.mode),r[a].lastCount+=u.length):(r[a]&&(r[a].lastCount=u.length),o[a][d]=g(u.length,u.mode)+4+n.getCharCountIndicator(u.mode,t)// switch cost
-)}}i=l}for(let e=0;e<i.length;e++)o[i[e]].end=0;return{map:o,table:r}}(i,t),s=d.find_path(a.map,"start","end"),l=[];for(let e=1;e<s.length-1;e++)l.push(a.table[s[e]].node);return r.fromArray(l.reduce(function(e,t){let r=e.length-1>=0?e[e.length-1]:null;return r&&r.mode===t.mode?e[e.length-1].data+=t.data:e.push(t),e},[]))},/**
+ */function(e,t){let r={},o={start:{}},i=["start"];for(let a=0;a<e.length;a++){let s=e[a],l=[];for(let e=0;e<s.length;e++){let d=s[e],u=""+a+e;l.push(u),r[u]={node:d,lastCount:0},o[u]={};for(let e=0;e<i.length;e++){let a=i[e];r[a]&&r[a].node.mode===d.mode?(o[a][u]=g(r[a].lastCount+d.length,d.mode)-g(r[a].lastCount,d.mode),r[a].lastCount+=d.length):(r[a]&&(r[a].lastCount=d.length),o[a][u]=g(d.length,d.mode)+4+n.getCharCountIndicator(d.mode,t)// switch cost
+)}}i=l}for(let e=0;e<i.length;e++)o[i[e]].end=0;return{map:o,table:r}}(i,t),s=u.find_path(a.map,"start","end"),l=[];for(let e=1;e<s.length-1;e++)l.push(a.table[s[e]].node);return r.fromArray(l.reduce(function(e,t){let r=e.length-1>=0?e[e.length-1]:null;return r&&r.mode===t.mode?e[e.length-1].data+=t.data:e.push(t),e},[]))},/**
  * Splits a string in various segments with the modes which
  * best represent their content.
  * The produced segments are far from being optimized.
@@ -609,7 +611,7 @@ if((r=n.from(t,l))!==n.BYTE&&r.bit<l.bit)throw Error('"'+e+'" cannot be encoded 
  *
  * @param  {string} data Input string
  * @return {Array}       Array of segments
- */r.rawSplit=function(e){return r.fromArray(h(e,u.isKanjiModeEnabled()))}},{"45f6d4bff9d2fc72":"2XDDf","73109cbf4f3c309d":"hTs8T","5320016e34c30467":"203uh",fd16f8f25b581951:"f7sIe","8a7b84039f1cf0d2":"1otz8","79379a3a8f3c26bb":"fkiQV","66903ca51bd2ea1d":"2iHLf","3b9f47d541e7d71f":"2Nh6w"}],hTs8T:[function(e,t,r){let n=e("29134b0b0820b091");function o(e){this.mode=n.NUMERIC,this.data=e.toString()}o.getBitsLength=function(e){return 10*Math.floor(e/3)+(e%3?e%3*3+1:0)},o.prototype.getLength=function(){return this.data.length},o.prototype.getBitsLength=function(){return o.getBitsLength(this.data.length)},o.prototype.write=function(e){let t,r;// The input data string is divided into groups of three digits,
+ */r.rawSplit=function(e){return r.fromArray(h(e,d.isKanjiModeEnabled()))}},{"45f6d4bff9d2fc72":"2XDDf","73109cbf4f3c309d":"hTs8T","5320016e34c30467":"203uh",fd16f8f25b581951:"f7sIe","8a7b84039f1cf0d2":"1otz8","79379a3a8f3c26bb":"fkiQV","66903ca51bd2ea1d":"2iHLf","3b9f47d541e7d71f":"2Nh6w"}],hTs8T:[function(e,t,r){let n=e("29134b0b0820b091");function o(e){this.mode=n.NUMERIC,this.data=e.toString()}o.getBitsLength=function(e){return 10*Math.floor(e/3)+(e%3?e%3*3+1:0)},o.prototype.getLength=function(){return this.data.length},o.prototype.getBitsLength=function(){return o.getBitsLength(this.data.length)},o.prototype.write=function(e){let t,r;// The input data string is divided into groups of three digits,
 // and each group is converted to its 10-bit binary equivalent.
 for(t=0;t+3<=this.data.length;t+=3)r=parseInt(this.data.substr(t,3),10),e.put(r,10);// If the number of input digits is not an exact multiple of three,
 // the final one or two digits are converted to 4 or 7 bits respectively.
@@ -655,7 +657,7 @@ e.put(r,13)}},t.exports=i},{b935cfd1cd03a1f6:"2XDDf",ca4944585cc8d12d:"2iHLf"}],
  * THE SOFTWARE.
  *****************************************************************************/var n={single_source_shortest_paths:function(e,t,r){// Predecessor map for each node that has been encountered.
 // node ID => predecessor node ID
-var o,i,a,s,l,u,d,c={},f={};f[t]=0;// Costs of shortest paths from s to all nodes encountered; differs from
+var o,i,a,s,l,d,u,c={},f={};f[t]=0;// Costs of shortest paths from s to all nodes encountered; differs from
 // `costs` in that it provides easy access to the node that currently has
 // the known shortest path from s.
 // XXX: Do we actually need both `costs` and `open`?
@@ -668,17 +670,17 @@ for(a in i=// In the nodes remaining in graph that have a known cost from s,
 l=e[i]||{})l.hasOwnProperty(a)&&(// Cost of s to u plus the cost of u to v across e--this is *a*
 // cost from s to v that may or may not be less than the current
 // known cost to v.
-u=s+l[a],// If we haven't visited v yet OR if the current known cost from s to
+d=s+l[a],// If we haven't visited v yet OR if the current known cost from s to
 // v is greater than the new cost we just found (cost of s to u plus
 // cost of u to v across e), update v's cost in the cost list and
 // update v's predecessor in the predecessor list (it's now u).
-d=f[a],(void 0===f[a]||d>u)&&(f[a]=u,h.push(a,u),c[a]=i));if(void 0!==r&&void 0===f[r])throw Error(["Could not find a path from ",t," to ",r,"."].join(""));return c},extract_shortest_path_from_predecessor_list:function(e,t){for(var r=[],n=t;n;)r.push(n),e[n],n=e[n];return r.reverse(),r},find_path:function(e,t,r){var o=n.single_source_shortest_paths(e,t,r);return n.extract_shortest_path_from_predecessor_list(o,r)},/**
+u=f[a],(void 0===f[a]||u>d)&&(f[a]=d,h.push(a,d),c[a]=i));if(void 0!==r&&void 0===f[r])throw Error(["Could not find a path from ",t," to ",r,"."].join(""));return c},extract_shortest_path_from_predecessor_list:function(e,t){for(var r=[],n=t;n;)r.push(n),e[n],n=e[n];return r.reverse(),r},find_path:function(e,t,r){var o=n.single_source_shortest_paths(e,t,r);return n.extract_shortest_path_from_predecessor_list(o,r)},/**
    * A very naive priority queue implementation.
    */PriorityQueue:{make:function(e){var t,r=n.PriorityQueue,o={};for(t in e=e||{},r)r.hasOwnProperty(t)&&(o[t]=r[t]);return o.queue=[],o.sorter=e.sorter||r.default_sorter,o},default_sorter:function(e,t){return e.cost-t.cost},/**
      * Add a new item to the queue and ensure the highest priority element
      * is at the front of the queue.
      */push:function(e,t){this.queue.push({value:e,cost:t}),this.queue.sort(this.sorter)},/**
      * Return the highest priority element in the queue.
-     */pop:function(){return this.queue.shift()},empty:function(){return 0===this.queue.length}}};t.exports=n},{}],i1BDL:[function(e,t,r){let n=e("5b3f7c513802d6c7");r.render=function(e,t,r){var o;let i=r,a=t;void 0!==i||t&&t.getContext||(i=t,t=void 0),t||(a=function(){try{return document.createElement("canvas")}catch(e){throw Error("You need to specify a canvas element")}}()),i=n.getOptions(i);let s=n.getImageWidth(e.modules.size,i),l=a.getContext("2d"),u=l.createImageData(s,s);return n.qrToImageData(u.data,e,i),o=a,l.clearRect(0,0,o.width,o.height),o.style||(o.style={}),o.height=s,o.width=s,o.style.height=s+"px",o.style.width=s+"px",l.putImageData(u,0,0),a},r.renderToDataURL=function(e,t,n){let o=n;void 0!==o||t&&t.getContext||(o=t,t=void 0),o||(o={});let i=r.render(e,t,o),a=o.type||"image/png",s=o.rendererOpts||{};return i.toDataURL(a,s.quality)}},{"5b3f7c513802d6c7":"3YBlJ"}],"3YBlJ":[function(e,t,r){function n(e){if("number"==typeof e&&(e=e.toString()),"string"!=typeof e)throw Error("Color should be defined as hex string");let t=e.slice().replace("#","").split("");if(t.length<3||5===t.length||t.length>8)throw Error("Invalid hex color: "+e);(3===t.length||4===t.length)&&(t=Array.prototype.concat.apply([],t.map(function(e){return[e,e]}))),6===t.length&&t.push("F","F");let r=parseInt(t.join(""),16);return{r:r>>24&255,g:r>>16&255,b:r>>8&255,a:255&r,hex:"#"+t.slice(0,6).join("")}}r.getOptions=function(e){e||(e={}),e.color||(e.color={});let t=void 0===e.margin||null===e.margin||e.margin<0?4:e.margin,r=e.width&&e.width>=21?e.width:void 0,o=e.scale||4;return{width:r,scale:r?4:o,margin:t,color:{dark:n(e.color.dark||"#000000ff"),light:n(e.color.light||"#ffffffff")},type:e.type,rendererOpts:e.rendererOpts||{}}},r.getScale=function(e,t){return t.width&&t.width>=e+2*t.margin?t.width/(e+2*t.margin):t.scale},r.getImageWidth=function(e,t){let n=r.getScale(e,t);return Math.floor((e+2*t.margin)*n)},r.qrToImageData=function(e,t,n){let o=t.modules.size,i=t.modules.data,a=r.getScale(o,n),s=Math.floor((o+2*n.margin)*a),l=n.margin*a,u=[n.color.light,n.color.dark];for(let t=0;t<s;t++)for(let r=0;r<s;r++){let d=(t*s+r)*4,c=n.color.light;if(t>=l&&r>=l&&t<s-l&&r<s-l){let e=Math.floor((t-l)/a),n=Math.floor((r-l)/a);c=u[i[e*o+n]?1:0]}e[d++]=c.r,e[d++]=c.g,e[d++]=c.b,e[d]=c.a}}},{}],"8CcR1":[function(e,t,r){let n=e("c36bbcf663291acc");function o(e,t){let r=e.a/255,n=t+'="'+e.hex+'"';return r<1?n+" "+t+'-opacity="'+r.toFixed(2).slice(1)+'"':n}function i(e,t,r){let n=e+t;return void 0!==r&&(n+=" "+r),n}r.render=function(e,t,r){let a=n.getOptions(t),s=e.modules.size,l=e.modules.data,u=s+2*a.margin,d=a.color.light.a?"<path "+o(a.color.light,"fill")+' d="M0 0h'+u+"v"+u+'H0z"/>':"",c="<path "+o(a.color.dark,"stroke")+' d="'+function(e,t,r){let n="",o=0,a=!1,s=0;for(let l=0;l<e.length;l++){let u=Math.floor(l%t),d=Math.floor(l/t);u||a||(a=!0),e[l]?(s++,l>0&&u>0&&e[l-1]||(n+=a?i("M",u+r,.5+d+r):i("m",o,0),o=0,a=!1),u+1<t&&e[l+1]||(n+=i("h",s),s=0)):o++}return n}(l,s,a.margin)+'"/>',f=a.width?'width="'+a.width+'" height="'+a.width+'" ':"",h='<svg xmlns="http://www.w3.org/2000/svg" '+f+('viewBox="0 0 '+u)+" "+u+'" shape-rendering="crispEdges">'+d+c+"</svg>\n";return"function"==typeof r&&r(null,h),h}},{c36bbcf663291acc:"3YBlJ"}]},["7rA3f"],"7rA3f","parcelRequire81ca")//# sourceMappingURL=referral.js.map
+     */pop:function(){return this.queue.shift()},empty:function(){return 0===this.queue.length}}};t.exports=n},{}],i1BDL:[function(e,t,r){let n=e("5b3f7c513802d6c7");r.render=function(e,t,r){var o;let i=r,a=t;void 0!==i||t&&t.getContext||(i=t,t=void 0),t||(a=function(){try{return document.createElement("canvas")}catch(e){throw Error("You need to specify a canvas element")}}()),i=n.getOptions(i);let s=n.getImageWidth(e.modules.size,i),l=a.getContext("2d"),d=l.createImageData(s,s);return n.qrToImageData(d.data,e,i),o=a,l.clearRect(0,0,o.width,o.height),o.style||(o.style={}),o.height=s,o.width=s,o.style.height=s+"px",o.style.width=s+"px",l.putImageData(d,0,0),a},r.renderToDataURL=function(e,t,n){let o=n;void 0!==o||t&&t.getContext||(o=t,t=void 0),o||(o={});let i=r.render(e,t,o),a=o.type||"image/png",s=o.rendererOpts||{};return i.toDataURL(a,s.quality)}},{"5b3f7c513802d6c7":"3YBlJ"}],"3YBlJ":[function(e,t,r){function n(e){if("number"==typeof e&&(e=e.toString()),"string"!=typeof e)throw Error("Color should be defined as hex string");let t=e.slice().replace("#","").split("");if(t.length<3||5===t.length||t.length>8)throw Error("Invalid hex color: "+e);(3===t.length||4===t.length)&&(t=Array.prototype.concat.apply([],t.map(function(e){return[e,e]}))),6===t.length&&t.push("F","F");let r=parseInt(t.join(""),16);return{r:r>>24&255,g:r>>16&255,b:r>>8&255,a:255&r,hex:"#"+t.slice(0,6).join("")}}r.getOptions=function(e){e||(e={}),e.color||(e.color={});let t=void 0===e.margin||null===e.margin||e.margin<0?4:e.margin,r=e.width&&e.width>=21?e.width:void 0,o=e.scale||4;return{width:r,scale:r?4:o,margin:t,color:{dark:n(e.color.dark||"#000000ff"),light:n(e.color.light||"#ffffffff")},type:e.type,rendererOpts:e.rendererOpts||{}}},r.getScale=function(e,t){return t.width&&t.width>=e+2*t.margin?t.width/(e+2*t.margin):t.scale},r.getImageWidth=function(e,t){let n=r.getScale(e,t);return Math.floor((e+2*t.margin)*n)},r.qrToImageData=function(e,t,n){let o=t.modules.size,i=t.modules.data,a=r.getScale(o,n),s=Math.floor((o+2*n.margin)*a),l=n.margin*a,d=[n.color.light,n.color.dark];for(let t=0;t<s;t++)for(let r=0;r<s;r++){let u=(t*s+r)*4,c=n.color.light;if(t>=l&&r>=l&&t<s-l&&r<s-l){let e=Math.floor((t-l)/a),n=Math.floor((r-l)/a);c=d[i[e*o+n]?1:0]}e[u++]=c.r,e[u++]=c.g,e[u++]=c.b,e[u]=c.a}}},{}],"8CcR1":[function(e,t,r){let n=e("c36bbcf663291acc");function o(e,t){let r=e.a/255,n=t+'="'+e.hex+'"';return r<1?n+" "+t+'-opacity="'+r.toFixed(2).slice(1)+'"':n}function i(e,t,r){let n=e+t;return void 0!==r&&(n+=" "+r),n}r.render=function(e,t,r){let a=n.getOptions(t),s=e.modules.size,l=e.modules.data,d=s+2*a.margin,u=a.color.light.a?"<path "+o(a.color.light,"fill")+' d="M0 0h'+d+"v"+d+'H0z"/>':"",c="<path "+o(a.color.dark,"stroke")+' d="'+function(e,t,r){let n="",o=0,a=!1,s=0;for(let l=0;l<e.length;l++){let d=Math.floor(l%t),u=Math.floor(l/t);d||a||(a=!0),e[l]?(s++,l>0&&d>0&&e[l-1]||(n+=a?i("M",d+r,.5+u+r):i("m",o,0),o=0,a=!1),d+1<t&&e[l+1]||(n+=i("h",s),s=0)):o++}return n}(l,s,a.margin)+'"/>',f=a.width?'width="'+a.width+'" height="'+a.width+'" ':"",h='<svg xmlns="http://www.w3.org/2000/svg" '+f+('viewBox="0 0 '+d)+" "+d+'" shape-rendering="crispEdges">'+u+c+"</svg>\n";return"function"==typeof r&&r(null,h),h}},{c36bbcf663291acc:"3YBlJ"}]},["7rA3f"],"7rA3f","parcelRequire81ca")//# sourceMappingURL=referral.js.map
 ;
 //# sourceMappingURL=referral.js.map
