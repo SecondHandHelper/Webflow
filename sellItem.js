@@ -193,23 +193,21 @@ async function sellItemMain() {
   // Show intro info about the importance to accurately describe the items condition
   itemCondition.addEventListener("input", () => {
     if (itemCondition.value === "Använd, men utan anmärkning") {
+      const hasCookieSeen = getCookie('conditionUsedInfoBoxSeen') === 'true';
       if (authUser.current) {
-        if (getCookie('conditionUsedInfoBoxSeen') !== 'true') {
-          let conditionUsedInfoBoxViews = user.current?.elementViews ? user.current.elementViews.filter((e) => e.elementID === "conditionUsedInfoBox") : [];
-          if (!conditionUsedInfoBoxViews.length) {
-            document.getElementById("triggerOpenConditionUsedInfo").click();
-            // Store elementViews to be able to hinder it to show automatically again
-            db.collection('users').doc(authUser.current.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "conditionUsedInfoBox", timestamp: new Date() }) });
-            setCookie('conditionUsedInfoBoxSeen', 'true', 100);
-          }
-        } else { // Store on user because cookie says they've seen it
-          db.collection('users').doc(authUser.current.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "conditionUsedInfoBox", timestamp: new Date() }) });
-        }
-      } else {
-        if (getCookie('conditionUsedInfoBoxSeen') !== 'true') {
+        const hasViewedElement = user.current?.elementViews?.some(view =>
+          view.elementID === "conditionUsedInfoBox"
+        );
+        
+        if (!hasViewedElement && !hasCookieSeen) {
           document.getElementById("triggerOpenConditionUsedInfo").click();
+          // Store elementViews to be able to hinder it to show automatically again
+          db.collection('users').doc(authUser.current.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "conditionUsedInfoBox", timestamp: new Date() }) });
           setCookie('conditionUsedInfoBoxSeen', 'true', 100);
         }
+      } else if (!hasCookieSeen) {
+        document.getElementById("triggerOpenConditionUsedInfo").click();
+        setCookie('conditionUsedInfoBoxSeen', 'true', 100);
       }
     }
   })

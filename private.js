@@ -318,6 +318,7 @@ async function privateMain() {
   showCommissionFreeBonus(items);
   prepareMenu(user.current);
   loadInfoRequests(items);
+  showAppPromoSection();
   //showHolidayModeDiv(items);
 
   // Create refCode
@@ -547,7 +548,7 @@ function setupBottomMenuPopupListeners() {
       const soldNotSentItems = document.querySelectorAll('#itemListSoldNotSent .div-block-45')
       const visibleChildren = Array.from(soldNotSentItems).filter(child => child.style.display !== 'none');
       if (visibleChildren.length === 0) {
-        document.getElementById('soldNotSentDiv').style.display='none';
+        document.getElementById('soldNotSentDiv').style.display = 'none';
       }
     } else {
       document.getElementById(itemMoreMenu.dataset.itemId).style.display = 'none';
@@ -579,6 +580,29 @@ async function yearlyDataExist(userId) {
   const yearlyDataJson = await yearlyDataResponse.json();
   const yearlyData = yearlyDataJson.data;
   return yearlyData.sold ? true : false
+}
+
+async function closeAppPromoSection() {
+  document.getElementById('appPromoSection').style.display = 'none';
+  if (authUser.current) {
+    db.collection('users').doc(authUser.current.uid).update({
+      elementViews: firebase.firestore.FieldValue.arrayUnion({
+        elementID: "appPromoSection",
+        timestamp: new Date()
+      })
+    });
+  }
+}
+
+async function showAppPromoSection() {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (!isIOS) return;
+  const hasViewedElement = user.current?.elementViews?.some(view =>
+    view.elementID === "appPromoSection"
+  );
+  if (!hasViewedElement) {
+    document.getElementById('appPromoSection').style.display = 'block';
+  }
 }
 
 async function showNpsSurvey(items) {
@@ -763,6 +787,10 @@ function onLoadHandler() {
     Intercom('update', {
       "hide_default_launcher": false
     });
+  });
+  document.getElementById("closeAppPromo").addEventListener("click", function (event) {
+    console.log("Close button clicked!");
+    closeAppPromoSection();
   });
 }
 if (localStorage.getItem('lwlItemDrafts')) {
