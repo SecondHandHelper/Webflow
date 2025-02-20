@@ -1,6 +1,6 @@
-export async function uploadTempImage(input, fileName) {
+export async function uploadTempImage(input, fileName, existingItemId = null) {
   try {
-    return await uploadTempImageWrapped(input, fileName);
+    return await uploadTempImageWrapped(input, fileName, existingItemId);
   } catch (ex) {
     if (ex.name === 'ImageResizeError') {
       console.error('Failed to resize image', ex);
@@ -10,16 +10,16 @@ export async function uploadTempImage(input, fileName) {
       console.error('Failed to upload image', ex);
       errorHandler.report(ex);
       // Retry once for upload errors
-      return await uploadTempImageWrapped(input, fileName);
+      return await uploadTempImageWrapped(input, fileName, existingItemId);
     }
   }
 }
 
-async function uploadTempImageWrapped(input, fileName) {
-    if (!sessionStorage.getItem('newItemId')) {
+async function uploadTempImageWrapped(input, fileName, existingItemId = null) {
+    if (!existingItemId && !sessionStorage.getItem('newItemId')) {
         sessionStorage.setItem('newItemId', await requestUniqueId());
     }
-    const tempId = sessionStorage.getItem('newItemId');
+    const tempId = existingItemId || sessionStorage.getItem('newItemId');
     let image;
     try {
       image = await scaleImageToMaxSize(input);
@@ -37,7 +37,7 @@ async function uploadTempImageWrapped(input, fileName) {
     form.append('itemId', tempId);
     form.append('fileName', fileName);
     form.append('file', image);
-    form.append('temporary', 'true');
+    form.append('temporary', !existingItemId);
     form.append('generateSmallImage', 'true');
     const response = await fetch(`${BACKEND_API_URL}/api/items/${tempId}/uploadImage`, {
         method: 'POST',
