@@ -74,11 +74,11 @@
 
   // Flattered page A/B test
   if (isMobile && window.location.pathname === '/flattered') {
-    let flatteredVariant = params.get(EXPERIMENTS.FLATTERED)?.toLowerCase() || 
-                          params.get('variant')?.toLowerCase() || 
-                          '';
+    let flatteredVariant = params.get(EXPERIMENTS.FLATTERED)?.toLowerCase() || '';
+    console.log('flatteredVariant', flatteredVariant);
     
     if (!flatteredVariant) {
+      console.log('flatteredVariant is empty');
       flatteredVariant = getExperimentCookie(EXPERIMENTS.FLATTERED) || 
                         ['a', 'b'][Math.floor(Math.random() * 2)];
       
@@ -94,8 +94,8 @@
 
     // Show variant
     document.addEventListener("DOMContentLoaded", function () {
-      const currentVariant = params.get(EXPERIMENTS.FLATTERED).toLowerCase();
-      
+      const currentVariant = params.get(EXPERIMENTS.FLATTERED)?.toLowerCase();
+
       if (currentVariant === 'a') {
         console.log('A: Update hero');
         heroTitle.innerHTML = 'Låt dina plagg från Flattered leva vidare';
