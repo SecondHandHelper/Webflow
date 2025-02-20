@@ -102,37 +102,80 @@ async function updateItem(itemId, changedImages) {
     ...(userSetCurrentPrice >= 100 && userSetCurrentPrice < lowestPrice ? { minPriceEstimate: userSetCurrentPrice } : {}),
   }
 
+  function inputNameToImageName(inputName) {
+    if (inputName === 'brandTagImage') {
+      return 'extraImage1';
+    } else if (inputName === 'materialTagImage') {
+      return 'extraImage2';
+    } else if (inputName.includes('defectImage')) {
+      const index = Number(inputName.split('defectImageV2_')[1]);
+      return `defectImage${index-1}`;
+    } else if (inputName.includes('extraImage')) {
+      const index = Number(inputName.split('extraImageV2_')[1]);
+      return `extraImage${index+3}`;
+    } else {
+      return inputName;
+    }
+  }
+
   async function uploadImages(itemId) {
-    if (changedImages.length > 0) {
-      // START - Mark imageRequest as Resolved
+    if (changedImages.length <= 0) {
+      return;
+    }
+    const imagesv2 = document.getElementById('defectImagesSection').style.display === 'flex'
+    // START - Mark imageRequest as Resolved
+    const newFilesUploaded = [...document.querySelectorAll('input[type=file]')].find(input => input.value?.length) != null;
+    if (newFilesUploaded) {
       await db.collection("items").doc(itemId).get().then((doc) => {
         if (doc.data()?.infoRequests?.images?.status === "Active") {
           changes["infoRequests.images.status"] = "Resolved";
         }
       });
-      // END - Mark imageRequest as Resolved
-      let elements = changedImages;
-      let images = new Map(); //Gather files from the form in a map "Images"
+    }
+    // END - Mark imageRequest as Resolved
+    let elements = changedImages;
+    let images = new Map(); //Gather files from the form in a map "Images"
+    if (imagesv2) {
+      document.querySelectorAll('input[type=file]').forEach(fileInput => {
+        if (fileInput.value?.length || fileInput.dataset.fileUrl?.length) {
+          const imageName = inputNameToImageName(fileInput.id);
+          images.set(imageName, fileInput.files[0] || fileInput.dataset.fileUrl);
+        }
+      });
+    } else {
       elements.forEach(element => {
         if (document.getElementById(element).files[0]) {
           let file = document.getElementById(element).files[0];
           images.set(element, file);
         }
       });
-      // Uploads files and add the new imageUrls to the changes object
-      await Promise.all(Array.from(images).map(async ([imageName, value]) => {
-        console.log(`${imageName}: ${value}`);
-        // If images was changed, set photo directions to default, since an 'info request' of images could have been shown
-        infoRequestImagesText.style.display = 'block';
-        infoRequestImagesDiv.style.display = 'none';
-        const { url: imageUrl } = await uploadTempImage(value, imageName);
+      }
+    // Uploads files and add the new imageUrls to the changes object
+    await Promise.all(Array.from(images).map(async ([imageName, value]) => {
+      console.log(`${imageName}: ${value}`);
+      // If images was changed, set photo directions to default, since an 'info request' of images could have been shown
+      infoRequestImagesText.style.display = 'block';
+      infoRequestImagesDiv.style.display = 'none';
+      const { url: imageUrl } = value instanceof File ? await uploadTempImage(value, imageName, itemId) : { url: value };
+      if (!imagesv2) {
         await callBackendApi(`/api/items/${itemId}/images`, { data: {
           fileName: imageName,
           url: imageUrl
         } });
-      }));
-      if (changedImages.indexOf('frontImage') > -1) {
-        // Front image was changed, also save the enhancedFrontImage in the right place
+      } else {
+        changes['imagesv2'] = [
+          ...(changes['imagesv2'] ? changes['imagesv2'] : []), 
+          {
+            name: imageName,
+            url: imageUrl
+          }
+        ];    
+      }
+    }));
+
+    if (changedImages.indexOf('frontImage') > -1) {
+      // Front image was changed, also save the enhancedFrontImage in the right place
+      if (!imagesv2) {
         const item = await callBackendApi(`/api/items/${itemId}`);
         const itemData = item.data;
         await callBackendApi(`/api/items/${itemId}/images`, { data: {
@@ -147,6 +190,37 @@ async function updateItem(itemId, changedImages) {
           changes['images.coverImageLarge'] = '';
           changes[`images.versionsStatus.coverImage`] = '';
         }
+      } else {
+        const enhancedFrontImageUrl = sessionStorage.getItem('enhancedFrontImage');
+        const extension = enhancedFrontImageUrl.split('.').pop();
+        const response = await callBackendApi(`/api/items/${itemId}/moveTempImage`, {
+          data: {
+            imageName: `enhancedFrontImage.${extension}`,
+            url: enhancedFrontImageUrl
+          }
+        });
+        changes['imagesv2'] = [
+          {
+            name: 'enhancedFrontImage',
+            url: response.data.url
+          },
+          ...(changes['imagesv2'] ? changes['imagesv2'] : []), 
+        ];
+      }
+    } else if (imagesv2) {
+      const enhancedFrontImageUrl = document.getElementById('frontImage').dataset.enhancedFileUrl;
+      changes['imagesv2'] = [
+        {
+          name: 'enhancedFrontImage',
+          url: enhancedFrontImageUrl,
+        },
+        ...(changes['imagesv2'] ? changes['imagesv2'] : []),
+      ]
+    }
+    if (changes['imagesv2']) {
+      changes['imagesv2Status'] = {
+        status: 'Process',
+        lastUpdated: Date.now(),
       }
     }
     await updateItemDoc(itemId, changes);
@@ -264,18 +338,92 @@ async function fillForm(itemId) {
       document.getElementById(imageName).required = false;
     }
 
-    for (const imageName in images) {
-      const possibleElmts = ["brandTagImage", "materialTagImage", "defectImage", "productImage", "extraImage"];
-      const url = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[`${imageName}Large`] || images[imageName];
-      if (possibleElmts.includes(imageName)) {
-        showImageAndHideSiblings(imageName, url);
+    function showDefectImagesV2(defectImagesV2) {
+      let maxIdx = -1;
+      const v2Containers = document.querySelectorAll('.file-upload-container-v2');
+      v2Containers.forEach(container => {
+        // Start by hiding all defect image containers
+        container.style.display = 'none';
+      });
+      defectImagesV2.sort((a, b) => a.name.localeCompare(b.name)).forEach((imageV2, idx) => {
+        const url = imageV2.versions?.small || imageV2.versions?.medium || imageV2.versions?.large || imageV2.url;
+        document.getElementById(`defectImageV2_${idx+1}`).dataset.fileUrl = imageV2.url;
+        document.getElementById(`defectImageV2_${idx+1}Preview`).style.backgroundImage = `url('${url}')`;
+        showImageState(`defectImageV2_${idx+1}`, 'success-state');
+        document.getElementById(`defectImageV2_${idx+1}`).required = false;
+        document.querySelector(`.file-upload-container-v2:has(#defectImageV2_${idx+1})`).style.display = 'inline-block';
+        maxIdx = Math.max(maxIdx, idx);
+      });
+      if (maxIdx < (v2Containers.length - 1)) {
+        // Show the first empty defect image container to allow adding new defect images
+        document.querySelector(`.file-upload-container-v2:has(#defectImageV2_${maxIdx + 2})`).style.display = 'inline-block';
       }
     }
-    // Special case for frontImage where we want to show the enhancedFrontImage
-    const frontImageUrl = images[`enhancedFrontImageSmall`] || images[`enhancedFrontImageMedium`] || images[`enhancedFrontImageLarge`] || images['enhancedFrontImage'] ||
-      images[`frontImageSmall`] || images[`frontImageMedium`] || images[`frontImageLarge`] || images['frontImage'];
-    if (frontImageUrl) {
-      showImageAndHideSiblings('frontImage', frontImageUrl);
+
+    function showExtraImagesV2(extraImagesV2) {
+      let maxIdx = -1;
+      const v2Containers = document.querySelectorAll('.file-upload-container-edit-v2');
+      v2Containers.forEach(container => {
+        // Start by hiding all extra image containers
+        container.style.display = 'none';
+      });
+      extraImagesV2.sort((a, b) => a.name.localeCompare(b.name)).forEach((imageV2, idx) => {
+        const url = imageV2.versions?.small || imageV2.versions?.medium || imageV2.versions?.large || imageV2.url;
+        document.getElementById(`extraImageV2_${idx+1}`).dataset.fileUrl = imageV2.url;
+        document.getElementById(`extraImageV2_${idx+1}Preview`).style.backgroundImage = `url('${url}')`;
+        showImageState(`extraImageV2_${idx+1}`, 'success-state');
+        document.getElementById(`extraImageV2_${idx+1}`).required = false;
+        document.querySelector(`.file-upload-container-edit-v2:has(#extraImageV2_${idx+1})`).style.display = 'inline-block';
+        maxIdx = Math.max(maxIdx, idx);
+      });
+      console.log("maxIdx: ", maxIdx);
+      console.log("v2Containers.length: ", v2Containers.length);
+      if (maxIdx < (v2Containers.length - 1)) {
+        // Show the first empty defect image container to allow adding new defect images
+        document.querySelector(`.file-upload-container-edit-v2:has(#extraImageV2_${maxIdx + 2})`).style.display = 'inline-block';
+      }
+    }
+
+    function showImageV2AndHideSiblings(imageV2, imageName) {
+      if (!imageV2?.url || !imageV2.name) {
+        return;
+      }
+      const url = imageV2.versions?.small || imageV2.versions?.medium || imageV2.versions?.large || imageV2.url;
+      document.getElementById(`${imageName}Preview`).style.backgroundImage = `url('${url}')`;
+      document.getElementById(imageName).dataset.fileUrl = imageV2.url;
+      showImageState(imageName, 'success-state');
+      document.getElementById(imageName).required = false;
+    }
+
+    if (data.imagesv2) {
+      document.getElementById('defectImagesSection').style.display='flex'
+      document.querySelector('.file-upload-container-edit:has(input#defectImage)').style.display='none'
+      document.querySelector('.file-upload-container-edit:has(input#extraImage)').style.display='none'
+      const enhancedFrontImage = data.imagesv2.find(img => img.name === 'enhancedFrontImage');
+      const frontImage = data.imagesv2.find(img => img.name === 'frontImage');
+      if (frontImage) {
+        showImageV2AndHideSiblings(frontImage, 'frontImage');
+        document.getElementById('frontImage').dataset.enhancedFileUrl = enhancedFrontImage?.url;
+      }
+      showImageV2AndHideSiblings(data.imagesv2.find(img => img.name === 'extraImage1'), 'brandTagImage');
+      showImageV2AndHideSiblings(data.imagesv2.find(img => img.name === 'extraImage2'), 'materialTagImage');
+      // loop through extraImageX and defectImageY and show them in their respective containers
+      showExtraImagesV2(data.imagesv2.filter(img => img.name.match(/extraImage[3456789]/)));
+      showDefectImagesV2(data.imagesv2.filter(img => img.name.match(/defectImage\d/)));      
+    } else {
+      for (const imageName in images) {
+        const possibleElmts = ["brandTagImage", "materialTagImage", "defectImage", "productImage", "extraImage"];
+        const url = images[`${imageName}Small`] || images[`${imageName}Medium`] || images[`${imageName}Large`] || images[imageName];
+        if (possibleElmts.includes(imageName)) {
+          showImageAndHideSiblings(imageName, url);
+        }
+      }
+      // Special case for frontImage where we want to show the enhancedFrontImage
+      const frontImageUrl = images[`enhancedFrontImageSmall`] || images[`enhancedFrontImageMedium`] || images[`enhancedFrontImageLarge`] || images['enhancedFrontImage'] ||
+        images[`frontImageSmall`] || images[`frontImageMedium`] || images[`frontImageLarge`] || images['frontImage'];
+      if (frontImageUrl) {
+        showImageAndHideSiblings('frontImage', frontImageUrl);
+      }
     }
 
     // Populate text input fields
@@ -325,8 +473,8 @@ async function fillForm(itemId) {
     pageTitleDiv.style.display = "flex";
     loadingDiv.style.display = "none";
   } catch (error) {
-    errorHandler.report(error);
     console.log("Error getting item document:", error);
+    errorHandler.report(error);
   }
 }
 
@@ -363,6 +511,111 @@ function setUpEventListeners() {
       }
       await enhanceFrontImage(imageUrl, false);
     }
+  });
+
+  document.querySelectorAll('.file-upload-container-v2').forEach(container => {
+    const defectImageV2 = container.querySelector('input');
+    defectImageV2.addEventListener("change", function () {
+      let input = this.files[0];
+      if (input) {
+        let src = URL.createObjectURL(input);
+        document.getElementById(`${id}PreviewUploading`).style.backgroundImage = `url('${src}')`;
+        document.getElementById(`${id}Preview`).style.backgroundImage = `url('${src}')`;
+        document.getElementById(id).required = false;
+        const nextSibling = container.nextElementSibling;
+        if (nextSibling) {
+          nextSibling.style.display = 'inline-block';
+        }
+      }
+    });
+  });
+
+  document.querySelectorAll('.file-upload-container-edit-v2').forEach(container => {
+    const extraImageV2 = container.querySelector('input');
+    extraImageV2.addEventListener("change", function () {
+      let input = this.files[0];
+      if (input) {
+        let src = URL.createObjectURL(input);
+        document.getElementById(`${id}PreviewUploading`).style.backgroundImage = `url('${src}')`;
+        document.getElementById(`${id}Preview`).style.backgroundImage = `url('${src}')`;
+        document.getElementById(id).required = false;
+        const nextSibling = container.nextElementSibling;
+        if (nextSibling) {
+          nextSibling.style.display = 'inline-block';
+        }
+      }
+    });
+  });
+
+  document.querySelectorAll('.w-file-remove-link').forEach(removeElement => {
+    removeElement.addEventListener('click', () => {
+      const container = removeElement.closest('.file-upload-container-v2') ||
+        removeElement.closest('.file-upload-container-edit-v2') ||
+          removeElement.closest('.file-upload-container-edit');
+      if (!container) {
+        console.log("No parent container found for removeElement: ", removeElement);
+        return;
+      }
+      const id = container.querySelector('input').id;
+      if (changedImages.includes(id)) {
+        changedImages = changedImages.filter(image => image !== id);
+      } else {
+        changedImages.push(id);
+        showSaveButton();
+      }
+    });
+  });
+  
+  const defectRemoveLinks = document.querySelectorAll('#defectImageList .success-state .w-file-remove-link');
+  [...defectRemoveLinks]?.forEach(link => {
+    link.addEventListener('click', () => {
+      const allContainers = document.querySelectorAll('#defectImageList .file-upload-container-v2');
+      const visibleContainers = [...allContainers].filter(container => container.style.display !== 'none');
+      const numberOfContainers = visibleContainers.length;
+      const containersWithValue = visibleContainers.filter(container => {
+        return container.querySelector('input').value?.length ||
+          container.querySelector('input').dataset.fileUrl?.length;
+      }).length;
+      const container = link.closest('.file-upload-container-v2');
+      container.querySelector('input').value = '';
+      container.querySelector('input').dataset.fileUrl = '';
+      const id = container.querySelector('input').id;
+      container.querySelector(`#${id}Preview`).style.backgroundImage = 'none';
+      container.querySelector(`#${id}PreviewUploading`).style.backgroundImage = 'none';
+      if (numberOfContainers > 1 && containersWithValue !== (allContainers.length - 1)) {
+        container.style.display = 'none';
+      }
+      // Move the now empty container to the end of the list, so that the add new image container
+      // is always last
+      const parent = container.parentElement;
+      parent.appendChild(container);
+    });
+  });
+
+  const extraRemoveLinks = document.querySelectorAll('.file-upload-container-edit-v2 .success-state .w-file-remove-link');
+  [...extraRemoveLinks]?.forEach(link => {
+    link.addEventListener('click', () => {
+      const allContainers = document.querySelectorAll('.file-upload-container-edit-v2');
+      const visibleContainers = [...allContainers].filter(container => container.style.display !== 'none');
+      const numberOfContainers = visibleContainers.length;
+      const containersWithValue = visibleContainers.filter(container => {
+        return container.querySelector('input').value?.length ||
+          container.querySelector('input').dataset.fileUrl?.length;
+      }).length;
+      const container = link.closest('.file-upload-container-edit-v2');
+      container.querySelector('input').value = '';
+      container.querySelector('input').dataset.fileUrl = '';
+      const id = container.querySelector('input').id;
+      container.querySelector(`#${id}Preview`).style.backgroundImage = 'none';
+      container.querySelector(`#${id}PreviewUploading`).style.backgroundImage = 'none';
+      if (numberOfContainers > 1 && containersWithValue !== (allContainers.length - 1)) {
+        container.style.display = 'none';
+      }
+      // Move the now empty container to the end of the list, so that the add new image container
+      // is always last
+      const parent = container.parentElement;
+      parent.appendChild(container);
+    });
   });
 
   let elementsArray = [...document.querySelectorAll("input").values(),
@@ -509,6 +762,7 @@ let changedImages = [];
 sessionStorage.removeItem('enhancedFrontImage');
 setUpEventListeners();
 const params = getParamsObject();
+console.log('edit item page loaded');
 user.whenSet(async () => await fillForm(params.id));
 autocomplete(document.getElementById("itemBrand"), brands); // Enable autocomplete
 
