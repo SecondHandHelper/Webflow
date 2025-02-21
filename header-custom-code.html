@@ -39,7 +39,6 @@
     document.addEventListener("DOMContentLoaded", function () {
       function showTestImage() {
         document.querySelectorAll('.hero-image-a').forEach(el => { el.style.display = 'block'; });
-        heroTitle.style.fontSize = '40px';
         document.querySelectorAll('.login-btn').forEach(el => {
           el.style.border = '1px solid rgba(128, 128, 128, 0.3)';
         });
@@ -53,12 +52,12 @@
       const currentVariant = params.get(EXPERIMENTS.HERO)?.toLowerCase();
       if (currentVariant === 'a') {
         heroTitle.innerHTML = 'Din smarta säljtjänst för second hand';
-        heroText.innerHTML = 'Mai är din AI-assistent som säljer åt dig på Tradera, Vestiaire Collective och andra marknadsplatser. Mai sköter allt, du behåller 80%.';
+        heroText.innerHTML = 'Mai är din AI-assistent som säljer kläderna åt dig på Tradera, Vestiaire och andra marknadsplatser. Mai sköter allt, behåll 80%.';
         showTestImage()
 
       } else if (currentVariant === 'b') {
         heroTitle.innerHTML = 'Sälj utan krångel, Mai säljer kläderna åt dig';
-        heroText.innerHTML = 'Mai hjälper dig sälja på utvalda marknadsplatser på några få klick.  Mai sköter allt, från prissättning till köparkontakt, så du slipper. Behåll 80%.';
+        heroText.innerHTML = 'Mai hjälper dig sälja på utvalda marknadsplatser på några få klick. Mai sköter allt, från köparkontakt till frakt, så du slipper. Behåll 80%.';
         showTestImage()
       }
 
