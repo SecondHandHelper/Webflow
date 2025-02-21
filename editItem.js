@@ -110,7 +110,7 @@ async function updateItem(itemId, changedImages) {
     } else if (inputName.includes('defectImage')) {
       return `defectImage${numDefectImagesSeen + 1}`;
     } else if (inputName.includes('extraImage')) {
-      return `extraImage${numExtraImagesSeen+2}`;
+      return `extraImage${numExtraImagesSeen + 1}`;
     } else {
       return inputName;
     }
@@ -140,9 +140,9 @@ async function updateItem(itemId, changedImages) {
         if (fileInput.value?.length || fileInput.dataset.fileUrl?.length) {
           const imageName = inputNameToImageName(fileInput.id, numExtraImagesSeen, numDefectImagesSeen);
           images.set(imageName, fileInput.files[0] || fileInput.dataset.fileUrl);
-          if (fileInput.id.includes('extraImage')) {
+          if (imageName.includes('extraImage')) {
             numExtraImagesSeen++;
-          } else if (fileInput.id.includes('defectImage')) {
+          } else if (imageName.includes('defectImage')) {
             numDefectImagesSeen++;
           }
         }
@@ -520,6 +520,7 @@ function setUpEventListeners() {
 
   document.querySelectorAll('.file-upload-container-v2').forEach(container => {
     const defectImageV2 = container.querySelector('input');
+    const id = defectImageV2.id;
     defectImageV2.addEventListener("change", function () {
       let input = this.files[0];
       if (input) {
@@ -537,6 +538,7 @@ function setUpEventListeners() {
 
   document.querySelectorAll('.file-upload-container-edit-v2').forEach(container => {
     const extraImageV2 = container.querySelector('input');
+    const id = extraImageV2.id;
     extraImageV2.addEventListener("change", function () {
       let input = this.files[0];
       if (input) {
