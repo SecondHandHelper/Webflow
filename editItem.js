@@ -102,17 +102,15 @@ async function updateItem(itemId, changedImages) {
     ...(userSetCurrentPrice >= 100 && userSetCurrentPrice < lowestPrice ? { minPriceEstimate: userSetCurrentPrice } : {}),
   }
 
-  function inputNameToImageName(inputName) {
+  function inputNameToImageName(inputName, numExtraImagesSeen, numDefectImagesSeen) {
     if (inputName === 'brandTagImage') {
       return 'extraImage1';
     } else if (inputName === 'materialTagImage') {
       return 'extraImage2';
     } else if (inputName.includes('defectImage')) {
-      const index = Number(inputName.split('defectImageV2_')[1]);
-      return `defectImage${index-1}`;
+      return `defectImage${numDefectImagesSeen + 1}`;
     } else if (inputName.includes('extraImage')) {
-      const index = Number(inputName.split('extraImageV2_')[1]);
-      return `extraImage${index+3}`;
+      return `extraImage${numExtraImagesSeen+2}`;
     } else {
       return inputName;
     }
@@ -136,10 +134,17 @@ async function updateItem(itemId, changedImages) {
     let elements = changedImages;
     let images = new Map(); //Gather files from the form in a map "Images"
     if (imagesv2) {
+      let numExtraImagesSeen = 0;
+      let numDefectImagesSeen = 0;
       document.querySelectorAll('input[type=file]').forEach(fileInput => {
         if (fileInput.value?.length || fileInput.dataset.fileUrl?.length) {
-          const imageName = inputNameToImageName(fileInput.id);
+          const imageName = inputNameToImageName(fileInput.id, numExtraImagesSeen, numDefectImagesSeen);
           images.set(imageName, fileInput.files[0] || fileInput.dataset.fileUrl);
+          if (fileInput.id.includes('extraImage')) {
+            numExtraImagesSeen++;
+          } else if (fileInput.id.includes('defectImage')) {
+            numDefectImagesSeen++;
+          }
         }
       });
     } else {
