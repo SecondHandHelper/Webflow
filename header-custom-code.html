@@ -1,6 +1,18 @@
+<!-- Segment initialization (but don't track page yet) -->
+<script>
+  !function () {
+    var analytics = window.analytics = window.analytics || []; if (!analytics.initialize) if (analytics.invoked) window.console && console.error && console.error("Segment snippet included twice."); else {
+      analytics.invoked = !0; analytics.methods = ["trackSubmit", "trackClick", "trackLink", "trackForm", "pageview", "identify", "reset", "group", "track", "ready", "alias", "debug", "page", "once", "off", "on", "addSourceMiddleware", "addIntegrationMiddleware", "setAnonymousId", "addDestinationMiddleware"]; analytics.factory = function (e) { return function () { var t = Array.prototype.slice.call(arguments); t.unshift(e); analytics.push(t); return analytics } }; for (var e = 0; e < analytics.methods.length; e++) { var key = analytics.methods[e]; analytics[key] = analytics.factory(key) } analytics.load = function (key, e) { var t = document.createElement("script"); t.type = "text/javascript"; t.async = !0; t.src = "https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js"; var n = document.getElementsByTagName("script")[0]; n.parentNode.insertBefore(t, n); analytics._loadOptions = e }; analytics._writeKey = "voF0TJjZHNsenbBzw8VeDIYggupAmfuj";; analytics.SNIPPET_VERSION = "4.15.3";
+      analytics.load("voF0TJjZHNsenbBzw8VeDIYggupAmfuj");
+    }
+  }();
+</script>
+
+<!-- A/B tests -->
 <script>
   let params = new URL(window.location).searchParams;
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  let isRunningExperiment = false;
 
   function setExperimentCookie(experimentId, variant, days) {
     const expires = new Date(Date.now() + days * 864e5).toUTCString();
@@ -17,7 +29,8 @@
   };
 
   // Mobile hero A/B test
-  if (isMobile && window.location.pathname === '/' && window.location.hostname.includes('webflow')) {
+  if (isMobile && window.location.pathname === '/') {
+    isRunningExperiment = true;
     let heroVariant = params.get(EXPERIMENTS.HERO)?.toLowerCase();
 
     // If no URL param, check cookie or assign random
@@ -52,42 +65,38 @@
       const currentVariant = params.get(EXPERIMENTS.HERO)?.toLowerCase();
       if (currentVariant === 'a') {
         heroTitle.innerHTML = 'Din smarta säljtjänst för second hand';
-        heroText.innerHTML = 'Mai är din AI-assistent som säljer kläderna åt dig på Tradera, Vestiaire och andra marknadsplatser. Mai sköter allt, behåll 80%.';
+        heroText.innerHTML = 'Mai är din AI-assistent som säljer kläder åt dig på Tradera, Vestiaire och andra marknadsplatser. Mai sköter allt – du behåller 80%.';
         showTestImage()
 
       } else if (currentVariant === 'b') {
         heroTitle.innerHTML = 'Sälj utan krångel, Mai säljer kläderna åt dig';
-        heroText.innerHTML = 'Mai hjälper dig sälja på utvalda marknadsplatser på några få klick. Mai sköter allt, från köparkontakt till frakt, så du slipper. Behåll 80%.';
+        heroText.innerHTML = 'Mai hjälper dig sälja på utvalda marknadsplatser på några få klick. Mai sköter allt, från köparkontakt till frakt, så du slipper. Du behåller 80%.';
         showTestImage()
       }
 
       // Track which hero variant was shown
-      /*
       analytics.track("Experiment Viewed", {
         experimentID: EXPERIMENTS.HERO,
         variantID: heroVariant
       });
-      */
     });
   }
 
   // Flattered page A/B test
   if (isMobile && window.location.pathname === '/flattered') {
     let flatteredVariant = params.get(EXPERIMENTS.FLATTERED)?.toLowerCase() || '';
-    console.log('flatteredVariant', flatteredVariant);
-    
+
     if (!flatteredVariant) {
-      console.log('flatteredVariant is empty');
-      flatteredVariant = getExperimentCookie(EXPERIMENTS.FLATTERED) || 
-                        ['a', 'b'][Math.floor(Math.random() * 2)];
-      
+      flatteredVariant = getExperimentCookie(EXPERIMENTS.FLATTERED) ||
+        ['a', 'b'][Math.floor(Math.random() * 2)];
+
       // Update URL since variant came from cookie or random
       const newUrl = new URL(window.location);
       newUrl.searchParams.set(EXPERIMENTS.FLATTERED, flatteredVariant);
       history.replaceState({}, '', newUrl);
       params = new URL(window.location).searchParams;
     }
-    
+
     // Always ensure cookie is set/refreshed
     setExperimentCookie(EXPERIMENTS.FLATTERED, flatteredVariant);
 
@@ -236,18 +245,23 @@
       }
     }
   }
-
 </script>
 
-<!-- Segment -->
+<!-- Track page -->
 <script>
-  !function () {
-    var analytics = window.analytics = window.analytics || []; if (!analytics.initialize) if (analytics.invoked) window.console && console.error && console.error("Segment snippet included twice."); else {
-      analytics.invoked = !0; analytics.methods = ["trackSubmit", "trackClick", "trackLink", "trackForm", "pageview", "identify", "reset", "group", "track", "ready", "alias", "debug", "page", "once", "off", "on", "addSourceMiddleware", "addIntegrationMiddleware", "setAnonymousId", "addDestinationMiddleware"]; analytics.factory = function (e) { return function () { var t = Array.prototype.slice.call(arguments); t.unshift(e); analytics.push(t); return analytics } }; for (var e = 0; e < analytics.methods.length; e++) { var key = analytics.methods[e]; analytics[key] = analytics.factory(key) } analytics.load = function (key, e) { var t = document.createElement("script"); t.type = "text/javascript"; t.async = !0; t.src = "https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js"; var n = document.getElementsByTagName("script")[0]; n.parentNode.insertBefore(t, n); analytics._loadOptions = e }; analytics._writeKey = "voF0TJjZHNsenbBzw8VeDIYggupAmfuj";; analytics.SNIPPET_VERSION = "4.15.3";
-      analytics.load("voF0TJjZHNsenbBzw8VeDIYggupAmfuj");
+  analytics.ready(function() {
+    if (isRunningExperiment) {
+      // Wait for URL updates if running experiment
+      setTimeout(() => {
+        analytics.page();
+        console.log('Page tracked with experiment URL:', window.location.href);
+      }, 50);
+    } else {
+      // Track immediately if no experiments
       analytics.page();
+      console.log('Page tracked immediately:', window.location.href);
     }
-  }();
+  });
 </script>
 
 <!-- CodeCrumbs -->
@@ -265,17 +279,6 @@
         'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
   })(window, document, 'script', 'dataLayer', 'GTM-KWV4J65');</script>
 <!-- End Google Tag Manager -->
-
-<!-- TikTok -->
-<script>
-  !function (w, d, t) {
-    w.TiktokAnalyticsObject = t; var ttq = w[t] = w[t] || []; ttq.methods = ["page", "track", "identify", "instances", "debug", "on", "off", "once", "ready", "alias", "group", "enableCookie", "disableCookie"], ttq.setAndDefer = function (t, e) { t[e] = function () { t.push([e].concat(Array.prototype.slice.call(arguments, 0))) } }; for (var i = 0; i < ttq.methods.length; i++)ttq.setAndDefer(ttq, ttq.methods[i]); ttq.instance = function (t) { for (var e = ttq._i[t] || [], n = 0; n < ttq.methods.length; n++)ttq.setAndDefer(e, ttq.methods[n]); return e }, ttq.load = function (e, n) { var i = "https://analytics.tiktok.com/i18n/pixel/events.js"; ttq._i = ttq._i || {}, ttq._i[e] = [], ttq._i[e]._u = i, ttq._t = ttq._t || {}, ttq._t[e] = +new Date, ttq._o = ttq._o || {}, ttq._o[e] = n || {}, ttq._partner = ttq._partner || 'Segment'; var o = document.createElement("script"); o.type = "text/javascript", o.async = !0, o.src = i + "?sdkid=" + e + "&lib=" + t; var a = document.getElementsByTagName("script")[0]; a.parentNode.insertBefore(o, a) };
-
-    ttq.load('CHNLVS3C77U0O25EL6C0');
-    ttq.page();
-  }(window, document, 'ttq');
-</script>
-<!-- End TikTok -->
 
 <meta name="facebook-domain-verification" content="5l4794w9fadbt3l14enhwey0lzhzde" />
 <meta name="facebook-domain-verification" content="9kx1fbpoujkbxq9m2hnaqyabbntrur" />
