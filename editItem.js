@@ -103,6 +103,7 @@ async function updateItem(itemId, changedImages) {
   }
 
   function inputNameToImageName(inputName, numExtraImagesSeen, numDefectImagesSeen) {
+    console.log("inputNameToImageName()");
     if (inputName === 'brandTagImage') {
       return 'extraImage1';
     } else if (inputName === 'materialTagImage') {
@@ -117,115 +118,120 @@ async function updateItem(itemId, changedImages) {
   }
 
   async function uploadImages(itemId) {
-    if (changedImages.length <= 0) {
-      return;
-    }
-    const imagesv2 = document.getElementById('defectImagesSection').style.display === 'flex'
-    // START - Mark imageRequest as Resolved
-    const newFilesUploaded = [...document.querySelectorAll('input[type=file]')].find(input => input.value?.length) != null;
-    if (newFilesUploaded) {
-      await db.collection("items").doc(itemId).get().then((doc) => {
-        if (doc.data()?.infoRequests?.images?.status === "Active") {
-          changes["infoRequests.images.status"] = "Resolved";
-        }
-      });
-    }
-    // END - Mark imageRequest as Resolved
-    let elements = changedImages;
-    let images = new Map(); //Gather files from the form in a map "Images"
-    if (imagesv2) {
-      let numExtraImagesSeen = 0;
-      let numDefectImagesSeen = 0;
-      document.querySelectorAll('input[type=file]').forEach(fileInput => {
-        if (fileInput.value?.length || fileInput.dataset.fileUrl?.length) {
-          const imageName = inputNameToImageName(fileInput.id, numExtraImagesSeen, numDefectImagesSeen);
-          images.set(imageName, fileInput.files[0] || fileInput.dataset.fileUrl);
-          if (imageName.includes('extraImage')) {
-            numExtraImagesSeen++;
-          } else if (imageName.includes('defectImage')) {
-            numDefectImagesSeen++;
-          }
-        }
-      });
-    } else {
-      elements.forEach(element => {
-        if (document.getElementById(element).files[0]) {
-          let file = document.getElementById(element).files[0];
-          images.set(element, file);
-        }
-      });
-      }
-    // Uploads files and add the new imageUrls to the changes object
-    await Promise.all(Array.from(images).map(async ([imageName, value]) => {
-      console.log(`${imageName}: ${value}`);
-      // If images was changed, set photo directions to default, since an 'info request' of images could have been shown
-      infoRequestImagesText.style.display = 'block';
-      infoRequestImagesDiv.style.display = 'none';
-      const { url: imageUrl } = value instanceof File ? await uploadTempImage(value, imageName, itemId) : { url: value };
-      if (!imagesv2) {
-        await callBackendApi(`/api/items/${itemId}/images`, { data: {
-          fileName: imageName,
-          url: imageUrl
-        } });
-      } else {
-        changes['imagesv2'] = [
-          ...(changes['imagesv2'] ? changes['imagesv2'] : []), 
-          {
-            name: imageName,
-            url: imageUrl
-          }
-        ];    
-      }
-    }));
-
-    if (changedImages.indexOf('frontImage') > -1) {
-      // Front image was changed, also save the enhancedFrontImage in the right place
-      if (!imagesv2) {
-        const item = await callBackendApi(`/api/items/${itemId}`);
-        const itemData = item.data;
-        await callBackendApi(`/api/items/${itemId}/images`, { data: {
-          fileName: `enhancedFrontImage`,
-          url: `${sessionStorage.getItem('enhancedFrontImage')}`
-        }});
-        changes[`images.versionsStatus.enhancedFrontImage`] = '';
-        if (itemData.images.coverImage === itemData.images.enhancedFrontImage) {
-          changes['images.coverImage'] = '';
-          changes['images.coverImageSmall'] = '';
-          changes['images.coverImageMedium'] = '';
-          changes['images.coverImageLarge'] = '';
-          changes[`images.versionsStatus.coverImage`] = '';
-        }
-      } else {
-        const enhancedFrontImageUrl = sessionStorage.getItem('enhancedFrontImage');
-        const extension = enhancedFrontImageUrl.split('.').pop();
-        const response = await callBackendApi(`/api/items/${itemId}/moveTempImage`, {
-          data: {
-            imageName: `enhancedFrontImage.${extension}`,
-            url: enhancedFrontImageUrl
+    console.log("uploadImages()");
+    if (changedImages.length >= 0) {
+      console.log("uploadImages() running");
+      const imagesv2 = document.getElementById('defectImagesSection').style.display === 'flex'
+      // START - Mark imageRequest as Resolved
+      const newFilesUploaded = [...document.querySelectorAll('input[type=file]')].find(input => input.value?.length) != null;
+      if (newFilesUploaded) {
+        await db.collection("items").doc(itemId).get().then((doc) => {
+          if (doc.data()?.infoRequests?.images?.status === "Active") {
+            changes["infoRequests.images.status"] = "Resolved";
           }
         });
+      }
+      // END - Mark imageRequest as Resolved
+      let elements = changedImages;
+      let images = new Map(); //Gather files from the form in a map "Images"
+      if (imagesv2) {
+        let numExtraImagesSeen = 0;
+        let numDefectImagesSeen = 0;
+        document.querySelectorAll('input[type=file]').forEach(fileInput => {
+          if (fileInput.value?.length || fileInput.dataset.fileUrl?.length) {
+            const imageName = inputNameToImageName(fileInput.id, numExtraImagesSeen, numDefectImagesSeen);
+            images.set(imageName, fileInput.files[0] || fileInput.dataset.fileUrl);
+            if (imageName.includes('extraImage')) {
+              numExtraImagesSeen++;
+            } else if (imageName.includes('defectImage')) {
+              numDefectImagesSeen++;
+            }
+          }
+        });
+      } else {
+        elements.forEach(element => {
+          if (document.getElementById(element).files[0]) {
+            let file = document.getElementById(element).files[0];
+            images.set(element, file);
+          }
+        });
+      }
+      // Uploads files and add the new imageUrls to the changes object
+      await Promise.all(Array.from(images).map(async ([imageName, value]) => {
+        console.log(`${imageName}: ${value}`);
+        // If images was changed, set photo directions to default, since an 'info request' of images could have been shown
+        infoRequestImagesText.style.display = 'block';
+        infoRequestImagesDiv.style.display = 'none';
+        const { url: imageUrl } = value instanceof File ? await uploadTempImage(value, imageName, itemId) : { url: value };
+        if (!imagesv2) {
+          await callBackendApi(`/api/items/${itemId}/images`, {
+            data: {
+              fileName: imageName,
+              url: imageUrl
+            }
+          });
+        } else {
+          changes['imagesv2'] = [
+            ...(changes['imagesv2'] ? changes['imagesv2'] : []),
+            {
+              name: imageName,
+              url: imageUrl
+            }
+          ];
+        }
+      }));
+
+      if (changedImages.indexOf('frontImage') > -1) {
+        // Front image was changed, also save the enhancedFrontImage in the right place
+        if (!imagesv2) {
+          const item = await callBackendApi(`/api/items/${itemId}`);
+          const itemData = item.data;
+          await callBackendApi(`/api/items/${itemId}/images`, {
+            data: {
+              fileName: `enhancedFrontImage`,
+              url: `${sessionStorage.getItem('enhancedFrontImage')}`
+            }
+          });
+          changes[`images.versionsStatus.enhancedFrontImage`] = '';
+          if (itemData.images.coverImage === itemData.images.enhancedFrontImage) {
+            changes['images.coverImage'] = '';
+            changes['images.coverImageSmall'] = '';
+            changes['images.coverImageMedium'] = '';
+            changes['images.coverImageLarge'] = '';
+            changes[`images.versionsStatus.coverImage`] = '';
+          }
+        } else {
+          const enhancedFrontImageUrl = sessionStorage.getItem('enhancedFrontImage');
+          const extension = enhancedFrontImageUrl.split('.').pop();
+          const response = await callBackendApi(`/api/items/${itemId}/moveTempImage`, {
+            data: {
+              imageName: `enhancedFrontImage.${extension}`,
+              url: enhancedFrontImageUrl
+            }
+          });
+          changes['imagesv2'] = [
+            {
+              name: 'enhancedFrontImage',
+              url: response.data.url
+            },
+            ...(changes['imagesv2'] ? changes['imagesv2'] : []),
+          ];
+        }
+      } else if (imagesv2) {
+        const enhancedFrontImageUrl = document.getElementById('frontImage').dataset.enhancedFileUrl;
         changes['imagesv2'] = [
           {
             name: 'enhancedFrontImage',
-            url: response.data.url
+            url: enhancedFrontImageUrl,
           },
-          ...(changes['imagesv2'] ? changes['imagesv2'] : []), 
-        ];
+          ...(changes['imagesv2'] ? changes['imagesv2'] : []),
+        ]
       }
-    } else if (imagesv2) {
-      const enhancedFrontImageUrl = document.getElementById('frontImage').dataset.enhancedFileUrl;
-      changes['imagesv2'] = [
-        {
-          name: 'enhancedFrontImage',
-          url: enhancedFrontImageUrl,
-        },
-        ...(changes['imagesv2'] ? changes['imagesv2'] : []),
-      ]
-    }
-    if (changes['imagesv2']) {
-      changes['imagesv2Status'] = {
-        status: 'Process',
-        lastUpdated: Date.now(),
+      if (changes['imagesv2']) {
+        changes['imagesv2Status'] = {
+          status: 'Process',
+          lastUpdated: Date.now(),
+        }
       }
     }
     await updateItemDoc(itemId, changes);
@@ -352,11 +358,11 @@ async function fillForm(itemId) {
       });
       defectImagesV2.sort((a, b) => a.name.localeCompare(b.name)).forEach((imageV2, idx) => {
         const url = imageV2.versions?.small || imageV2.versions?.medium || imageV2.versions?.large || imageV2.url;
-        document.getElementById(`defectImageV2_${idx+1}`).dataset.fileUrl = imageV2.url;
-        document.getElementById(`defectImageV2_${idx+1}Preview`).style.backgroundImage = `url('${url}')`;
-        showImageState(`defectImageV2_${idx+1}`, 'success-state');
-        document.getElementById(`defectImageV2_${idx+1}`).required = false;
-        document.querySelector(`.file-upload-container-v2:has(#defectImageV2_${idx+1})`).style.display = 'inline-block';
+        document.getElementById(`defectImageV2_${idx + 1}`).dataset.fileUrl = imageV2.url;
+        document.getElementById(`defectImageV2_${idx + 1}Preview`).style.backgroundImage = `url('${url}')`;
+        showImageState(`defectImageV2_${idx + 1}`, 'success-state');
+        document.getElementById(`defectImageV2_${idx + 1}`).required = false;
+        document.querySelector(`.file-upload-container-v2:has(#defectImageV2_${idx + 1})`).style.display = 'inline-block';
         maxIdx = Math.max(maxIdx, idx);
       });
       if (maxIdx < (v2Containers.length - 1)) {
@@ -374,11 +380,11 @@ async function fillForm(itemId) {
       });
       extraImagesV2.sort((a, b) => a.name.localeCompare(b.name)).forEach((imageV2, idx) => {
         const url = imageV2.versions?.small || imageV2.versions?.medium || imageV2.versions?.large || imageV2.url;
-        document.getElementById(`extraImageV2_${idx+1}`).dataset.fileUrl = imageV2.url;
-        document.getElementById(`extraImageV2_${idx+1}Preview`).style.backgroundImage = `url('${url}')`;
-        showImageState(`extraImageV2_${idx+1}`, 'success-state');
-        document.getElementById(`extraImageV2_${idx+1}`).required = false;
-        document.querySelector(`.file-upload-container-edit-v2:has(#extraImageV2_${idx+1})`).style.display = 'inline-block';
+        document.getElementById(`extraImageV2_${idx + 1}`).dataset.fileUrl = imageV2.url;
+        document.getElementById(`extraImageV2_${idx + 1}Preview`).style.backgroundImage = `url('${url}')`;
+        showImageState(`extraImageV2_${idx + 1}`, 'success-state');
+        document.getElementById(`extraImageV2_${idx + 1}`).required = false;
+        document.querySelector(`.file-upload-container-edit-v2:has(#extraImageV2_${idx + 1})`).style.display = 'inline-block';
         maxIdx = Math.max(maxIdx, idx);
       });
       console.log("maxIdx: ", maxIdx);
@@ -401,9 +407,9 @@ async function fillForm(itemId) {
     }
 
     if (data.imagesv2) {
-      document.getElementById('defectImagesSection').style.display='flex'
-      document.querySelector('.file-upload-container-edit:has(input#defectImage)').style.display='none'
-      document.querySelector('.file-upload-container-edit:has(input#extraImage)').style.display='none'
+      document.getElementById('defectImagesSection').style.display = 'flex'
+      document.querySelector('.file-upload-container-edit:has(input#defectImage)').style.display = 'none'
+      document.querySelector('.file-upload-container-edit:has(input#extraImage)').style.display = 'none'
       const enhancedFrontImage = data.imagesv2.find(img => img.name === 'enhancedFrontImage');
       const frontImage = data.imagesv2.find(img => img.name === 'frontImage');
       if (frontImage) {
@@ -414,7 +420,7 @@ async function fillForm(itemId) {
       showImageV2AndHideSiblings(data.imagesv2.find(img => img.name === 'extraImage2'), 'materialTagImage');
       // loop through extraImageX and defectImageY and show them in their respective containers
       showExtraImagesV2(data.imagesv2.filter(img => img.name.match(/extraImage[3456789]/)));
-      showDefectImagesV2(data.imagesv2.filter(img => img.name.match(/defectImage\d/)));      
+      showDefectImagesV2(data.imagesv2.filter(img => img.name.match(/defectImage\d/)));
     } else {
       for (const imageName in images) {
         const possibleElmts = ["brandTagImage", "materialTagImage", "defectImage", "productImage", "extraImage"];
@@ -558,7 +564,7 @@ function setUpEventListeners() {
     removeElement.addEventListener('click', () => {
       const container = removeElement.closest('.file-upload-container-v2') ||
         removeElement.closest('.file-upload-container-edit-v2') ||
-          removeElement.closest('.file-upload-container-edit');
+        removeElement.closest('.file-upload-container-edit');
       if (!container) {
         console.log("No parent container found for removeElement: ", removeElement);
         return;
@@ -572,7 +578,7 @@ function setUpEventListeners() {
       }
     });
   });
-  
+
   const defectRemoveLinks = document.querySelectorAll('#defectImageList .success-state .w-file-remove-link');
   [...defectRemoveLinks]?.forEach(link => {
     link.addEventListener('click', () => {
