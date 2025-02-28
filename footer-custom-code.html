@@ -49,7 +49,7 @@
       window.location.reload();
     })
   }
-  
+
   // SEGMENT IDENTIFY
   function identify(authenticatedUser, dbUser) {
     const now = new Date().toISOString();
@@ -167,6 +167,8 @@
             method: useMethod,
             headers: {
               'Content-Type': 'application/json',
+              'X-Client-Channel': 'Web',
+              'X-Client-Version': JS_VERSION,
               'Authorization': `Bearer ${idToken}`
             },
             ...(data ? {body: JSON.stringify(data)} : {}),
@@ -309,7 +311,7 @@
     } else {
       appendJsScript(`http://localhost:1234/${jsFile}`, loadFromGitHack);
     }
-  }  
+  }
 </script>
 <style>
   div.intercom-lightweight-app {
