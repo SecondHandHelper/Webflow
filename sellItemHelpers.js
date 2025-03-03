@@ -403,7 +403,7 @@ export function initializeCategorySelect(placeholderText = 'Kategori', onChangeC
     },
     {
       "text": "Skor", "children": [
-        { "id": "Sneakers", "text": "Sneakers", }, { "id": "Sandaler", "text": "Sandaler", }, { "id": "Klackar", "text": "Klackar", }, { "id": "Ballerinaskor", "text": "Ballerinaskor", }, { "id": "Loafers", "text": "Loafers", }, { "id": "Flip-flops", "text": "Flip-flops", }, { "id": "Boots", "text": "Boots", }, { "id": "Kängor", "text": "Kängor", }, { "id": "Vinterskor", "text": "Vinterskor", }, { "id": "Skor", "text": "Annat (Skor)", }
+        { "id": "Sneakers", "text": "Sneakers", }, { "id": "Sandaler", "text": "Sandaler", }, { "id": "Klackar", "text": "Klackar", }, { "id": "Ballerinaskor", "text": "Ballerinaskor", }, { "id": "Loafers", "text": "Loafers", }, { "id": "Flip-flops", "text": "Flip-flops", }, { "id": "Regnstövlar", "text": "Regnstövlar", }, { "id": "Boots", "text": "Boots", }, { "id": "Kängor", "text": "Kängor", }, { "id": "Vinterskor", "text": "Vinterskor", }, { "id": "Skor", "text": "Annat (Skor)", }
       ]
     },
     {
