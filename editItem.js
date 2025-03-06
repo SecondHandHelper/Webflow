@@ -1,6 +1,14 @@
 import { enhanceFrontImage, showImageState, uploadImageAndShowPreview, uploadTempImage } from "./sellItemHelpers";
 import { autocomplete, brands } from "./autocomplete-brands";
 
+const params = getParamsObject();
+if (params.app) {
+  const goBackButtons = document.querySelectorAll('.goback');
+  goBackButtons.forEach(button => {
+    button.style.visibility = 'hidden';
+  });
+}
+
 function isNumeric(str) {
   if (typeof str != "string") return false // we only process strings!
   return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
@@ -774,7 +782,6 @@ function crossFade(showElm) {
 let changedImages = [];
 sessionStorage.removeItem('enhancedFrontImage');
 setUpEventListeners();
-const params = getParamsObject();
 console.log('edit item page loaded');
 user.whenSet(async () => await fillForm(params.id));
 autocomplete(document.getElementById("itemBrand"), brands); // Enable autocomplete

@@ -318,7 +318,8 @@ async function privateMain() {
   showCommissionFreeBonus(items);
   prepareMenu(user.current);
   loadInfoRequests(items);
-  showAppPromoSection();
+  showFreeSellBox(items);
+  //showAppPromoSection();
   //showHolidayModeDiv(items);
 
   // Create refCode
@@ -580,6 +581,20 @@ async function yearlyDataExist(userId) {
   const yearlyDataJson = await yearlyDataResponse.json();
   const yearlyData = yearlyDataJson.data;
   return yearlyData.sold ? true : false
+}
+
+async function showFreeSellBox(items) {
+  const noItems = items.length === 0;
+  const noSoldItems = !items.some(item => item.status === "Sold");
+  const doc = await db.collection("users").doc(authUser.current.uid).get();
+  const hasActiveCoupon = doc.data()?.oneTimeCommissionFreeCoupon === "Active";
+  if (hasActiveCoupon) {
+    if (!noItems && noSoldItems) {
+      document.getElementById('freeSellBoxTitle').innerHTML = 'Nästa försäljning är fri';
+      document.getElementById('freeSellBoxText').innerHTML = 'Du har fått en fri försäljning av Mai';
+    }
+    document.getElementById('freeSellBox').style.display = 'block';
+  }
 }
 
 async function closeAppPromoSection() {
