@@ -52,10 +52,13 @@ async function addFollowUp() {
 }
 
 user.whenSet(async () => {
-  // Store elementViews to be able to hinder it to show again
-  db.collection('users').doc(authUser.current.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "npsSurvey", timestamp: new Date() }) });
-  // Track with segment
-  analytics.track("Element Viewed", { elementID: "npsSurvey" });
+  const params = getParamsObject();
+  if (!params.app) {
+    // Store elementViews to be able to hinder it to show again
+    db.collection('users').doc(authUser.current.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "npsSurvey", timestamp: new Date() }) });
+    // Track with segment
+    analytics.track("Element Viewed", { elementID: "npsSurvey" });
+  }
 });
 
 
