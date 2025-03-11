@@ -109,5 +109,7 @@ function loadItem(itemId) {
     });
 }
 
-// Load item
-loadItem(params.id);
+// Load item when user is signed in
+authUser.whenSet(() => {
+  loadItem(params.id);
+});
