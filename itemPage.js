@@ -8,7 +8,8 @@ if (params.app) {
   });
 }
 
-async function loadItem(itemId) {
+async function loadItem(itemId, events) {
+  const hasSaleApprovedEvent = events.some(event => event.type === 'saleApproved');
   const item = await callBackendApi(`/api/items/${itemId}`);
   if (!item.data) {
     return;
@@ -60,12 +61,30 @@ async function loadItem(itemId) {
     editItemLink.style.display = 'block';
   }
   if (data.status === "Sold") {
-    statusText = `Såld!`;
+    if (fsUser.trustedSellerStatus === 'Pending' && !hasSaleApprovedEvent) {
+      statusText = 'Inväntar godkännande';
+    } else if (hasSaleDeclinedEvent) {
+      if (item.returnShippingStatus === 'Collected') {
+        statusText = 'Returnerat';
+        text1 = 'Plaggets skick avvek från beskrivningen, det är nu på väg tillbaka till dig.';
+        toTrackReturnLink.href = `https://tracking.postnord.com/se/tracking?id=${data.returnPostnordShipmentId}`;
+        toTrackReturnLink.style.display = "flex";
+      } else {
+        statusText = 'På väg tillbaka till dig';
+        text1 = 'Plagget har returnerats till dig.';
+      }
+    } else {
+      statusText = `Såld!`;
+      text1 = data.payoutStatus === "Payed" ? "" : (data.payoutType === 'Brand Gift Card' ? "Presentkortet skapas inom en dag" : "Utbetalning kommer via Swish inom en dag");
+    }
     itemStatusText.style.fontSize = "18px";
     itemStatusText.style.fontWeight = "500";
-    text1 = data.payoutStatus === "Payed" ? "" : (data.payoutType === 'Brand Gift Card' ? "Presentkortet skapas inom en dag" : "Utbetalning kommer via Swish inom en dag");
     if (data.shippingStatus === "Not sent") {
-      text1 = data.payoutType === 'Brand Gift Card' ? "Presentkortet skapas när du skickat plagget" : "Utbetalning sker när du skickat plagget";
+      if (fsUser.trustedSellerStatus === 'Pending') {
+        text1 = 'Utbetalning sker 5 dagar efter att köparen hämtat ut plagg och ingen avvikelse rapporteras.';
+      } else {
+        text1 = data.payoutType === 'Brand Gift Card' ? "Presentkortet skapas när du skickat plagget" : "Utbetalning sker när du skickat plagget";
+      }
       toShipItemLink.href = window.location.origin + `/ship-item?id=${itemId}`;
       toShipItemLink.style.display = "flex";
     }
@@ -86,13 +105,15 @@ async function loadItem(itemId) {
   loadingDiv.style.display = "none";
 }
 
-async function loadItemEvents(itemId) {
-    itemEventsDiv.innerHTML = '';
-    let response = await fetch(`https://europe-west3-second-hand-helper.cloudfunctions.net/itemEvents/${itemId}`, {
-        method: 'GET',
-        headers: {'Content-Type': 'application/json'},
-    });
-    const events = await response.json();
+async function fetchItemEvents(itemId) {
+  const response = await fetch(`https://europe-west3-second-hand-helper.cloudfunctions.net/itemEvents/${itemId}`, {
+    method: 'GET',
+    headers: {'Content-Type': 'application/json'},
+  });
+  return await response.json();
+}
+
+async function loadItemEvents(events) {
     console.log(events);
     let itemAddedEventExists = false;
 
@@ -214,6 +235,12 @@ function getEventComponent(event, style) {
     if (event.type === 'valuationUserAdjusted') {
         return eventComponentHtml(displayLine, icon, className, `Du justerade värderingen till ${event.data.min}-${event.data.max} kr`, time);
     }
+    if (event.type === 'saleApproved') {
+        return eventComponentHtml(displayLine, icon, className, `Försäljning godkänd`, time);
+    }
+    if (event.type === 'saleDeclined') {
+        return eventComponentHtml(displayLine, icon, className, `Försäljningen godkändes inte`, time);
+    }
     return false;
 }
 
@@ -228,5 +255,9 @@ itemText2.addEventListener('click', toEditItem);
 itemCurrentPrice.addEventListener('click', toEditItem);
 
 // Load item
-loadItem(params.id);
-loadItemEvents(params.id);
+authUser.whenSet(() => {
+  fetchItemEvents(params.id).then(events => {
+    loadItem(params.id, events);
+    loadItemEvents(events);
+  });
+});
