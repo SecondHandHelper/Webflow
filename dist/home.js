@@ -580,28 +580,30 @@ function loadRecentlySold() {
     const recentlySoldItems = callBackendApi("/api/items/recentlySold");
     recentlySoldItems.then((result)=>{
         // Read result of the Cloud Function.
-        const itemListRecentlySoldStartPage = document.getElementById("itemListRecentlySoldStartPage");
-        itemListRecentlySoldStartPage.innerHTML = "";
+        const itemListRecentlySold1 = document.getElementById("itemListRecentlySold1");
+        const itemListRecentlySold2 = document.getElementById("itemListRecentlySold2");
+        itemListRecentlySold1.innerHTML = "";
+        itemListRecentlySold2.innerHTML = "";
+        const itemListRecentlySoldStartPageDesktop = document.getElementById("itemListRecentlySoldStartPageDesktop");
         itemListRecentlySoldStartPageDesktop.innerHTML = "";
-        for (const item of result.data){
+        result.data.forEach((item, index)=>{
             const brand = item.brand;
             const soldPrice = item.soldPrice;
             const soldDate = new Date(item.soldDate);
             const publishedDate = new Date(item.publishedDate);
-            const soldTimeText = new Date(item.soldDate).toISOString().split("T")[0] === new Date().toISOString().split("T")[0] ? "Idag" : "Ig\xe5r";
             const imageUrl = (0, _general.itemCoverImage)(item);
             const daysToSold = Math.floor((soldDate.getTime() - publishedDate.getTime()) / 86400000);
             if (soldPrice >= 180 || daysToSold <= 20) {
-                const itemCardHTML = `<div class="div-block-14-big"><div class="ratio-box _16-9"><div class="conten-block with-image">
+                const itemCardHTML = `<div class="item-card-recently-sold"><div class="ratio-box _16-9"><div class="content-block with-image">
                         <div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div>
-                        <div class="text-block-14">${soldPrice} kr</div>
-                        <div class='text-block-34'>${brand}</div>`;
-                //I cut out the "Idag / Igår" during summer, since so little is sold every day. Add this last to show it again: <div class='text-block-34'>${soldTimeText}</div></div>
-                itemListRecentlySoldStartPage.innerHTML += itemCardHTML;
-                const desktopCardHTML = itemCardHTML.replace("14-big", "14-big-desktop");
-                itemListRecentlySoldStartPageDesktop.innerHTML += desktopCardHTML;
+                        <div>${brand}
+S\xe5ld f\xf6r ${soldPrice}kr</div>
+                        </div>`;
+                if (index % 2 === 0) itemListRecentlySold1.innerHTML += itemCardHTML;
+                else itemListRecentlySold2.innerHTML += itemCardHTML;
+                itemListRecentlySoldStartPageDesktop.innerHTML += itemCardHTML;
             }
-        }
+        });
     }).catch((error)=>{
         errorHandler.report(error);
         // Getting the Error details.
@@ -619,13 +621,12 @@ async function fetchAndLoadRecentlyAddedItems() {
         itemList.innerHTML = "";
         itemListDesktop.innerHTML = "";
         for (const item of response.data){
-            const itemCardHTML = `<div class="div-block-14-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
+            const itemCardHTML = `<div class="div-block-14-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="content-block with-image">
                         <div class="img-container" style="background-image: url('${item.image}')"></div></div></div>
                         <div class="recently-added-text-block">
                             <div class="recent-added-items-subheader">${item.brand}</div>
                             <div class="recent-added-items-subheader-category">${item.category}</div>
                             <div class="recently-added-price">${item.currentPrice} kr</div>
-                            <div class="recently-added-brands-link-text">Mai Shop</div>
                         </div><a/></div>`;
             itemList.innerHTML += itemCardHTML;
             const desktopCardHTML = itemCardHTML.replace("14-big", "14-big-desktop");
@@ -636,6 +637,34 @@ async function fetchAndLoadRecentlyAddedItems() {
         console.log("error", e);
     }
 }
+function autoScrollList(element, speed) {
+    if (!element) {
+        console.error("Error: The list element is missing.");
+        return;
+    }
+    let isUserInteracting = false;
+    function scroll() {
+        if (!isUserInteracting) element.scrollLeft += speed; // Move the list
+        requestAnimationFrame(scroll);
+    }
+    // Pause when user interacts (hover or touch)
+    element.addEventListener("mouseenter", ()=>isUserInteracting = true);
+    element.addEventListener("touchstart", ()=>isUserInteracting = true);
+    if (speed < 0) {
+        console.log("scroll to end");
+        setTimeout(()=>{
+            element.scrollLeft = element.scrollWidth; // Move to end
+            setTimeout(()=>{
+                console.log("starting auto-scroll...");
+                scroll(); // Start auto-scroll
+            }, 500); // Give some time for layout to update
+        }, 200);
+    } else scroll();
+}
+window.onload = function() {
+    autoScrollList(document.getElementById("itemListRecentlySold1"), 0.7); // Move left
+    autoScrollList(document.getElementById("itemListRecentlySold2"), -0.4); // Move right
+};
 const trackHowItWorksInteractions = ()=>{
     const howItWorksDiv = document.getElementById("howItWorksDiv");
     new IntersectionObserver((entries, observer)=>{
