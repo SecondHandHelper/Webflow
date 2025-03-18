@@ -31,7 +31,10 @@ function loadRecentlySold() {
         if (soldPrice >= 180 || daysToSold <= 20) {
           const itemCardHTML = `<div class="item-card-recently-sold"><div class="ratio-box _16-9"><div class="content-block with-image">
                         <div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div>
-                        <div>${brand}\nSåld för ${soldPrice}kr</div>
+                        <div>
+                        <div>${brand}</div>
+                        <div>Såld för ${soldPrice}kr</div>
+                        </div>
                         </div>`;
           if (index % 2 === 0) {
             itemListRecentlySold1.innerHTML += itemCardHTML;
@@ -80,43 +83,16 @@ async function fetchAndLoadRecentlyAddedItems() {
   }
 }
 
-function autoScrollList(element, speed) {
-  if (!element) {
-    console.error("Error: The list element is missing.");
-    return;
-  }
-
-  let isUserInteracting = false;
-
-  function scroll() {
-      if (!isUserInteracting) {
-        element.scrollLeft += speed; // Move the list
-      }
-
-      requestAnimationFrame(scroll);
-  }
-
-  // Pause when user interacts (hover or touch)
-  element.addEventListener("mouseenter", () => (isUserInteracting = true));
-  element.addEventListener("touchstart", () => (isUserInteracting = true));
-
-  if (speed < 0) {
-    console.log("scroll to end");
-    setTimeout(() => {
-      element.scrollLeft = element.scrollWidth; // Move to end
-      setTimeout(() => {
-        console.log("starting auto-scroll...");
-        scroll(); // Start auto-scroll
-      }, 500); // Give some time for layout to update
-    }, 200);
-  } else {
-    scroll();
-  }
-}
-
 window.onload = function () {
-  autoScrollList(document.getElementById("itemListRecentlySold1"), 0.7); // Move left
-  autoScrollList(document.getElementById("itemListRecentlySold2"), -0.4); // Move right
+  const list1 = document.getElementById("itemListRecentlySold1");
+  const list2 = document.getElementById("itemListRecentlySold2");
+
+  if (list1) {
+    list1.classList.add("scroll-left");
+  }
+  if (list2) {
+    list2.classList.add("scroll-right");
+  }
 }
 
 const trackHowItWorksInteractions = () => {

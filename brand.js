@@ -121,11 +121,27 @@ async function fetchAndLoadRecentlyAddedItems() {
 }
 
 // Channel bottom sheet
-document.getElementById('sellItemCtaButton').addEventListener('click', ()=> channelRouter('/sell-item'));
-document.getElementById('sellWithMaiCarouselButton').addEventListener('click', ()=> channelRouter('/sell-item'));
-document.getElementById('sellStickyHeaderButton').addEventListener('click', ()=> channelRouter('/sell-item'));
-document.getElementById('darkOverlay').addEventListener('click', ()=> hideChannelBottomSheet());
-document.getElementById('closeChannelBottomSheet').addEventListener('click', ()=> hideChannelBottomSheet());
+const openIds = [
+  'sellItemCtaButton',
+  'sellWithMaiCarouselButton',
+  'sellStickyHeaderButton'
+];
+openIds.forEach(id => {
+  const button = document.getElementById(id);
+  if (button) {
+    button.addEventListener('click', () => channelRouter('/sell-item'));
+  }
+});
+const closeIds = [
+  'darkOverlay',
+  'closeChannelBottomSheet'
+];
+closeIds.forEach(id => {
+  const element = document.getElementById(id);
+  if (element) {
+    element.addEventListener('click', () => hideChannelBottomSheet());
+  }
+});
 // End of channel bottom sheet
 
 loadRecentlySold();
