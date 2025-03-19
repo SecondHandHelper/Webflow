@@ -60,36 +60,48 @@ async function loadItem(itemId) {
     editItemLink.style.display = 'block';
   }
   if (data.status === "Sold") {
-    console.log('calling featureIsEnabled');
-    const trustedSellerEnabled = false;
-    if (trustedSellerEnabled && fsUser.trustedSellerStatus === 'Pending' &&
-        (!item.saleApprovalStatus || item.saleApprovalStatus === 'Pending')) {
-      statusText = 'Inväntar godkännande';
-    } else if (trustedSellerEnabled && item.refundResponsible === 'Seller') {
-      if (item.returnShippingStatus === 'Collected') {
-        statusText = 'Returnerat';
-        text1 = 'Plaggets skick avvek från beskrivningen, det är nu på väg tillbaka till dig.';
-        toTrackReturnLink.href = `https://tracking.postnord.com/se/tracking?id=${data.returnPostnordShipmentId}`;
-        toTrackReturnLink.style.display = "flex";
-      } else {
-        statusText = 'På väg tillbaka till dig';
-        text1 = 'Plagget har returnerats till dig.';
-      }
+    const notTrustedSeller = user.current.trustedSellerStatus !== 'Trusted';
+    const trustedSellerEnabled = true;
+    
+    statusText = `Såld!`;
+
+    // Happy case
+    if (trustedSellerEnabled && notTrustedSeller){
+      text1 = "Utbetalning sker 5 dagar efter att köparen mottagit plagget och ingen skickavvikelse rapporteras."
     } else {
-      statusText = `Såld!`;
       text1 = data.payoutStatus === "Payed" ? "" : (data.payoutType === 'Brand Gift Card' ? "Presentkortet skapas inom en dag" : "Utbetalning kommer via Swish inom en dag");
-    }
-    itemStatusText.style.fontSize = "18px";
-    itemStatusText.style.fontWeight = "500";
-    text1 = data.payoutStatus === "Payed" ? "" : (data.payoutType === 'Brand Gift Card' ? "Presentkortet skapas inom en dag" : "Utbetalning kommer via Swish inom en dag");
-    if (data.shippingStatus === "Not sent") {
-      text1 = data.payoutType === 'Brand Gift Card' ? "Presentkortet skapas när du skickat plagget" : "Utbetalning sker när du skickat plagget";
-      toShipItemLink.href = window.location.origin + `/ship-item?id=${itemId}`;
-      toShipItemLink.style.display = "flex";
     }
     sellerGetsTitle.innerHTML = data.payoutStatus === "Payed" ? "Du fick" : "Du får";
     sellerGetsText.innerHTML = `${data.payoutType === 'Brand Gift Card' ? data.soldPrice : data.sellerGets} kr`
     sellerGetsDiv.style.display = "flex";
+
+    if (data.shippingStatus === "Not sent") {
+      toShipItemLink.href = window.location.origin + `/ship-item?id=${itemId}`;
+      toShipItemLink.style.display = "flex";
+    } else {
+      if (trustedSellerEnabled && notTrustedSeller){
+        if (!data.saleApprovalStatus || data.saleApprovalStatus === 'Pending') {
+          statusText = 'Inväntar godkännande';
+          toTrustedSellerArticleLink.style.display = "flex";
+        // Return case
+        } else if (item?.reclaim?.status === 'Approved' && item.refundResponsible === 'Seller') {
+          if (item.returnShippingStatus === 'Collected') {
+            statusText = 'Returnerat';
+            text1 = 'Plagget har returnerats till dig.';
+          } else if (item.returnPostnordShipmentId) {
+            statusText = 'På väg tillbaka till dig';
+            text1 = 'Plaggets skick avvek från beskrivningen, det är nu på väg tillbaka till dig.';
+            toTrackReturnLink.href = `https://tracking.postnord.com/se/tracking?id=${data.returnPostnordShipmentId}`;
+            toTrackReturnLink.style.display = "flex";
+          }
+        }
+      }
+    }
+
+    if (statusText.includes('Såld')){
+      itemStatusText.style.fontSize = "18px";
+      itemStatusText.style.fontWeight = "500";
+    }
   }
 
   itemBrandText.innerHTML = data.brand;
