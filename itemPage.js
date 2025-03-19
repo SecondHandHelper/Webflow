@@ -60,7 +60,8 @@ async function loadItem(itemId) {
     editItemLink.style.display = 'block';
   }
   if (data.status === "Sold") {
-    const trustedSellerEnabled = featureIsEnabled('trustedSeller');
+    console.log('calling featureIsEnabled');
+    const trustedSellerEnabled = false;
     if (trustedSellerEnabled && fsUser.trustedSellerStatus === 'Pending' &&
         (!item.saleApprovalStatus || item.saleApprovalStatus === 'Pending')) {
       statusText = 'Inväntar godkännande';
