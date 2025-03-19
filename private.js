@@ -319,7 +319,7 @@ async function privateMain() {
   prepareMenu(user.current);
   loadInfoRequests(items);
   showFreeSellBox(items);
-  if (user.current?.trustedSellerStatus !== 'Pending' && 
+  if (featureIsEnabled('trustedSeller') && user.current?.trustedSellerStatus !== 'Pending' && 
     user.current?.trustedSellerStatusChange && !user.current.trustedSellerStatusChange.seen) {
       console.log('showTrustedSellerBottomSheet');
     showTrustedSellerBottomSheet();
