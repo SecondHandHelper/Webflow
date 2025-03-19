@@ -319,6 +319,11 @@ async function privateMain() {
   prepareMenu(user.current);
   loadInfoRequests(items);
   showFreeSellBox(items);
+  if (user.current?.trustedSellerStatus !== 'Pending' && 
+    user.current?.trustedSellerStatusChange && !user.current.trustedSellerStatusChange.seen) {
+      console.log('showTrustedSellerBottomSheet');
+    showTrustedSellerBottomSheet();
+  }
   //showAppPromoSection();
   //showHolidayModeDiv(items);
 
@@ -765,6 +770,53 @@ async function storeFeedback() {
     closeFeedbackForm();
   });
 }
+
+function showTrustedSellerBottomSheet() {
+  document.getElementById("darkOverlay").classList.add("active");
+  const change = user.current?.trustedSellerStatusChange.type;
+  if (change === 'pendingToTrusted' || change === 'untrustedToTrusted') {
+    document.getElementById('trustedSellerTitle').innerText = 'Du har uppnåt statusen Pålitlig Säljare!';
+    document.getElementById('trustedSellerText').innerText = `Tack${user.current?.addressFirstName ? ' ' + user.current.addressFirstName : ''}, för att du gör det enkelt för köpare att handla tryggt i andra hand! Från och med nu får du utbetalt direkt när du skickar dina plagg.`;
+  } else if (change === 'pendingToUntrusted') {
+    document.getElementById('trustedSellerButton').style.display = 'none';
+    document.getElementById('trustedSellerIcon').style.display = 'none';
+    document.getElementById('trustedSellerLink').innerText = 'Mer om Mais pålitlighets-program'
+    document.getElementById('trustedSellerLinkIcon').style.display = 'block';
+    document.getElementById('trustedSellerTitle').innerText = 'Du är inte en Pålitlig Säljare ännu - men kan bli framöver!';
+    document.getElementById('trustedSellerText').innerHTML = `Eftersom en av dina första försäljningar har reklamerats eller inte skickats, så uppfyller du just nu inte kriterierna för en Pålitlig Säljare. Du kan fortfarande sälja, men har ännu inte fått uppgraderingen till snabbare utbetalningar.<br><br>Genomför fler godkända försäljningar för att bli en Pålitlig Säljare - vi utvärderar din status varje månad!`;
+  } else if (change === 'trustedToUntrusted') {
+    document.getElementById('trustedSellerButton').style.display = 'none';
+    document.getElementById('trustedSellerIcon').style.opacity = '0.2';
+    document.getElementById('trustedSellerLink').innerText = 'Mer om Mais pålitlighets-program'
+    document.getElementById('trustedSellerLinkIcon').style.display = 'block';
+    document.getElementById('trustedSellerTitle').innerText = 'Din säljarstatus har ändrats';
+    document.getElementById('trustedSellerText').innerText = `Du uppfyller för närvarande inte kriterierna för en Pålitlig Säljare, på grund av upprepade  reklamationer eller försäljningar som inte har skickats. Du kan fortfarande sälja, men utbetalning kommer ske först när försäljningen godkänts efter att köparen hämtat ut varan.`;
+  }
+  document.getElementById("trustedSellerBottomSheet").classList.add("active");
+}
+
+async function hideTrustedSellerBottomSheet() {
+  document.getElementById("darkOverlay").classList.remove("active");
+  document.getElementById("trustedSellerBottomSheet").classList.remove("active");
+  try {
+    await callBackendApi('/api/users', {
+      data: {
+         data: {
+           trustedSellerStatusChange: {
+             type: user.current?.trustedSellerStatusChange?.type,
+             timestamp: new Date(),
+             seen: true
+           }
+         }
+      },
+      method: 'PUT'
+    })
+  } catch (e) {
+    errorHandler.report(e);
+    console.log('Error updating user', e)
+  }
+}
+
 let loadHandlerHasRun = false;
 
 function onLoadHandler() {
@@ -811,6 +863,15 @@ function onLoadHandler() {
     console.log("Close button clicked!");
     closeAppPromoSection();
   });
+  document
+    .getElementById("darkOverlay")
+    .addEventListener("click", hideTrustedSellerBottomSheet);
+  document
+    .getElementById("closeTrustedSellerBottomSheet")
+    .addEventListener("click", hideTrustedSellerBottomSheet);
+  document
+    .getElementById("trustedSellerButton")
+    .addEventListener("click", hideTrustedSellerBottomSheet);
 }
 if (localStorage.getItem('lwlItemDrafts')) {
   location.href = '/lwl?createDrafts=true';
