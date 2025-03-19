@@ -92,17 +92,22 @@ export function formatPersonalId(personalIdInput) {
 }
 
 export function itemCoverImage(item) {
+  if (item.images) {
     const images = item.images;
-    if (images.modelImage) {
-        return images.modelImageSmall || images.modelImage
+    return images.modelImageSmall || images.modelImage || images.coverImageSmall || images.coverImage || images.enhancedFrontImageSmall || images.enhancedFrontImage || images.frontImageSmall || images.frontImage;
+  } else if (item.imagesv2) {
+    const priorityOrder = ['modelImage', 'enhancedFrontImage', 'frontImage'];
+    for (const name of priorityOrder) {
+      const image = item.imagesv2.find(img => img.name === name);
+      if (image) {
+        if (image.versions.small) return image.versions.small;
+        if (image.versions.medium) return image.versions.medium;
+        if (image.versions.large) return image.versions.large;
+        if (image.url) return image.url;
+      }
     }
-    if (images.coverImage) {
-        return images.coverImageSmall || images.coverImage
-    }
-    if (images.enhancedFrontImage) {
-        return images.enhancedFrontImageSmall || images.enhancedFrontImage
-    }
-    return images.frontImageSmall || images.frontImage
+  }
+  return null;
 }
 
 export function shareCode() {
