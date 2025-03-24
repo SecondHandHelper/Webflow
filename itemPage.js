@@ -65,9 +65,11 @@ async function loadItem(itemId) {
     
     statusText = `Såld!`;
 
+    console.log('(trustedSellerEnabled && notTrustedSeller)', (trustedSellerEnabled && notTrustedSeller));
+
     // Happy case
     if (trustedSellerEnabled && notTrustedSeller){
-      text1 = "Utbetalning sker 5 dagar efter att köparen mottagit plagget och ingen skickavvikelse rapporteras."
+      text1 = "Du får betalt 5 dagar efter att köparen hämtat ut plagget, och ingen reklamation har skett."
     } else {
       text1 = data.payoutStatus === "Payed" ? "" : (data.payoutType === 'Brand Gift Card' ? "Presentkortet skapas inom en dag" : "Utbetalning kommer via Swish inom en dag");
     }
@@ -90,7 +92,7 @@ async function loadItem(itemId) {
             text1 = 'Plagget har returnerats till dig.';
           } else if (item.returnPostnordShipmentId) {
             statusText = 'På väg tillbaka till dig';
-            text1 = 'Plaggets skick avvek från beskrivningen, det är nu på väg tillbaka till dig.';
+            text1 = 'Plagget reklamerades och är nu på väg tillbaka till dig';
             toTrackReturnLink.href = `https://tracking.postnord.com/se/tracking?id=${data.returnPostnordShipmentId}`;
             toTrackReturnLink.style.display = "flex";
           }
