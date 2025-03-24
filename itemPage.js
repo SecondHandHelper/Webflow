@@ -252,6 +252,12 @@ function getEventComponent(event, style) {
     if (event.type === 'itemCollected') {
         return eventComponentHtml(displayLine, icon, className, `Upphämtat av köparen`, time);
     }
+    if (event.type === 'saleApproved') {
+      return eventComponentHtml(displayLine, icon, className, `Försäljning godkänd`, time);
+    }
+    if (event.type === 'saleDeclined') {
+      return eventComponentHtml(displayLine, icon, className, `Försäljningen godkändes inte`, time);
+    }
     return false;
 }
 
