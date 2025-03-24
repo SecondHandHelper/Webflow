@@ -238,13 +238,19 @@ function getEventComponent(event, style) {
         return eventComponentHtml(displayLine, icon, className, `Fraktetikett skickades till dig`, time);
     }
     if (event.type === 'itemSent') {
-        return eventComponentHtml(displayLine, icon, className, `Plagget skickades iväg`, time);
+        return eventComponentHtml(displayLine, icon, className, `Du skickade plagget`, time);
     }
     if (event.type === 'payoutCompleted') {
         return eventComponentHtml(displayLine, icon, className, `Du fick ${event.data.amount} kr utbetalt`, time);
     }
     if (event.type === 'valuationUserAdjusted') {
         return eventComponentHtml(displayLine, icon, className, `Du justerade värderingen till ${event.data.min}-${event.data.max} kr`, time);
+    }
+    if (event.type === 'itemDelivered') {
+        return eventComponentHtml(displayLine, icon, className, `Levererad till köparens ombud`, time);
+    }
+    if (event.type === 'itemCollected') {
+        return eventComponentHtml(displayLine, icon, className, `Upphämtat av köparen`, time);
     }
     return false;
 }
