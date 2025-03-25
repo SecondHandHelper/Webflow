@@ -64,7 +64,6 @@ async function loadItem(itemId) {
     const trustedSellerEnabled = true;
     
     statusText = `Såld!`;
-
     console.log('(trustedSellerEnabled && notTrustedSeller)', (trustedSellerEnabled && notTrustedSeller));
 
     // Happy case
@@ -73,24 +72,22 @@ async function loadItem(itemId) {
     } else {
       text1 = data.payoutStatus === "Payed" ? "" : (data.payoutType === 'Brand Gift Card' ? "Presentkortet skapas inom en dag" : "Utbetalning kommer via Swish inom en dag");
     }
-    sellerGetsTitle.innerHTML = data.payoutStatus === "Payed" ? "Du fick" : "Du får";
-    sellerGetsText.innerHTML = `${data.payoutType === 'Brand Gift Card' ? data.soldPrice : data.sellerGets} kr`
-    sellerGetsDiv.style.display = "flex";
 
     if (data.shippingStatus === "Not sent") {
       toShipItemLink.href = window.location.origin + `/ship-item?id=${itemId}`;
       toShipItemLink.style.display = "flex";
     } else {
+      console.log('data.saleApprovalStatus', data.saleApprovalStatus);
       if (trustedSellerEnabled && notTrustedSeller){
         if (!data.saleApprovalStatus || data.saleApprovalStatus === 'Pending') {
           statusText = 'Inväntar godkännande';
           toTrustedSellerArticleLink.style.display = "flex";
         // Return case
-        } else if (item?.reclaim?.status === 'Approved' && item.refundResponsible === 'Seller') {
-          if (item.returnShippingStatus === 'Collected') {
+        } else if (data?.reclaim?.status === 'Approved' && data.refundResponsible === 'Seller') {
+          if (data.returnShippingStatus === 'Collected') {
             statusText = 'Returnerat';
             text1 = 'Plagget har returnerats till dig.';
-          } else if (item.returnPostnordShipmentId) {
+          } else if (data.returnPostnordShipmentId) {
             statusText = 'På väg tillbaka till dig';
             text1 = 'Plagget reklamerades och är nu på väg tillbaka till dig';
             toTrackReturnLink.href = `https://tracking.postnord.com/se/tracking?id=${data.returnPostnordShipmentId}`;
@@ -101,6 +98,9 @@ async function loadItem(itemId) {
     }
 
     if (statusText.includes('Såld')){
+      sellerGetsTitle.innerHTML = data.payoutStatus === "Payed" ? "Du fick" : "Du får";
+      sellerGetsText.innerHTML = `${data.payoutType === 'Brand Gift Card' ? data.soldPrice : data.sellerGets} kr`
+      sellerGetsDiv.style.display = "flex";
       itemStatusText.style.fontSize = "18px";
       itemStatusText.style.fontWeight = "500";
     }
