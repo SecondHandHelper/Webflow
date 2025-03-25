@@ -198,6 +198,7 @@ async function askForAdditionalUserDetails(userID) {
   let personalId;
   let personalIdExists = true;
   let oneItemNotPaid = false;
+  let oneItemNotPaidAndApproved = false;
   let oneItemNotSent = false;
   let pickupShippingMethod = false;
 
@@ -212,11 +213,15 @@ async function askForAdditionalUserDetails(userID) {
         status = doc.data().status;
         shippingStatus = doc.data().shippingStatus;
         const payoutStatus = doc.data().payoutStatus;
+        const saleApprovalStatus = doc.data().saleApprovalStatus;
         if (shippingStatus === "Not sent") {
           oneItemNotSent = true;
         }
         if (payoutStatus !== "Payed") {
           oneItemNotPaid = true;
+          if (saleApprovalStatus === 'Approved') {
+            oneItemNotPaidAndApproved = true;
+          }
         }
       });
     });
@@ -244,7 +249,10 @@ async function askForAdditionalUserDetails(userID) {
   }
 
   // Redirect user to personalId form if they haven't added it yet
-  if (oneItemNotPaid == true && personalIdExists == false) {
+  const userIsTrustedSeller = user.current?.trustedSellerStatus === 'Trusted';
+  const userIsNotTrustedSeller = user.current?.trustedSellerStatus === 'Not Trusted';
+  if (oneItemNotPaid && !personalIdExists && 
+    (userIsTrustedSeller || oneItemNotPaidAndApproved)) {
     location.href = "/personal-id-form";
   }
 }
