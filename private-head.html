@@ -54,7 +54,7 @@
     #inactiveItemsInfoBox { display: none; }
     #youGetInfoBox { display: none; }
     #darkOverlay { display: none; }
-    
+    #trustedSellerLinkIcon { display: none; }
 		::-webkit-scrollbar {
     		width: 0;
     		background: transparent;
@@ -77,5 +77,22 @@
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+    }
+    #trustedSellerBottomSheet {
+        position: fixed;
+        left: 0;
+        right: 0;
+        z-index: 5;
+        bottom: -100%;
+        transition: bottom 0.3s ease-in-out;
+    }
+    /* When active, fade in */
+    #darkOverlay.active {
+        visibility: visible;
+        opacity: 1;
+    }
+    /* When active, slide in */
+    #trustedSellerBottomSheet.active {
+        bottom: 0;
     }
 </style>
