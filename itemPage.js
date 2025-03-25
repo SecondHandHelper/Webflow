@@ -61,7 +61,7 @@ async function loadItem(itemId) {
   }
   if (data.status === "Sold") {
     const notTrustedSeller = user.current.trustedSellerStatus !== 'Trusted';
-    const trustedSellerEnabled = true;
+    const trustedSellerEnabled = user.current.testUser;
     
     statusText = `Såld!`;
     console.log('(trustedSellerEnabled && notTrustedSeller)', (trustedSellerEnabled && notTrustedSeller));

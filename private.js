@@ -327,7 +327,7 @@ async function privateMain() {
   prepareMenu(user.current);
   loadInfoRequests(items);
   showFreeSellBox(items);
-  if (featureIsEnabled('trustedSeller') && user.current?.trustedSellerStatus !== 'Pending' && 
+  if (user.current?.testUser && user.current?.trustedSellerStatus !== 'Pending' && 
     user.current?.trustedSellerStatusChange && !user.current.trustedSellerStatusChange.seen) {
       console.log('showTrustedSellerBottomSheet');
     showTrustedSellerBottomSheet();
@@ -782,23 +782,24 @@ async function storeFeedback() {
 function showTrustedSellerBottomSheet() {
   document.getElementById("darkOverlay").classList.add("active");
   const change = user.current?.trustedSellerStatusChange.type;
-  if (change === 'pendingToTrusted' || change === 'untrustedToTrusted') {
-    document.getElementById('trustedSellerTitle').innerText = 'Du har uppnåt statusen Pålitlig Säljare!';
-    document.getElementById('trustedSellerText').innerText = `Tack${user.current?.addressFirstName ? ' ' + user.current.addressFirstName : ''}, för att du gör det enkelt för köpare att handla tryggt i andra hand! Från och med nu får du utbetalt direkt när du skickar dina plagg.`;
+  if (change === 'pendingToTrusted') {
+    document.getElementById('trustedSellerTitle').innerText = 'Du har uppnåt statusen\nPålitlig Säljare!';
+    document.getElementById('trustedSellerText').innerText = 'Tack vare en hög andel godkända försäljningar har du nu blivit Pålitlig Säljare! Från och med nu får du utbetalt direkt när du skickar dina plagg och täcks av Mais säljskydd vid eventuella reklamationer.';
+  } else if (change === 'untrustedToTrusted') {
+    document.getElementById('trustedSellerTitle').innerText = 'Du har uppnåt statusen\nPålitlig Säljare!';
+    document.getElementById('trustedSellerText').innerText = `Tack${user.current?.addressFirstName ? ' ' + user.current.addressFirstName : ''}, för att du gör det enkelt för köpare att handla tryggt i andra hand! Från och med nu får du utbetalt direkt när du skickar dina plagg och täcks av Mais säljskydd vid eventuella reklamationer.`;
   } else if (change === 'pendingToUntrusted') {
-    document.getElementById('trustedSellerButton').style.display = 'none';
-    document.getElementById('trustedSellerIcon').style.display = 'none';
-    document.getElementById('trustedSellerLink').innerText = 'Mer om Mais pålitlighets-program'
-    document.getElementById('trustedSellerLinkIcon').style.display = 'block';
-    document.getElementById('trustedSellerTitle').innerText = 'Du är inte en Pålitlig Säljare ännu - men kan bli framöver!';
-    document.getElementById('trustedSellerText').innerHTML = `Eftersom en av dina första försäljningar har reklamerats eller inte skickats, så uppfyller du just nu inte kriterierna för en Pålitlig Säljare. Du kan fortfarande sälja, men har ännu inte fått uppgraderingen till snabbare utbetalningar.<br><br>Genomför fler godkända försäljningar för att bli en Pålitlig Säljare - vi utvärderar din status varje månad!`;
-  } else if (change === 'trustedToUntrusted') {
-    document.getElementById('trustedSellerButton').style.display = 'none';
+    document.getElementById('trustedSellerButton').innerText = 'Okej';
     document.getElementById('trustedSellerIcon').style.opacity = '0.2';
-    document.getElementById('trustedSellerLink').innerText = 'Mer om Mais pålitlighets-program'
-    document.getElementById('trustedSellerLinkIcon').style.display = 'block';
-    document.getElementById('trustedSellerTitle').innerText = 'Din säljarstatus har ändrats';
-    document.getElementById('trustedSellerText').innerText = `Du uppfyller för närvarande inte kriterierna för en Pålitlig Säljare, på grund av upprepade  reklamationer eller försäljningar som inte har skickats. Du kan fortfarande sälja, men utbetalning kommer ske först när försäljningen godkänts efter att köparen hämtat ut varan.`;
+    document.getElementById('trustedSellerLink').innerText = 'Hur blir jag Pålitlig Säljare?'
+    document.getElementById('trustedSellerTitle').innerText = 'Just nu uppfyller du inte kriterierna för Pålitlig Säljare';
+    document.getElementById('trustedSellerText').innerHTML = `Eftersom en av dina första försäljningar antingen reklamerades eller inte skickades i tid, så uppfyller du just nu inte kriterierna för statusen Pålitlig Säljare. Du kan fortfarande sälja, men har ännu inte kvalificerat dig för snabbare utbetalningar eller Mais säljskydd.`;
+  } else if (change === 'trustedToUntrusted') {
+    document.getElementById('trustedSellerButton').innerText = 'Okej';
+    document.getElementById('trustedSellerIcon').style.opacity = '0.2';
+    document.getElementById('trustedSellerLink').innerText = 'Hur blir jag Pålitlig Säljare igen?'
+    document.getElementById('trustedSellerTitle').innerText = 'Du har inte längre statusen Pålitlig Säljare';
+    document.getElementById('trustedSellerText').innerText = `På grund av upprepade reklamationer eller försäljningar som inte skickats i tid, så uppfyller du för närvarande inte kriterierna för säljarstatusen Pålitlig Säljare. Du kan fortfarande sälja, men utbetalning sker först när köparen mottagit varan och eventuella reklamationer skickas tillbaka till dig.`;
   }
   document.getElementById("trustedSellerBottomSheet").classList.add("active");
 }
