@@ -6,13 +6,13 @@ function updateContentForUser(user) {
   if (user.current?.trustedSellerStatus === 'Trusted') {
   } else if (user.current?.trustedSellerStatus === 'Untrusted') {
     document.getElementById('trustedSellerIcon').style.opacity = 0.2;
-    document.getElementById('trustedSellerHeading').innerText = 'Du har inte uppnåt statusen Pålitlig Säljare ännu';
+    document.getElementById('trustedSellerHeading').innerText = 'För tillfället har du inte statusen Pålitlig Säljare';
     document.getElementById('trustedSellerBody').innerText = 'Eftersom du är en ny användare så har du inte uppnåt statusen Pålitlig Säljare ännu. Vi utvärderar din säljarstatus efter att du sålt dina första 3 plagg.'
-  } else {
+  } else { // Pending
     document.getElementById('trustedSellerIcon').style.display = 'none';
     document.getElementById('untrustedSellerIcon').style.display = 'block';
     document.getElementById('trustedSellerHeading').innerText = 'För tillfället har du inte statusen Pålitlig Säljare';
-    document.getElementById('trustedSellerBody').innerText = 'Eftersom dina försäljningar har reklamerats eller inte skickats i tid så uppfyller du just nu inte kriterierna för att bli en Pålitlig Säljare. Du kan fortfarande sälja, och får utbetalt när köparen mottagit och godkänt varan. Reklamationer skickas tillbaka till dig. Vi utvärderar din säljarstatus månadsvis.'
+    document.getElementById('trustedSellerBody').innerText = 'Än så länge har du inte sålt tillräckligt många plagg för att uppnå statusen Pålitlig Säljare. När 3 av dina försäljningar godkänts så får du statusen, då förutsatt att alla försäljningar skickats i tid och inte reklamerats av köpare.'
   }
 }
 
