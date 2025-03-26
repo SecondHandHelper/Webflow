@@ -894,7 +894,16 @@ function onLoadHandler() {
     document.getElementById('darkOverlay').classList.add('active');
   });
   document.getElementById('closeApprovedSaleInfoBox').addEventListener('click', hideApprovedSaleInfoBox);
-  document.getElementById('trustedSellerWidget').style.display = 'block';
+  if (!user.current?.trustedSellerStatus || user.current?.trustedSellerStatus === 'Pending') {
+    document.getElementById('trustedSellerWidget').style.display = 'block';
+    document.getElementById('widgetNumApprovedSales').innerText = Number(user.current?.approvedSalesCount);
+    if (user.current?.approvedSalesCount >= 1) {
+      document.getElementById('widgetFirstSaleBar').style.backgroundColor = '#02AC08';
+    }
+    if (user.current?.approvedSalesCount >= 2) {
+      document.getElementById('widgetSecondSaleBar').style.backgroundColor = '#02AC08';
+    }
+  }
 }
 if (localStorage.getItem('lwlItemDrafts')) {
   location.href = '/lwl?createDrafts=true';
