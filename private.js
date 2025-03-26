@@ -273,6 +273,12 @@ async function privateMain() {
 
   updateIC(userId, email, phone);
   askForAdditionalUserDetails(userId);
+  if(user.current?.trustedSellerStatus === 'Trusted'){
+    document.getElementById('trustedIconHeader').style.display = 'block';
+  } else {
+    document.getElementById('fullLogo').style.display = 'block';
+    document.getElementById('onlyLogo').style.display = 'none';
+  }
   loadSoldByOthers(userId);
   setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
 

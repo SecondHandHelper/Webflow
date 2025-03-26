@@ -1,8 +1,9 @@
 
-function updateContentForUser(user) {
+function updateContentForUser() {
   document.getElementById('trustedSellerLink').addEventListener('click', function() {
     Intercom('showArticle', 10805226);
   });
+  console.log('user.current?.trustedSellerStatus', user.current?.trustedSellerStatus);
   if (user.current?.trustedSellerStatus === 'Trusted') {
   } else if (user.current?.trustedSellerStatus === 'Untrusted') {
     document.getElementById('trustedSellerIcon').style.display = 'none';
@@ -15,6 +16,8 @@ function updateContentForUser(user) {
     document.getElementById('trustedSellerHeading').innerText = 'För tillfället har du inte statusen Pålitlig Säljare';
     document.getElementById('trustedSellerBody').innerText = 'Än så länge har du inte sålt tillräckligt många plagg för att uppnå statusen Pålitlig Säljare. När 3 av dina försäljningar godkänts så får du statusen, då förutsatt att alla försäljningar skickats i tid och inte reklamerats av köpare.'
   }
+  loadingDiv.style.display = 'none';
+  document.getElementById('contentDiv').style.display = 'block';
 }
 
 window.intercomSettings = { app_id: "klyy0le5" };
