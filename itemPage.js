@@ -166,12 +166,16 @@ function eventComponentHtml(displayLine, icon, className, text, time) {
 }
 
 function getEventComponent(event, style) {
+    console.log('event', event);
     let className = '';
     let icon = '<div class="div-block-143"></div>';
     // Highlighted event styling
     if (style === 'highlighted') {
         className = 'highlighted-event';
         icon = '<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/62c53fa9db6d0f383ee430f9_check-mark%202%20(1).svg" loading="lazy" width="auto" alt="">';
+    }
+    if (event.type === 'buyerFeedback') {
+        icon = '<img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/67e417040dc69683fcf4b4c5_star-solid-yellow.svg" loading="lazy" width="auto" alt="">';
     }
     const displayLine = 'block';
     const weekdays = ['Sön', 'Mån', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör', 'Sön']
@@ -257,6 +261,9 @@ function getEventComponent(event, style) {
     }
     if (event.type === 'saleDeclined') {
       return eventComponentHtml(displayLine, icon, className, `Försäljningen godkändes inte`, time);
+    }
+    if (event.type === 'buyerFeedback') {
+      return eventComponentHtml(displayLine, icon, className, `Kommentar från köparen:\n"${event.data.comment}"`, time);
     }
     return false;
 }

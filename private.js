@@ -903,6 +903,9 @@ function onLoadHandler() {
   if (!user.current?.trustedSellerStatus || user.current?.trustedSellerStatus === 'Pending') {
     document.getElementById('trustedSellerWidget').style.display = 'block';
     document.getElementById('widgetNumApprovedSales').innerText = Number(user.current?.approvedSalesCount);
+    if (user.current?.approvedSalesCount === 1) {
+      document.getElementById('approvedSalesText').innerText = 'godkänd försäljning';
+    }
     if (user.current?.approvedSalesCount >= 1) {
       document.getElementById('widgetFirstSaleBar').style.backgroundColor = '#02AC08';
     }
