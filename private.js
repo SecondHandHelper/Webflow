@@ -804,6 +804,11 @@ function showTrustedSellerBottomSheet() {
   document.getElementById("trustedSellerBottomSheet").classList.add("active");
 }
 
+async function hideApprovedSaleInfoBox() {
+  document.getElementById('approvedSaleInfoBox').style.display = 'none';
+  document.getElementById('darkOverlay').classList.remove('active');
+}
+
 async function hideTrustedSellerBottomSheet() {
   document.getElementById("darkOverlay").classList.remove("active");
   document.getElementById("trustedSellerBottomSheet").classList.remove("active");
@@ -874,13 +879,22 @@ function onLoadHandler() {
   });
   document
     .getElementById("darkOverlay")
-    .addEventListener("click", hideTrustedSellerBottomSheet);
+    .addEventListener("click", function() {
+      hideTrustedSellerBottomSheet();
+      hideApprovedSaleInfoBox();
+    });
   document
     .getElementById("closeTrustedSellerBottomSheet")
     .addEventListener("click", hideTrustedSellerBottomSheet);
   document
     .getElementById("trustedSellerButton")
     .addEventListener("click", hideTrustedSellerBottomSheet);
+  document.getElementById('approvedSalesLines').addEventListener('click', function () {
+    document.getElementById('approvedSaleInfoBox').style.display = 'block';
+    document.getElementById('darkOverlay').classList.add('active');
+  });
+  document.getElementById('closeApprovedSaleInfoBox').addEventListener('click', hideApprovedSaleInfoBox);
+  document.getElementById('trustedSellerWidget').style.display = 'block';
 }
 if (localStorage.getItem('lwlItemDrafts')) {
   location.href = '/lwl?createDrafts=true';

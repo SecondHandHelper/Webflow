@@ -53,7 +53,8 @@
 	.restart-button { display: none; }
     #inactiveItemsInfoBox { display: none; }
     #youGetInfoBox { display: none; }
-    #darkOverlay { display: none; }
+    #approvedSaleInfoBox { display: none; }
+    #trustedSellerWidget { display: none; }
     #trustedSellerLinkIcon { display: none; }
 		::-webkit-scrollbar {
     		width: 0;
@@ -87,10 +88,10 @@
         transition: bottom 0.3s ease-in-out;
     }
     #darkOverlay {
-        display: block;
-        visibility: hidden;
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
+      display: block;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
     }
     /* When active, fade in */
     #darkOverlay.active {
