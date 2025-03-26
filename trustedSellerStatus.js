@@ -5,7 +5,8 @@ function updateContentForUser(user) {
   });
   if (user.current?.trustedSellerStatus === 'Trusted') {
   } else if (user.current?.trustedSellerStatus === 'Untrusted') {
-    document.getElementById('trustedSellerIcon').style.opacity = 0.2;
+    document.getElementById('trustedSellerIcon').style.display = 'none';
+    document.getElementById('untrustedSellerIcon').style.display = 'block';
     document.getElementById('trustedSellerHeading').innerText = 'För tillfället har du inte statusen Pålitlig Säljare';
     document.getElementById('trustedSellerBody').innerText = 'Eftersom du är en ny användare så har du inte uppnåt statusen Pålitlig Säljare ännu. Vi utvärderar din säljarstatus efter att du sålt dina första 3 plagg.'
   } else { // Pending
