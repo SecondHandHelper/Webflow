@@ -29,6 +29,7 @@
   };
   
   const heroLive = false;
+  const flatteredLive = false;
 
   // Mobile hero A/B test
   if (heroLive && isMobile && window.location.pathname === '/') {
@@ -85,7 +86,7 @@
   }
 
   // Flattered page A/B test
-  if (isMobile && window.location.pathname === '/flattered') {
+  if (flatteredLive && isMobile && window.location.pathname === '/flattered') {
     let flatteredVariant = params.get(EXPERIMENTS.FLATTERED)?.toLowerCase() || '';
 
     if (!flatteredVariant) {
