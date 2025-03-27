@@ -421,7 +421,7 @@ async function fillForm(itemId) {
       const enhancedFrontImage = data.imagesv2.find(img => img.name === 'enhancedFrontImage');
       const frontImage = data.imagesv2.find(img => img.name === 'frontImage');
       if (frontImage) {
-        showImageV2AndHideSiblings(frontImage, 'frontImage');
+        showImageV2AndHideSiblings(enhancedFrontImage, 'frontImage');
         document.getElementById('frontImage').dataset.enhancedFileUrl = enhancedFrontImage?.url;
       }
       showImageV2AndHideSiblings(data.imagesv2.find(img => img.name === 'extraImage1'), 'brandTagImage');
