@@ -317,6 +317,7 @@ async function privateMain() {
     showInactiveItemsSection(),
   ]);
   loadItemCards(items, user.current);
+  showTrustedSellerWidget(items);
   console.log('user.current', user.current);
 
   if (window.location.href.endsWith('#wardrobe')) {
@@ -810,6 +811,37 @@ function showTrustedSellerBottomSheet() {
   document.getElementById("trustedSellerBottomSheet").classList.add("active");
 }
 
+function showTrustedSellerWidget(items) {
+  if (!user.current?.trustedSellerStatus || user.current?.trustedSellerStatus === 'Pending') {
+    const trustedSellerWidget = document.getElementById('trustedSellerWidget');
+    const hasItems = items?.data?.length > 0;
+    
+    // If no items, move widget after soldByOthersDiv
+    if (!hasItems) {
+      console.log('No items, moving widget after soldByOthersDiv');
+      const soldByOthersDiv = document.getElementById('soldByOthersDiv');
+      soldByOthersDiv.parentNode.insertBefore(trustedSellerWidget, soldByOthersDiv.nextSibling);
+    }
+
+    if (user.current?.approvedSalesCount) {
+      document.getElementById('widgetNumApprovedSales').innerText = Math.max(0, 3 - Number(user.current?.approvedSalesCount));
+    }
+    if (user.current?.approvedSalesCount === 2) {
+      document.getElementById('approvedSalesText').innerText = 'godkänd försäljning kvar';
+    }
+    if (user.current?.approvedSalesCount >= 1) {
+      document.getElementById('widgetFirstSaleBar').style.backgroundColor = '#02AC08';
+    }
+    if (user.current?.approvedSalesCount >= 2) {
+      document.getElementById('widgetSecondSaleBar').style.backgroundColor = '#02AC08';
+    }
+    if (user.current?.approvedSalesCount >= 3) {
+      document.getElementById('widgetThirdSaleBar').style.backgroundColor = '#02AC08';
+    }
+    trustedSellerWidget.style.display = 'block';
+  }
+}
+
 async function hideApprovedSaleInfoBox() {
   document.getElementById('approvedSaleInfoBox').style.display = 'none';
   document.getElementById('darkOverlay').classList.remove('active');
@@ -900,24 +932,6 @@ function onLoadHandler() {
     document.getElementById('darkOverlay').classList.add('active');
   });
   document.getElementById('closeApprovedSaleInfoBox').addEventListener('click', hideApprovedSaleInfoBox);
-  if (!user.current?.trustedSellerStatus || user.current?.trustedSellerStatus === 'Pending') {
-    document.getElementById('trustedSellerWidget').style.display = 'block';
-    if (user.current?.approvedSalesCount) {
-      document.getElementById('widgetNumApprovedSales').innerText = Math.max(0, 3 - Number(user.current?.approvedSalesCount));
-    }
-    if (user.current?.approvedSalesCount === 2) {
-      document.getElementById('approvedSalesText').innerText = 'godkänd försäljning kvar';
-    }
-    if (user.current?.approvedSalesCount >= 1) {
-      document.getElementById('widgetFirstSaleBar').style.backgroundColor = '#02AC08';
-    }
-    if (user.current?.approvedSalesCount >= 2) {
-      document.getElementById('widgetSecondSaleBar').style.backgroundColor = '#02AC08';
-    }
-    if (user.current?.approvedSalesCount >= 3) {
-      document.getElementById('widgetThirdSaleBar').style.backgroundColor = '#02AC08';
-    }
-  }
 }
 if (localStorage.getItem('lwlItemDrafts')) {
   location.href = '/lwl?createDrafts=true';
