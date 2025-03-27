@@ -902,15 +902,20 @@ function onLoadHandler() {
   document.getElementById('closeApprovedSaleInfoBox').addEventListener('click', hideApprovedSaleInfoBox);
   if (!user.current?.trustedSellerStatus || user.current?.trustedSellerStatus === 'Pending') {
     document.getElementById('trustedSellerWidget').style.display = 'block';
-    document.getElementById('widgetNumApprovedSales').innerText = Number(user.current?.approvedSalesCount);
-    if (user.current?.approvedSalesCount === 1) {
-      document.getElementById('approvedSalesText').innerText = 'godkänd försäljning';
+    if (user.current?.approvedSalesCount) {
+      document.getElementById('widgetNumApprovedSales').innerText = Math.max(0, 3 - Number(user.current?.approvedSalesCount));
+    }
+    if (user.current?.approvedSalesCount === 2) {
+      document.getElementById('approvedSalesText').innerText = 'godkänd försäljning kvar';
     }
     if (user.current?.approvedSalesCount >= 1) {
       document.getElementById('widgetFirstSaleBar').style.backgroundColor = '#02AC08';
     }
     if (user.current?.approvedSalesCount >= 2) {
       document.getElementById('widgetSecondSaleBar').style.backgroundColor = '#02AC08';
+    }
+    if (user.current?.approvedSalesCount >= 3) {
+      document.getElementById('widgetThirdSaleBar').style.backgroundColor = '#02AC08';
     }
   }
 }
