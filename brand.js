@@ -92,7 +92,6 @@ async function fetchAndLoadRecentlyAddedItems() {
                             <div class="recent-added-items-subheader">${item.brand}</div>
                             <div class="recent-added-items-subheader-category">${item.category}</div>
                             <div class="recently-added-price">${item.currentPrice} kr</div>
-                            <div class="recently-added-brands-link-text">Mai Shop</div>
                         </div><a/></div>`;
       if (isBrandLook2) {
         itemCardHTML = `<div class="div-block-14-super-big"><a href="${item.url}"/><div class="ratio-box _16-9"><div class="conten-block with-image">
