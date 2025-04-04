@@ -282,8 +282,8 @@
   // FEATURE TOGGLE FUNCTION
   const featureConfig = {
     alpha: { trustedSeller: true, modelDB: true, adjustValuation: true },
-    beta: { trustedSeller: false, modelDB: true, adjustValuation: true },
-    default: { trustedSeller: false, modelDB: true, adjustValuation: true }
+    beta: { trustedSeller: true, modelDB: true, adjustValuation: true },
+    default: { trustedSeller: true, modelDB: true, adjustValuation: true }
   };
 
   function featureIsEnabled(featureName) {

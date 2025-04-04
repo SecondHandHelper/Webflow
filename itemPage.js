@@ -61,13 +61,10 @@ async function loadItem(itemId) {
   }
   if (data.status === "Sold") {
     const notTrustedSeller = user.current.trustedSellerStatus !== 'Trusted';
-    const trustedSellerEnabled = user.current.testUser;
-    
     statusText = `Såld!`;
-    console.log('(trustedSellerEnabled && notTrustedSeller)', (trustedSellerEnabled && notTrustedSeller));
 
     // Happy case
-    if (trustedSellerEnabled && notTrustedSeller){
+    if (notTrustedSeller) {
       text1 = "Du får betalt 5 dagar efter att köparen hämtat ut plagget, och ingen reklamation har skett."
     } else {
       text1 = data.payoutStatus === "Payed" ? "" : (data.payoutType === 'Brand Gift Card' ? "Presentkortet skapas inom en dag" : "Utbetalning kommer via Swish inom en dag");
@@ -78,7 +75,7 @@ async function loadItem(itemId) {
       toShipItemLink.style.display = "flex";
     } else {
       console.log('data.saleApprovalStatus', data.saleApprovalStatus);
-      if (trustedSellerEnabled && notTrustedSeller){
+      if (notTrustedSeller) {
         if (!data.saleApprovalStatus || data.saleApprovalStatus === 'Pending') {
           statusText = 'Inväntar godkännande';
           toTrustedSellerArticleLink.style.display = "flex";
