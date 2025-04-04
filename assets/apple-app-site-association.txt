@@ -30,6 +30,9 @@
             },
             {
                 "/": "/user-management/*"
+            },
+            {
+                "/": "/trusted-seller-status/*"
             }
         ]
       }
