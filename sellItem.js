@@ -236,6 +236,7 @@ async function sellItemMain() {
   initializeModelConfirm();
   initializeMaterialConfirm();
   initializeSizeConfirm();
+  initializeCategoryConfirm();
   initializeSuggestButtonsSaveState();
   initializeClearFormButton();
   initializeSaveFormButton();
@@ -714,7 +715,7 @@ export function rememberUnsavedChanges() {
   delete item.preferences;
   item.acceptPrice = item.acceptPrice && item.acceptPrice > 0 ? item.acceptPrice : null;
   item.originalPrice = item.originalPrice && item.originalPrice > 0 ? item.originalPrice : null;
-  ['itemBrand', 'itemSize', 'itemMaterial', 'itemColor'].forEach(inputName => {
+  ['itemBrand', 'itemSize', 'itemMaterial', 'itemColor', 'itemCategory'].forEach(inputName => {
     const suggestButtons = document.getElementById(inputName).parentNode.querySelector('.suggest-buttons') ||
       document.getElementById(inputName).parentNode.parentNode.querySelector('.suggest-buttons');
     if (suggestButtons?.style?.display === 'block') {
@@ -724,6 +725,10 @@ export function rememberUnsavedChanges() {
   const modelSuggestButtons = document.getElementById('modelSuggestButtons');
   if (modelSuggestButtons?.style?.display === 'flex') {
     item['itemModelConfirm'] = true;
+  }
+  if (document.querySelector('#suggest-categories-div').style.display === 'flex') {
+    item['categorySuggest1'] = document.querySelector('#categorySuggest1').innerText;
+    item['categorySuggest2'] = document.querySelector('#categorySuggest2').innerText;
   }
   if (!isDefaultFormState(item)) {
     localStorage.setItem('newItem', JSON.stringify(item));
@@ -887,6 +892,13 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
     const itemCategory = $('#itemCategory');
     itemCategory.val(data.category);
     itemCategory.trigger('change');
+    showSuggestButtons('itemCategory', restoreSavedState, data.itemCategoryConfirm);
+    if (data.itemCategoryConfirm && data.categorySuggest1) {
+      document.querySelector('#categorySuggest1').innerText = data.categorySuggest1;
+      document.querySelector('#categorySuggest2').innerText = data.categorySuggest2;
+      document.querySelector('#suggest-categories-div').style.display = 'flex';
+      document.querySelector('#suggest-categories-div').style.maxHeight = '200px';
+    }
 
     // Populate radio-buttons
     if (data.sex) {
@@ -1069,42 +1081,65 @@ async function detectAndFillBrandModelMaterialAndSize(imageUrl) {
       // Don't do anything if brand, material, size and model already filled in
       return;
     }
-    const response = await callBackendApi('/api/images/detectInfo', {
-      data: { imageUrl, brand: itemBrand.value, color: itemColor.value },
-      requiresAuth: false,
-    });
-    if (!document.querySelector('#itemBrand').value.length && response.data?.brand) {
-      document.querySelector('#itemBrand').value = response.data.brand;
+    const [detectInfoResponse, detectCategoryResponse] = await Promise.all([
+      callBackendApi('/api/images/detectInfo', {
+        data: { imageUrl, brand: itemBrand.value, color: itemColor.value },
+        requiresAuth: false,
+      }),
+      callBackendApi('/api/images/detectCategory', {
+        data: { imageUrl },
+        requiresAuth: true,
+      })
+    ]);
+    if (!document.querySelector('#itemBrand').value.length && detectInfoResponse.data?.brand) {
+      document.querySelector('#itemBrand').value = detectInfoResponse.data.brand;
       document.querySelector('#itemBrand').setCustomValidity('Bekräfta eller ändra märket');
       document.getElementById('itemBrandLabel').style.display = 'inline-block';
       document.querySelector('#brandSuggestButtons').style.display = 'block';
       document.querySelector('#itemBrand').dispatchEvent(new Event('change'));
-      await displayFindModelDiv(response.data.brand);
+      await displayFindModelDiv(detectInfoResponse.data.brand);
       analytics.track("Element Viewed", { elementID: "brandSuggestButtons" });
     }
-    if (!document.querySelector('#itemMaterial').value.length && response.data?.materials) {
-      document.querySelector('#itemMaterial').value = response.data.materials;
+    if (!document.querySelector('#itemMaterial').value.length && detectInfoResponse.data?.materials) {
+      document.querySelector('#itemMaterial').value = detectInfoResponse.data.materials;
       document.querySelector('#itemMaterial').setCustomValidity('Bekräfta eller ändra materialet');
       document.getElementById('itemMaterialLabel').style.display = 'inline-block';
       document.querySelector('#materialSuggestButtons').style.display = 'block';
       document.querySelector('#itemMaterial').dispatchEvent(new Event('change'));
       analytics.track("Element Viewed", { elementID: "materialSuggestButtons" });
     }
-    if (!document.querySelector('#itemSize').value.length && response.data?.size) {
-      document.querySelector('#itemSize').value = response.data.size;
+    if (!document.querySelector('#itemSize').value.length && detectInfoResponse.data?.size) {
+      document.querySelector('#itemSize').value = detectInfoResponse.data.size;
       document.querySelector('#itemSize').setCustomValidity('Bekräfta eller ändra storlek');
       document.getElementById('itemSizeLabel').style.display = 'inline-block';
       document.querySelector('#sizeSuggestButtons').style.display = 'block';
       document.querySelector('#itemSize').dispatchEvent(new Event('change'));
       analytics.track("Element Viewed", { elementID: "sizeSuggestButtons" });
     }
-    if (!document.getElementById('itemModel').value.length && response.data?.model) {
+    if (!document.getElementById('itemModel').value.length && detectInfoResponse.data?.model) {
       const formBrandValue = document.getElementById('itemBrand').value;
-      if (isBrandPartner(formBrandValue) && response.data.model.brand === formBrandValue) {
-        showModelSuggestion(response.data.model);
+      if (isBrandPartner(formBrandValue) && detectInfoResponse.data.model.brand === formBrandValue) {
+        showModelSuggestion(detectInfoResponse.data.model);
       } else {
-        localStorage.setItem('detectedModel', JSON.stringify(response.data.model));
+        localStorage.setItem('detectedModel', JSON.stringify(detectInfoResponse.data.model));
       }
+    }
+    if (!document.querySelector('#itemCategory').value.length && detectCategoryResponse.data?.categories?.length) {
+      document.querySelector('#itemCategory').value = detectCategoryResponse.data.categoriesSv[0];
+      document.querySelector('#categorySuggest1').innerText = detectCategoryResponse.data.categoriesSv[1];
+      document.querySelector('#categorySuggest2').innerText = detectCategoryResponse.data.categoriesSv[2];
+      document.querySelector('#categorySuggestButtons').style.display = 'block';
+      console.log('detectCategoryResponse.data.categoriesSv', detectCategoryResponse.data.categoriesSv);
+      document.querySelector('#suggest-categories-div').style.maxHeight = '0px';
+      document.querySelector('#suggest-categories-div').style.display = 'flex';
+      document.querySelector('#suggest-categories-div').style.transition = 'max-height 300ms ease-in-out';
+      // Need to trigger reflow before setting max-height for transition to work
+      console.log('trigger reflow');
+      document.querySelector('#suggest-categories-div').offsetHeight;
+      console.log('set max-height');
+      document.querySelector('#suggest-categories-div').style.maxHeight = '200px';
+      document.querySelector('#itemCategory').dispatchEvent(new Event('change'));
+      analytics.track("Element Viewed", { elementID: "categorySuggestButtons" });
     }
   } catch (e) {
     errorHandler.report(e);
@@ -1262,6 +1297,52 @@ function initializeRestoreOnNavigation() {
   });
 }
 
+function initializeCategoryConfirm() {
+  document.getElementById('categorySuggest1').addEventListener('click', () => {
+    document.querySelector('#categorySuggestButtons').style.display = 'none';
+    document.getElementById('itemCategory').value = document.querySelector('#categorySuggest1').innerText;
+    $('#itemCategory').trigger('change');
+    document.querySelector('#suggest-categories-div').style.maxHeight = '0px';
+    setTimeout(() => {
+      document.querySelector('#suggest-categories-div').style.display = 'none';
+    }, 300);
+    document.querySelector('#itemCategory').setCustomValidity('');
+  });
+  document.getElementById('categorySuggest2').addEventListener('click', () => {
+    document.querySelector('#categorySuggestButtons').style.display = 'none';
+    document.querySelector('#itemCategory').setCustomValidity('');
+    document.getElementById('itemCategory').value = document.querySelector('#categorySuggest2').innerText;
+    $('#itemCategory').trigger('change');
+    document.querySelector('#suggest-categories-div').style.maxHeight = '0px';
+    setTimeout(() => {
+      document.querySelector('#suggest-categories-div').style.display = 'none';
+    }, 300);
+  });
+  document.getElementById('categorySuggestMore').addEventListener('click', () => {
+    document.querySelector('#suggest-categories-div').style.display = 'none';
+    document.querySelector('#itemCategory').setCustomValidity('');
+    document.querySelector('#suggest-categories-div').style.maxHeight = '0px';
+    document.querySelector('#categorySuggestButtons').style.display = 'none';
+    document.getElementById('itemCategory').value = '';
+    $('#itemCategory').trigger('change');
+    $('#itemCategory').select2('open');
+  });
+
+  document.getElementById('rejectCategory').addEventListener('click', () => {
+    $('#itemCategory').val('');
+    document.querySelector('#suggest-categories-div').style.maxHeight = '0px';
+    document.querySelector('#suggest-categories-div').style.display = 'none';
+    fieldLabelToggle('itemCategoryLabel');
+    document.querySelector('#itemCategory').setCustomValidity('');
+  });
+  document.getElementById('confirmCategory').addEventListener('click', () => {
+    document.querySelector('#itemCategory').setCustomValidity('');
+    document.querySelector('#suggest-categories-div').style.maxHeight = '0px';
+    document.querySelector('#suggest-categories-div').style.display = 'none';
+  })
+}
+
+
 function initializeSizeConfirm() {
   document.getElementById('rejectSize').addEventListener('click', () => {
     document.querySelector('#itemSize').value = '';
@@ -1326,6 +1407,7 @@ function clearFormFields() {
   const itemCategory = $('#itemCategory');
   itemCategory.val('');
   itemCategory.trigger('change');
+  document.querySelector('#suggest-categories-div').style.display = 'none';
 
   // Populate radio-buttons
   document.getElementById('Man').previousElementSibling.classList.remove("w--redirected-checked");
@@ -1353,6 +1435,7 @@ function initializeDeleteImageListeners() {
   })
   document.getElementById("deleteFrontImageIcon").addEventListener('click', () => {
     document.getElementById("frontImage").required = true;
+    showImageState('frontImgae', 'default-state');
     removeSavedImage('enhancedFrontImage');
   });
   document.getElementById("deleteBrandTagImageIcon").addEventListener('click', () => {
