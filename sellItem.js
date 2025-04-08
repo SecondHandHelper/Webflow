@@ -895,7 +895,12 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
     showSuggestButtons('itemCategory', restoreSavedState, data.itemCategoryConfirm);
     if (data.itemCategoryConfirm && data.categorySuggest1) {
       document.querySelector('#categorySuggest1').innerText = data.categorySuggest1;
-      document.querySelector('#categorySuggest2').innerText = data.categorySuggest2;
+      if (data.categorySuggest2) {
+        document.querySelector('#categorySuggest2').innerText = data.categorySuggest2;
+        document.querySelector('#categorySuggest2').style.display = 'block';
+      } else {
+        document.querySelector('#categorySuggest2').style.display = 'none';
+      }
       document.querySelector('#suggest-categories-div').style.display = 'flex';
       document.querySelector('#suggest-categories-div').style.maxHeight = '200px';
     }
@@ -1124,20 +1129,25 @@ async function detectAndFillBrandModelMaterialAndSize(imageUrl) {
         localStorage.setItem('detectedModel', JSON.stringify(detectInfoResponse.data.model));
       }
     }
-    if (!document.querySelector('#itemCategory').value.length && detectCategoryResponse.data?.categories?.length) {
+    console.log('detectCategoryResponse.data.categoriesSv', detectCategoryResponse.data.categoriesSv);
+    if (!document.querySelector('#itemCategory').value.length && detectCategoryResponse.data?.categoriesSv?.length) {
       document.querySelector('#itemCategory').value = detectCategoryResponse.data.categoriesSv[0];
-      document.querySelector('#categorySuggest1').innerText = detectCategoryResponse.data.categoriesSv[1];
-      document.querySelector('#categorySuggest2').innerText = detectCategoryResponse.data.categoriesSv[2];
       document.querySelector('#categorySuggestButtons').style.display = 'block';
-      console.log('detectCategoryResponse.data.categoriesSv', detectCategoryResponse.data.categoriesSv);
-      document.querySelector('#suggest-categories-div').style.maxHeight = '0px';
-      document.querySelector('#suggest-categories-div').style.display = 'flex';
-      document.querySelector('#suggest-categories-div').style.transition = 'max-height 300ms ease-in-out';
-      // Need to trigger reflow before setting max-height for transition to work
-      console.log('trigger reflow');
-      document.querySelector('#suggest-categories-div').offsetHeight;
-      console.log('set max-height');
-      document.querySelector('#suggest-categories-div').style.maxHeight = '200px';
+      if (detectCategoryResponse.data.categoriesSv.length > 1) {
+        document.querySelector('#categorySuggest1').innerText = detectCategoryResponse.data.categoriesSv[1];
+        document.querySelector('#suggest-categories-div').style.maxHeight = '0px';
+        document.querySelector('#suggest-categories-div').style.display = 'flex';
+        document.querySelector('#suggest-categories-div').style.transition = 'max-height 300ms ease-in-out';
+        // Need to trigger reflow before setting max-height for transition to work
+        document.querySelector('#suggest-categories-div').offsetHeight;
+        document.querySelector('#suggest-categories-div').style.maxHeight = '200px';
+      }
+      if (detectCategoryResponse.data.categoriesSv.length > 2) {
+        document.querySelector('#categorySuggest2').innerText = detectCategoryResponse.data.categoriesSv[2];
+        document.querySelector('#categorySuggest2').style.display = 'block';
+      } else {
+        document.querySelector('#categorySuggest2').style.display = 'none';
+      }
       document.querySelector('#itemCategory').dispatchEvent(new Event('change'));
       analytics.track("Element Viewed", { elementID: "categorySuggestButtons" });
     }
@@ -1330,10 +1340,12 @@ function initializeCategoryConfirm() {
 
   document.getElementById('rejectCategory').addEventListener('click', () => {
     $('#itemCategory').val('');
+    $('#itemCategory').trigger('change');
     document.querySelector('#suggest-categories-div').style.maxHeight = '0px';
     document.querySelector('#suggest-categories-div').style.display = 'none';
     fieldLabelToggle('itemCategoryLabel');
     document.querySelector('#itemCategory').setCustomValidity('');
+    document.querySelector('#categorySuggestButtons').style.display = 'none';
   });
   document.getElementById('confirmCategory').addEventListener('click', () => {
     document.querySelector('#itemCategory').setCustomValidity('');

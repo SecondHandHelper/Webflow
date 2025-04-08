@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.3.3';
+  const JS_VERSION = 'v1.3.4';
   errorHandler = new StackdriverErrorReporter();
   const environment = location.href.includes('maiapp.se') ? 'web-prod' : 'web-test';
   errorHandler.start({
