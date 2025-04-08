@@ -74,6 +74,7 @@ followUpSubmitButton.addEventListener("click", async function () {
     // In the app!
     const message = JSON.stringify({ type: 'nps-submitted', data: { score: npsScore } });
     window.ReactNativeWebView.postMessage(message);
+    if (authUser.current) { location.href = "/private"; }
     return;
   }
   // Show thank you div
