@@ -12,7 +12,8 @@ import {
   showLoadingIcon,
   uploadImageAndShowPreview,
   showImageError,
-  hideImageError
+  hideImageError,
+  colorMapping
 } from "./sellItemHelpers";
 import QRCode from "qrcode";
 import { formatPersonalId, getFormAddressFields, isValidSwedishSsn, setFormAddressFields } from "./general";
@@ -976,32 +977,6 @@ function initializeSelectColor() {
   };
 }
 
-const apiColorMapping = {
-  "black": "Black",
-  "white": "White",
-  "gray": "Grey",
-  "blue": "Blue",
-  "dark_blue": "Navy",
-  "multicolor/colorful": 'Multicolour',
-  "red": "Red",
-  "pink": "Pink",
-  "brown": "Brown",
-  "beige": "Beige",
-  "light_blue": "Blue",
-  "green": "Green",
-  "silver": "Silver",
-  "purple": "Purple",
-  "maroon": "Burgundy",
-  "gold": "Gold",
-  "orange": "Orange",
-  "yellow": "Yellow",
-  "teal": "Turquoise",
-  "olive": "Green",
-  "cyan": "Turquoise",
-  "magenta": "Pink",
-  "mustard": "Yellow"
-};
-
 async function frontImageChangeHandler(event) {
   let input = this.files[0];
   if (input) {
@@ -1162,19 +1137,35 @@ async function detectAndFillColor(imageUrl) {
     return;
   }
   try {
-    const response = await callBackendApi('/api/images/detectColor', { data: { imageUrl }, requiresAuth: false });
+    const response = await callBackendApi('/api/images/detectColor2', { data: { imageUrl }, requiresAuth: true });
     if (!response.data?.colors || !response.data.colors.length) {
       console.log("Unable to detect product color");
       return;
     }
-    if (response.data.colors.length > 2) {
-      document.querySelector('#itemColor').value = 'Multicolour';
-    } else if (apiColorMapping[response.data.colors?.[0]]) {
-      document.querySelector('#itemColor').value = apiColorMapping[response.data.colors?.[0]];
+    console.log("response.data.colors", response.data.colors);
+    if (!document.querySelector('#itemColor').value.length && response.data.colors?.[0]) {
+      document.querySelector('#itemColor').value = response.data.colors?.[0];
+      // TODO: Translate colors to swedish before setting colorSuggest1 & colorSuggest2
+      if (response.data.colors.length > 1) {
+        document.querySelector('#colorSuggest1').innerText = colorMapping[response.data.colors[1]];
+        document.querySelector('#suggest-colors-div').style.maxHeight = '0px';
+        document.querySelector('#suggest-colors-div').style.display = 'flex';
+        document.querySelector('#suggest-colors-div').style.transition = 'max-height 300ms ease-in-out';
+        // Need to trigger reflow before setting max-height for transition to work
+        document.querySelector('#suggest-colors-div').offsetHeight;
+        document.querySelector('#suggest-colors-div').style.maxHeight = '200px';
+      }
+      if (response.data.colors.length > 2) {
+        document.querySelector('#colorSuggest2').innerText = colorMapping[response.data.colors[2]];
+        document.querySelector('#colorSuggest2').style.display = 'block';
+      } else {
+        document.querySelector('#categorySuggest2').style.display = 'none';
+      }
     } else {
       console.log("Unable to set color from", response.data.colors?.[0]);
       return;
     }
+
     document.querySelector('#itemColor').setCustomValidity('Bekräfta eller ändra färgen');
     document.querySelector('#colorSuggestButtons').style.display = 'block';
     document.querySelector('#itemColor').dispatchEvent(new Event('change'));
@@ -1380,6 +1371,39 @@ function initializeSuggestButtonsSaveState() {
 }
 
 function initializeColorConfirm() {
+  document.getElementById('colorSuggest1').addEventListener('click', () => {
+    document.querySelector('#colorSuggestButtons').style.display = 'none';
+    const selectEntry = Object.entries(colorMapping).find(([key, value]) =>
+      value == document.querySelector('#colorSuggest1').innerText
+    );
+    document.getElementById('itemColor').value = selectEntry[0];
+    document.querySelector('#suggest-colors-div').style.maxHeight = '0px';
+    setTimeout(() => {
+      document.querySelector('#suggest-colors-div').style.display = 'none';
+    }, 300);
+    document.querySelector('#itemColor').setCustomValidity('');
+  });
+  document.getElementById('colorSuggest2').addEventListener('click', () => {
+    document.querySelector('#colorSuggestButtons').style.display = 'none';
+    document.querySelector('#itemColor').setCustomValidity('');
+    const selectEntry = Object.entries(colorMapping).find(([key, value]) =>
+       value == document.querySelector('#colorSuggest2').innerText
+    );
+    document.getElementById('itemColor').value = selectEntry[0];
+    document.querySelector('#suggest-colors-div').style.maxHeight = '0px';
+    setTimeout(() => {
+      document.querySelector('#suggest-colors-div').style.display = 'none';
+    }, 300);
+  });
+  document.getElementById('colorSuggestMore').addEventListener('click', () => {
+    document.querySelector('#suggest-colors-div').style.display = 'none';
+    document.querySelector('#itemColor').setCustomValidity('');
+    document.querySelector('#suggest-colors-div').style.maxHeight = '0px';
+    document.querySelector('#colorSuggestButtons').style.display = 'none';
+    document.getElementById('itemColor').value = '';
+    document.getElementById('itemColor').click();
+  });
+
   document.getElementById('rejectColor').addEventListener('click', () => {
     document.querySelector('#itemColor').value = '';
     document.querySelector('#colorSuggestButtons').style.display = 'none';
