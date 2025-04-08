@@ -230,7 +230,7 @@
   const isBrandPartner = (brandName) => {
     return Object.values(brandPartners)
       .some(partner =>
-        partner.name.toUpperCase() === brandName.toUpperCase() &&
+        partner.name.toUpperCase() === brandName?.toUpperCase() &&
         partner.featureEnabled === true
       );
   };
