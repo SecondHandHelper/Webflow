@@ -73,15 +73,15 @@ followUpSubmitButton.addEventListener("click", async function () {
   if (window.ReactNativeWebView?.postMessage && followupWasSupplied && npsScore && npsScore >= 10) {
     // In the app!
     const message = JSON.stringify({ type: 'nps-submitted', data: { score: npsScore } });
+    thankYouForFeedbackDiv.style.display = 'block';
+    thankYouInviteFriendsDiv.style.display = 'none';
+    analytics.track("Element Viewed", { elementID: "askForAppReview" });
     window.ReactNativeWebView.postMessage(message);
-    if (authUser.current) { location.href = "/private"; }
-    return;
   }
-  // Show thank you div
-  if (user.current?.referralData?.referralCode && npsScore >= 9 && npsScore <= 10){
+  else if (user.current?.referralData?.referralCode && npsScore >= 9 && npsScore <= 10){
     referralCodeText.innerHTML = user.current.referralData.referralCode;
-    thankYouNoPromotorDiv.style.display = 'none';
-    thankYouPromotorDiv.style.display = 'block';
+    thankYouForFeedbackDiv.style.display = 'none';
+    thankYouInviteFriendsDiv.style.display = 'block';
     analytics.track("Element Viewed", { elementID: "thankYouPromotorDiv" });
   }
   triggerShowThankYou.click();
