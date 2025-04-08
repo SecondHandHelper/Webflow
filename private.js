@@ -120,7 +120,7 @@ function showInviteToast(items) {
   let nowDate = new Date();
   let daysSinceLatestSold = 10;
   let soldItemsCount = 0;
-  let oneSoldNotSentItemExist = false;
+  let atLeastOneShippedItem = false;
 
 
   // Last viewed
@@ -145,14 +145,14 @@ function showInviteToast(items) {
           let daysDiff = Math.floor(timeDifference / (1000 * 3600 * 24));
           if (daysDiff <= daysSinceLatestSold) { daysSinceLatestSold = daysDiff; }
         }
-        if (shippingStatus !== 'Sent') {
-          oneSoldNotSentItemExist = true;
+        if (shippingStatus === 'Sent') {
+          atLeastOneShippedItem = true;
         }
       }
     });
   }
   if (!user.current?.referralData?.referralCode) { return }
-  if ((!viewedToastBefore || daysSinceToastLastViewed > 45) && (daysSinceLatestSold <= 7 || (soldItemsCount >= 3 && daysSinceLatestSold <= 45))) {
+  if (atLeastOneShippedItem && (!viewedToastBefore || daysSinceToastLastViewed > 45) && (daysSinceLatestSold <= 14 || (soldItemsCount >= 3 && daysSinceLatestSold <= 45))) {
     referralCodeText.innerHTML = user.current.referralData.referralCode;
     triggerInviteToastOpen.click();
 
