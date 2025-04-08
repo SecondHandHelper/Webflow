@@ -48,7 +48,12 @@ async function addFollowUp() {
   const answer = followUpAnswer.value;
 
   // Update latest NPS document with question and answer
-  if (answer) { await db.collection('nps').doc(npsId).update({ followUpQuestion: question, followUpAnswer: answer }); }
+  if (answer) {
+    await db.collection('nps').doc(npsId).update({ followUpQuestion: question, followUpAnswer: answer });
+    return true;
+  }
+
+  return false;
 }
 
 user.whenSet(async () => {
@@ -64,7 +69,13 @@ user.whenSet(async () => {
 
 npsSubmitButton.addEventListener("click", addNpsScore);
 followUpSubmitButton.addEventListener("click", async function () {
-  await addFollowUp();
+  const followupWasSupplied = await addFollowUp();
+  if (window.ReactNativeWebView?.postMessage && followupWasSupplied && npsScore && npsScore >= 10) {
+    // In the app!
+    const message = JSON.stringify({ type: 'nps-submitted', data: { score: npsScore } });
+    window.ReactNativeWebView.postMessage(message);
+    return;
+  }
   // Show thank you div
   if (user.current?.referralData?.referralCode && npsScore >= 9 && npsScore <= 10){
     referralCodeText.innerHTML = user.current.referralData.referralCode;
