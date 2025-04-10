@@ -621,7 +621,10 @@ function initializeInputEventListeners() {
   itemAge.addEventListener('input', fieldLabelToggle('itemAgeLabel'));
   itemCondition.addEventListener('input', fieldLabelToggle('itemConditionLabel'));
   itemColor.addEventListener('change', fieldLabelToggle('itemColorLabel'));
-  itemColor.addEventListener('input', clearConfirmButtonValidity);
+  itemColor.addEventListener('input', async (event) => {
+    clearConfirmButtonValidity(event);
+    clearSuggestPills();
+  });
   itemUserComment.addEventListener('input', fieldLabelToggle('userCommentLabel'));
 
   document.getElementById('saveItemDraftButton').addEventListener('click', async () => {
@@ -727,9 +730,17 @@ export function rememberUnsavedChanges() {
   if (modelSuggestButtons?.style?.display === 'flex') {
     item['itemModelConfirm'] = true;
   }
-  if (document.querySelector('#suggest-categories-div').style.display === 'flex') {
+  if (document.querySelector('#suggest-categories-div').style.display !== 'none') {
     item['categorySuggest1'] = document.querySelector('#categorySuggest1').innerText;
-    item['categorySuggest2'] = document.querySelector('#categorySuggest2').innerText;
+    if (document.querySelector('#categorySuggest2').style.display !== 'none') {
+      item['categorySuggest2'] = document.querySelector('#categorySuggest2').innerText;
+    }
+  }
+  if (document.querySelector('#suggest-colors-div').style.display !== 'none') {
+    item['colorSuggest1'] = document.querySelector('#colorSuggest1').innerText;
+    if (document.querySelector('#colorSuggest2').style.display !== 'none') {
+      item['colorSuggest2'] = document.querySelector('#colorSuggest2').innerText;
+    }
   }
   if (!isDefaultFormState(item)) {
     localStorage.setItem('newItem', JSON.stringify(item));
@@ -887,6 +898,18 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
     selectFieldValue(itemAge, data.age);
     selectFieldValue(itemColor, data.color || atItem?.color);
     showSuggestButtons('itemColor', restoreSavedState, data.itemColorConfirm);
+    if (data.itemColorConfirm && data.colorSuggest1) {
+      document.querySelector('#colorSuggest1').innerText = data.colorSuggest1;
+      if (data.colorSuggest2) {
+        document.querySelector('#colorSuggest2').innerText = data.colorSuggest2;
+        document.querySelector('#colorSuggest2').style.display = 'flex';
+      } else {
+        document.querySelector('#colorSuggest2').style.display = 'none';
+      }
+      document.querySelector('#suggest-colors-div').style.display = 'flex';
+      document.querySelector('#suggest-colors-div').style.maxHeight = '200px';
+    }
+    
     if (itemCondition.selectedIndex >= 0 && itemCondition.options[itemCondition.selectedIndex].text === "Använd, tecken på slitage") {
       defectInfoDiv.style.display = 'block';
     }
@@ -896,9 +919,10 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
     showSuggestButtons('itemCategory', restoreSavedState, data.itemCategoryConfirm);
     if (data.itemCategoryConfirm && data.categorySuggest1) {
       document.querySelector('#categorySuggest1').innerText = data.categorySuggest1;
+      console.log('data.categorySuggest2', data.categorySuggest2);
       if (data.categorySuggest2) {
         document.querySelector('#categorySuggest2').innerText = data.categorySuggest2;
-        document.querySelector('#categorySuggest2').style.display = 'block';
+        document.querySelector('#categorySuggest2').style.display = 'flex';
       } else {
         document.querySelector('#categorySuggest2').style.display = 'none';
       }
@@ -1054,6 +1078,13 @@ function clearConfirmButtonValidity(event) {
   suggestButtons.style.display = 'none';
 }
 
+function clearSuggestPills() {
+  document.querySelector('#itemColor').setCustomValidity('');
+  document.querySelector('#suggest-colors-div').style.maxHeight = '0px';
+  document.querySelector('#suggest-colors-div').style.display = 'none';
+  document.querySelector('#colorSuggestButtons').style.display = 'none';
+}
+
 async function detectAndFillBrandModelMaterialAndSize(imageUrl) {
   try {
     if (document.querySelector('#itemBrand').value.length && document.querySelector('#itemMaterial').value.length
@@ -1119,7 +1150,7 @@ async function detectAndFillBrandModelMaterialAndSize(imageUrl) {
       }
       if (detectCategoryResponse.data.categoriesSv.length > 2) {
         document.querySelector('#categorySuggest2').innerText = detectCategoryResponse.data.categoriesSv[2];
-        document.querySelector('#categorySuggest2').style.display = 'block';
+        document.querySelector('#categorySuggest2').style.display = 'flex';
       } else {
         document.querySelector('#categorySuggest2').style.display = 'none';
       }
@@ -1157,9 +1188,9 @@ async function detectAndFillColor(imageUrl) {
       }
       if (response.data.colors.length > 2) {
         document.querySelector('#colorSuggest2').innerText = colorMapping[response.data.colors[2]];
-        document.querySelector('#colorSuggest2').style.display = 'block';
+        document.querySelector('#colorSuggest2').style.display = 'flex';
       } else {
-        document.querySelector('#categorySuggest2').style.display = 'none';
+        document.querySelector('#colorSuggest2').style.display = 'none';
       }
     } else {
       console.log("Unable to set color from", response.data.colors?.[0]);
@@ -1320,15 +1351,8 @@ function initializeCategoryConfirm() {
     }, 300);
   });
   document.getElementById('categorySuggestMore').addEventListener('click', () => {
-    document.querySelector('#suggest-categories-div').style.display = 'none';
-    document.querySelector('#itemCategory').setCustomValidity('');
-    document.querySelector('#suggest-categories-div').style.maxHeight = '0px';
-    document.querySelector('#categorySuggestButtons').style.display = 'none';
-    document.getElementById('itemCategory').value = '';
-    $('#itemCategory').trigger('change');
     $('#itemCategory').select2('open');
   });
-
   document.getElementById('rejectCategory').addEventListener('click', () => {
     $('#itemCategory').val('');
     $('#itemCategory').trigger('change');
@@ -1343,6 +1367,12 @@ function initializeCategoryConfirm() {
     document.querySelector('#suggest-categories-div').style.maxHeight = '0px';
     document.querySelector('#suggest-categories-div').style.display = 'none';
   })
+  $('#itemCategory').on('select2:select', () => {
+    document.querySelector('#itemCategory').setCustomValidity('');
+    document.querySelector('#suggest-categories-div').style.maxHeight = '0px';
+    document.querySelector('#suggest-categories-div').style.display = 'none';
+    document.querySelector('#categorySuggestButtons').style.display = 'none';
+  });
 }
 
 
@@ -1395,15 +1425,6 @@ function initializeColorConfirm() {
       document.querySelector('#suggest-colors-div').style.display = 'none';
     }, 300);
   });
-  document.getElementById('colorSuggestMore').addEventListener('click', () => {
-    document.querySelector('#suggest-colors-div').style.display = 'none';
-    document.querySelector('#itemColor').setCustomValidity('');
-    document.querySelector('#suggest-colors-div').style.maxHeight = '0px';
-    document.querySelector('#colorSuggestButtons').style.display = 'none';
-    document.getElementById('itemColor').value = '';
-    document.getElementById('itemColor').click();
-  });
-
   document.getElementById('rejectColor').addEventListener('click', () => {
     document.querySelector('#itemColor').value = '';
     document.querySelector('#colorSuggestButtons').style.display = 'none';
