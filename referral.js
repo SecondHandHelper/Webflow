@@ -8,6 +8,12 @@ async function main() {
       return location.href = '/private';
     }
   }
+  const referralCode = user.current?.referralData?.referralCode;
+  document.getElementById('referralCode').innerText = referralCode || '';
+  if (user.current?.referralData?.referredUsers?.length > 0) {
+    document.getElementById('topStatsLoadingIcon').style.display = 'block';
+  }
+
   document.getElementById('referralCode').innerText = user.current.referralData.referralCode;
   if (user.current?.referralData?.referredUsers?.length > 0) {
     //TOP STATS
@@ -59,12 +65,6 @@ function statusText(status) {
 
 shareReferralLinkButton.addEventListener('click', shareCode);
 document.getElementById('referralCode').innerText = '';
-const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
-const referralCode = sessionUser?.referralData?.referralCode;
-document.getElementById('referralCode').innerText = referralCode || '';
-if (sessionUser?.referralData?.referredUsers?.length > 0) {
-  document.getElementById('topStatsLoadingIcon').style.display = 'block';
-}
 var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 if (isMobile) {
   user.whenSet(main);

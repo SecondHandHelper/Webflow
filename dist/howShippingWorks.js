@@ -1,2 +1,21 @@
-!function(e,n,r,o,t,i,u){var f="undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:"undefined"!=typeof window?window:"undefined"!=typeof global?global:{},d="function"==typeof f[o]&&f[o],l=d.i||{},a=d.cache||{},c="undefined"!=typeof module&&"function"==typeof module.require&&module.require.bind(module);function s(n,r){if(!a[n]){if(!e[n]){var t="function"==typeof f[o]&&f[o];if(!r&&t)return t(n,!0);if(d)return d(n,!0);if(c&&"string"==typeof n)return c(n);var i=Error("Cannot find module '"+n+"'");throw i.code="MODULE_NOT_FOUND",i}l.resolve=function(r){var o=e[n][1][r];return null!=o?o:r},l.cache={};var u=a[n]=new s.Module(n);e[n][0].call(u.exports,l,u,u.exports,f)}return a[n].exports;function l(e){var n=l.resolve(e);return!1===n?{}:s(n)}}s.isParcelRequire=!0,s.Module=function(e){this.id=e,this.bundle=s,this.require=c,this.exports={}},s.modules=e,s.cache=a,s.parent=d,s.distDir=void 0,s.publicUrl=void 0,s.devServer=void 0,s.i=l,s.register=function(n,r){e[n]=[function(e,n){n.exports=r},{}]},Object.defineProperty(s,"root",{get:function(){return f[o]}}),f[o]=s;for(var p=0;p<n.length;p++)s(n[p]);if(r){var y=s(r);"object"==typeof exports&&"undefined"!=typeof module?module.exports=y:"function"==typeof define&&define.amd&&define(function(){return y})}}({kMCfr:[function(e,n,r,o){!async function(){if(authUser.current){let e=await callBackendApi("/api/bags/orders/allowed",{requiresAuth:!0});console.log("maxBags",e),e?.data?.maxOrderBags>0&&(document.getElementById("orderBagsButton").style.display="flex")}}()},{}]},["kMCfr"],"kMCfr","parcelRequire81ca");
+!// modules are defined as an array
+// [ module function, map of requires ]
+//
+// map of requires is short require name -> numeric require
+//
+// anything defined in a previous bundle is accessed via the
+// orig method which is the require for previous bundles
+function(e,n,t,o,r){/* eslint-disable no-undef */var i="undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:"undefined"!=typeof window?window:"undefined"!=typeof global?global:{},f="function"==typeof i[o]&&i[o],u=f.cache||{},d="undefined"!=typeof module&&"function"==typeof module.require&&module.require.bind(module);function l(n,t){if(!u[n]){if(!e[n]){// if we cannot find the module within our internal map or
+// cache jump to the current global require ie. the last bundle
+// that was added to the page.
+var r="function"==typeof i[o]&&i[o];if(!t&&r)return r(n,!0);// If there are other bundles on this page the require from the
+// previous one is saved to 'previousRequire'. Repeat this as
+// many times as there are bundles until the module is found or
+// we exhaust the require chain.
+if(f)return f(n,!0);// Try the node require function if it exists.
+if(d&&"string"==typeof n)return d(n);var a=Error("Cannot find module '"+n+"'");throw a.code="MODULE_NOT_FOUND",a}s.resolve=function(t){var o=e[n][1][t];return null!=o?o:t},s.cache={};var c=u[n]=new l.Module(n);e[n][0].call(c.exports,s,c,c.exports,this)}return u[n].exports;function s(e){var n=s.resolve(e);return!1===n?{}:l(n)}}l.isParcelRequire=!0,l.Module=function(e){this.id=e,this.bundle=l,this.exports={}},l.modules=e,l.cache=u,l.parent=f,l.register=function(n,t){e[n]=[function(e,n){n.exports=t},{}]},Object.defineProperty(l,"root",{get:function(){return i[o]}}),i[o]=l;for(var a=0;a<n.length;a++)l(n[a]);if(t){// Expose entry point to Node, AMD or browser globals
+// Based on https://github.com/ForbesLindesay/umd/blob/master/template.js
+var c=l(t);// CommonJS
+"object"==typeof exports&&"undefined"!=typeof module?module.exports=c:"function"==typeof define&&define.amd?define(function(){return c}):r&&(this[r]=c)}}({kMCfr:[function(e,n,t){!async function(){if(authUser.current){let e=await callBackendApi("/api/bags/orders/allowed",{requiresAuth:!0});console.log("maxBags",e),e?.data?.maxOrderBags>0&&(document.getElementById("orderBagsButton").style.display="flex")}}()},{}]},["kMCfr"],"kMCfr","parcelRequire81ca")//# sourceMappingURL=howShippingWorks.js.map
+;
 //# sourceMappingURL=howShippingWorks.js.map
