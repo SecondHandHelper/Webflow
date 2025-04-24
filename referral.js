@@ -63,12 +63,13 @@ function statusText(status) {
   }[status];
 }
 
+const params = getParamsObject();
 shareReferralLinkButton.addEventListener('click', shareCode);
 document.getElementById('referralCode').innerText = '';
 var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 if (isMobile) {
   user.whenSet(main);
-  if (!sessionUser) {
+  if (!user.current && !params.has('app')) {
     location.href = '/sign-in'
   }
 } else {
