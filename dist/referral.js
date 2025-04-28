@@ -27,7 +27,7 @@ if(10!==(e=e.replace(/\D/g,"")// strip out all but digits
 .reverse()// reverse order for Luhn
 .slice(0,10)).length)return!1;let t=e.map(e=>Number(e)).reduce((e,t,r)=>(r%2&&(t*=2),t>9&&(t-=9),e+t));return 0==t%10}function l(e){let t=e.replace("-","");return(12!==t.length&&("19"!==t.substring(0,2)||"20"!==t.substring(0,2))&&(t=99>=Number(t.substring(0,2))&&Number(t.substring(0,2))>25?"19"+t:"20"+t),12===t.length)?t:null}function u(e){if(e.images){let t=e.images;return t.modelImageSmall||t.modelImage||t.coverImageSmall||t.coverImage||t.enhancedFrontImageSmall||t.enhancedFrontImage||t.frontImageSmall||t.frontImage}if(e.imagesv2)for(let t of["modelImage","enhancedFrontImage","frontImage"]){let r=e.imagesv2.find(e=>e.name===t);if(r){if(r.versions.small)return r.versions.small;if(r.versions.medium)return r.versions.medium;if(r.versions.large)return r.versions.large;if(r.url)return r.url}}return null}function d(){let e=user.current.referralData.referralCode,t=`Hej! F\xf6lj min personliga l\xe4nk s\xe5 s\xe4ljer Mai ditt f\xf6rsta plagg kostnadsfritt! Mai sk\xf6ter f\xf6rs\xe4ljningen av dina kl\xe4der, inklusive v\xe4rdering, l\xe4gger ut p\xe5 flera plattformar samtidigt, har kontakten med k\xf6pare och ordnar med frakt n\xe4r det blir s\xe5lt. Man f\xe5r sj\xe4lv beh\xe5lla 80% av vinsten, och blir det inte s\xe5lt kostar det ingenting.
 
-Om du registrerar dig med min kod (f\xf6lj l\xe4nken) och provar s\xe4lja ett plagg inom 7 dagar f\xe5r du beh\xe5lla 100% av vinsten f\xf6r det f\xf6rsta plagget (ist\xe4llet f\xf6r 80%). Min kod: ${e}`;if(navigator.share)navigator.share({text:t,url:`https://maiapp.se/?invite=${e}`}).then(()=>{console.log("Thanks for sharing!")}).catch(e=>{console.error(e),errorHandler.report(e)});else{console.log("Browser doesn't support navigator.share => Copy to clipboard!");let r=t+"\n"+`https://maiapp.se/?invite=${e}`;navigator.clipboard.writeText(r),linkCopiedBanner.style.display="flex",setTimeout(function(){linkCopiedBanner.style.display="none"},1500)}}function c(e){let t=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;t?(document.getElementById("continueOnWebBottomSheet").href=window.location.origin+e,document.getElementById("darkOverlay").classList.add("active"),document.getElementById("channelBottomSheet").classList.add("active")):window.location.href=e}function f(){document.getElementById("darkOverlay").classList.remove("active"),document.getElementById("channelBottomSheet").classList.remove("active")}n.defineInteropFlag(r),n.export(r,"signOut",()=>o),n.export(r,"setFormAddressFields",()=>i),n.export(r,"getFormAddressFields",()=>a),// Validate Swedish Social Security Number (personnummer) using checksum
+Om du registrerar dig med min kod (f\xf6lj l\xe4nken) och provar s\xe4lja ett plagg inom 7 dagar f\xe5r du beh\xe5lla 100% av vinsten f\xf6r det f\xf6rsta plagget (ist\xe4llet f\xf6r 80%). Min kod: ${e}`;if(navigator.share)navigator.share({text:t,url:`https://invite.maiapp.se/?invite=${e}`}).then(()=>{console.log("Thanks for sharing!")}).catch(e=>{console.error(e),errorHandler.report(e)});else{console.log("Browser doesn't support navigator.share => Copy to clipboard!");let r=t+"\n"+`https://invite.maiapp.se/?invite=${e}`;navigator.clipboard.writeText(r),linkCopiedBanner.style.display="flex",setTimeout(function(){linkCopiedBanner.style.display="none"},1500)}}function c(e){let t=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;t?(document.getElementById("continueOnWebBottomSheet").href=window.location.origin+e,document.getElementById("darkOverlay").classList.add("active"),document.getElementById("channelBottomSheet").classList.add("active")):window.location.href=e}function f(){document.getElementById("darkOverlay").classList.remove("active"),document.getElementById("channelBottomSheet").classList.remove("active")}n.defineInteropFlag(r),n.export(r,"signOut",()=>o),n.export(r,"setFormAddressFields",()=>i),n.export(r,"getFormAddressFields",()=>a),// Validate Swedish Social Security Number (personnummer) using checksum
 //   Note: this is somewhat simplified because it does not take into account
 //   that the date of the number is valid (e.g. "000000-0000" does return as true)
 n.export(r,"isValidSwedishSsn",()=>s),n.export(r,"formatPersonalId",()=>l),n.export(r,"itemCoverImage",()=>u),n.export(r,"shareCode",()=>d),// Channel bottom sheet
@@ -66,7 +66,7 @@ n=f.getBestVersionForData(t,r)}// Build optimized segments
 h=m.fromString(e,n||40)}else throw Error("Invalid data");// Get the min version that can contain data
 let y=f.getBestVersionForData(h,r);// If no version is found, data cannot be stored
 if(!y)throw Error("The amount of data is too big to be stored in a QR Code");// If not specified, use min version as default
-if(t){if(t<y)throw Error("\nThe chosen QR Code version cannot contain this amount of data.\nMinimum version required to store current data is: "+y+".\n")}else t=y;let E=/**
+if(t){if(t<y)throw Error("\nThe chosen QR Code version cannot contain this amount of data.\nMinimum version required to store current data is: "+y+".\n")}else t=y;let v=/**
  * Create encoded codewords from data input
  *
  * @param  {Number}   version              QR Code version
@@ -101,14 +101,14 @@ let u=(l-o.getLengthInBits())/8;for(let e=0;e<u;e++)o.put(e%2?17:236,8);return(/
  * @param  {ErrorCorrectionLevel} errorCorrectionLevel Error correction level
  * @return {Uint8Array}                     Buffer containing encoded codewords
  */function(e,t,r){let o,i;// Total codewords for this QR code version (Data + Error correction)
-let a=n.getSymbolTotalCodewords(t),s=d.getTotalCodewordsCount(t,r),l=a-s,u=d.getBlocksCount(t,r),f=a%u,h=u-f,g=Math.floor(a/u),m=Math.floor(l/u),p=m+1,y=g-m,E=new c(y),v=0,b=Array(u),I=Array(u),B=0,C=new Uint8Array(e.buffer);// Divide the buffer into the required number of blocks
+let a=n.getSymbolTotalCodewords(t),s=d.getTotalCodewordsCount(t,r),l=a-s,u=d.getBlocksCount(t,r),f=a%u,h=u-f,g=Math.floor(a/u),m=Math.floor(l/u),p=m+1,y=g-m,v=new c(y),E=0,b=Array(u),I=Array(u),B=0,C=new Uint8Array(e.buffer);// Divide the buffer into the required number of blocks
 for(let e=0;e<u;e++){let t=e<h?m:p;// extract a block of data from buffer
-b[e]=C.slice(v,v+t),// Calculate EC codewords for this data block
-I[e]=E.encode(b[e]),v+=t,B=Math.max(B,t)}// Create final data
+b[e]=C.slice(E,E+t),// Calculate EC codewords for this data block
+I[e]=v.encode(b[e]),E+=t,B=Math.max(B,t)}// Create final data
 // Interleave the data and error correction codewords from each block
 let w=new Uint8Array(a),A=0;// Add data codewords
 for(o=0;o<B;o++)for(i=0;i<u;i++)o<b[i].length&&(w[A++]=b[i][o]);// Apped EC codewords
-for(o=0;o<y;o++)for(i=0;i<u;i++)w[A++]=I[i][o];return w}(o,e,t))}(t,r,h),v=n.getSymbolSize(t),b=new a(v);return(// Add function modules
+for(o=0;o<y;o++)for(i=0;i<u;i++)w[A++]=I[i][o];return w}(o,e,t))}(t,r,h),E=n.getSymbolSize(t),b=new a(E);return(// Add function modules
 /**
  * QRCode for JavaScript
  *
@@ -166,7 +166,7 @@ p(b,r,0),t>=7&&/**
  *
  * @param  {BitMatrix}  matrix Modules matrix
  * @param  {Uint8Array} data   Data codewords
- */function(e,t){let r=e.size,n=-1,o=r-1,i=7,a=0;for(let s=r-1;s>0;s-=2)for(6===s&&s--;;){for(let r=0;r<2;r++)if(!e.isReserved(o,s-r)){let n=!1;a<t.length&&(n=(t[a]>>>i&1)==1),e.set(o,s-r,n),-1==--i&&(a++,i=7)}if((o+=n)<0||r<=o){o-=n,n=-n;break}}}(b,E),isNaN(o)&&(o=u.getBestMask(b,p.bind(null,b,r))),// Apply mask pattern
+ */function(e,t){let r=e.size,n=-1,o=r-1,i=7,a=0;for(let s=r-1;s>0;s-=2)for(6===s&&s--;;){for(let r=0;r<2;r++)if(!e.isReserved(o,s-r)){let n=!1;a<t.length&&(n=(t[a]>>>i&1)==1),e.set(o,s-r,n),-1==--i&&(a++,i=7)}if((o+=n)<0||r<=o){o-=n,n=-n;break}}}(b,v),isNaN(o)&&(o=u.getBestMask(b,p.bind(null,b,r))),// Apply mask pattern
 u.applyMask(o,b),// Replace format info bits with correct values
 p(b,r,o),{modules:b,version:t,errorCorrectionLevel:r,maskPattern:o,segments:h})}(e,r,y,h)}},{"4cf6a8173d9f3a2":"2iHLf","2ad62f61c352884c":"kU8Fo","87d5a6270eb1dc26":"dvmjt","91abc94f777368cc":"4koKB","9737c3939ab85d95":"2m37T",cee3d371e219e45e:"9BWaM","8700c8c682afabf3":"2hy8U","65ad903a6ba3e":"ivpAq","1e8e447afb4d169c":"ixGQe","8a4a19af97836d80":"61NkN","26720f9d94c9e268":"4DCia","7b6429a248ecc51f":"2XDDf","1368d0fa14524351":"kBoY1"}],"2iHLf":[function(e,t,r){let n;let o=[0,26,44,70,100,134,172,196,242,292,346,404,466,532,581,655,733,815,901,991,1085,1156,1258,1364,1474,1588,1706,1828,1921,2051,2185,2323,2465,2611,2761,2876,3034,3196,3362,3532,3706];/**
  * Returns the QR Code size for the specified version
