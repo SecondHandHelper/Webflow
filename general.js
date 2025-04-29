@@ -117,14 +117,14 @@ export function shareCode() {
     if (navigator.share) {
         navigator.share({
             text: text,
-            url: `https://invite.maiapp.se/?invite=${code}`
+            url: `https://invite.maiapp.se/refer?invite=${code}`
         }).then(() => { console.log('Thanks for sharing!'); }).catch((e) => {
             console.error(e);
             errorHandler.report(e);
         });
     } else {
         console.log("Browser doesn't support navigator.share => Copy to clipboard!");
-        const shareText = text + "\n" + `https://invite.maiapp.se/?invite=${code}`;
+        const shareText = text + "\n" + `https://invite.maiapp.se/refer?invite=${code}`;
         navigator.clipboard.writeText(shareText);
         linkCopiedBanner.style.display = 'flex';
         setTimeout(function () { linkCopiedBanner.style.display = 'none'; }, 1500);
