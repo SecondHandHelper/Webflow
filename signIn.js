@@ -13,15 +13,14 @@ firebase.auth().onAuthStateChanged(async (result) => {
     localStorage.setItem('idToken', idToken);
     try {
       setPreferredLogInMethodCookie(authenticated.providerData[0].providerId);
-      const doc = await db.collection("users").doc(authenticated.uid).get();
-      if (doc.exists) {
-        const createdToday =
-          doc.data()?.createdAt?.toDate().toDateString() ===
-          new Date().toDateString();
-        if (createdToday && doc.data()?.preferences?.shippingMethod) {
-          doc.ref.update({
-            ...(!doc.data()?.preferences?.shippingMethod && { preferences: { shippingMethod: 'Service point' } }),
-            ...(!doc.data()?.channelsInUse && { channelsInUse: ['Web'] })
+      const response = await callBackendApi('/users', { requiresAuth: true });
+      const user = response.data;
+      if (user) {
+        const createdToday = new Date(user.createdAt).toDateString() === new Date().toDateString();
+        if (createdToday && !user.preferences?.shippingMethod) {
+          db.users.doc(authenticated.uid).update({
+            preferences: { shippingMethod: 'Service point' },
+            ...(!user.channelsInUse && { channelsInUse: ['Web'] })
           });
         }
         identify(authenticated, doc.data());
