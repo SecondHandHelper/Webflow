@@ -13,7 +13,7 @@ firebase.auth().onAuthStateChanged(async (result) => {
     localStorage.setItem('idToken', idToken);
     try {
       setPreferredLogInMethodCookie(authenticated.providerData[0].providerId);
-      const response = await callBackendApi('/users', { requiresAuth: true });
+      const response = await callBackendApi('/api/users', { requiresAuth: true });
       const user = response.data;
       if (user) {
         const createdToday = new Date(user.createdAt).toDateString() === new Date().toDateString();
