@@ -18,10 +18,10 @@ firebase.auth().onAuthStateChanged(async (result) => {
       if (fsUser) {
         const createdToday = new Date(fsUser.createdAt).toDateString() === new Date().toDateString();
         if (createdToday && !fsUser.preferences?.shippingMethod) {
-          await callBackendApi('/api/users', { method: 'PUT', data: {
+          await callBackendApi('/api/users', { method: 'PUT', data: { data: {
             preferences: { shippingMethod: 'Service point' },
             ...(!fsUser.channelsInUse && { channelsInUse: ['Web'] })
-          }});
+          }}});
         }
         identify(authenticated, fsUser);
         console.log("user:", fsUser);
