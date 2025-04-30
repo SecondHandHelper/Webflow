@@ -18,10 +18,10 @@ firebase.auth().onAuthStateChanged(async (result) => {
       if (user) {
         const createdToday = new Date(user.createdAt).toDateString() === new Date().toDateString();
         if (createdToday && !user.preferences?.shippingMethod) {
-          db.users.doc(authenticated.uid).update({
+          await callBackendApi('/api/users', { method: 'PUT', body: {
             preferences: { shippingMethod: 'Service point' },
             ...(!user.channelsInUse && { channelsInUse: ['Web'] })
-          });
+          }});
         }
         identify(authenticated, doc.data());
         console.log("user:", doc.data());
