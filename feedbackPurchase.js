@@ -10,36 +10,21 @@ function initializePage(item) {
         item?.images?.modelImage || item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || item?.images?.frontImageSmall || item?.images?.frontImage :
         item?.images?.modelImage || item?.images?.enhancedFrontImage || item?.images?.frontImage;
     document.getElementById('itemImage').src = imageUrl;
-    
-    // Om postnord qr code finns -> Visa den
-    if (item?.returnQrCode) {
-      hideAllButtons();
-      toMaiButton.style.display = 'flex';
-      introDiv.style.display = 'none';
-      thankYouDiv.style.display = 'none';
-      itemBanner.style.display = 'block';
-      qrCodeImage.style.backgroundImage = `url('${item.returnQrCode}')`;
-      postnordQrCodeLink.href = item.returnQrCodePage;
-      postnordQrCodeDiv.style.display = 'flex';
-      shippingText.innerText = `När det skickats så återbetalar vi dig och skickar bekräftelse till din email ${contact}`;
-    } else if (item?.reclaim?.status){
-      // Om reclaim redan finns -> Gå direkt till Tack!
-      hideAllButtons();
-      toMaiButton.style.display = 'flex';
-      introDiv.style.display = 'none';
-      thankYouDiv.style.display = 'block';
-      itemBanner.style.display = 'block';
-    }
+}
+
+async function goToReclaim(itemId) {
+  const res = await saveFeedback(itemId);
+  window.location.href = `/reclaim/?id=${itemId}`;
 }
 
 function addEventListeners() {
+    const params = getParamsObject();
+
     document.getElementById('doneButton').addEventListener('click', async function () {
         // Save reclaim
-        const params = getParamsObject();
         const res = await saveFeedback(params.id);
         // Show confirmation
         if (res) {
-            console.log('Im here');
             feedbackForm.style.display = 'none';
             hideAllButtons();
             toMaiButton.style.display = 'flex';
@@ -72,7 +57,18 @@ function addEventListeners() {
             updateStars(stars, index); // Fyll i stjärnorna med färg
             stars.forEach(s => s.setCustomValidity(''));
             commentContainer.style.display = 'block';
+            // Only show reclaimTextFeedbackFrom if rating is 3 or less
+            const selectedRating = parseInt(star.value);
+            if (selectedRating <= 3) {
+                reclaimTextFeedbackFrom.style.display = 'block';
+            } else {
+                reclaimTextFeedbackFrom.style.display = 'none';
+            }
         });
+    });
+
+    document.getElementById('reclaimLink2').addEventListener('click', async function () {
+        await goToReclaim(params.id);
     });
 }
 
