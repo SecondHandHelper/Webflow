@@ -275,6 +275,7 @@ coverImageDiv.addEventListener('click', toEditItem);
 itemText2.addEventListener('click', toEditItem);
 itemCurrentPrice.addEventListener('click', toEditItem);
 
-// Load item
-loadItem(params.id);
-loadItemEvents(params.id);
+authUser.whenSet(() => {
+  loadItem(params.id);
+  loadItemEvents(params.id);
+});

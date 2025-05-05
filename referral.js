@@ -2,6 +2,7 @@ import { shareCode } from "./general";
 import QRCode from "qrcode";
 
 async function main() {
+  console.log('referral main function running')
   const params = new URL(window.location).searchParams;
   if (!params.has('app')) {
     if (!user.current?.referralData?.referralCode) {
@@ -53,6 +54,7 @@ async function main() {
       //To add: Show airtable data...
     });
   }
+  console.log('referral main function finished')
 }
 
 function statusText(status) {
@@ -68,6 +70,7 @@ shareReferralLinkButton.addEventListener('click', shareCode);
 document.getElementById('referralCode').innerText = '';
 var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 if (isMobile) {
+  authUser.whenSet(() => console.log('referral authUser set callback running'));
   user.whenSet(main);
   if (!user.current && !params.has('app')) {
     location.href = '/sign-in'
