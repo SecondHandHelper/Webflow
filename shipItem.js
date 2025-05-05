@@ -110,4 +110,6 @@ function loadItem(itemId) {
 }
 
 // Load item
-loadItem(params.id);
+authUser.whenSet(() => {
+  loadItem(params.id);
+});
