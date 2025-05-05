@@ -145,15 +145,20 @@
       return this.value;
     },
     set current(newVal) {
-      const oldEmail = this.value?.email;
-      const oldPhone = this.value?.phoneNumber;
-      this.value = newVal;
-      if (newVal && (newVal.email != oldEmail || newVal.phoneNumber != oldPhone)) {
-        this.callbacks.forEach((cb) => {
-          typeof cb === 'function' && cb(newVal)
-        });
+      try {
+        const oldEmail = this.value?.email;
+        const oldPhone = this.value?.phoneNumber;
+        this.value = newVal;
+        if (newVal) {
+          console.log(`user set current calling ${this.callbacks?.length} callbacks`);
+          this.callbacks.forEach((cb) => {
+            typeof cb === 'function' && cb(newVal)
+          });
+          this.callbacks = [];
+        }
+      } catch (e) {
+        console.log('Error in set current user:', JSON.stringify(e));
       }
-      this.callbacks = [];
     },
     async whenSet(cb) {
       if (this.value) {
@@ -186,10 +191,12 @@
       if (newVal.uid && errorHandler) {
         errorHandler.setUser(newVal.uid);
       }
-      this.callbacks.forEach((cb) => {
-        typeof cb === 'function' && cb(newVal)
-      });
-      this.callbacks = [];
+      if (newVal) {
+        this.callbacks.forEach((cb) => {
+          typeof cb === 'function' && cb(newVal)
+        });
+        this.callbacks = [];
+      }
     },
     whenSet(cb) {
       if (this.value) {
