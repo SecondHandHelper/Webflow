@@ -1,15 +1,15 @@
 <!-- The core Firebase JS SDK is always required and must be listed first -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-functions-compat.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuidv4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.3.20';
+  const JS_VERSION = 'v1.3.21';
   errorHandler = new StackdriverErrorReporter();
   const environment = location.href.includes('maiapp.se') ? 'web-prod' : 'web-test';
   errorHandler.start({
@@ -93,6 +93,7 @@
     });
   }
   const BACKEND_API_URL = 'https://web-api-886292162262.europe-west1.run.app';
+  const LEGACY_BACKEND_API_URL = 'https://europe-west1-second-hand-helper.cloudfunctions.net/webApi';
 
   async function getIdToken(refresh = false) {
     let idToken = localStorage.getItem('idToken');
@@ -135,7 +136,7 @@
   };
 
   // Function to call web api backend function, with or without auth
-  async function callBackendApi(path, { data, method, requiresAuth, timeoutSec = 20 } = {}) {
+  async function callBackendApi(path, { data, method, requiresAuth, timeoutSec = 20, useLegacyFallback = true } = {}) {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), timeoutSec*1000);
     let idToken = '';
@@ -146,41 +147,62 @@
         idToken = await getIdToken();
       } catch (e) {
         if (requiresAuth !== AUTH_IF_AVAILABLE ) {
-          // For requiresAuth === AUTH_IF_AVAILABLE we don't throw here
           throw e;
         }
       }
     }
-    try {
-      let response = await fetch(`${BACKEND_API_URL}${path}`, {
-        method: useMethod,
-        headers: {
-          'Content-Type': 'application/json',
-          ...CLIENT_CHANNEL_HEADERS,
-          ...(idToken?.length ? { 'Authorization': `Bearer ${idToken}`} : {})
-        },
-        ...(data ? { body: JSON.stringify(data) } : {}),
-        signal: controller.signal
-      })
-      if (useAuth && response.status === 401) {
-        // Try the call again with a refreshed idToken when the firebase user is authenticated
-        console.log('Waiting for onAuthStateChangedPromise to try again');
-        const result = await onAuthStateChangedPromise();
-        console.log('trying again');
-        if (result) {
-          idToken = await getIdToken(true);
-          response = await fetch(`${BACKEND_API_URL}${path}`, {
-            method: useMethod,
-            headers: {
-              'Content-Type': 'application/json',
-              ...CLIENT_CHANNEL_HEADERS,
-              'Authorization': `Bearer ${idToken}`
-            },
-            ...(data ? {body: JSON.stringify(data)} : {}),
-            signal: controller.signal
-          });
+
+    const makeRequest = async (url) => {
+      try {
+        const response = await fetch(`${url}${path}`, {
+          method: useMethod,
+          headers: {
+            'Content-Type': 'application/json',
+            ...CLIENT_CHANNEL_HEADERS,
+            ...(idToken?.length ? { 'Authorization': `Bearer ${idToken}`} : {})
+          },
+          ...(data ? { body: JSON.stringify(data) } : {}),
+          signal: controller.signal
+        });
+
+        if (useAuth && response.status === 401) {
+          // Try the call again with a refreshed idToken when the firebase user is authenticated
+          console.log('Waiting for onAuthStateChangedPromise to try again');
+          const result = await onAuthStateChangedPromise();
+          console.log('trying again');
+          if (result) {
+            idToken = await getIdToken(true);
+            const retryResponse = await fetch(`${url}${path}`, {
+              method: useMethod,
+              headers: {
+                'Content-Type': 'application/json',
+                ...CLIENT_CHANNEL_HEADERS,
+                'Authorization': `Bearer ${idToken}`
+              },
+              ...(data ? {body: JSON.stringify(data)} : {}),
+              signal: controller.signal
+            });
+            return retryResponse;
+          }
         }
+        return response;
+      } catch (e) {
+        errorHandler.report(`Error calling backend function ${method} ${path}: ${JSON.stringify(e)}`);
+        return { ok: false };
       }
+    };
+
+    try {
+      // Try the new backend first
+      let response = await makeRequest(BACKEND_API_URL);
+      
+      // If the new backend fails and we have fallback enabled, try the legacy backend
+      if (!response.ok && useLegacyFallback) {
+        errorHandler.report(`New backend failed, falling back to legacy backend for ${method} ${path}`);
+        console.log('New backend failed, falling back to legacy backend');
+        response = await makeRequest(LEGACY_BACKEND_API_URL);
+      }
+
       if (!response.ok || response.headers.get('content-length') === '0') {
         return { data: undefined }
       }
@@ -243,6 +265,7 @@
         if (user) {
           location.href = "/private";
         } else {
+          console.log('going back to home because of referrer not including origin and no user');
           location.href = '/';
         }
       }
@@ -252,8 +275,12 @@
   // TRACK LINK CLICKS
   function linkClickTracker(event) {
     if (event.currentTarget.id) {
-      console.log('Clicked link ', event.currentTarget.id);
-      analytics.track('Click', { elementID: event.currentTarget.id });
+      try {
+        console.log('Clicked link ', event.currentTarget.id);
+        analytics.track('Click', { elementID: event.currentTarget.id });
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
   document.querySelectorAll("a").forEach(link => link.addEventListener('click', linkClickTracker) );
