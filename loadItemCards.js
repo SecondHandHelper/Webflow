@@ -481,9 +481,9 @@ export function loadItemCards(items, userData = null) {
 
         if (!isCanceled) {
           if (buyerFirstName != null && buyerAddressCity != null && soldPrice) {
-            const brandCollab = isBrandPartner(item.brand);
-            const str = `Såld till ${buyerFirstName} i ${buyerAddressCity}${brandCollab ? '' : (' för ' + soldPrice + ' kr')}`;
-            if (!brandCollab) {
+            const brandCollabGiftCard = isBrandPartner(item.brand)?.giftCards;
+            const str = `Såld till ${buyerFirstName} i ${buyerAddressCity}${brandCollabGiftCard ? '' : (' för ' + soldPrice + ' kr')}`;
+            if (!brandCollabGiftCard) {
               // Split sentence into two equally long rows
               let output = '';
               const words = str.split(' ');
@@ -498,7 +498,7 @@ export function loadItemCards(items, userData = null) {
               text2 = str.trim();
             }
             text2 = item.payoutType === 'Brand Gift Card' ? `(${brandPartners[item.brand].name}-presentkort)<br>` + text2 : text2;
-            text3 = brandCollab && item.payoutType !== 'Brand Gift Card' ? `Ändra till ${soldPrice} kr i presentkort?` : '';
+            text3 = brandCollabGiftCard && item.payoutType !== 'Brand Gift Card' ? `Ändra till ${soldPrice} kr i presentkort?` : '';
           }
 
           // Add a user action, such as 'show QR button', 'show barcode' or 'bag received checkbox'

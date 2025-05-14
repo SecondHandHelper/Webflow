@@ -212,25 +212,29 @@
       url: 'flattered.com',
       name: 'Flattered',
       maiShopPath: '/flattered',
-      featureEnabled: true
+      featureEnabled: true,
+      giftCards: true
     },
     'Filippa K': {
       url: 'filippa-k.com',
       name: 'Filippa K',
       maiShopPath: '/filippa-k',
-      featureEnabled: true
+      featureEnabled: true,
+      giftCards: true
     },
     'Blankens': {
       url: 'blankens.com',
       name: 'Blankens',
       maiShopPath: '/blankens',
-      featureEnabled: true
+      featureEnabled: true,
+      giftCards: true
     },
     'Eytys': {
       url: 'eytys.com',
       name: 'EYTYS',
       maiShopPath: '/eytys',
-      featureEnabled: true
+      featureEnabled: true,
+      giftCards: false
     }
   };
 
@@ -241,7 +245,6 @@
         partner.featureEnabled === true
       );
   };
-
 
   if (!authUser.current && localStorage.getItem('authUser') && localStorage.getItem('idToken')) {
     const p = new URL(window.location).searchParams
