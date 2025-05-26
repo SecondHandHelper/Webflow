@@ -246,6 +246,14 @@
       );
   };
 
+  const isGiftCardPartner = (brandName) => {
+    return Object.values(brandPartners).find(partner => 
+      partner.name.toUpperCase() === brandName?.toUpperCase() && 
+      partner.featureEnabled === true &&
+      partner.giftCards === true
+    );
+  };
+
   if (!authUser.current && localStorage.getItem('authUser') && localStorage.getItem('idToken')) {
     const p = new URL(window.location).searchParams
     const savedUser = localStorage.getItem('sessionUser') ? JSON.parse(localStorage.getItem('sessionUser')) : undefined;

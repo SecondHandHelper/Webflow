@@ -478,10 +478,12 @@ export function loadItemCards(items, userData = null) {
         let text1 = `Du får ${sellerGetsValue} kr`;
         let text2 = '';
         let text3 = '';
-
+        console.log('HERE', item);
         if (!isCanceled) {
+          console.log('buyerFirstName', buyerFirstName, buyerAddressCity, soldPrice);
           if (buyerFirstName != null && buyerAddressCity != null && soldPrice) {
-            const brandCollabGiftCard = isBrandPartner(item.brand)?.giftCards;
+            const brandCollabGiftCard = isGiftCardPartner(item.brand)?.giftCards;
+            console.log('brandCollabGiftCard', brandCollabGiftCard, item.brand);
             const str = `Såld till ${buyerFirstName} i ${buyerAddressCity}${brandCollabGiftCard ? '' : (' för ' + soldPrice + ' kr')}`;
             if (!brandCollabGiftCard) {
               // Split sentence into two equally long rows
