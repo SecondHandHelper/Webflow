@@ -100,9 +100,9 @@ export function itemCoverImage(item) {
     for (const name of priorityOrder) {
       const image = item.imagesv2.find(img => img.name === name);
       if (image) {
-        if (image.versions.small) return image.versions.small;
-        if (image.versions.medium) return image.versions.medium;
-        if (image.versions.large) return image.versions.large;
+        if (image?.versions?.small) return image.versions.small;
+        if (image?.versions?.medium) return image.versions.medium;
+        if (image?.versions?.large) return image.versions.large;
         if (image.url) return image.url;
       }
     }
