@@ -10,8 +10,8 @@ if (params.app) {
 
 async function loadItem(itemId) {
   const item = await callBackendApi(`/api/items/${itemId}`);
-  if (!item.data) {
-    return;
+  if (!item.data) { 
+    return null;
   }
   const data = item.data;
   console.log("Item data:", data);
@@ -113,9 +113,10 @@ async function loadItem(itemId) {
 
   itemDiv.style.display = "block";
   loadingDiv.style.display = "none";
+  return data;
 }
 
-async function loadItemEvents(itemId) {
+async function loadItemEvents(itemId, item) {
     itemEventsDiv.innerHTML = '';
     let response = await fetch(`https://europe-west3-second-hand-helper.cloudfunctions.net/itemEvents/${itemId}`, {
         method: 'GET',
@@ -134,7 +135,7 @@ async function loadItemEvents(itemId) {
 
             // Build lists...
             let style = i === events.length - 1 ? 'highlighted' : '';
-            const component = getEventComponent(event, style);
+            const component = getEventComponent(event, style, item);
             if (component) {
                 let content = itemEventsDiv.innerHTML;
                 itemEventsDiv.innerHTML = component.concat(content);
@@ -162,7 +163,7 @@ function eventComponentHtml(displayLine, icon, className, text, time) {
                     </div></div>`;
 }
 
-function getEventComponent(event, style) {
+function getEventComponent(event, style, item) {
     console.log('event', event);
     let className = '';
     let icon = '<div class="div-block-143"></div>';
@@ -204,7 +205,11 @@ function getEventComponent(event, style) {
     }
     if (event.type === 'priceAdjusted') {
         const {platform, newPrice} = event.data
-        const capPlatform = platform && platform.charAt(0).toUpperCase() + platform.slice(1).split(/(?=[A-Z])/).join(' ');
+        let capPlatform = platform && platform.charAt(0).toUpperCase() + platform.slice(1).split(/(?=[A-Z])/).join(' ');
+        if (item?.status === 'Published' && capPlatform === 'Mai Shop' && item?.platformListings?.maiShop?.url) {
+          console.log('item price', item.platformListings.maiShop, newPrice)
+          capPlatform = `<a href="${item?.platformListings?.maiShop?.url}" style="text-decoration: underline;" target="_blank">${capPlatform}</a>`
+        }
         return eventComponentHtml(displayLine, icon, className,
             `Pris sänktes till ${newPrice} kr ${platform && platform !== '' ? ' på ' + capPlatform : ''}`,
             time);
@@ -225,9 +230,16 @@ function getEventComponent(event, style) {
     if (event.type === 'platformAdded') {
         return (event.data.platforms || [])
             .filter(p => p !== 'Google Shopping' && p !== 'Instagram Shop' && p !== 'Facebook Shop')
-            .map(p => eventComponentHtml(displayLine, icon, className,
-                `Publicerades på ${p}${p === 'Mai Shop' ? '<br>(Google Shopping, Instagram Shop, Facebook Shop)' : ''}`,
-                time))
+            .map(p => {
+              let shopText = p;
+              if (shopText === 'Mai Shop') {
+                if (item?.status === 'Published' && item?.platformListings?.maiShop?.url) {
+                  shopText = `<a href="${item?.platformListings?.maiShop?.url}" style="text-decoration: underline;" target="_blank">${shopText}</a>`
+                }
+                shopText += '<br>(Google Shopping, Instagram Shop, Facebook Shop)'
+              }
+              return eventComponentHtml(displayLine, icon, className, `Publicerades på ${shopText}`, time);
+            })
             .join('\n');
     }
     if (event.type === 'itemSold') {
@@ -275,7 +287,7 @@ coverImageDiv.addEventListener('click', toEditItem);
 itemText2.addEventListener('click', toEditItem);
 itemCurrentPrice.addEventListener('click', toEditItem);
 
-authUser.whenSet(() => {
-  loadItem(params.id);
-  loadItemEvents(params.id);
+authUser.whenSet(async () => {
+  const item = await loadItem(params.id);
+  loadItemEvents(params.id, item);
 });
