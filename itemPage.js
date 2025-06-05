@@ -66,8 +66,13 @@ async function loadItem(itemId) {
     // Happy case
     if (notTrustedSeller) {
       text1 = "Du får betalt 5 dagar efter att köparen hämtat ut plagget, och ingen reklamation har skett."
-    } else {
-      text1 = data.payoutStatus === "Payed" ? "" : (data.payoutType === 'Brand Gift Card' ? "Presentkortet skapas inom en dag" : "Utbetalning kommer via Swish inom en dag");
+    } else if (data.payoutStatus !== "Payed") {
+      text1 = data.payoutType === 'Brand Gift Card'
+        ? `Ditt presentkort på ${data.cleanedBrand} skapas inom en dag`
+        : (data.payoutType === 'Mai Resale Gift Card'
+            ? "Dina Mai Shop Credits betalas ut inom en dag"
+            : "Utbetalning kommer via Swish inom en dag"
+          );
     }
 
     if (data.shippingStatus === "Not sent") {
