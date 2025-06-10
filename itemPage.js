@@ -213,7 +213,7 @@ function getEventComponent(event, style, item) {
         let capPlatform = platform && platform.charAt(0).toUpperCase() + platform.slice(1).split(/(?=[A-Z])/).join(' ');
         if (item?.status === 'Published' && capPlatform === 'Mai Shop' && item?.platformListings?.maiShop?.url) {
           console.log('item price', item.platformListings.maiShop, newPrice)
-          capPlatform = `<a href="${item?.platformListings?.maiShop?.url}" style="text-decoration: underline;" target="_blank">${capPlatform}</a>`
+          capPlatform = `<a href="${item?.platformListings?.maiShop?.url}" style="text-decoration: underline;" id="maiShopItemEventLink" target="_blank">${capPlatform}</a>`
         }
         return eventComponentHtml(displayLine, icon, className,
             `Pris sänktes till ${newPrice} kr ${platform && platform !== '' ? ' på ' + capPlatform : ''}`,
@@ -239,7 +239,7 @@ function getEventComponent(event, style, item) {
               let shopText = p;
               if (shopText === 'Mai Shop') {
                 if (item?.status === 'Published' && item?.platformListings?.maiShop?.url) {
-                  shopText = `<a href="${item?.platformListings?.maiShop?.url}" style="text-decoration: underline;" target="_blank">${shopText}</a>`
+                  shopText = `<a href="${item?.platformListings?.maiShop?.url}" style="text-decoration: underline;" id="maiShopItemEventLink" target="_blank">${shopText}</a>`
                 }
                 shopText += '<br>(Google Shopping, Instagram Shop, Facebook Shop)'
               }
