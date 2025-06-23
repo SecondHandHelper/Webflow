@@ -58,6 +58,14 @@ async function loadItem(itemId) {
       document.getElementById('itemCurrentPriceDiv').style.display = 'flex';
     }
     editItemLink.style.display = 'block';
+
+    const totalViews = (data.platformListings?.maiShop?.views || 0) + (data.platformListings?.tradera?.views || 0);
+    const totalLikes = (data.platformListings?.maiShop?.likes || 0) + (data.platformListings?.tradera?.likes || 0);
+    if (totalViews > 0 || totalLikes > 0) {
+      viewsCount.innerHTML = totalViews;
+      likesCount.innerHTML = totalLikes;
+      viewsAndLikesDiv.style.display = 'flex';
+    }
   }
   if (data.status === "Sold") {
     const notTrustedSeller = user.current.trustedSellerStatus !== 'Trusted';
