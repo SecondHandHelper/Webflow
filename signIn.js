@@ -71,6 +71,7 @@ async function updateFirestoreUserDocument(userId, email, phone, ssn) {
   if (ssn) { fields["personalId"] = ssn; }
   const signInMethod = authUser.current.providerData[0].providerId;
   if (signInMethod) { fields["signInMethod"] = signInMethod; }
+  fields["preferences"] = { shippingMethod: 'Service point' };
   const docRef = db.collection("users").doc(userId);
 
   try {
@@ -94,6 +95,7 @@ async function updateFirestoreUserDocument(userId, email, phone, ssn) {
       if (Object.keys(a).length > 0) { fields["attribution"] = a }
 
       // Create User Document
+      // Always set preferences.shippingMethod to 'Service point' when creating user
       await docRef.set(fields);
       console.log(`User document was created with id ${userId} and these fields: `, fields);
       identify(authUser.current, fields);
