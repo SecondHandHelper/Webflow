@@ -164,14 +164,14 @@ async function loadItemEvents(itemId, item) {
     }
 }
 
-function eventComponentHtml(displayLine, icon, className, text, time) {
+function eventComponentHtml(displayLine, icon, className, text, time, displayInfoIcon = false) {
     return `<div class="div-block-135"><div class="div-block-144"><div class="div-block-142">
                         <div class="div-block-139" style="display: ${displayLine};"></div>
                         </div>
                         <div class="div-block-138">${icon}</div>
                         </div>
                     <div class="div-block-136">
-                        <div class="item-event-text ${className}">${text}</div>
+                        <div class="item-event-text ${className}">${text}${displayInfoIcon ? '     <img class="event-info-icon" src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/64a5c2b2484c893d82cdd2d4_info-icon-grey.svg" loading="lazy" alt="">' : ''}</div>
                         <div class="text-block-82">${time}</div>
                     </div></div>`;
 }
@@ -217,7 +217,7 @@ function getEventComponent(event, style, item) {
         return eventComponentHtml(displayLine, icon, className, `Försäljning påbörjades`, time);
     }
     if (event.type === 'priceAdjusted') {
-        const {platform, newPrice} = event.data
+        const {platform, newPrice, isEarlyPriceDrop} = event.data
         let capPlatform = platform && platform.charAt(0).toUpperCase() + platform.slice(1).split(/(?=[A-Z])/).join(' ');
         if (item?.status === 'Published' && capPlatform === 'Mai Shop' && item?.platformListings?.maiShop?.url) {
           console.log('item price', item.platformListings.maiShop, newPrice)
@@ -225,7 +225,7 @@ function getEventComponent(event, style, item) {
         }
         return eventComponentHtml(displayLine, icon, className,
             `Pris sänktes till ${newPrice} kr ${platform && platform !== '' ? ' på ' + capPlatform : ''}`,
-            time);
+            time, isEarlyPriceDrop);
     }
     if (event.type === 'priceRequestSent') {
         return eventComponentHtml(displayLine, icon, className, `Nytt prisförslag på ${event.data.min}-${event.data.max} kr`, time);
