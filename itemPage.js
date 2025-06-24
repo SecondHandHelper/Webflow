@@ -157,6 +157,16 @@ async function loadItemEvents(itemId, item) {
         itemEventsDiv.style.display = 'block';
         itemEventsLoadingDiv.style.display = 'none';
 
+        // Add event listeners for info icons
+        const infoIcons = itemEventsDiv.querySelectorAll('.event-info-icon');
+        infoIcons.forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showEventInfoModal();
+            });
+        });
+
         // Show list if itemAdded exists
         if (!itemAddedEventExists) {
             sellingProcessDiv.style.display = 'none';
@@ -165,13 +175,16 @@ async function loadItemEvents(itemId, item) {
 }
 
 function eventComponentHtml(displayLine, icon, className, text, time, displayInfoIcon = false) {
+    const infoIconHtml = displayInfoIcon ? 
+        `<img class="event-info-icon" src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/64a5c2b2484c893d82cdd2d4_info-icon-grey.svg" loading="lazy" alt="">` : '';
+    
     return `<div class="div-block-135"><div class="div-block-144"><div class="div-block-142">
                         <div class="div-block-139" style="display: ${displayLine};"></div>
                         </div>
                         <div class="div-block-138">${icon}</div>
                         </div>
                     <div class="div-block-136">
-                        <div class="item-event-text ${className}">${text}${displayInfoIcon ? '     <img class="event-info-icon" src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/64a5c2b2484c893d82cdd2d4_info-icon-grey.svg" loading="lazy" alt="">' : ''}</div>
+                        <div class="item-event-text ${className}">${text}${displayInfoIcon ? infoIconHtml : ''}</div>
                         <div class="text-block-82">${time}</div>
                     </div></div>`;
 }
@@ -304,3 +317,30 @@ authUser.whenSet(async () => {
   const item = await loadItem(params.id);
   loadItemEvents(params.id, item);
 });
+
+function showEventInfoModal() {
+    const modal = document.querySelector('.event-info-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        
+        // Close on backdrop click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeEventInfoModal();
+            }
+        });
+        
+        // Close on close button click
+        const closeBtn = modal.querySelector('.close-modal-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeEventInfoModal);
+        }
+    }
+}
+
+function closeEventInfoModal() {
+    const modal = document.querySelector('.event-info-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
