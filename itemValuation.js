@@ -1,7 +1,7 @@
 window.itemValuationJsLoaded = true;
 async function showDeclineValuation(item) {
   document.getElementById('valuationHeading').style.display = 'none';
-  document.getElementById('valuationMotivation').style.display = 'none';
+  document.getElementById('sellProcessInfo').style.display = 'none';
   document.getElementById('valuationText').innerText = 'Säljer ej';
   document.getElementById('valuationText').style.display = 'block';
   document.getElementById('rejectButton').style.display = 'none';
@@ -365,7 +365,7 @@ const showAdjustValuation = async (item) => {
   }
 
   rangeSlider(minPrice, maxPrice, item);
-  document.getElementById('valuationMotivation').addEventListener('click', (e) => {
+  document.getElementById('sellProcessInfo').addEventListener('click', (e) => {
     const elements = document.getElementsByClassName('tooltip-motivation');
     const visible = elements[0]?.classList.contains('tooltip-show');
     for (const element of elements) {
@@ -430,10 +430,6 @@ const showAdjustValuation = async (item) => {
     analytics.track('Click', { elementID: 'maxDecrease' });
     validateInput();
   });
-
-  if (item.infoRequests?.price?.type === 'Final Offer' || item.infoRequests?.price?.type === 'Valuation') {
-    document.getElementById('valuationMotivation').style.display = 'none';
-  }
 }
 
 const getItem = async (itemId) => {
