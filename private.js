@@ -339,6 +339,7 @@ async function privateMain() {
     showTrustedSellerBottomSheet();
   }
   //showAppPromoSection();
+  showDownloadAppInMenu();
   //showHolidayModeDiv(items);
 
   // Create refCode
@@ -637,6 +638,12 @@ async function showAppPromoSection() {
   if (!hasViewedElement) {
     document.getElementById('appPromoSection').style.display = 'block';
   }
+}
+
+async function showDownloadAppInMenu() {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (!isIOS) return;
+  document.getElementById('menuDownloadApp').style.display = 'block';
 }
 
 async function showNpsSurvey(items) {
