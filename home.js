@@ -191,7 +191,7 @@ function showChannelBottomSheet(webpath) {
 }
 
 function channelRouter(webpath) {
-  if (isIOS) {
+  if (isIos) {
     showChannelBottomSheet(webpath);
   } else {
     window.location.href = webpath;
