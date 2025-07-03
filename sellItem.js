@@ -283,6 +283,10 @@ async function sellItemMain() {
   }
   initializeSaveStateListeners();
   initializeRestoreOnNavigation();
+
+  if (document.getElementById('imagesDownloadApp') && /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+    document.getElementById('imagesDownloadApp').style.display = 'block';
+  }
 }
 
 async function addItem() {

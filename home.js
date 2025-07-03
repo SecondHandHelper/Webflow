@@ -191,8 +191,6 @@ function showChannelBottomSheet(webpath) {
 }
 
 function channelRouter(webpath) {
-  const isIOS =
-    /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   if (isIOS) {
     showChannelBottomSheet(webpath);
   } else {
@@ -223,11 +221,19 @@ document
   .addEventListener("click", hideChannelBottomSheet);
 // End of channel bottom sheet
 
+function showDownloadAppLink() {
+  const elm = document.getElementById("downloadAppLink");
+  elm.style.display = "flex";
+}
+
 authUser.whenSet(signedInNextStep);
 loadRecentlySold();
 fetchAndLoadRecentlyAddedItems();
 trackHowItWorksInteractions();
 noCommissionCampaign();
+if (isIos) {
+  showDownloadAppLink();
+}
 
 // Set attribution cookies (could be put on any campaign page)
 checkCookie("utm_campaign");
