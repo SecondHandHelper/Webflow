@@ -230,15 +230,27 @@ function getEventComponent(event, style, item) {
         return eventComponentHtml(displayLine, icon, className, `Försäljning påbörjades`, time);
     }
     if (event.type === 'priceAdjusted') {
-        const {platform, newPrice, isEarlyPriceDrop} = event.data
+        const {platform, newPrice, isEarlyPriceDrop} = event.data;
+        // TODO: Remove this once we send early price drop info via the event instead
+        console.log('isEarlyPriceDrop', isEarlyPriceDrop);
+        let earlyPriceDrop = isEarlyPriceDrop;
+        if (earlyPriceDrop === undefined) {
+            const daysSincePublished = Math.round((date.getTime() - new Date(item.publishedDate).getTime()) / (1000 * 3600 * 24));
+            if (platform === 'maiShop') {
+                earlyPriceDrop = daysSincePublished <= 6;
+            } else if (platform === 'tradera') {
+                earlyPriceDrop = daysSincePublished <= 8;
+            }
+        }
+        console.log('earlyPriceDrop', earlyPriceDrop);
         let capPlatform = platform && platform.charAt(0).toUpperCase() + platform.slice(1).split(/(?=[A-Z])/).join(' ');
         if (item?.status === 'Published' && capPlatform === 'Mai Shop' && item?.platformListings?.maiShop?.url) {
           console.log('item price', item.platformListings.maiShop, newPrice)
           capPlatform = `<a href="${item?.platformListings?.maiShop?.url}" style="text-decoration: underline;" id="maiShopItemEventLink" target="_blank">${capPlatform}</a>`
         }
         return eventComponentHtml(displayLine, icon, className,
-            `Pris sänktes till ${newPrice} kr ${platform && platform !== '' ? ' på ' + capPlatform : ''}`,
-            time, isEarlyPriceDrop);
+            `Sänktes till ${newPrice} kr${platform === 'tradera' ? ' i utropspris' : ''} ${platform && platform !== '' ? ' på ' + capPlatform : ''}`,
+            time, earlyPriceDrop);
     }
     if (event.type === 'priceRequestSent') {
         return eventComponentHtml(displayLine, icon, className, `Nytt prisförslag på ${event.data.min}-${event.data.max} kr`, time);
