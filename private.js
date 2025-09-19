@@ -1,4 +1,4 @@
-import { itemCoverImage, shareCode, signOut } from "./general";
+import { itemCoverImage, shareCode, signOut, animateCloseToast } from "./general";
 import { loadInfoRequests } from "./infoRequestsFunctions";
 import { loadItemCards } from "./loadItemCards";
 
@@ -102,8 +102,6 @@ if (sessionUser) {
   const referralCode = sessionUser?.referralData?.referralCode;
   prepareMenu(sessionUser);
 }
-
-
 
 async function showOrderBagsSection() {
   try {
@@ -520,16 +518,6 @@ async function showInYourWardrobeSection() {
 
   //Tracking
   itemList.querySelectorAll("a").forEach(link => link.addEventListener('click', linkClickTracker));
-  const observer = new IntersectionObserver((entries, opts) => {
-    const rect = itemList.getBoundingClientRect();
-    const isVisible = rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
-    if (isVisible) {
-      console.log("Wardrobe viewed");
-      analytics.track("Element Viewed", { elementID: "wardrobeItemsDiv" });
-      observer.disconnect();
-    }
-  }, { threshold: 1, root: null })
-  observer.observe(itemList);
 }
 
 function setupBottomMenuPopupListeners() {
@@ -894,6 +882,7 @@ function onLoadHandler() {
     await connectReferralUsers(inputCode);
   });
 
+  closeBidToastButton.addEventListener("click", function () { animateCloseToast('bidToast'); });
   closeMeasurementsToastButton.addEventListener("click", function () { triggerMeasurementsToastClose.click(); });
   closeNewPriceToastButton.addEventListener("click", function () { triggerNewPriceToastClose.click(); });
   closeInviteToastButton.addEventListener("click", function () { triggerInviteToastClose.click(); });
@@ -921,11 +910,14 @@ function onLoadHandler() {
     console.log("Close button clicked!");
     closeAppPromoSection();
   });
+
+  
   document
     .getElementById("darkOverlay")
     .addEventListener("click", function() {
       hideTrustedSellerBottomSheet();
       hideApprovedSaleInfoBox();
+      animateCloseToast('bidToast');
     });
   document
     .getElementById("closeTrustedSellerBottomSheet")

@@ -370,9 +370,21 @@ function getShippingInfoDiv(itemId, method, soldDate, pickupDate, bagReceived, s
 }
 
 export function loadItemCards(items, userData = null) {
+  // Clear containers
   itemListSelling.innerHTML = "";
   itemListSoldNotSent.innerHTML = "";
   itemListSold.innerHTML = "";
+  
+  // Create DocumentFragments for batch DOM updates
+  const sellingFragment = document.createDocumentFragment();
+  const soldNotSentFragment = document.createDocumentFragment();
+  const soldFragment = document.createDocumentFragment();
+  
+  // Collect HTML strings for batch processing
+  let sellingHTML = "";
+  let soldNotSentHTML = "";
+  let soldHTML = "";
+  
   var youEarned = 0;
 
   (items || []).forEach((item) => {
@@ -457,7 +469,7 @@ export function loadItemCards(items, userData = null) {
         }
 
         let sellingItemCardHTML = `<div class="div-block-14-big"><a id="itemLinkBlock" href="${itemPageUrl}" class="link-block-18 w-inline-block"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></div></div><div class="text-block-14">${brand}</div>${textDiv1}${textDiv2}</a></div>`;
-        itemListSelling.innerHTML += sellingItemCardHTML;
+        sellingHTML += sellingItemCardHTML;
 
         //Display list
         myItemsDiv.style.display = "block";
@@ -478,12 +490,9 @@ export function loadItemCards(items, userData = null) {
         let text1 = `Du får ${sellerGetsValue} kr`;
         let text2 = '';
         let text3 = '';
-        console.log('HERE', item);
         if (!isCanceled) {
-          console.log('buyerFirstName', buyerFirstName, buyerAddressCity, soldPrice);
           if (buyerFirstName != null && buyerAddressCity != null && soldPrice) {
             const brandCollabGiftCard = isGiftCardPartner(item.brand)?.giftCards;
-            console.log('brandCollabGiftCard', brandCollabGiftCard, item.brand);
             const str = `Såld till ${buyerFirstName} i ${buyerAddressCity}${brandCollabGiftCard ? '' : (' för ' + soldPrice + ' kr')}`;
             if (!brandCollabGiftCard) {
               // Split sentence into two equally long rows
@@ -512,11 +521,14 @@ export function loadItemCards(items, userData = null) {
               if (!bagReceived) {
                 userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
                 if (upsShipmentId) { shipper = 'ups' };
-                setTimeout(() => {
-                  document.getElementById(`bagReceivedCheckbox-${itemId}`).addEventListener('click', (event) => {
-                    bagReceivedAction(event.target, itemId, soldDate, shippingMethod);
-                  });
-                }, 0)
+                // Store event listener data for batch processing
+                window._pendingEventListeners = window._pendingEventListeners || [];
+                window._pendingEventListeners.push({
+                  type: 'bagReceivedCheckbox',
+                  itemId: itemId,
+                  soldDate: soldDate,
+                  shippingMethod: shippingMethod
+                });
               }
             }
             else if (postnordQrCode) {
@@ -528,18 +540,23 @@ export function loadItemCards(items, userData = null) {
           if (shippingMethod === 'Pickup') {
             if (!bagReceived) {
               userActionDiv = getBagReceivedCheckbox(itemId, soldDate, shippingMethod);
-              setTimeout(() => {
-                document.getElementById(`bagReceivedCheckbox-${itemId}`).addEventListener('click', (event) => {
-                  bagReceivedAction(event.target, itemId, soldDate, shippingMethod);
-                });
-              }, 0)
+              // Store event listener data for batch processing
+              window._pendingEventListeners = window._pendingEventListeners || [];
+              window._pendingEventListeners.push({
+                type: 'bagReceivedCheckbox',
+                itemId: itemId,
+                soldDate: soldDate,
+                shippingMethod: shippingMethod
+              });
             } else if (bagReceived && !pickupDate) {
               userActionDiv = getBookPickupButton(itemId);
-              setTimeout(() => {
-                document.getElementById(`bookPickUpButton-${itemId}`).addEventListener('click', () => {
-                  openPickupToast(itemId, soldDate);
-                });
-              }, 0)
+              // Store event listener data for batch processing
+              window._pendingEventListeners = window._pendingEventListeners || [];
+              window._pendingEventListeners.push({
+                type: 'bookPickupButton',
+                itemId: itemId,
+                soldDate: soldDate
+              });
             }
           }
 
@@ -553,11 +570,13 @@ export function loadItemCards(items, userData = null) {
           <a id="changeShippingMethodA-${itemId}" href="#">
               <div id="changeShippingMethod-${itemId}" class="change-shipping-method-text">Ändra fraktsätt</div>
           </a>`;
-            setTimeout(() => {
-              document.getElementById(`changeShippingMethodA-${itemId}`).addEventListener('click', () => {
-                openShippingToast(itemId, soldDate);
-              })
-            }, 0)
+            // Store event listener data for batch processing
+            window._pendingEventListeners = window._pendingEventListeners || [];
+            window._pendingEventListeners.push({
+              type: 'changeShippingMethod',
+              itemId: itemId,
+              soldDate: soldDate
+            });
           }
         } else {
           userActionDiv = getResellButton(itemId);
@@ -568,16 +587,12 @@ export function loadItemCards(items, userData = null) {
               <img src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/65269f37a18d8c128d29ed1c_trash-can%20(1).svg" class="image-154">
               <div class="text-block-373">Ta bort plagg</div>
           </a>`;
-          setTimeout(() => {
-            document.getElementById(`removeItemButton-${itemId}`).addEventListener('click', () => {
-              itemMoreMenu.style.display = 'block';
-              setTimeout(() => itemMoreMenu.classList.add('sticky-bottom-show'), 0);
-              itemMoreMenu.dataset.itemId = itemId;
-              itemMoreMenu.dataset.section = 'sold-not-sent';
-              e.preventDefault();
-              e.stopPropagation();
-            })
-          }, 0)
+          // Store event listener data for batch processing
+          window._pendingEventListeners = window._pendingEventListeners || [];
+          window._pendingEventListeners.push({
+            type: 'removeItemButton',
+            itemId: itemId
+          });
         }
 
 
@@ -597,17 +612,25 @@ export function loadItemCards(items, userData = null) {
           ${removeItemButton}
           </div></div></div></div>`;
 
-        setTimeout(() => {
-          document.getElementById(`youGetLink-${itemId}`).addEventListener('click', () => {
-            console.log(`clicked youGetLink-${itemId}`);
-            openYouGetInfoBox(soldPrice, sellerGetsValue);
+        // Store event listener data for later batch processing
+        window._pendingEventListeners = window._pendingEventListeners || [];
+        window._pendingEventListeners.push({
+          type: 'youGetLink',
+          itemId: itemId,
+          soldPrice: soldPrice,
+          sellerGetsValue: sellerGetsValue
+        });
+        
+        if (text3) {
+          window._pendingEventListeners.push({
+            type: 'convertToGiftCard',
+            itemId: itemId,
+            item: item,
+            soldPrice: soldPrice
           });
-          document.getElementById(`convertToGiftCard-${itemId}`)?.addEventListener('click', () => {
-            const itemImage = item?.images?.modelImage || item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || item?.images?.frontImageSmall || item?.images?.frontImage;
-            openConvertToGiftCard(itemId, itemImage, soldPrice, item.brand);
-          });
-        }, 0)
-        itemListSoldNotSent.innerHTML += soldNotSentCardHTML;
+        }
+        
+        soldNotSentHTML += soldNotSentCardHTML;
 
         // Display list
         soldNotSentDiv.style.display = "block";
@@ -620,7 +643,7 @@ export function loadItemCards(items, userData = null) {
       } else {
         const voucher =  item.payoutType === 'Brand Gift Card' ? '<br> (Presentkort)' : '';
         var soldItemCardHTML = `<div class="item-card-small"><div class="ratio-box _16-9"><div class="conten-block with-image"><a id="itemLinkFromSoldBeforeSection" href="${itemPageUrl}"><div class="img-container" style="background-image: url('${frontImageUrl}');"></div></a></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>${item.payoutStatus === "Payed" ? "Du fick" : "Du får"} ${sellerGetsValue} kr${voucher}</div></div>`;
-        itemListSold.innerHTML += soldItemCardHTML;
+        soldHTML += soldItemCardHTML;
 
         // Display list, hide empty state
         soldItemsDiv.style.display = "block";
@@ -631,6 +654,74 @@ export function loadItemCards(items, userData = null) {
       }
     }
   });
+
+  // Batch DOM updates - single operations instead of multiple innerHTML +=
+  if (sellingHTML) {
+    itemListSelling.innerHTML = sellingHTML;
+  }
+  if (soldNotSentHTML) {
+    itemListSoldNotSent.innerHTML = soldNotSentHTML;
+  }
+  if (soldHTML) {
+    itemListSold.innerHTML = soldHTML;
+  }
+
+  // Batch event listener setup
+  if (window._pendingEventListeners) {
+    window._pendingEventListeners.forEach(listener => {
+      if (listener.type === 'youGetLink') {
+        const element = document.getElementById(`youGetLink-${listener.itemId}`);
+        if (element) {
+          element.addEventListener('click', () => {
+            openYouGetInfoBox(listener.soldPrice, listener.sellerGetsValue);
+          });
+        }
+      } else if (listener.type === 'convertToGiftCard') {
+        const element = document.getElementById(`convertToGiftCard-${listener.itemId}`);
+        if (element) {
+          element.addEventListener('click', () => {
+            const itemImage = listener.item?.images?.modelImage || listener.item?.images?.enhancedFrontImageSmall || listener.item?.images?.enhancedFrontImage || listener.item?.images?.frontImageSmall || listener.item?.images?.frontImage;
+            openConvertToGiftCard(listener.itemId, itemImage, listener.soldPrice, listener.item.brand);
+          });
+        }
+      } else if (listener.type === 'bagReceivedCheckbox') {
+        const element = document.getElementById(`bagReceivedCheckbox-${listener.itemId}`);
+        if (element) {
+          element.addEventListener('click', (event) => {
+            bagReceivedAction(event.target, listener.itemId, listener.soldDate, listener.shippingMethod);
+          });
+        }
+      } else if (listener.type === 'bookPickupButton') {
+        const element = document.getElementById(`bookPickUpButton-${listener.itemId}`);
+        if (element) {
+          element.addEventListener('click', () => {
+            openPickupToast(listener.itemId, listener.soldDate);
+          });
+        }
+      } else if (listener.type === 'changeShippingMethod') {
+        const element = document.getElementById(`changeShippingMethodA-${listener.itemId}`);
+        if (element) {
+          element.addEventListener('click', () => {
+            openShippingToast(listener.itemId, listener.soldDate);
+          });
+        }
+      } else if (listener.type === 'removeItemButton') {
+        const element = document.getElementById(`removeItemButton-${listener.itemId}`);
+        if (element) {
+          element.addEventListener('click', (e) => {
+            itemMoreMenu.style.display = 'block';
+            setTimeout(() => itemMoreMenu.classList.add('sticky-bottom-show'), 0);
+            itemMoreMenu.dataset.itemId = listener.itemId;
+            itemMoreMenu.dataset.section = 'sold-not-sent';
+            e.preventDefault();
+            e.stopPropagation();
+          });
+        }
+      }
+    });
+    // Clear the pending listeners
+    window._pendingEventListeners = [];
+  }
 
   loadingDiv.style.display = "none";
   sectionsDiv.style.display = "block";

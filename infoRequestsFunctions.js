@@ -1,4 +1,4 @@
-import {itemCoverImage} from "./general";
+import {itemCoverImage, animateOpenToast, animateCloseToast, hideInfoRequestCard} from "./general";
 
 async function openMeasurementsToast(itemId, description) {
     measurementDescriptionText.innerHTML = description;
@@ -77,6 +77,85 @@ async function openLongerPeriodToast(itemId, brand, currentMinPrice, deniedBefor
     triggerLongerPeriodToastOpen.click();
 }
 
+async function openBidToast(itemId, minPrice, bidPrice, expires) {
+  if(!itemId){return}
+  bidButtonsContainer.style.visibility = 'visible';
+  bidButtonsContainer.style.visibility = 'visible';
+  bidPriceText.innerHTML = `${bidPrice} kr`;
+  
+  // Calculate hours and minutes remaining
+  const now = new Date();
+  const expirationDate = new Date(expires);
+  const timeDiffMs = expirationDate.getTime() - now.getTime();
+  const timeDiffMinutes = Math.floor(timeDiffMs / (1000 * 60));
+  const hours = Math.floor(timeDiffMinutes / 60);
+  const minutes = Math.floor(timeDiffMinutes % 60);
+  
+  bidDescription.innerHTML = `Budet ligger under ditt lägsta pris på ${minPrice} kr. Giltigt i ${hours} h och ${minutes} min.`;
+
+  // Accept bid and show confirmation
+  bidAcceptButton.removeEventListener("click", bidAcceptHandler);
+  const acceptBid = async function () {
+      try {
+          acceptBidLoading.style.display = 'block';
+          acceptBidButtonText.style.display = 'none';
+
+          // Call the API endpoint to accept the bid
+          await callBackendApi(`/api/items/${itemId}/infoRequests`, {
+              method: 'PUT',
+              data: {
+                  type: 'bid',
+                  response: 'Accepted'
+              }
+          });
+
+          acceptBidLoading.style.display = 'none';
+          acceptBidButtonText.style.display = 'block';
+          bidTitle.style.visibility = 'hidden';
+          bidButtonsContainer.style.visibility = 'hidden';
+          
+          // Fade out animation
+          bidPriceText.style.transition = 'opacity 0.3s ease';
+          bidDescription.style.transition = 'opacity 0.3s ease';
+          bidPriceText.style.opacity = '0';
+          bidDescription.style.opacity = '0';
+          
+          // Wait for fade out to complete, then change text and fade in
+          setTimeout(() => {
+              bidPriceText.innerHTML = 'Toppen!';
+              bidDescription.innerHTML = 'När köparen betalat får du ett SMS om att det är sålt och redo att skickas.';
+              
+              // Fade in animation
+              bidPriceText.style.opacity = '1';
+              bidDescription.style.opacity = '1';
+          }, 300);
+          
+          // Hide the specific info request element instead of reloading the page
+          hideInfoRequestCard(`infoRequestBid-${itemId}`);
+      } catch (error) {
+          console.error('Failed to accept bid:', error);
+          // You might want to show an error message to the user here
+      }
+  };
+  bidAcceptButton.addEventListener('click', acceptBid);
+  bidAcceptHandler = acceptBid;
+  
+  // Decline bid
+  bidDenyButton.removeEventListener("click", bidDenyHandler);
+  const denyBid = async function () {
+      await db.collection('items').doc(itemId).update({
+          "infoRequests.bid.status": "Resolved",
+          "infoRequests.bid.response": "Denied",
+      });
+      animateCloseToast('bidToast');
+      // Hide the specific info request element instead of reloading the page
+      hideInfoRequestCard(`infoRequestBid-${itemId}`);
+  };
+  bidDenyButton.addEventListener('click', denyBid);
+  bidDenyHandler = denyBid;
+  animateOpenToast('bidToast');
+}
+
 async function storePriceResponse(itemId, max, min, response, status) {
     console.log("storePriceResponse", itemId, max, min, response);
     // Accept price
@@ -109,6 +188,8 @@ async function storePriceResponse(itemId, max, min, response, status) {
 }
 let acceptNewPriceHandler;
 let denyNewPriceHandler;
+let bidAcceptHandler;
+let bidDenyHandler;
 
 async function openNewPriceToast(itemId, status, max, min, brand, description, category, type, currentMax, currentMin) {
     console.log("openNewPriceToast", itemId, status, max, min, brand, description, category, type, currentMax, currentMin);
@@ -167,6 +248,7 @@ async function openNewPriceToast(itemId, status, max, min, brand, description, c
 }
 
 export function loadInfoRequests(items) {
+    const bidClone = document.getElementById('infoRequestBidTemplate').cloneNode(true);  
     const measurementsClone = document.getElementById('infoRequestMeasurementsTemplate').cloneNode(true);
     const longerPeriodClone = document.getElementById('infoRequestLongerPeriodTemplate').cloneNode(true);
     const updateImagesClone = document.getElementById('infoRequestImagesTemplate').cloneNode(true);
@@ -185,6 +267,7 @@ export function loadInfoRequests(items) {
             const archived = item.archived;
             const category = item.category;
             const frontImageUrl = itemCoverImage(item);
+
             if (archived == undefined && status !== "Unsold" && status !== "Sold" && infoRequests) {
                 displayRequests();
             }
@@ -250,6 +333,26 @@ export function loadInfoRequests(items) {
                               })
                             }, 0);
                         }
+                        // BID REQUEST
+                        if (req === "bid") {
+                          const expires = infoRequests[req].expires;
+                          const now = new Date();
+                          const expirationDate = new Date(expires);
+                          
+                          // Only show bid request if it hasn't expired
+                          if (expirationDate > now) {
+                            const newRequest = bidClone.cloneNode(true);
+                            newRequest.id = `infoRequestBid-${itemId}`;
+                            newRequest.querySelector('.img-container').style.backgroundImage = `url('${frontImageUrl}')`;
+                            infoRequestsList.appendChild(newRequest);
+                            setTimeout(() => {
+                              document.querySelector(`#infoRequestBid-${itemId} a`).addEventListener('click', async () => {
+                                const bidPrice = infoRequests[req].price;
+                                await openBidToast(itemId, currentMinPrice, bidPrice, expires);
+                              })
+                            }, 0);
+                          }
+                      }
                         infoRequestsDiv.style.display = "block";
                     }
                 }

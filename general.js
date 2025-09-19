@@ -152,3 +152,59 @@ export function hideChannelBottomSheet(){
   document.getElementById('channelBottomSheet').classList.remove('active');
 }
 // End of channel bottom sheet
+
+// Toast animation functions
+export function animateOpenToast(elementId) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    // Set initial position below screen
+    element.style.transform = 'translateY(100%)';
+    element.style.transition = 'transform 0.3s ease-out';
+    element.style.display = 'block';
+    
+    // Animate to visible position
+    setTimeout(() => {
+      element.style.transform = 'translateY(0%)';
+    }, 10);
+    document.getElementById("darkOverlay").classList.add("active");
+  }
+}
+
+export function animateCloseToast(elementId) {
+  const element = document.getElementById(elementId);
+  
+  // Add the visibility check here
+  if (!element || element.style.display === 'none') {
+    return;
+  }
+  
+  // Animate down and hide
+  element.style.transform = 'translateY(100%)';
+  element.style.transition = 'transform 0.3s ease-in';
+  
+  // Hide after animation completes
+  setTimeout(() => {
+    element.style.display = 'none';
+  }, 300);
+  
+  document.getElementById("darkOverlay").classList.remove("active");
+}
+
+export function hideInfoRequestCard(elementId) {
+  const bidRequestElement = document.getElementById(elementId);
+  if (bidRequestElement) {
+    bidRequestElement.style.display = 'none';
+    
+    // Check if there are any remaining visible cards
+    const infoRequestsList = document.getElementById('infoRequestsList');
+    if (infoRequestsList) {
+      const visibleCards = infoRequestsList.querySelectorAll('[id^="infoRequest"]:not([style*="display: none"])');
+      if (visibleCards.length === 0) {
+        const infoRequestsDiv = document.getElementById('infoRequestsDiv');
+        if (infoRequestsDiv) {
+          infoRequestsDiv.style.display = 'none';
+        }
+      }
+    }
+  }
+}
