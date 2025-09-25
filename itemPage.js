@@ -167,6 +167,16 @@ async function loadItemEvents(itemId, item) {
             });
         });
 
+        // Add event listeners for price strategy events
+        const priceStrategyEvents = itemEventsDiv.querySelectorAll('.price-strategy-event');
+        priceStrategyEvents.forEach(event => {
+            event.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showEventInfoModal();
+            });
+        });
+
         // Show list if itemAdded exists
         if (!itemAddedEventExists) {
             sellingProcessDiv.style.display = 'none';
@@ -230,19 +240,7 @@ function getEventComponent(event, style, item) {
         return eventComponentHtml(displayLine, icon, className, `Försäljning påbörjades`, time);
     }
     if (event.type === 'priceAdjusted') {
-        const {platform, newPrice, isEarlyPriceDrop} = event.data;
-        // TODO: Remove this once we send early price drop info via the event instead
-        console.log('isEarlyPriceDrop', isEarlyPriceDrop);
-        let earlyPriceDrop = isEarlyPriceDrop;
-        if (earlyPriceDrop === undefined) {
-            const daysSincePublished = Math.round((date.getTime() - new Date(item.publishedDate).getTime()) / (1000 * 3600 * 24));
-            if (platform === 'maiShop') {
-                earlyPriceDrop = daysSincePublished <= 6;
-            } else if (platform === 'tradera') {
-                earlyPriceDrop = daysSincePublished <= 8;
-            }
-        }
-        console.log('earlyPriceDrop', earlyPriceDrop);
+        const {platform, newPrice} = event.data;
         let capPlatform = platform && platform.charAt(0).toUpperCase() + platform.slice(1).split(/(?=[A-Z])/).join(' ');
         if (item?.status === 'Published' && capPlatform === 'Mai Shop' && item?.platformListings?.maiShop?.url) {
           console.log('item price', item.platformListings.maiShop, newPrice)
@@ -250,7 +248,22 @@ function getEventComponent(event, style, item) {
         }
         return eventComponentHtml(displayLine, icon, className,
             `Sänktes till ${newPrice} kr${platform === 'tradera' ? ' i utropspris' : ''} ${platform && platform !== '' ? ' på ' + capPlatform : ''}`,
-            time, earlyPriceDrop);
+            time);
+    }
+    if (event.type === 'priceStrategyApplied') {
+        icon = '<img src="https://cdn.prod.website-files.com/6297d3d527db5dd4cf02e924/67e3dc5e1a697a2d9bd399f2_flash.svg" loading="lazy" width="17px" height="17px" style="margin-top: 3px; opacity: 0.86;" alt="">';
+        const {priceStrategy} = event.data || {};
+        let message = '';
+        if (priceStrategy === 'faster') {
+            message = 'Tidig prisjustering';
+        } else if (priceStrategy === 'fastest') {
+            message = 'Snabbare prisjustering aktiverad';
+        } else {
+            message = 'Prisstrategi tillämpades';
+        }
+        const component = eventComponentHtml(displayLine, icon, className, message, time);
+        // Add clickable class and unique ID to the component
+        return component.replace('<div class="div-block-135">', `<div class="div-block-135 price-strategy-event" data-event-id="${event.timestamp}">`);
     }
     if (event.type === 'priceRequestSent') {
         return eventComponentHtml(displayLine, icon, className, `Nytt prisförslag på ${event.data.min}-${event.data.max} kr`, time);
