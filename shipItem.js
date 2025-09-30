@@ -49,6 +49,7 @@ function loadItem(itemId) {
 
         if (shippingMethod) {
           if (shippingMethod === 'Service point') {
+            console.log('postnordQrCode', postnordQrCode, typeof postnordQrCode);
             if (postnordQrCode && !(soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed')) {
               qrCodeImage.style.backgroundImage = `url('${postnordQrCode}')`;
               postnordQrCodeDiv.href = postnordQrCodePage;
@@ -77,9 +78,14 @@ function loadItem(itemId) {
                 openShippingLabelButton.href = vestiaireShippingLabel;
                 openShippingLabelButton.style.display = 'block';
               }
+            } else if (!postnordQrCode && !(soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed')) {
+              howToShipQrDiv.style.display = 'block';
+              postnordQrCodeMissingDiv.style.display = 'flex';
+              mainInstructionText.innerText = 'Skriv gärna till oss,\nså hjälper vi dig.';
+              mainInstructionDiv.style.display = 'block';
             } else {
-              howToShipNoQrDiv.style.display = "block";
-              dividerTop.style.display = "none";
+              mainInstructionText.innerText = 'Något har gått fel! Skriv till oss, så hjälper vi dig.';
+              mainInstructionDiv.style.display = 'block';
             }
           } else if (shippingMethod === 'Pickup') {
             howToShipPickupDiv.style.display = "block";
