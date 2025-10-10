@@ -276,6 +276,7 @@ const showValuation = async (item) => {
   document.getElementById('minPrice').disabled = true;
   document.getElementById('maxPrice').value = maxPrice;
   document.getElementById('maxPrice').disabled = true;
+  console.log(item.infoRequests?.price?.type)
   if (item.infoRequests?.price?.type) {
     document.getElementById('valuationExplanation').innerText = item.infoRequests.price.description;
     if (item.infoRequests?.price?.type === 'Final Offer') {
@@ -285,6 +286,7 @@ const showValuation = async (item) => {
   } else if (item.mlValuation) {
     document.getElementById('valuationExplanation').innerText = getMlValuationExplanation(item)
   } else if (item.estimatedValuation) {
+    console.log(`item  has estimatedValuation ${!!item.estimatedValuation}`);
     document.getElementById('valuationExplanation').innerText = getEstimatedPriceExplanation(item)
   }
 
@@ -300,6 +302,15 @@ const showValuation = async (item) => {
   document.getElementById('rejectButton').addEventListener('click', () => rejectValuation(item));
 }
 
+const shortCondition = (condition) => {
+  return {
+    'Helt ny, med prislapp kvar': 'Nyskick',
+    'Helt ny, men utan prislapp': 'Nyskick',
+    'Använd, men utan anmärkning': 'Bra skick',
+    'Använd, tecken på slitage': 'Defekter',
+  }[condition] || '';
+};
+
 const getAttributeDisplayValue = (item, attribute) => {
   switch (attribute) {
     case 'cleanedBrand':
@@ -311,7 +322,7 @@ const getAttributeDisplayValue = (item, attribute) => {
     case 'cleanedModel':
       return item.cleanedModel || item.model || '';
     case 'condition':
-      return shortCondition(item.condition || '', intl);
+      return shortCondition(item.condition || '');
     case 'maiMaterial':
       return item.maiMaterial || item.material || '';
     default:
@@ -339,10 +350,10 @@ const getAttributeDisplayName = (attribute) => {
 
 const buildGroupingDescription = (item, grouping) => {
   const attributeNames = grouping.map(attr =>
-    getAttributeDisplayName(attr, intl),
+    getAttributeDisplayName(attr),
   );
   const attributeValues = grouping.map(attr =>
-    getAttributeDisplayValue(item, attr, intl),
+    getAttributeDisplayValue(item, attr),
   );
 
   // Filter out empty values
@@ -387,6 +398,15 @@ const buildGroupingDescription = (item, grouping) => {
   return `Prisspannet är baserat på liknande sålda ${brandPart} i samma ${attributeTypes}. Snittpriset för dessa försäljningar ligger på ${groupAvgPrice} kr.`;
 };
 
+const isUnknownModel = (item) => {
+  const includedBrandSegments = [ '1A', '1B', '1C', '2A', '2B', '2C', '3', '4', '5A', '7', '9' ];
+  const isIncludedBrandSegment = item?.brandSegment && includedBrandSegments.includes(item.brandSegment);
+  const hasModel = !!item?.model;
+  const grouping = item?.estimatedValuation?.grouping || [];
+  const groupingHasModel = grouping.some(g => g.toLowerCase().includes('model'));
+  return !!(isIncludedBrandSegment && hasModel && !groupingHasModel);
+};
+
 const getEstimatedPriceExplanation = (item) => {
   if (!item.estimatedValuation) {
     return '';
@@ -400,7 +420,7 @@ const getEstimatedPriceExplanation = (item) => {
     groupingText = buildGroupingDescription(item, item.estimatedValuation.grouping);
   }
 
-  if (options?.isUnknownModel) {
+  if (isUnknownModel(item)) {
     return `Vi hittar ingen exakt modell-match för detta plagg, så värderingen är något mer osäker. ${groupingText}`.trim();
   }
 
