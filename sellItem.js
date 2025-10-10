@@ -199,7 +199,7 @@ async function sellItemMain() {
         const hasViewedElement = user.current?.elementViews?.some(view =>
           view.elementID === "conditionUsedInfoBox"
         );
-        
+
         if (!hasViewedElement && !hasCookieSeen) {
           document.getElementById("triggerOpenConditionUsedInfo").click();
           // Store elementViews to be able to hinder it to show automatically again
@@ -326,7 +326,7 @@ async function addItem() {
 }
 
 function needsHumanCheck({ humanCheckNeeded, newMinMaxLog, lowValueSegment, lowValueCategory }) {
-  return humanCheckNeeded || (newMinMaxLog.match(/accept price is above max/i) && !lowValueSegment && !lowValueCategory)
+  return humanCheckNeeded || (newMinMaxLog?.match(/accept price is above max/i) && !lowValueSegment && !lowValueCategory)
 }
 
 async function saveValuationInStorageOrBackend(valuationData, itemId) {
@@ -343,47 +343,47 @@ async function saveValuationInStorageOrBackend(valuationData, itemId) {
   }
 }
 
-async function saveItemValuation(itemId, mlValuationData) {
-  const { minPrice, maxPrice, decline, humanCheckNeeded, humanCheckExplanation, willNotSell, soldPrice, version,
-    newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog, adjustmentAllowed, newBrand, newBrandCategory,
-    valuatedBrandItems, brandMeanMax, brandAccuracy, brandCategoryAccuracy, fewBrand, brandMeanSold,
-    brandCategoryMeanSold, highPriceVarBrandCategory, brandShareSold } = mlValuationData || {};
-  if (!minPrice && !decline) {
+async function saveItemValuation(itemId, estimatedValuationData) {
+  if (!estimatedValuationData?.minPriceEstimate && !estimatedValuationData?.decline) {
     return;
   }
-  const valuationData = {
-    mlValuation: {
-      decline, humanCheckNeeded, minPriceEstimate: minPrice, maxPriceEstimate: maxPrice,
-      humanCheckExplanation,
-      willNotSellPrediction: willNotSell,
-      soldPriceEstimate: soldPrice,
-      modelVersion: version?.toString(),
-      newMinPriceEstimate, newMaxPriceEstimate, newMinMaxLog, adjustmentAllowed, newBrand, newBrandCategory,
-      valuatedBrandItems, brandMeanMax, brandAccuracy, brandCategoryAccuracy, fewBrand, brandMeanSold,
-      brandCategoryMeanSold, highPriceVarBrandCategory, brandShareSold
-    },
-    newMinPriceEstimate: newMinPriceEstimate || minPrice,
-    newMaxPriceEstimate: newMaxPriceEstimate || maxPrice,
-    ...(decline || needsHumanCheck(mlValuationData) ? {} : {
-      valuationStatus: 'Completed',
-      valuationDate: new Date().toISOString(),
-      infoRequests: {
-        price: {
-          status: 'Active',
-          response: '',
-          description: 'Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar. Värderingen utgår från vad liknande sålts för.',
-          minPrice: newMinPriceEstimate || minPrice,
-          maxPrice: newMaxPriceEstimate || maxPrice,
-        }
-      }
-    })
-  }
-  await saveValuationInStorageOrBackend(valuationData, itemId);
+  const estimatedData = {
+    estimatedValuation: estimatedValuationData,
+    newMinPriceEstimate: estimatedValuationData.minPriceEstimate,
+    newMaxPriceEstimate: estimatedValuationData.maxPriceEstimate,
+    ...(estimatedValuationData.decline ||
+    estimatedValuationData.humanCheckNeeded
+      ? {}
+      : {
+          valuationStatus: 'Completed',
+          valuationDate: new Date().toISOString(),
+          infoRequests: {
+            price: {
+              type: 'MLValuation',
+              status: 'Active',
+              response: '',
+              description:
+                'Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar. Värderingen utgår från vad liknande sålts för.',
+              minPrice: estimatedValuationData.minPriceEstimate,
+              maxPrice: estimatedValuationData.maxPriceEstimate,
+            },
+          },
+        }),
+  };
+  await saveValuationInStorageOrBackend(estimatedData, itemId);
 }
 
 function round10(val) {
   return Math.round((val || 0) / 10) * 10;
 }
+
+function shouldUseResellValuation(item, resellItem) {
+  return (
+    item.status !== 'Sold' &&
+    resellItem.valuatedBy &&
+    !['Tobias Rosman', 'Mai Development'].includes(resellItem.valuatedBy)
+  );
+};
 
 async function setValuationFromResellItem(resellItem, item, itemId) {
   const maxPrice = resellItem.status === 'Sold' ? resellItem.maxPriceEstimate :
@@ -418,12 +418,14 @@ async function getAndSaveValuation(itemId, item) {
   if (params.id && params.type !== 'draft') {
     const getItemResponse = await callBackendApi(`/api/items/${params.id}`);
     const resellItem = getItemResponse.data;
-    await setValuationFromResellItem(resellItem, item, itemId);
-    return '/item-valuation';
+    if (shouldUseResellValuation(item, resellItem)) {
+      await setValuationFromResellItem(resellItem, item, itemId);
+      return '/item-valuation';
+    }
   }
   try {
-    const res = await callBackendApi('/api/valuation', { data: { itemId, item }, requiresAuth: false });
-    const { minPrice, maxPrice, decline } = res.data || {};
+    const res = await callBackendApi('/api/valuation/estimate', { data: { itemId, item }, requiresAuth: false });
+    const { minPriceEstimate: minPrice, maxPriceEstimate: maxPrice, decline } = res.data || {};
     await saveItemValuation(itemId, res.data);
     return nextStepAfterValuation(minPrice && maxPrice, decline, needsHumanCheck(res.data));
   } catch (e) {
@@ -432,8 +434,8 @@ async function getAndSaveValuation(itemId, item) {
   return nextStepAfterValuation();
 }
 
-function nextStepAfterValuation(mlValuationPresent, decline, valuationNeedsChecking) {
-  if (!mlValuationPresent || valuationNeedsChecking) {
+function nextStepAfterValuation(valuationPresent, decline, valuationNeedsChecking) {
+  if (!valuationPresent || valuationNeedsChecking) {
     if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
       return '/sign-in';
     }
@@ -913,7 +915,7 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
       document.querySelector('#suggest-colors-div').style.display = 'flex';
       document.querySelector('#suggest-colors-div').style.maxHeight = '200px';
     }
-    
+
     if (itemCondition.selectedIndex >= 0 && itemCondition.options[itemCondition.selectedIndex].text === "Använd, tecken på slitage") {
       defectInfoDiv.style.display = 'block';
     }

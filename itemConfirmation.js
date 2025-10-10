@@ -1,7 +1,7 @@
 import {colorName} from "./sellItemHelpers";
 
 function initializeFields(item) {
-    const { humanCheckNeeded, maxPriceEstimate: mlMaxPriceEstimate, newMinMaxLog } = item.mlValuation || {};
+    const { humanCheckNeeded, maxPriceEstimate: mlMaxPriceEstimate, newMinMaxLog } = item.mlValuation || item.estimatedValuation || {};
     if (item.infoRequests?.price?.response === 'User proposal') {
         document.getElementById('nextStepTitle').style.display = 'block';
         document.getElementById('nextStepTitle').innerText = 'Granskar prisändringar';
@@ -137,7 +137,7 @@ function initializeSlider(item) {
               continue;
           }
           console.log('imageName', imageName);
-          const imageUrl = window.innerWidth <= 350 
+          const imageUrl = window.innerWidth <= 350
             ? (images[`${imageName}Small`] || images[imageName])
             : images[imageName];
 
@@ -188,7 +188,7 @@ function initializeSlider(item) {
     // Determine if the swipe is significant enough to change slides
     if (startX !== null && currentX !== null) {
       const deltaX = currentX - startX;
-  
+
       if (Math.abs(deltaX) > 50) {  // Only process if it's a significant swipe
         if (deltaX > 50) {
           currentSlide = Math.max(currentSlide - 1, 0);
@@ -197,11 +197,11 @@ function initializeSlider(item) {
         }
       }
     }
-    
+
     // Reset the coordinates
     startX = null;
     currentX = null;
-  
+
     updateCarousel();
   });
 
@@ -212,8 +212,8 @@ function initializeSlider(item) {
 const params = getParamsObject();
 if (params.id) {
   getItem(params.id).then(initializeSlider)
-      .catch(e => //location.href = '/private' 
-        console.log('failed')  
+      .catch(e => //location.href = '/private'
+        console.log('failed')
       );
 } else {
   item = JSON.parse(localStorage.getItem('latestItemCreated'));

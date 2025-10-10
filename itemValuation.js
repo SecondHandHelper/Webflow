@@ -33,10 +33,9 @@ async function showDeclineValuation(item) {
   }
 }
 
-const adjustmentOk = (minPrice, maxPrice) => {
+const adjustmentOk = (minPrice) => {
   const adjustedMin = document.getElementById('minPrice').value;
-  const adjustedMax = document.getElementById('maxPrice').value;
-  return !adjustmentRequiresReview(minPrice, maxPrice, Number(adjustedMin), Number(adjustedMax));
+  return !adjustmentRequiresReview(minPrice, Number(adjustedMin));
 }
 
 const priceTooHigh = (price, adjustedPrice) => {
@@ -53,35 +52,30 @@ const priceTooHigh = (price, adjustedPrice) => {
 const minPriceNotOk = (minPrice, maxPrice, adjustedMin) =>
   priceTooHigh(minPrice, adjustedMin) || adjustedMin > estimatedPrice(minPrice, maxPrice);
 
-const adjustmentRequiresReview = (minPrice, maxPrice, adjustmentMin, adjustmentMax) =>
-  minPriceNotOk(minPrice, maxPrice, adjustmentMin) || priceTooHigh(maxPrice, adjustmentMax);
+const adjustmentRequiresReview = (minPrice, adjustedtMin) => adjustedtMin >= 2 * minPrice;
 
-const maxTooHighWarning = (maxPrice, adjustmentMax) => priceTooHigh(maxPrice, adjustmentMax) ? 'Ovanligt högt startpris' : null;
-const minTooHighWarning = (minPrice, adjustmentMin) => priceTooHigh(minPrice, adjustmentMin) ? 'Ovanligt högt lägsta pris' : null;
-const minAboveValuationWarning = (adjustmentMin, estimatedPrice) => adjustmentMin > estimatedPrice ? 'Lägsta priset överstiger vår värdering' : null;
+const minTooHighWarning = (minPrice, adjustedMin) => adjustmentRequiresReview(minPrice, adjustedMin) ? 'Ovanligt högt lägsta pris' : null;
 
-const adjustmentWarningText = (minPrice, maxPrice, adjustmentMin, adjustmentMax) => [
-  maxTooHighWarning(maxPrice, adjustmentMax),
-  minTooHighWarning(minPrice, adjustmentMin),
-  minAboveValuationWarning(adjustmentMin, estimatedPrice(minPrice, maxPrice))
-].filter(p => p).join('<br>');
+const adjustmentWarningText = (minPrice, adjustedMin) => minTooHighWarning(minPrice, adjustedMin);
 
-const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmentMaxInput) => {
-  const adjustmentMin = Number(adjustmentMinInput.value);
-  const adjustmentMax = Number(adjustmentMaxInput.value);
-  adjustmentMaxInput.style.color = priceTooHigh(maxPrice, adjustmentMax) ? '#E20000' : '#333';
-  adjustmentMinInput.style.color = minPriceNotOk(minPrice, maxPrice, adjustmentMin) ? '#E20000' : '#333';
-  if (adjustmentRequiresReview(minPrice, maxPrice, adjustmentMin, adjustmentMax)) {
+const adjustmentValidations = (minPrice, maxPrice, adjustedMinInput, adjustedMaxInput) => {
+  console.log('adjustmentValidations');
+  const adjustedMin = Number(adjustedMinInput.value);
+  const adjustedMax = Number(adjustedMaxInput.value);
+  adjustedMinInput.style.color = adjustmentRequiresReview(minPrice, adjustedMin) ? '#E20000' : '#333';
+  console.log(`adjustedMin ${adjustedMin} ${minPrice}`);
+  if (adjustmentRequiresReview(minPrice, adjustedMin)) {
+    console.log(`adjustmentRequiresReview ${minPrice} ${adjustedMin}`);
     if (document.getElementById('requiresReviewDiv').style.display !== 'block') {
       document.getElementById('requiresReviewDiv').style.display = 'block';
       analytics.track("Element Viewed", { elementID: "requiresReviewDiv" });
     }
-    document.getElementById('adjustmentWarningText').innerHTML = adjustmentWarningText(minPrice, maxPrice, adjustmentMin, adjustmentMax);
+    document.getElementById('adjustmentWarningText').innerHTML = adjustmentWarningText(minPrice, maxPrice, adjustedMin, adjustmentMax);
     document.getElementById('noteDiv').style.display = 'none';
     document.getElementById('sendForReviewButton').style.display = 'flex';
     document.getElementById('confirmButton').style.display = 'none';
     document.getElementById('rejectButton').style.display = 'none';
-  } else if (adjustmentMax !== maxPrice || adjustmentMin !== minPrice) {
+  } else if (adjustedMax !== maxPrice || adjustedMin !== minPrice) {
     document.getElementById('confirmButton').style.display = 'flex';
     document.getElementById('sendForReviewButton').style.display = 'none';
     if (document.getElementById('resetButton').style.visibility !== 'visible') {
@@ -94,7 +88,7 @@ const adjustmentValidations = (minPrice, maxPrice, adjustmentMinInput, adjustmen
     if (adjustmentMax > maxPrice) {
       noteText += 'Ett höjt startpris kan innebära att det tar längre tid för plagget att säljas.';
     }
-    if (adjustmentMin > minPrice) {
+    if (adjustedMin > minPrice) {
       noteText += `${noteText ? ' ' : ''}Ett höjt lägsta pris minskar sannolikheten att det blir sålt.`;
     }
     if (!noteText) {
@@ -152,7 +146,7 @@ async function saveValuationStatus(itemId, minPrice, maxPrice) {
     if (adjustedMin !== minPrice || adjustedMax !== maxPrice) {
       savedItem.item.infoRequests.price.userAdjustedMin = adjustedMin;
       savedItem.item.infoRequests.price.userAdjustedMax = adjustedMax;
-      if (adjustmentOk(minPrice, maxPrice)) {
+      if (adjustmentOk(minPrice)) {
         savedItem.item.minPriceEstimate = adjustedMin;
         savedItem.item.newMinPriceEstimate = adjustedMin;
         savedItem.item.maxPriceEstimate = adjustedMax;
@@ -173,14 +167,14 @@ async function saveValuationStatus(itemId, minPrice, maxPrice) {
       data: {
         itemId, minPrice, maxPrice, adjustmentMin: adjustedMin, adjustmentMax: adjustedMax,
         userProposalMotivation: document.getElementById('userProposalMotivation').value,
-        adjustmentRequiresReview: !adjustmentOk(minPrice, maxPrice)
+        adjustmentRequiresReview: !adjustmentOk(minPrice)
       }
     });
     const params = getParamsObject();
     if (localStorage.getItem('latestItemCreated') && !params.id) {
       const latestItemCreated = JSON.parse(localStorage.getItem('latestItemCreated'));
-      latestItemCreated.infoRequests.price.response = adjustmentOk(minPrice, maxPrice) ? 'Accepted' : 'User proposal';
-      if (adjustmentOk(minPrice, maxPrice)) {
+      latestItemCreated.infoRequests.price.response = adjustmentOk(minPrice) ? 'Accepted' : 'User proposal';
+      if (adjustmentOk(minPrice)) {
         latestItemCreated.minPriceEstimate = adjustedMin;
         latestItemCreated.maxPriceEstimate = adjustedMax;
       }
@@ -200,12 +194,12 @@ const initialPageSetup = (item) => {
   document.getElementById('itemImage').src = window.innerWidth <= 400 ?
     item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || item?.images?.modelImage || item?.images?.frontImageSmall || item?.images?.frontImage :
     item?.images?.enhancedFrontImage || item?.images?.modelImage || item?.images?.frontImage;
-  const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate } = item.mlValuation || {};
+  const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate } = item.mlValuation || item.estimatedValuation || {};
   const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
   const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
 
   document.getElementById('chatLink').onclick = () => Intercom('showNewMessage',
-    item.mlValuation?.decline ?
+    item.mlValuation?.decline || item.estimatedValuation?.decline ?
       `ID: ${item.id}\n\nGällande att ni tackat nej till ${item.brand.trim()}-${item.category.toLowerCase()}:\n\n` :
       `ID: ${item.id}\n\nGällande prisintervallet på ${minPrice}-${maxPrice} kr för ${item.brand.trim()}-${item.category.toLowerCase()}. Vad skulle du vilja ändra det till och varför?\n\n`);
   document.getElementById('valuationClose').addEventListener('click', () => {
@@ -265,10 +259,9 @@ const increasePrice = (input, origValue) => {
 
 const estimatedPrice = (minPrice, maxPrice) => Math.round((minPrice + maxPrice) / 20) * 10;
 const showValuation = async (item) => {
-  const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline } = item.mlValuation || {};
+  const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate, decline } = item.mlValuation || item.estimatedValuation || {};
   const params = getParamsObject();
-  const version = params.version || item?.mlValuation?.modelVersion;
-  if (!params.id && decline) { // Don't show decline screen based on mlValuation if the user come from a infoRequest on private page
+  if (!params.id && decline) { // Don't show decline screen based on valuation if the user come from a infoRequest on private page
     await showDeclineValuation(item);
     document.getElementById('valuationResultDiv').style.display = 'flex';
     return;
@@ -289,8 +282,10 @@ const showValuation = async (item) => {
       document.getElementById('valuationExplanationHeader').innerText = 'Motivering';
       document.getElementById('valuationExplanationHeader').style.display = 'block';
     }
-  } else {
-    document.getElementById('valuationExplanation').innerText = getValuationExplanation(item)
+  } else if (item.mlValuation) {
+    document.getElementById('valuationExplanation').innerText = getMlValuationExplanation(item)
+  } else if (item.estimatedValuation) {
+    document.getElementById('valuationExplanation').innerText = getEstimatedPriceExplanation(item)
   }
 
   document.getElementById('valuationText').style.display = 'block';
@@ -305,7 +300,118 @@ const showValuation = async (item) => {
   document.getElementById('rejectButton').addEventListener('click', () => rejectValuation(item));
 }
 
-const getValuationExplanation = (item) => {
+const getAttributeDisplayValue = (item, attribute) => {
+  switch (attribute) {
+    case 'cleanedBrand':
+      return item.cleanedBrand || item.brand || '';
+    case 'category':
+      return item.category || '';
+    case 'model_group':
+      return item.estimatedValuation?.modelGroup || '';
+    case 'cleanedModel':
+      return item.cleanedModel || item.model || '';
+    case 'condition':
+      return shortCondition(item.condition || '', intl);
+    case 'maiMaterial':
+      return item.maiMaterial || item.material || '';
+    default:
+      return '';
+  }
+};
+
+const getAttributeDisplayName = (attribute) => {
+  switch (attribute) {
+    case 'cleanedBrand':
+      return 'varumärke';
+    case 'category':
+      return 'kategori';
+    case 'model_group':
+    case 'cleanedModel':
+      return 'modell';
+    case 'condition':
+      return 'skick';
+    case 'maiMaterial':
+      return 'material';
+    default:
+      return attribute;
+  }
+};
+
+const buildGroupingDescription = (item, grouping) => {
+  const attributeNames = grouping.map(attr =>
+    getAttributeDisplayName(attr, intl),
+  );
+  const attributeValues = grouping.map(attr =>
+    getAttributeDisplayValue(item, attr, intl),
+  );
+
+  // Filter out empty values
+  const validAttributes = attributeNames
+    .map((name, index) => ({ name, value: attributeValues[index] }))
+    .filter(pair => pair.value && pair.value.trim() !== '');
+
+  if (validAttributes.length === 0) {
+    return '';
+  }
+
+  // Separate brand from other attributes
+  const brandAttribute = validAttributes.find(
+    attr => attr.name === 'varumärke',
+  );
+  const otherAttributes = validAttributes.filter(
+    attr => attr.name !== 'varumärke',
+  );
+
+  // Build brand part (optional)
+  let brandPart = '';
+  if (brandAttribute) {
+    brandPart = `från ${brandAttribute.value} `;
+  }
+
+  // Build attribute types part
+  let attributeTypes = '';
+  if (otherAttributes.length === 0) {
+    attributeTypes = 'kategori';
+  } else if (otherAttributes.length === 1) {
+    attributeTypes = otherAttributes[0].name;
+  } else if (otherAttributes.length === 2) {
+    attributeTypes = `${otherAttributes[0].name} och ${otherAttributes[1].name}`;
+  } else {
+    const allButLast = otherAttributes.slice(0, -1).map(attr => attr.name);
+    const last = otherAttributes[otherAttributes.length - 1].name;
+    attributeTypes = `${allButLast.join(', ')} och ${last}`;
+  }
+
+  const groupAvgPrice = Math.round(item.estimatedValuation?.groupAvgPrice || 0);
+
+  return `Prisspannet är baserat på liknande sålda ${brandPart} i samma ${attributeTypes}. Snittpriset för dessa försäljningar ligger på ${groupAvgPrice} kr.`;
+};
+
+const getEstimatedPriceExplanation = (item) => {
+  if (!item.estimatedValuation) {
+    return '';
+  }
+
+  let groupingText = '';
+  if (
+    item.estimatedValuation.grouping &&
+    item.estimatedValuation.grouping.length > 0
+  ) {
+    groupingText = buildGroupingDescription(item, item.estimatedValuation.grouping);
+  }
+
+  if (options?.isUnknownModel) {
+    return `Vi hittar ingen exakt modell-match för detta plagg, så värderingen är något mer osäker. ${groupingText}`.trim();
+  }
+
+  if (item.estimatedValuation.highUncertaintyFlag) {
+    return `${groupingText} Spannet vi presenterat har större osäkerhet pga hög variation av slutpriser bland liknande sålda.`.trim();
+  }
+
+  return groupingText;
+}
+
+const getMlValuationExplanation = (item) => {
   if (!item || !item.mlValuation) {
     return 'Värderingen baseras på plagg från liknande varumärken som vi värderat tidigare. För att öka sannolikheten att få det sålt kan du justera ner lägsta priset.';
   }
@@ -339,7 +445,7 @@ const getValuationExplanation = (item) => {
 }
 
 const showAdjustValuation = async (item) => {
-  const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate } = item.mlValuation || {};
+  const { minPriceEstimate, newMinPriceEstimate, newMaxPriceEstimate, maxPriceEstimate } = item.mlValuation || item.estimatedValuation || {};
   const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
   const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
 
@@ -391,6 +497,7 @@ const showAdjustValuation = async (item) => {
     const adjustmentMinInput = document.getElementById('minPrice');
     const adjustmentMaxInput = document.getElementById('maxPrice');
     const adjustmentMin = Number(adjustmentMinInput.value);
+    console.log(`adjustmentMin ${adjustmentMin} ${minPrice}`);
     if (adjustmentMin !== minPrice) {
       document.getElementById('origMinPrice').style.visibility = 'visible';
     } else {
@@ -437,20 +544,20 @@ const getItem = async (itemId) => {
   return { ...(res?.data || {}), id: itemId };
 }
 
-const maxIncrease = (price, adjustFlags) => {
-  const { fewBrand, newBrand, brandAccuracy, brandCategoryAccuracy, highPriceVarBrandCategory } = adjustFlags;
-  const uncertainValuationAdjustment = fewBrand || newBrand || highPriceVarBrandCategory ||
-    brandAccuracy < 0.8 || brandCategoryAccuracy < 0.7 ? 0.1 : 0;
+const maxIncrease = (price) => {
   if (price <= 400) {
-    return price * (0.3 + uncertainValuationAdjustment);
+    return price * 0.3;
   } else if (price <= 800) {
-    return price * (0.25 + uncertainValuationAdjustment);
+    return price * 0.25;
   }
-  return price * (0.2 + uncertainValuationAdjustment);
+  return price * 0.2;
 }
 
-const minPriceMaxIncrease = (minPrice, maxPrice, adjustFlags) =>
-  Math.min(maxIncrease(minPrice, adjustFlags), estimatedPrice(minPrice, maxPrice) - minPrice);
+export const minPriceMaxIncrease = (minPrice, maxPrice) =>
+  Math.min(
+    maxIncrease(minPrice),
+    estimatedPrice(minPrice, maxPrice) - minPrice,
+  );
 
 function rangeSlider(minPrice, maxPrice, item) {
   const range = document.getElementById('adjustmentSlider');
@@ -486,16 +593,17 @@ function rangeSlider(minPrice, maxPrice, item) {
         maxInput.value = maxPrice;
         break;
       case 4:
-        minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, maxPrice, item.mlValuation) * 0.33) / 10) * 10;
-        maxInput.value = Math.round((maxPrice + maxIncrease(maxPrice, item.mlValuation) * 0.33) / 10) * 10;
+        console.log(`4 ${minPrice} ${maxPrice} ${minPriceMaxIncrease(minPrice, maxPrice)} ${maxIncrease(maxPrice)}`);
+        minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, maxPrice) * 0.33) / 10) * 10;
+        maxInput.value = Math.round((maxPrice + maxIncrease(maxPrice) * 0.33) / 10) * 10;
         break;
       case 5:
-        minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, maxPrice, item.mlValuation) * 0.67) / 10) * 10;
-        maxInput.value = Math.round((maxPrice + maxIncrease(maxPrice, item.mlValuation) * 0.67) / 10) * 10;
+        minInput.value = Math.round((minPrice + minPriceMaxIncrease(minPrice, maxPrice) * 0.67) / 10) * 10;
+        maxInput.value = Math.round((maxPrice + maxIncrease(maxPrice) * 0.67) / 10) * 10;
         break;
       case 6:
-        minInput.value = Math.floor((minPrice + minPriceMaxIncrease(minPrice, maxPrice, item.mlValuation)) / 10) * 10;
-        maxInput.value = Math.floor((maxPrice + maxIncrease(maxPrice, item.mlValuation)) / 10) * 10;
+        minInput.value = Math.floor((minPrice + minPriceMaxIncrease(minPrice, maxPrice)) / 10) * 10;
+        maxInput.value = Math.floor((maxPrice + maxIncrease(maxPrice)) / 10) * 10;
         break;
     }
     minInput.dispatchEvent(new Event('input'));
@@ -509,7 +617,7 @@ async function sellToMai(item) {
   /* Show spinner and call endpoint */
   document.getElementById('sellToMaiBtnSpinner').style.display = 'block';
   document.getElementById('popupButtonText').style.display = 'none';
-  
+
   const response = await callBackendApi(`/api/items/${item.id}`, {
     data: { soldToMai: true },
     method: 'PUT'
@@ -532,13 +640,13 @@ async function sellToMai(item) {
 function showSellToMaiOption(item) {
   const minPrice = item.infoRequests?.price?.minPrice;
   const sellToMaiOffer = item.infoRequests?.price?.sellToMaiOffer;
-  if (!(sellToMaiOffer && minPrice)) {return} 
-  
+  if (!(sellToMaiOffer && minPrice)) {return}
+
   /* Show sell to Mai option */
   const sellNowPrice = Math.round(0.7 * minPrice);
   document.getElementById('sellToMaiDiv').style.display = 'flex';
   document.getElementById('openSellToMaiBtnText').innerText = `Sälj nu för ${sellNowPrice} kr`;
-  
+
   /* Setup sell to Mai modal and buttons */
   document.getElementById('sellNowPrice').innerText = `${sellNowPrice} kr`;
   document.getElementById('popupButtonText').innerText = `Ja, sälj till Mai för ${sellNowPrice} kr`;
