@@ -1,5 +1,18 @@
 import {itemCoverImage, animateOpenToast, animateCloseToast, hideInfoRequestCard} from "./general";
 
+/**
+ * Converts expires value to a Date object, handling both Firestore timestamp format
+ * ({ _seconds, _nanoseconds }) and standard Date formats (string, number, Date)
+ */
+function convertExpiresToDate(expires) {
+    // Handle Firestore timestamp format
+    if (expires && typeof expires === 'object' && expires._seconds !== undefined) {
+        return new Date(expires._seconds * 1000 + (expires._nanoseconds || 0) / 1000000);
+    }
+    // Handle standard Date formats
+    return new Date(expires);
+}
+
 async function openMeasurementsToast(itemId, description) {
     measurementDescriptionText.innerHTML = description;
     measurementsSubmitButton.addEventListener('click', async function () {
@@ -85,7 +98,7 @@ async function openBidToast(itemId, minPrice, bidPrice, expires) {
   
   // Calculate hours and minutes remaining
   const now = new Date();
-  const expirationDate = new Date(expires);
+  const expirationDate = convertExpiresToDate(expires);
   const timeDiffMs = expirationDate.getTime() - now.getTime();
   const timeDiffMinutes = Math.floor(timeDiffMs / (1000 * 60));
   const hours = Math.floor(timeDiffMinutes / 60);
@@ -248,6 +261,7 @@ async function openNewPriceToast(itemId, status, max, min, brand, description, c
 }
 
 export function loadInfoRequests(items) {
+    console.log("loadInfoRequests");
     const bidClone = document.getElementById('infoRequestBidTemplate').cloneNode(true);  
     const measurementsClone = document.getElementById('infoRequestMeasurementsTemplate').cloneNode(true);
     const longerPeriodClone = document.getElementById('infoRequestLongerPeriodTemplate').cloneNode(true);
@@ -273,6 +287,7 @@ export function loadInfoRequests(items) {
             }
 
             function displayRequests() {
+                console.log("displayRequests", infoRequests);
                 for (const req in infoRequests) {
                     if (infoRequests[req]?.status === "Active") {
                         let description = infoRequests[req].description;
@@ -337,10 +352,12 @@ export function loadInfoRequests(items) {
                         if (req === "bid") {
                           const expires = infoRequests[req].expires;
                           const now = new Date();
-                          const expirationDate = new Date(expires);
+                          const expirationDate = convertExpiresToDate(expires);
                           
                           // Only show bid request if it hasn't expired
+                          console.log("Expired?: ", (expirationDate > now));
                           if (expirationDate > now) {
+                            console.log("We try to show it!");
                             const newRequest = bidClone.cloneNode(true);
                             newRequest.id = `infoRequestBid-${itemId}`;
                             newRequest.querySelector('.img-container').style.backgroundImage = `url('${frontImageUrl}')`;
@@ -353,7 +370,9 @@ export function loadInfoRequests(items) {
                             }, 0);
                           }
                       }
-                        infoRequestsDiv.style.display = "block";
+                        if (infoRequestsList.children.length > 0) {
+                            infoRequestsDiv.style.display = "block";
+                        }
                     }
                 }
             }
