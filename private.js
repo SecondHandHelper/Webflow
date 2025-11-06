@@ -199,6 +199,7 @@ async function askForAdditionalUserDetails(userID) {
   let oneItemNotPaidAndApproved = false;
   let oneItemNotSent = false;
   let pickupShippingMethod = false;
+  let swishNotAvailableUserIds = ['l3FdLmp4CHU0tdmGXvVkjx1inr32'];
 
   // First, get items with status "Sold" and shippingStatus "Not sent"
   await db.collection("items")
@@ -249,7 +250,7 @@ async function askForAdditionalUserDetails(userID) {
   // Redirect user to personalId form if they haven't added it yet
   const userIsTrustedSeller = user.current?.trustedSellerStatus === 'Trusted';
   const userIsNotTrustedSeller = user.current?.trustedSellerStatus === 'Not Trusted';
-  if (oneItemNotPaid && !personalIdExists && 
+  if (oneItemNotPaid && !personalIdExists && !swishNotAvailableUserIds.includes(userID) &&
     (userIsTrustedSeller || oneItemNotPaidAndApproved)) {
     location.href = "/personal-id-form";
   }

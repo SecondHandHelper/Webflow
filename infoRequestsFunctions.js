@@ -104,7 +104,7 @@ async function openBidToast(itemId, minPrice, bidPrice, expires) {
   const hours = Math.floor(timeDiffMinutes / 60);
   const minutes = Math.floor(timeDiffMinutes % 60);
   
-  bidDescription.innerHTML = `Budet ligger under ditt lägsta pris på ${minPrice} kr. Giltigt i ${hours} h och ${minutes} min.`;
+  bidDescription.innerHTML = `Budet ligger under ditt lägsta pris på ${minPrice} kr. Giltigt i ${hours} tim och ${minutes} min.`;
 
   // Accept bid and show confirmation
   bidAcceptButton.removeEventListener("click", bidAcceptHandler);
