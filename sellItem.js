@@ -377,15 +377,15 @@ function round10(val) {
   return Math.round((val || 0) / 10) * 10;
 }
 
-function shouldUseResellValuation(item, resellItem) {
+function shouldUseResellValuation(resellItem) {
   return (
-    item.status !== 'Sold' &&
+    resellItem.status !== 'Sold' &&
     resellItem.valuatedBy &&
     !['Tobias Rosman', 'Mai Development'].includes(resellItem.valuatedBy)
   );
 };
 
-async function setValuationFromResellItem(resellItem, item, itemId) {
+async function setValuationFromResellItem(resellItem, itemId) {
   const maxPrice = resellItem.status === 'Sold' ? resellItem.maxPriceEstimate :
     Math.min(resellItem.maxPriceEstimate,
       Math.max(resellItem.minPriceEstimate + 150, round10(resellItem.minPriceEstimate * 1.3)));
@@ -418,8 +418,8 @@ async function getAndSaveValuation(itemId, item) {
   if (params.id && params.type !== 'draft') {
     const getItemResponse = await callBackendApi(`/api/items/${params.id}`);
     const resellItem = getItemResponse.data;
-    if (shouldUseResellValuation(item, resellItem)) {
-      await setValuationFromResellItem(resellItem, item, itemId);
+    if (shouldUseResellValuation(resellItem)) {
+      await setValuationFromResellItem(resellItem, itemId);
       return '/item-valuation';
     }
   }
