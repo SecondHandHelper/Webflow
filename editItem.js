@@ -471,7 +471,7 @@ async function fillForm(itemId) {
       if (condition === options[i].innerText) {
         itemCondition.selectedIndex = i;
         itemCondition.style.color = "#333";
-        if (options[i].innerText === "Använd, tecken på slitage") {
+        if (options[i].innerText === "Använd, tecken på slitage" || options[i].innerText === "Använd, tydligt slitage") {
           defectInfoDiv.style.display = 'block';
         }
       }
@@ -653,7 +653,7 @@ function setUpEventListeners() {
 
   itemCondition.onchange = function () {
     let input = this.value;
-    if (input === "Använd, tecken på slitage") {
+    if (input === "Använd, tecken på slitage" || input === "Använd, tydligt slitage") {
       defectInfoDiv.style.display = 'block';
       itemCondition.style.color = "#333";
     } else if (input === "") {

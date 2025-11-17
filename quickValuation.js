@@ -103,8 +103,9 @@ function showLatestItemsSold(latestSales) {
     const condition = {
       'Helt ny, med prislapp kvar': 'Helt ny',
       'Helt ny, men utan prislapp': 'Nyskick',
-      'Använd, men utan anmärkning': 'Bra skick',
-      'Använd, tecken på slitage': 'Defekter'
+      'Använd, men utan anmärkning': 'Fint skick',
+      'Använd, tecken på slitage': 'Bra skick',
+      'Använd, tydligt slitage': 'Defekter'
     }[item.condition];
     const soldDate = new Date(item.soldDate).toLocaleDateString('sv-SE',{day: 'numeric', month:'short', year: 'numeric'})
       .replace('.', '').replace(/ (\d{4})$/, ', $1');

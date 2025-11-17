@@ -179,7 +179,7 @@ async function sellItemMain() {
   // Hide/Show extra fields for defects
   itemCondition.onchange = function () {
     let input = this.value;
-    if (input === "Använd, tecken på slitage") {
+    if (input === "Använd, tecken på slitage" || input === "Använd, tydligt slitage") {
       defectInfoDiv.style.display = 'block';
       itemCondition.style.color = "#333";
     } else if (input === "") {
@@ -219,11 +219,14 @@ async function sellItemMain() {
   nwot.addEventListener('click', () => {
     selectFieldValue(itemCondition, 'Helt ny, men utan prislapp');
   })
-  usedNoDefect.addEventListener('click', () => {
+  usedLikeNew.addEventListener('click', () => {
     selectFieldValue(itemCondition, 'Använd, men utan anmärkning');
   })
-  usedDefect.addEventListener('click', () => {
+  usedGood.addEventListener('click', () => {
     selectFieldValue(itemCondition, 'Använd, tecken på slitage');
+  })
+  usedWorn.addEventListener('click', () => {
+    selectFieldValue(itemCondition, 'Använd, tydligt slitage');
   })
 
   personalId.addEventListener("input", () => {
@@ -484,7 +487,7 @@ function collect() {
   // Get defects list
   let defectElements = new Map().set("hole", hole.checked).set("stain", stain.checked).set("lostFit", lostFit.checked).set("pilling", pilling.checked).set("threadUp", threadUp.checked).set("colorChange", colorChange.checked).set("otherDefect", otherDefect.checked);
   let defects = [];
-  if (condition === 'Använd, tecken på slitage') {
+  if (condition === 'Använd, tecken på slitage' || condition === 'Använd, tydligt slitage') {
     defectElements.forEach((value, key) => {
       if (value) {
         let string = defectsChoicesInSwedish().get(key);
@@ -916,7 +919,7 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
       document.querySelector('#suggest-colors-div').style.maxHeight = '200px';
     }
 
-    if (itemCondition.selectedIndex >= 0 && itemCondition.options[itemCondition.selectedIndex].text === "Använd, tecken på slitage") {
+    if (itemCondition.selectedIndex >= 0 && (itemCondition.options[itemCondition.selectedIndex].text === "Använd, tecken på slitage" || itemCondition.options[itemCondition.selectedIndex].text === "Använd, tydligt slitage")) {
       defectInfoDiv.style.display = 'block';
     }
     const itemCategory = $('#itemCategory');

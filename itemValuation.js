@@ -304,10 +304,11 @@ const showValuation = async (item) => {
 
 const shortCondition = (condition) => {
   return {
-    'Helt ny, med prislapp kvar': 'Nyskick',
-    'Helt ny, men utan prislapp': 'Nyskick',
-    'Använd, men utan anmärkning': 'Bra skick',
-    'Använd, tecken på slitage': 'Defekter',
+    'Helt ny, med prislapp kvar': 'Helt ny',
+    'Helt ny, men utan prislapp': 'Helt ny',
+    'Använd, men utan anmärkning': 'Nyskick',
+    'Använd, tecken på slitage': 'Fint skick',
+    'Använd, tydligt slitage': 'Defekter',
   }[condition] || '';
 };
 
