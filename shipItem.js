@@ -78,6 +78,11 @@ function loadItem(itemId) {
                 openShippingLabelButton.href = vestiaireShippingLabel;
                 openShippingLabelButton.style.display = 'block';
               }
+            else if (soldPlatform === 'Grailed') {
+              mainInstructionText.innerText = 'Sätt på fraktsedeln vi skickat dig på påsen och lämna till ombud';
+              howToShipNoQrDiv.style.display = "block";
+              mainInstructionDiv.style.display = "block";
+            }
             } else if (!postnordQrCode && !(soldPlatform === 'Vestiaire Collective' || soldPlatform === 'Grailed')) {
               howToShipQrDiv.style.display = 'block';
               postnordQrCodeMissingDiv.style.display = 'flex';
