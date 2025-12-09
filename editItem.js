@@ -468,12 +468,15 @@ async function fillForm(itemId) {
     }
     options = itemCondition.options;
     for (let i = 0; i < options.length; i++) {
-      if (condition === options[i].innerText) {
+      const optionValue = options[i].attributes.value?.value || options[i].value || '';
+      if (condition === optionValue) {
         itemCondition.selectedIndex = i;
         itemCondition.style.color = "#333";
-        if (options[i].innerText === "Använd, tecken på slitage" || options[i].innerText === "Använd, tydligt slitage") {
+        // Check if the condition value (not text) matches the defect conditions
+        if (condition === "Använd, tecken på slitage" || condition === "Använd, tydligt slitage") {
           defectInfoDiv.style.display = 'block';
         }
+        break;
       }
     }
 
