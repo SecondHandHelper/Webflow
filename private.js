@@ -278,6 +278,9 @@ async function privateMain() {
     document.getElementById('fullLogo').style.display = 'block';
     document.getElementById('onlyLogo').style.display = 'none';
   }
+  if (user.current?.maiCircle) {
+    document.getElementById('headerMaiCircleButton').style.display = 'flex';
+  }
   loadSoldByOthers(userId);
   setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
 

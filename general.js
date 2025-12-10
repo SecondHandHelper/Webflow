@@ -112,8 +112,12 @@ export function itemCoverImage(item) {
 
 export function shareCode() {
     const code = user.current.referralData.referralCode;
-    //const text = `Hej, jag vill tipsa om Mai för att rensa ur garderoben. Mai är en tjänst som hjälper dig att sälja dina kläder på ett enkelt sätt. Man tar bara bilder på sina plagg, sedan sköter Mai resten - såsom värdering, annonsering på flera plattformar, kontakt med köpare och frakt när det blir sålt. Man får själv behålla 80% av vinsten, och blir det inte sålt kostar det ingenting.\n\nOm du registrerar dig med min kod (följ länken) och provar sälja ett plagg inom 7 dagar får du behålla 100% av vinsten för det första plagget (istället för 80%). Min kod: ${code}\n\nLäs mer och använd min kod här:`;
-    const text = `Hej! Följ min personliga länk så säljer Mai ditt första plagg kostnadsfritt! Mai sköter försäljningen av dina kläder, inklusive värdering, lägger ut på flera plattformar samtidigt, har kontakten med köpare och ordnar med frakt när det blir sålt. Man får själv behålla 80% av vinsten, och blir det inte sålt kostar det ingenting.\n\nOm du registrerar dig med min kod (följ länken) och provar sälja ett plagg inom 7 dagar får du behålla 100% av vinsten för det första plagget (istället för 80%). Min kod: ${code}`;
+    let text;
+    if (user.current?.maiCircle) {
+        text = "Här får du en exklusiv inbjudan till Mai, som ger en extra fin start med tre kommissionsfria försäljningar.";
+    } else {
+        text = "Jag bjuder in dig till Mai för att sälja dina kläder! Gå genom min länk för att få en extra kommissionsfri försäljning.";
+    }
     if (navigator.share) {
         navigator.share({
             text: text,

@@ -2,12 +2,20 @@ import { shareCode } from "./general";
 import QRCode from "qrcode";
 
 async function main() {
+  console.log('referral main');
   const params = new URL(window.location).searchParams;
   if (!params.has('app')) {
     if (!user.current?.referralData?.referralCode) {
       return location.href = '/private';
     }
   }
+  
+  // Show/hide referral text based on maiCircle status
+  if (user.current?.maiCircle) {
+    document.getElementById('referralText').style.display = 'none';
+    document.getElementById('referralTextMaiCircle').style.display = 'block';
+  }
+  
   const referralCode = user.current?.referralData?.referralCode;
   document.getElementById('referralCode').innerText = referralCode || '';
   if (user.current?.referralData?.referredUsers?.length > 0) {
@@ -18,49 +26,10 @@ async function main() {
   if (user.current?.referralData?.referredUsers?.length > 0) {
     //TOP STATS
     document.getElementById('invitedFriends').innerText = user.current.referralData.referredUsers.length;
-    const referredUserStatsResponse = await callBackendApi('/api/users/referredUserStats', { requiresAuth: true });
-    const referredUserStats = referredUserStatsResponse.data;
-    document.getElementById('soldItems').innerText = `${referredUserStats.soldItems}`;
-    // https://supermiljobloggen.se/nyheter/secondhand-200-ganger-mindre-klimatskadligt-an-nyproducerat/
-    // 1 plagg orsakar 10 kg CO2 (2-17), och köpa begagnat orsakar 10/200 kg = 0.02kg så i genomsnitt 10kg sparat/plagg
-    document.getElementById('savedCo2').innerText = (referredUserStats.soldItems * 10 / 1000).toLocaleString('sv');
-    topStatsDiv.style.visibility = 'visible';
-    triggerShowReferralTopStats.click();
-
-    //INVITE STATS
-    document.getElementById('invitesRegistered').innerText = referredUserStats.users?.length
-    document.getElementById('invitesAddedItems').innerText = referredUserStats.users?.filter(usr => usr.status === 'activated' || usr.status === 'sold').length;
-    document.getElementById('invitesSoldItems').innerText = referredUserStats.users?.filter(usr => usr.status === 'sold').length;
-    const invitedFriendRow = document.getElementById('invitedFriendRow');
-    const invitedFriendStatusesDiv = document.getElementById('invitedFriendStatusesDiv');
-    invitedFriendStatusesDiv.innerHTML = '';
-    for (const [idx, invitedFriend] of (referredUserStats.users?.entries() || [])) {
-      const newRow = invitedFriendRow.cloneNode(true);
-      newRow.id = `${newRow.id}_${idx}`;
-      newRow.firstChild.innerText = invitedFriend.name;
-      newRow.childNodes[1].innerText = statusText(invitedFriend.status);
-      invitedFriendStatusesDiv.appendChild(newRow);
-    }
-    document.getElementById('referralDetails').style.display = 'block';
-    callBackendApi('/api/users/referralStats', { requiresAuth: true }).then(referralStatsResponse => {
-      const referralStats = referralStatsResponse.data;
-      document.getElementById('nextFreePill').style.display = referralStats.freeSells > referralStats.usedFreeSells ? 'block' : 'none';
-      document.getElementById('freeSells').innerText = referralStats.freeSells;
-      document.getElementById('usedFreeSells').innerText = referralStats.usedFreeSells;
-      document.getElementById('availableFreeSells').innerText = `/${referralStats.freeSells}`;
-      freeSellsStats.style.visibility = 'visible';
-      freeSellsStatsLoadingIcon.style.display = 'none';
-      //To add: Show airtable data...
-    });
+    document.getElementById('topStatsDiv').style.visibility = 'visible';
+    document.getElementById('topStats').style.display = 'flex';
+    document.getElementById('topStatsLoadingIcon').style.display = 'none';
   }
-}
-
-function statusText(status) {
-  return {
-    registered: 'Skapat konto',
-    activated: 'Lagt upp plagg',
-    sold: 'Sålt plagg'
-  }[status];
 }
 
 const params = getParamsObject();

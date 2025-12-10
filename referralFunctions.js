@@ -18,7 +18,12 @@ async function showBonusSection() {
   console.log("Days since user registered", daysDiff);
   const referralData = user.current?.referralData;
 
-  if (referralData && referralData?.referredBy && !referralData?.referredByBonusPaid && !referralData?.referredByDiscountUsed) {
+  // Check for VIP invite first
+  if (user.current?.vipInvite) {
+    return;
+  }
+
+  if (!user.current?.vipInvite && referralData && referralData?.referredBy && !referralData?.referredByBonusPaid && !referralData?.referredByDiscountUsed) {
     // Get inviters first name
     const inviter = referralData?.referredBy;
     const res = await callBackendApi(`/api/users/${inviter}/referrerInfo`, { requiresAuth: true });
@@ -36,19 +41,33 @@ async function showBonusSection() {
   }
 }
 
-async function showActivatedBonus(referrerName, referrerCode) {
+async function showActivatedBonus(referrerName, referrerCode, isVipInvite = false) {
   console.log('showActivatedBonus run');
-  let bonusNameText = 'BONUS';
-  if (referrerName && referrerName !== 'Mai') {
-    bonusNameText = "BONUS - INBJUDEN AV " + referrerName.toUpperCase();
-  } else if (referrerCode) {
-    bonusNameText = "BONUS - " + referrerCode.toUpperCase();
-  }
   if (document.getElementById("bonusSection")) {
-    document.getElementById("bonusName").innerHTML = bonusNameText;
-    document.getElementById("bonusActivatedState").style.display = 'block';
-    document.getElementById("enterCodeState").style.display = 'none';
-    bonusSection.style.display = 'block';
+    if (isVipInvite) {
+      // VIP invite special handling
+      let bonusNameText = 'INBJUDEN AV VÄN';
+      if (referrerName) {
+        bonusNameText = "INBJUDEN AV " + referrerName.toUpperCase();
+      }
+      document.getElementById("bonusName").innerHTML = bonusNameText;
+      document.getElementById("bonusTitle").innerHTML = 'Välkommen';
+      document.getElementById("bonusText").innerHTML = 'Eftersom du blivit särskilt inbjuden vill vi ge dig en extra fin start. Du får sälja dina första tre plagg helt utan avgift, och vi bjuder på 200 kr att handla för på Mai.';
+      document.getElementById("bonusActivatedState").style.display = 'block';
+      document.getElementById("enterCodeState").style.display = 'none';
+      bonusSection.style.display = 'block';
+    } else {
+      let bonusNameText = 'BONUS';
+      if (referrerName && referrerName !== 'Mai') {
+        bonusNameText = "BONUS - INBJUDEN AV " + referrerName.toUpperCase();
+      } else if (referrerCode) {
+        bonusNameText = "BONUS - " + referrerCode.toUpperCase();
+      }
+      document.getElementById("bonusName").innerHTML = bonusNameText;
+      document.getElementById("bonusActivatedState").style.display = 'block';
+      document.getElementById("enterCodeState").style.display = 'none';
+      bonusSection.style.display = 'block';
+    }
   }
 }
 
@@ -89,7 +108,19 @@ async function connectReferralUsers(inputCode) {
       return 
     }
     if (res?.data?.name) {
-      await showActivatedBonus(res?.data?.name, inputCode);
+      // Refresh user data to get updated vipInvite status
+      const userResponse = await callBackendApi('/api/users', { requiresAuth: true });
+      if (userResponse?.data) {
+        user.current = userResponse.data;
+        localStorage.setItem('sessionUser', JSON.stringify(user.current));
+      }
+      
+      // Check if user has vipInvite after refresh
+      if (user.current?.vipInvite) {
+        await showActivatedBonus(res?.data?.name, inputCode, true);
+      } else {
+        await showActivatedBonus(res?.data?.name, inputCode);
+      }
       console.log("Referral connection successfully stored");
     } else {
       console.log("Failed to use referral code", res?.data);
