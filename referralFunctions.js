@@ -52,7 +52,7 @@ async function showActivatedBonus(referrerName, referrerCode, isVipInvite = fals
       }
       document.getElementById("bonusName").innerHTML = bonusNameText;
       document.getElementById("bonusTitle").innerHTML = 'Välkommen';
-      document.getElementById("bonusText").innerHTML = 'Eftersom du blivit särskilt inbjuden vill vi ge dig en extra fin start. Du får sälja dina första tre plagg helt utan avgift, och vi bjuder på 200 kr att handla för på Mai.';
+      document.getElementById("bonusText").innerHTML = 'Eftersom du blivit särskilt inbjuden vill vi ge dig en extra fin start. Du får sälja dina första tre plagg helt utan avgift.';
       document.getElementById("bonusActivatedState").style.display = 'block';
       document.getElementById("enterCodeState").style.display = 'none';
       bonusSection.style.display = 'block';

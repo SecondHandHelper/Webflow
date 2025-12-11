@@ -280,6 +280,7 @@ async function privateMain() {
   }
   if (user.current?.maiCircle) {
     document.getElementById('headerMaiCircleButton').style.display = 'flex';
+    document.getElementById('cta-header-text').style.display = 'none';
   }
   loadSoldByOthers(userId);
   setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
@@ -603,8 +604,17 @@ async function showFreeSellBox(items) {
   if (hasActiveCoupon) {
     if (!noItems && noSoldItems) {
       document.getElementById('freeSellBoxTitle').innerHTML = 'Nästa försäljning är fri';
-      document.getElementById('freeSellBoxText').innerHTML = 'Du har fått en fri försäljning av Mai';
+      document.getElementById('freeSellBoxSubText').innerHTML = 'Du har fått en fri försäljning av Mai';
     }
+    document.getElementById('freeSellBox').style.display = 'block';
+  }
+  console.log('user.current?.referralData?.vipInviteDiscountsUsed', user.current?.referralData?.vipInviteDiscountsUsed);
+  const vipInviteDiscountsUsed = user.current?.referralData?.vipInviteDiscountsUsed || 0;
+  console.log('vipInviteDiscountsUsed', vipInviteDiscountsUsed);
+  console.log('user.current?.vipInvite && vipInviteDiscountsUsed < 3', (user.current?.vipInvite && vipInviteDiscountsUsed < 3));
+  if (user.current?.vipInvite && vipInviteDiscountsUsed < 3) {
+    document.getElementById('freeSellBoxTitle').innerHTML = 'Tre kostnadsfria försäljningar';
+    document.getElementById('freeSellBoxSubText').innerHTML = 'Exklusiv inbjudan av vän';
     document.getElementById('freeSellBox').style.display = 'block';
   }
 }
