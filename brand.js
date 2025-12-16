@@ -61,7 +61,7 @@ function loadRecentlySold() {
       }
       if (isBrandLook2) {
         itemListRecentlySoldStartPage.innerHTML += `<div class="div-block-14-super-big"><div class="ratio-box _16-9"><div class="content-block with-image">
-                        <a href="https://shop.maiapp.se/collections${brandPartners[brand].maiShopPath}" class="see-more-items-button">Till Mai Shop</a>  
+                        <a href="https://mairesale.com/collections${brandPartners[brand].maiShopPath}" class="see-more-items-button">Till Mai Shop</a>
                         </div></div>`;
       }
     })
@@ -110,7 +110,7 @@ async function fetchAndLoadRecentlyAddedItems() {
     }
     if (isBrandLook2) {
       itemList.innerHTML += `<div class="div-block-14-super-big"><div class="ratio-box _16-9"><div class="content-block with-image">
-                        <a href="https://shop.maiapp.se/collections/${brandPartners[brand].maiShopPath}" class="see-more-items-button">Upptäck mer</a>  
+                        <a href="https://mairesale.com/collections/${brandPartners[brand].maiShopPath}" class="see-more-items-button">Upptäck mer</a>
                         </div></div>`;
     }
   } catch (e) {

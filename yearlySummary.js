@@ -46,14 +46,14 @@ function shareYearly() {
   const params = getParamsObject();
   if (navigator.share) {
     navigator.share({
-      url: `https://maiapp.se/yearly-summary?id=${params.id}&year=${params.year}`
+      url: `https://mairesale.com/yearly-summary?id=${params.id}&year=${params.year}`
     }).then(() => { console.log('Thanks for sharing!'); }).catch((e) => {
       console.error(e);
       errorHandler.report(e);
     });
   } else {
     console.log("Browser doesn't support navigator.share => Copy to clipboard!");
-    const shareText = `https://maiapp.se/yearly-summary?id=${params.id}&year=${params.year}`;
+    const shareText = `https://mairesale.com/yearly-summary?id=${params.id}&year=${params.year}`;
     navigator.clipboard.writeText(shareText);
     linkCopiedBanner.style.display = 'flex';
     setTimeout(function () { linkCopiedBanner.style.display = 'none'; }, 1500);

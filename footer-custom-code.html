@@ -11,7 +11,7 @@
 <script>
   const JS_VERSION = 'v1.3.49';
   errorHandler = new StackdriverErrorReporter();
-  const environment = location.href.includes('maiapp.se') ? 'web-prod' : 'web-test';
+  const environment = (location.href.includes('maiapp.se') || location.href.includes('mairesale.com')) ? 'web-prod' : 'web-test';
   errorHandler.start({
     key: 'AIzaSyA1XebVWrZ_WlhKtlqqaRE8omzzn50zd-U',
     projectId: 'second-hand-helper',
@@ -339,7 +339,7 @@
       appendJsScript(`https://rawcdn.githack.com/SecondHandHelper/Webflow/${version}/dist/${jsFile}`);
     }
 
-    if (location.href.match(/maiapp.se/)) {
+    if (location.href.match(/maiapp.se|mairesale.com/)) {
       loadFromGitHack();
     } else {
       appendJsScript(`http://localhost:1234/${jsFile}`, loadFromGitHack);

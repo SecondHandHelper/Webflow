@@ -2,7 +2,7 @@
   var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   var domain = window.location.origin;
   // Show desktop DIV if on desktop
-  if (!isMobile && domain.includes("maiapp.se")) {
+  if (!isMobile && (domain.includes("maiapp.se") || domain.includes("mairesale.com"))) {
     desktopDiv.style.display = 'block';
     mobileContainer.style.display = 'none';
   }

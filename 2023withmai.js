@@ -40,14 +40,14 @@ function shareYearly() {
   const params = getParamsObject();
   if (navigator.share) {
     navigator.share({
-      url: `https://maiapp.se/2023withmai?id=${params.id}`
+      url: `https://mairesale.com/2023withmai?id=${params.id}`
     }).then(() => { console.log('Thanks for sharing!'); }).catch((e) => {
       console.error(e);
       errorHandler.report(e);
     });
   } else {
     console.log("Browser doesn't support navigator.share => Copy to clipboard!");
-    const shareText = `https://maiapp.se/2023withmai?id=${params.id}`;
+    const shareText = `https://mairesale.com/2023withmai?id=${params.id}`;
     navigator.clipboard.writeText(shareText);
     linkCopiedBanner.style.display = 'flex';
     setTimeout(function () { linkCopiedBanner.style.display = 'none'; }, 1500);

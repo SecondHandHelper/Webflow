@@ -95,7 +95,7 @@ async function openBidToast(itemId, minPrice, bidPrice, expires) {
   bidButtonsContainer.style.visibility = 'visible';
   bidButtonsContainer.style.visibility = 'visible';
   bidPriceText.innerHTML = `${bidPrice} kr`;
-  
+
   // Calculate hours and minutes remaining
   const now = new Date();
   const expirationDate = convertExpiresToDate(expires);
@@ -103,7 +103,7 @@ async function openBidToast(itemId, minPrice, bidPrice, expires) {
   const timeDiffMinutes = Math.floor(timeDiffMs / (1000 * 60));
   const hours = Math.floor(timeDiffMinutes / 60);
   const minutes = Math.floor(timeDiffMinutes % 60);
-  
+
   bidDescription.innerHTML = `Budet ligger under ditt lägsta pris på ${minPrice} kr. Giltigt i ${hours} tim och ${minutes} min.`;
 
   // Accept bid and show confirmation
@@ -126,23 +126,23 @@ async function openBidToast(itemId, minPrice, bidPrice, expires) {
           acceptBidButtonText.style.display = 'block';
           bidTitle.style.visibility = 'hidden';
           bidButtonsContainer.style.visibility = 'hidden';
-          
+
           // Fade out animation
           bidPriceText.style.transition = 'opacity 0.3s ease';
           bidDescription.style.transition = 'opacity 0.3s ease';
           bidPriceText.style.opacity = '0';
           bidDescription.style.opacity = '0';
-          
+
           // Wait for fade out to complete, then change text and fade in
           setTimeout(() => {
               bidPriceText.innerHTML = 'Toppen!';
               bidDescription.innerHTML = 'När köparen betalat får du ett SMS om att det är sålt och redo att skickas.';
-              
+
               // Fade in animation
               bidPriceText.style.opacity = '1';
               bidDescription.style.opacity = '1';
           }, 300);
-          
+
           // Hide the specific info request element instead of reloading the page
           hideInfoRequestCard(`infoRequestBid-${itemId}`);
       } catch (error) {
@@ -152,9 +152,10 @@ async function openBidToast(itemId, minPrice, bidPrice, expires) {
   };
   bidAcceptButton.addEventListener('click', acceptBid);
   bidAcceptHandler = acceptBid;
-  
+
   // Decline bid
   bidDenyButton.removeEventListener("click", bidDenyHandler);
+  // TODO: Use web-api endpoint instead to trigger backend logic
   const denyBid = async function () {
       await db.collection('items').doc(itemId).update({
           "infoRequests.bid.status": "Resolved",
@@ -262,7 +263,7 @@ async function openNewPriceToast(itemId, status, max, min, brand, description, c
 
 export function loadInfoRequests(items) {
     console.log("loadInfoRequests");
-    const bidClone = document.getElementById('infoRequestBidTemplate').cloneNode(true);  
+    const bidClone = document.getElementById('infoRequestBidTemplate').cloneNode(true);
     const measurementsClone = document.getElementById('infoRequestMeasurementsTemplate').cloneNode(true);
     const longerPeriodClone = document.getElementById('infoRequestLongerPeriodTemplate').cloneNode(true);
     const updateImagesClone = document.getElementById('infoRequestImagesTemplate').cloneNode(true);
@@ -291,7 +292,7 @@ export function loadInfoRequests(items) {
                 for (const req in infoRequests) {
                     if (infoRequests[req]?.status === "Active") {
                         let description = infoRequests[req].description;
-                        
+
                         if (description) { description = description.replace(/'/g, ''); }
                         // PRICE REQUEST
                         if (req === "price") {
@@ -353,7 +354,7 @@ export function loadInfoRequests(items) {
                           const expires = infoRequests[req].expires;
                           const now = new Date();
                           const expirationDate = convertExpiresToDate(expires);
-                          
+
                           // Only show bid request if it hasn't expired
                           console.log("Expired?: ", (expirationDate > now));
                           if (expirationDate > now) {
@@ -377,7 +378,7 @@ export function loadInfoRequests(items) {
                 }
             }
     });
-    
+
 /*
     db.collection("items").where("user", "==", userId).get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
@@ -400,7 +401,7 @@ export function loadInfoRequests(items) {
                 for (const req in infoRequests) {
                     if (infoRequests[req]?.status === "Active") {
                         let description = infoRequests[req].description;
-                        
+
                         if (description) { description = description.replace(/'/g, ''); }
                         // PRICE REQUEST
                         if (req === "price") {

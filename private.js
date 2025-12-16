@@ -337,7 +337,7 @@ async function privateMain() {
   prepareMenu(user.current);
   loadInfoRequests(items);
   showFreeSellBox(items);
-  if (user.current?.trustedSellerStatus !== 'Pending' && 
+  if (user.current?.trustedSellerStatus !== 'Pending' &&
     user.current?.trustedSellerStatusChange && !user.current.trustedSellerStatusChange.seen) {
     showTrustedSellerBottomSheet();
   }
@@ -723,7 +723,7 @@ async function fetchAndShowRecommendedItems(items) {
     itemList.querySelectorAll("a").forEach(link => link.addEventListener('click', linkClickTracker));
 
     document.getElementById('goToMaiShopLinkRecommendations').setAttribute("href",
-      `https://shop.maiapp.se/collections/damklader/${response.data[0].sex || 'Woman'}?sort_by=created-descending&filter.p.m.global.size=${itemSizes.join('&filter.p.m.global.size=')}`);
+      `https://mairesale.com/collections/damklader/${response.data[0].sex || 'Woman'}?sort_by=created-descending&filter.p.m.global.size=${itemSizes.join('&filter.p.m.global.size=')}`);
     const observer = new IntersectionObserver((entries, opts) => {
       const rect = itemList.getBoundingClientRect();
       const isVisible = rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
@@ -823,7 +823,7 @@ function showTrustedSellerWidget(items) {
   if (!user.current?.trustedSellerStatus || user.current?.trustedSellerStatus === 'Pending') {
     const trustedSellerWidget = document.getElementById('trustedSellerWidget');
     const hasItems = items?.data?.length > 0;
-    
+
     // If no items, move widget after soldByOthersDiv
     if (!hasItems) {
       console.log('No items, moving widget after soldByOthersDiv');
@@ -925,7 +925,7 @@ function onLoadHandler() {
     closeAppPromoSection();
   });
 
-  
+
   document
     .getElementById("darkOverlay")
     .addEventListener("click", function() {
