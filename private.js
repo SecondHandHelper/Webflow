@@ -281,6 +281,7 @@ async function privateMain() {
   if (user.current?.maiCircle) {
     document.getElementById('headerMaiCircleButton').style.display = 'flex';
     document.getElementById('cta-header-text').style.display = 'none';
+    document.getElementById('cta-header').style.borderRadius = '9999px';
   }
   loadSoldByOthers(userId);
   setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
