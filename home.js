@@ -1,5 +1,78 @@
 import { itemCoverImage } from "./general";
 
+function startAutoScroll(itemListElement) {
+  if (!itemListElement) return;
+  
+  let autoScrollActive = true;
+  let animationFrameId = null;
+  let isProgrammaticScroll = false;
+  let lastScrollLeft = itemListElement.scrollLeft;
+  const scrollSpeed = 0.5; // pixels per frame (adjust for speed)
+  
+  // Check if there's content to scroll
+  const maxScroll = itemListElement.scrollWidth - itemListElement.clientWidth;
+  if (maxScroll <= 0) return; // No scrolling needed
+  
+  const autoScroll = () => {
+    if (!autoScrollActive) return;
+    
+    const currentScroll = itemListElement.scrollLeft;
+    const maxScroll = itemListElement.scrollWidth - itemListElement.clientWidth;
+    
+    // Stop if we've reached the end
+    if (currentScroll >= maxScroll - 1) {
+      return;
+    }
+    
+    // Scroll to the right programmatically
+    isProgrammaticScroll = true;
+    itemListElement.scrollLeft += scrollSpeed;
+    lastScrollLeft = itemListElement.scrollLeft;
+    isProgrammaticScroll = false;
+    animationFrameId = requestAnimationFrame(autoScroll);
+  };
+  
+  // Pause auto-scroll on user interaction
+  const pauseAutoScroll = () => {
+    autoScrollActive = false;
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+  };
+  
+  // Detect user scroll (when scroll position changes without our programmatic scroll)
+  const handleScroll = () => {
+    if (isProgrammaticScroll) {
+      lastScrollLeft = itemListElement.scrollLeft;
+      return;
+    }
+    
+    const currentScrollLeft = itemListElement.scrollLeft;
+    // If scroll changed and it wasn't our programmatic scroll, user is interacting
+    if (Math.abs(currentScrollLeft - lastScrollLeft) > scrollSpeed * 1.5) {
+      pauseAutoScroll();
+      itemListElement.removeEventListener('scroll', handleScroll);
+    } else {
+      lastScrollLeft = currentScrollLeft;
+    }
+  };
+  
+  // Listen for direct user interactions (these immediately pause)
+  itemListElement.addEventListener('touchstart', pauseAutoScroll, { once: true });
+  itemListElement.addEventListener('mousedown', pauseAutoScroll, { once: true });
+  itemListElement.addEventListener('wheel', pauseAutoScroll, { once: true });
+  itemListElement.addEventListener('scroll', handleScroll);
+  
+  // Start auto-scroll after a short delay to ensure content is rendered
+  setTimeout(() => {
+    if (autoScrollActive) {
+      lastScrollLeft = itemListElement.scrollLeft;
+      animationFrameId = requestAnimationFrame(autoScroll);
+    }
+  }, 500);
+}
+
 function loadRecentlySold() {
   const recentlySoldItems = callBackendApi("/api/items/recentlySold");
 
@@ -9,11 +82,7 @@ function loadRecentlySold() {
       const itemListRecentlySold1 = document.getElementById(
         "itemListRecentlySold1"
       );
-      const itemListRecentlySold2 = document.getElementById(
-        "itemListRecentlySold2"
-      );
       itemListRecentlySold1.innerHTML = "";
-      itemListRecentlySold2.innerHTML = "";
       const itemListRecentlySoldStartPageDesktop = document.getElementById(
         "itemListRecentlySoldStartPageDesktop"
       );
@@ -33,17 +102,16 @@ function loadRecentlySold() {
                         <div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div>
                         <div>
                         <div>${brand}</div>
-                        <div>Såld för ${soldPrice}kr</div>
+                        <div>Såld för ${soldPrice} kr</div>
                         </div>
                         </div>`;
-          if (index % 2 === 0) {
-            itemListRecentlySold1.innerHTML += itemCardHTML;
-          } else {
-            itemListRecentlySold2.innerHTML += itemCardHTML;
-          }
+          itemListRecentlySold1.innerHTML += itemCardHTML;
           itemListRecentlySoldStartPageDesktop.innerHTML += itemCardHTML;
         }
       });
+      
+      // Start auto-scroll after items are loaded
+      startAutoScroll(itemListRecentlySold1);
     })
     .catch((error) => {
       errorHandler.report(error);
@@ -80,18 +148,6 @@ async function fetchAndLoadRecentlyAddedItems() {
   } catch (e) {
     errorHandler.report(e);
     console.log("error", e);
-  }
-}
-
-window.onload = function () {
-  const list1 = document.getElementById("itemListRecentlySold1");
-  const list2 = document.getElementById("itemListRecentlySold2");
-
-  if (list1) {
-    list1.classList.add("scroll-left");
-  }
-  if (list2) {
-    list2.classList.add("scroll-right");
   }
 }
 
