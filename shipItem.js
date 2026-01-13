@@ -11,7 +11,6 @@ if (params.app) {
 
 function loadItem(itemId) {
   console.log(`loadItem(${itemId})`);
-  console.log('TOBIAS');
   db.collection("items").doc(itemId)
     .get().then((doc) => {
       if (doc.exists) {
@@ -127,8 +126,10 @@ if (isMobile) {
   authUser.whenSet(() => {
     loadItem(params.id);
   });
-  if (!user.current && !params.has('app')) {
-    location.href = '/sign-in'
+  console.log('DO I GET HERE? user.current', user.current);
+  if (!user.current && !params.app) {
+    console.log('TOBIAS redirecting to sign-in');
+    location.href = './sign-in' + window.location.search;
   }
 } else {
   const qrCanvas = document.getElementById('qrCanvas')
