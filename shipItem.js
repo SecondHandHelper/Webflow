@@ -1,4 +1,5 @@
 import { itemCoverImage } from "./general";
+import QRCode from "qrcode";
 
 const params = getParamsObject();
 if (params.app) {
@@ -10,6 +11,7 @@ if (params.app) {
 
 function loadItem(itemId) {
   console.log(`loadItem(${itemId})`);
+  console.log('TOBIAS');
   db.collection("items").doc(itemId)
     .get().then((doc) => {
       if (doc.exists) {
@@ -119,7 +121,22 @@ function loadItem(itemId) {
     });
 }
 
-// Load item
-authUser.whenSet(() => {
-  loadItem(params.id);
-});
+var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+if (isMobile) {
+  // Load item
+  authUser.whenSet(() => {
+    loadItem(params.id);
+  });
+  if (!user.current && !params.has('app')) {
+    location.href = '/sign-in'
+  }
+} else {
+  const qrCanvas = document.getElementById('qrCanvas')
+  if (qrCanvas) {
+    QRCode.toCanvas(qrCanvas, window.location.href, function (error) {
+      if (error) console.error(error)
+      console.log('success!');
+    });
+  }
+}
+
