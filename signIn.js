@@ -148,11 +148,6 @@ async function createCrossDomainSession() {
       method: "POST",
       fetchInit: { credentials: "include" }, // required for httpOnly cookie
     });
-
-    if (!res.ok) {
-      const errorText = await res.text().catch(() => "");
-      console.warn("[SSO] Failed to create session cookie:", res.status, errorText);
-    }
   } catch (e) {
     console.warn("[SSO] Error creating session cookie:", e);
   }

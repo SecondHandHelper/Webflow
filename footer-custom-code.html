@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.3.63';
+  const JS_VERSION = 'v1.3.64';
   errorHandler = new StackdriverErrorReporter();
   const environment = (location.href.includes('maiapp.se') || location.href.includes('mairesale.com')) ? 'web-prod' : 'web-test';
   errorHandler.start({
@@ -244,13 +244,10 @@
         fetchInit: { credentials: "include" },
       });
 
-      if (!res.ok) return;
-
-      const data = await res.json().catch(() => null);
-      if (!data || !data.token) return;
+      if (!res.data?.token) return;
 
       // Log into Firebase using the custom token
-      await auth.signInWithCustomToken(data.token);
+      await auth.signInWithCustomToken(res.data.token);
     } catch (e) {
       console.warn("[SSO] Session cookie bootstrap failed:", e);
     }
@@ -262,9 +259,9 @@
 
 </script>
 
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.63/cookieManagement.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.63/signIn.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.63/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.64/cookieManagement.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.64/signIn.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.64/referralFunctions.js"></script>
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>
