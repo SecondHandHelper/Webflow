@@ -241,6 +241,7 @@
       // Ask backend to verify session cookie and return a Firebase custom token
       const res = await callBackendApi('/api/users/session/verify', {
         method: "POST",
+        requiresAuth: false,
         fetchInit: { credentials: "include" },
       });
 
