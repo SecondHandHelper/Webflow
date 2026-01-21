@@ -146,7 +146,7 @@ async function createCrossDomainSession() {
   try {
     const res = await callBackendApi('/api/users/session', {
       requiresAuth: true,
-      extraHeaders: { credentials: "include" }, // required for httpOnly cookie
+      fetchInit: { credentials: "include" }, // required for httpOnly cookie
     });
 
     if (!res.ok) {

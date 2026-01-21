@@ -11,7 +11,7 @@ export function signOut() {
         deleteCookie('maiAuth');
         callBackendApi('/api/users/session', {
           method: "DELETE",
-          extraHeaders: { credentials: "include" },
+          fetchInit: { credentials: "include" },
         }).catch((error) => {
           errorHandler.report(error);
           console.warn("[SSO] Error clearing session cookie:", e);

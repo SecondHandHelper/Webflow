@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.3.60';
+  const JS_VERSION = 'v1.3.61';
   errorHandler = new StackdriverErrorReporter();
   const environment = (location.href.includes('maiapp.se') || location.href.includes('mairesale.com')) ? 'web-prod' : 'web-test';
   errorHandler.start({
@@ -137,7 +137,7 @@
   };
 
   // Function to call web api backend function, with or without auth
-  async function callBackendApi(path, { data, method, requiresAuth, timeoutSec = 20, useLegacyFallback = true, extraHeaders = {} } = {}) {
+  async function callBackendApi(path, { data, method, requiresAuth, timeoutSec = 20, useLegacyFallback = true, fetchInit = {} } = {}) {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), timeoutSec*1000);
     let idToken = '';
@@ -161,8 +161,8 @@
             'Content-Type': 'application/json',
             ...CLIENT_CHANNEL_HEADERS,
             ...(idToken?.length ? { 'Authorization': `Bearer ${idToken}`} : {}),
-            ...extraHeaders
           },
+          ...fetchInit,
           ...(data ? { body: JSON.stringify(data) } : {}),
           signal: controller.signal
         });
@@ -241,7 +241,7 @@
       // Ask backend to verify session cookie and return a Firebase custom token
       const res = await callBackendApi('/api/users/session/verify', {
         method: "POST",
-        extraHeaders: { credentials: "include" },
+        fetchInit: { credentials: "include" },
       });
 
       if (!res.ok) return;
@@ -262,9 +262,9 @@
 
 </script>
 
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.60/cookieManagement.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.60/signIn.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.60/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.61/cookieManagement.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.61/signIn.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.61/referralFunctions.js"></script>
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>
