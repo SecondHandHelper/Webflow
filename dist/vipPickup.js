@@ -38,7 +38,7 @@ var n=t.code;console.log("Error message: ",t.message,n)});// [END fb_functions_c
 }(),isIos&&function(){let t=document.getElementById("downloadAppLink");t.style.display="flex"}(),// Show intercom messenger
 window.intercomSettings={app_id:"klyy0le5"},!function(){var t=window,n=t.Intercom;if("function"==typeof n)n("reattach_activator"),n("update",t.intercomSettings);else{var r=document,o=function(){o.c(arguments)};o.q=[],o.c=function(t){o.q.push(t)},t.Intercom=o;var i=function(){var t=r.createElement("script");t.type="text/javascript",t.async=!0,t.src="https://widget.intercom.io/widget/klyy0le5";var n=r.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n)};t.attachEvent?t.attachEvent("onload",i):t.addEventListener("load",i,!1)}}(),"function"==typeof Intercom)l();else{// Wait for Intercom to load
 let t=setInterval(()=>{"function"==typeof Intercom&&(clearInterval(t),l())},100);// Timeout after 5 seconds if Intercom doesn't load
-setTimeout(()=>clearInterval(t),5e3)}if(!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){let t=document.getElementById("qrCanvas");t&&(0,s.default).toCanvas(t,window.location.href,function(t){t?(console.error("QR code generation error:",t),errorHandler.report(t)):console.log("QR code generated successfully")})}},{"./general":"1tOWF",qrcode:"6s2CO","@parcel/transformer-js/src/esmodule-helpers.js":"bNgzC"}],"1tOWF":[function(t,n,r){var o=t("@parcel/transformer-js/src/esmodule-helpers.js");function i(){firebase.auth().signOut().then(()=>{console.log("User signed out"),authUser.current=null,user.current=null,userId=null,localStorage.removeItem("sessionUser"),localStorage.removeItem("idToken"),localStorage.removeItem("authUserId"),localStorage.removeItem("authUser"),deleteCookie("maiAuth"),callBackendApi("/api/users/session",{method:"DELETE",extraHeaders:{credentials:"include"}}).catch(t=>{errorHandler.report(t),console.warn("[SSO] Error clearing session cookie:",e)}),location.href="/"}).catch(t=>{errorHandler.report(t),console.log(t)})}function a(t){document.getElementById("addressFirstName").value=t.addressFirstName||"",document.getElementById("addressFirstName").dispatchEvent(new Event("input")),document.getElementById("addressLastName").value=t.addressLastName||"",document.getElementById("addressLastName").dispatchEvent(new Event("input")),document.getElementById("addressStreetAddress").value=t.addressStreetAddress||"",document.getElementById("addressStreetAddress").dispatchEvent(new Event("input")),document.getElementById("addressCO").value=t.addressCO||"",document.getElementById("addressCO").dispatchEvent(new Event("input")),document.getElementById("addressPostalCode").value=t.addressPostalCode||"",document.getElementById("addressPostalCode").dispatchEvent(new Event("input")),document.getElementById("addressCity").value=t.addressCity||"",document.getElementById("addressCity").dispatchEvent(new Event("input")),document.getElementById("addressDoorCode").value=t.addressDoorCode||"",document.getElementById("addressDoorCode").dispatchEvent(new Event("input"))}function s(){let t=document.getElementById("addressFirstName").value,n=document.getElementById("addressLastName").value,r=document.getElementById("addressStreetAddress").value,o=document.getElementById("addressCO").value,i=document.getElementById("addressPostalCode").value,a=document.getElementById("addressCity").value,s=document.getElementById("addressDoorCode").value;return t=t?t.trim().charAt(0).toUpperCase()+t.trim().slice(1):"",n=n?n.trim().charAt(0).toUpperCase()+n.trim().slice(1):"",r=r?r.trim().charAt(0).toUpperCase()+r.trim().slice(1):"",o=o?o.trim():"",{addressFirstName:t,addressLastName:n,addressStreetAddress:r,addressCO:o,addressPostalCode:i=i?i.trim().replace(/\D/g,""):"",addressCity:a=a?a.trim().charAt(0).toUpperCase()+a.trim().slice(1):"",addressDoorCode:s=s?s.trim():""}}function l(t){// verify we got 10 digits, otherwise it is invalid
+setTimeout(()=>clearInterval(t),5e3)}if(!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){let t=document.getElementById("qrCanvas");t&&(0,s.default).toCanvas(t,window.location.href,function(t){t?(console.error("QR code generation error:",t),errorHandler.report(t)):console.log("QR code generated successfully")})}},{"./general":"1tOWF",qrcode:"6s2CO","@parcel/transformer-js/src/esmodule-helpers.js":"bNgzC"}],"1tOWF":[function(t,n,r){var o=t("@parcel/transformer-js/src/esmodule-helpers.js");function i(){firebase.auth().signOut().then(()=>{console.log("User signed out"),authUser.current=null,user.current=null,userId=null,localStorage.removeItem("sessionUser"),localStorage.removeItem("idToken"),localStorage.removeItem("authUserId"),localStorage.removeItem("authUser"),deleteCookie("maiAuth"),callBackendApi("/api/users/session",{method:"DELETE",fetchInit:{credentials:"include"}}).catch(t=>{errorHandler.report(t),console.warn("[SSO] Error clearing session cookie:",e)}),location.href="/"}).catch(t=>{errorHandler.report(t),console.log(t)})}function a(t){document.getElementById("addressFirstName").value=t.addressFirstName||"",document.getElementById("addressFirstName").dispatchEvent(new Event("input")),document.getElementById("addressLastName").value=t.addressLastName||"",document.getElementById("addressLastName").dispatchEvent(new Event("input")),document.getElementById("addressStreetAddress").value=t.addressStreetAddress||"",document.getElementById("addressStreetAddress").dispatchEvent(new Event("input")),document.getElementById("addressCO").value=t.addressCO||"",document.getElementById("addressCO").dispatchEvent(new Event("input")),document.getElementById("addressPostalCode").value=t.addressPostalCode||"",document.getElementById("addressPostalCode").dispatchEvent(new Event("input")),document.getElementById("addressCity").value=t.addressCity||"",document.getElementById("addressCity").dispatchEvent(new Event("input")),document.getElementById("addressDoorCode").value=t.addressDoorCode||"",document.getElementById("addressDoorCode").dispatchEvent(new Event("input"))}function s(){let t=document.getElementById("addressFirstName").value,n=document.getElementById("addressLastName").value,r=document.getElementById("addressStreetAddress").value,o=document.getElementById("addressCO").value,i=document.getElementById("addressPostalCode").value,a=document.getElementById("addressCity").value,s=document.getElementById("addressDoorCode").value;return t=t?t.trim().charAt(0).toUpperCase()+t.trim().slice(1):"",n=n?n.trim().charAt(0).toUpperCase()+n.trim().slice(1):"",r=r?r.trim().charAt(0).toUpperCase()+r.trim().slice(1):"",o=o?o.trim():"",{addressFirstName:t,addressLastName:n,addressStreetAddress:r,addressCO:o,addressPostalCode:i=i?i.trim().replace(/\D/g,""):"",addressCity:a=a?a.trim().charAt(0).toUpperCase()+a.trim().slice(1):"",addressDoorCode:s=s?s.trim():""}}function l(t){// verify we got 10 digits, otherwise it is invalid
 if(10!==(t=t.replace(/\D/g,"")// strip out all but digits
 .split("")// convert string to array
 .reverse()// reverse order for Luhn
@@ -123,14 +123,14 @@ let c=(u-i.getLengthInBits())/8;for(let t=0;t<c;t++)i.put(t%2?17:236,8);return(/
  * @param  {ErrorCorrectionLevel} errorCorrectionLevel Error correction level
  * @return {Uint8Array}                     Buffer containing encoded codewords
  */function(t,n,r){let i,a;// Total codewords for this QR code version (Data + Error correction)
-let s=o.getSymbolTotalCodewords(n),l=d.getTotalCodewordsCount(n,r),u=s-l,c=d.getBlocksCount(n,r),h=s%c,g=c-h,m=Math.floor(s/c),p=Math.floor(u/c),y=p+1,v=m-p,E=new f(v),b=0,B=Array(c),I=Array(c),w=0,C=new Uint8Array(t.buffer);// Divide the buffer into the required number of blocks
+let s=o.getSymbolTotalCodewords(n),l=d.getTotalCodewordsCount(n,r),u=s-l,c=d.getBlocksCount(n,r),h=s%c,g=c-h,m=Math.floor(s/c),p=Math.floor(u/c),y=p+1,v=m-p,E=new f(v),b=0,I=Array(c),B=Array(c),w=0,C=new Uint8Array(t.buffer);// Divide the buffer into the required number of blocks
 for(let t=0;t<c;t++){let n=t<g?p:y;// extract a block of data from buffer
-B[t]=C.slice(b,b+n),// Calculate EC codewords for this data block
-I[t]=E.encode(B[t]),b+=n,w=Math.max(w,n)}// Create final data
+I[t]=C.slice(b,b+n),// Calculate EC codewords for this data block
+B[t]=E.encode(I[t]),b+=n,w=Math.max(w,n)}// Create final data
 // Interleave the data and error correction codewords from each block
 let A=new Uint8Array(s),N=0;// Add data codewords
-for(i=0;i<w;i++)for(a=0;a<c;a++)i<B[a].length&&(A[N++]=B[a][i]);// Apped EC codewords
-for(i=0;i<v;i++)for(a=0;a<c;a++)A[N++]=I[a][i];return A}(i,t,n))}(n,r,g),b=o.getSymbolSize(n),B=new s(b);return(// Add function modules
+for(i=0;i<w;i++)for(a=0;a<c;a++)i<I[a].length&&(A[N++]=I[a][i]);// Apped EC codewords
+for(i=0;i<v;i++)for(a=0;a<c;a++)A[N++]=B[a][i];return A}(i,t,n))}(n,r,g),b=o.getSymbolSize(n),I=new s(b);return(// Add function modules
 /**
  * QRCode for JavaScript
  *
@@ -160,37 +160,37 @@ for(i=0;i<v;i++)for(a=0;a<c;a++)A[N++]=I[a][i];return A}(i,t,n))}(n,r,g),b=o.get
  *
  * @param  {BitMatrix} matrix  Modules matrix
  * @param  {Number}    version QR Code version
- */function(t,n){let r=t.size,o=u.getPositions(n);for(let n=0;n<o.length;n++){let i=o[n][0],a=o[n][1];for(let n=-1;n<=7;n++)if(!(i+n<=-1)&&!(r<=i+n))for(let o=-1;o<=7;o++)a+o<=-1||r<=a+o||(n>=0&&n<=6&&(0===o||6===o)||o>=0&&o<=6&&(0===n||6===n)||n>=2&&n<=4&&o>=2&&o<=4?t.set(i+n,a+o,!0,!0):t.set(i+n,a+o,!1,!0))}}(B,n),/**
+ */function(t,n){let r=t.size,o=u.getPositions(n);for(let n=0;n<o.length;n++){let i=o[n][0],a=o[n][1];for(let n=-1;n<=7;n++)if(!(i+n<=-1)&&!(r<=i+n))for(let o=-1;o<=7;o++)a+o<=-1||r<=a+o||(n>=0&&n<=6&&(0===o||6===o)||o>=0&&o<=6&&(0===n||6===n)||n>=2&&n<=4&&o>=2&&o<=4?t.set(i+n,a+o,!0,!0):t.set(i+n,a+o,!1,!0))}}(I,n),/**
  * Add timing pattern bits to matrix
  *
  * Note: this function must be called before {@link setupAlignmentPattern}
  *
  * @param  {BitMatrix} matrix Modules matrix
- */function(t){let n=t.size;for(let r=8;r<n-8;r++){let n=r%2==0;t.set(r,6,n,!0),t.set(6,r,n,!0)}}(B),/**
+ */function(t){let n=t.size;for(let r=8;r<n-8;r++){let n=r%2==0;t.set(r,6,n,!0),t.set(6,r,n,!0)}}(I),/**
  * Add alignment patterns bits to matrix
  *
  * Note: this function must be called after {@link setupTimingPattern}
  *
  * @param  {BitMatrix} matrix  Modules matrix
  * @param  {Number}    version QR Code version
- */function(t,n){let r=l.getPositions(n);for(let n=0;n<r.length;n++){let o=r[n][0],i=r[n][1];for(let n=-2;n<=2;n++)for(let r=-2;r<=2;r++)-2===n||2===n||-2===r||2===r||0===n&&0===r?t.set(o+n,i+r,!0,!0):t.set(o+n,i+r,!1,!0)}}(B,n),// Add temporary dummy bits for format info just to set them as reserved.
+ */function(t,n){let r=l.getPositions(n);for(let n=0;n<r.length;n++){let o=r[n][0],i=r[n][1];for(let n=-2;n<=2;n++)for(let r=-2;r<=2;r++)-2===n||2===n||-2===r||2===r||0===n&&0===r?t.set(o+n,i+r,!0,!0):t.set(o+n,i+r,!1,!0)}}(I,n),// Add temporary dummy bits for format info just to set them as reserved.
 // This is needed to prevent these bits from being masked by {@link MaskPattern.applyMask}
 // since the masking operation must be performed only on the encoding region.
 // These blocks will be replaced with correct values later in code.
-y(B,r,0),n>=7&&/**
+y(I,r,0),n>=7&&/**
  * Add version info bits to matrix
  *
  * @param  {BitMatrix} matrix  Modules matrix
  * @param  {Number}    version QR Code version
- */function(t,n){let r,o,i;let a=t.size,s=h.getEncodedBits(n);for(let n=0;n<18;n++)r=Math.floor(n/3),o=n%3+a-8-3,i=(s>>n&1)==1,t.set(r,o,i,!0),t.set(o,r,i,!0)}(B,n),// Add data codewords
+ */function(t,n){let r,o,i;let a=t.size,s=h.getEncodedBits(n);for(let n=0;n<18;n++)r=Math.floor(n/3),o=n%3+a-8-3,i=(s>>n&1)==1,t.set(r,o,i,!0),t.set(o,r,i,!0)}(I,n),// Add data codewords
 /**
  * Add encoded data bits to matrix
  *
  * @param  {BitMatrix}  matrix Modules matrix
  * @param  {Uint8Array} data   Data codewords
- */function(t,n){let r=t.size,o=-1,i=r-1,a=7,s=0;for(let l=r-1;l>0;l-=2)for(6===l&&l--;;){for(let r=0;r<2;r++)if(!t.isReserved(i,l-r)){let o=!1;s<n.length&&(o=(n[s]>>>a&1)==1),t.set(i,l-r,o),-1==--a&&(s++,a=7)}if((i+=o)<0||r<=i){i-=o,o=-o;break}}}(B,E),isNaN(i)&&(i=c.getBestMask(B,y.bind(null,B,r))),// Apply mask pattern
-c.applyMask(i,B),// Replace format info bits with correct values
-y(B,r,i),{modules:B,version:n,errorCorrectionLevel:r,maskPattern:i,segments:g})}(t,r,v,g)}},{"4cf6a8173d9f3a2":"2iHLf","2ad62f61c352884c":"kU8Fo","87d5a6270eb1dc26":"dvmjt","91abc94f777368cc":"4koKB","9737c3939ab85d95":"2m37T",cee3d371e219e45e:"9BWaM","8700c8c682afabf3":"2hy8U","65ad903a6ba3e":"ivpAq","1e8e447afb4d169c":"ixGQe","8a4a19af97836d80":"61NkN","26720f9d94c9e268":"4DCia","7b6429a248ecc51f":"2XDDf","1368d0fa14524351":"kBoY1"}],"2iHLf":[function(t,n,r){let o;let i=[0,26,44,70,100,134,172,196,242,292,346,404,466,532,581,655,733,815,901,991,1085,1156,1258,1364,1474,1588,1706,1828,1921,2051,2185,2323,2465,2611,2761,2876,3034,3196,3362,3532,3706];/**
+ */function(t,n){let r=t.size,o=-1,i=r-1,a=7,s=0;for(let l=r-1;l>0;l-=2)for(6===l&&l--;;){for(let r=0;r<2;r++)if(!t.isReserved(i,l-r)){let o=!1;s<n.length&&(o=(n[s]>>>a&1)==1),t.set(i,l-r,o),-1==--a&&(s++,a=7)}if((i+=o)<0||r<=i){i-=o,o=-o;break}}}(I,E),isNaN(i)&&(i=c.getBestMask(I,y.bind(null,I,r))),// Apply mask pattern
+c.applyMask(i,I),// Replace format info bits with correct values
+y(I,r,i),{modules:I,version:n,errorCorrectionLevel:r,maskPattern:i,segments:g})}(t,r,v,g)}},{"4cf6a8173d9f3a2":"2iHLf","2ad62f61c352884c":"kU8Fo","87d5a6270eb1dc26":"dvmjt","91abc94f777368cc":"4koKB","9737c3939ab85d95":"2m37T",cee3d371e219e45e:"9BWaM","8700c8c682afabf3":"2hy8U","65ad903a6ba3e":"ivpAq","1e8e447afb4d169c":"ixGQe","8a4a19af97836d80":"61NkN","26720f9d94c9e268":"4DCia","7b6429a248ecc51f":"2XDDf","1368d0fa14524351":"kBoY1"}],"2iHLf":[function(t,n,r){let o;let i=[0,26,44,70,100,134,172,196,242,292,346,404,466,532,581,655,733,815,901,991,1085,1156,1258,1364,1474,1588,1706,1828,1921,2051,2185,2323,2465,2611,2761,2876,3034,3196,3362,3532,3706];/**
  * Returns the QR Code size for the specified version
  *
  * @param  {Number} version QR Code version
