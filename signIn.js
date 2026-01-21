@@ -26,7 +26,10 @@ firebase.auth().onAuthStateChanged(async (result) => {
         identify(authenticated, fsUser);
         user.current = fsUser;
         localStorage.setItem('sessionUser', JSON.stringify(user.current));
-        await createCrossDomainSession();
+        createCrossDomainSession();
+        if (!fsUser.shopifyCustomer?.customerId) {
+          createShopifyUser();
+        }
       }
     } catch (error) {
       errorHandler.report(error);
@@ -144,12 +147,20 @@ async function getSignInInfo(signInInfoKey) {
 
 async function createCrossDomainSession() {
   try {
-    const res = await callBackendApi('/api/users/session', {
+    await callBackendApi('/api/users/session', {
       method: "POST",
       fetchInit: { credentials: "include" }, // required for httpOnly cookie
     });
   } catch (e) {
     console.warn("[SSO] Error creating session cookie:", e);
+  }
+}
+
+async function createShopifyUser() {
+  try {
+    await callBackendApi('/api/users/shopify/create-customer', { method: "POST" });
+  } catch (e) {
+    console.warn("[SSO] Error creating Shopify user:", e);
   }
 }
 
