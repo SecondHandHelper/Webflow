@@ -130,11 +130,11 @@
   }
 
   const AUTH_IF_AVAILABLE = 'IF_AVAILABLE';
-  // const CLIENT_CHANNEL_HEADERS = {
-  //   'X-Client-Channel': 'Web',
-  //   'X-Client-Version': JS_VERSION,
-  // };
-  const CLIENT_CHANNEL_HEADERS = {};
+
+  const CLIENT_CHANNEL_HEADERS = {
+   'X-Client-Channel': 'Web',
+   'X-Client-Version': JS_VERSION,
+  };
 
   // Function to call web api backend function, with or without auth
   async function callBackendApi(path, { data, method, requiresAuth, timeoutSec = 20, useLegacyFallback = true } = {}) {
