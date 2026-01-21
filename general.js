@@ -9,6 +9,13 @@ export function signOut() {
         localStorage.removeItem('authUserId');
         localStorage.removeItem('authUser');
         deleteCookie('maiAuth');
+        callBackendApi('/api/users/session', {
+          method: "DELETE",
+          extraHeaders: { credentials: "include" },
+        }).catch((error) => {
+          errorHandler.report(error);
+          console.warn("[SSO] Error clearing session cookie:", e);
+        });
         location.href = '/';
     }).catch((error) => {
         errorHandler.report(error);
@@ -165,7 +172,7 @@ export function animateOpenToast(elementId) {
     element.style.transform = 'translateY(100%)';
     element.style.transition = 'transform 0.3s ease-out';
     element.style.display = 'block';
-    
+
     // Animate to visible position
     setTimeout(() => {
       element.style.transform = 'translateY(0%)';
@@ -176,21 +183,21 @@ export function animateOpenToast(elementId) {
 
 export function animateCloseToast(elementId) {
   const element = document.getElementById(elementId);
-  
+
   // Add the visibility check here
   if (!element || element.style.display === 'none') {
     return;
   }
-  
+
   // Animate down and hide
   element.style.transform = 'translateY(100%)';
   element.style.transition = 'transform 0.3s ease-in';
-  
+
   // Hide after animation completes
   setTimeout(() => {
     element.style.display = 'none';
   }, 300);
-  
+
   document.getElementById("darkOverlay").classList.remove("active");
 }
 
@@ -198,7 +205,7 @@ export function hideInfoRequestCard(elementId) {
   const bidRequestElement = document.getElementById(elementId);
   if (bidRequestElement) {
     bidRequestElement.style.display = 'none';
-    
+
     // Check if there are any remaining visible cards
     const infoRequestsList = document.getElementById('infoRequestsList');
     if (infoRequestsList) {

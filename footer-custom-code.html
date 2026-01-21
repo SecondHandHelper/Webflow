@@ -92,7 +92,7 @@
       campaign
     });
   }
-  const BACKEND_API_URL = 'https://web-api-886292162262.europe-west1.run.app';
+  const BACKEND_API_URL = 'https://api.mairesale.com';
   const IMAGE_BACKEND_API_URL = 'https://images-api-886292162262.europe-west1.run.app';
   const LEGACY_BACKEND_API_URL = 'https://europe-west1-second-hand-helper.cloudfunctions.net/webApi';
 
@@ -137,7 +137,7 @@
   };
 
   // Function to call web api backend function, with or without auth
-  async function callBackendApi(path, { data, method, requiresAuth, timeoutSec = 20, useLegacyFallback = true } = {}) {
+  async function callBackendApi(path, { data, method, requiresAuth, timeoutSec = 20, useLegacyFallback = true, extraHeaders = {} } = {}) {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), timeoutSec*1000);
     let idToken = '';
@@ -160,7 +160,8 @@
           headers: {
             'Content-Type': 'application/json',
             ...CLIENT_CHANNEL_HEADERS,
-            ...(idToken?.length ? { 'Authorization': `Bearer ${idToken}`} : {})
+            ...(idToken?.length ? { 'Authorization': `Bearer ${idToken}`} : {}),
+            ...extraHeaders
           },
           ...(data ? { body: JSON.stringify(data) } : {}),
           signal: controller.signal
@@ -218,6 +219,47 @@
       clearTimeout(timeout);
     }
   }
+
+  async function bootstrapFromSessionCookie() {
+    try {
+      // Ensure Firebase is initialized before this runs
+      const auth = firebase.auth();
+
+      // If already logged in, nothing to do
+      if (auth.currentUser) return;
+
+      // Wait briefly for Firebase to hydrate cached auth state
+      await new Promise((resolve) => {
+        const unsubscribe = auth.onAuthStateChanged(() => {
+          unsubscribe();
+          resolve();
+        });
+      });
+
+      if (auth.currentUser) return;
+
+      // Ask backend to verify session cookie and return a Firebase custom token
+      const res = await callBackendApi('/api/users/session/verify', {
+        method: "POST",
+        extraHeaders: { credentials: "include" },
+      });
+
+      if (!res.ok) return;
+
+      const data = await res.json().catch(() => null);
+      if (!data || !data.token) return;
+
+      // Log into Firebase using the custom token
+      await auth.signInWithCustomToken(data.token);
+    } catch (e) {
+      console.warn("[SSO] Session cookie bootstrap failed:", e);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    bootstrapFromSessionCookie();
+  });
+
 </script>
 
 <script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.2.117/cookieManagement.js"></script>

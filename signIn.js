@@ -142,6 +142,22 @@ async function getSignInInfo(signInInfoKey) {
   }
 }
 
+async function createCrossDomainSession() {
+  try {
+    const res = await callBackendApi('/api/users/session', {
+      requiresAuth: true,
+      extraHeaders: { credentials: "include" }, // required for httpOnly cookie
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text().catch(() => "");
+      console.warn("[SSO] Failed to create session cookie:", res.status, errorText);
+    }
+  } catch (e) {
+    console.warn("[SSO] Error creating session cookie:", e);
+  }
+}
+
 async function signedInNextStep(fallbackRedirect) {
   // User is signed in
   if (authUser.current) {
@@ -149,6 +165,7 @@ async function signedInNextStep(fallbackRedirect) {
     const phone = authUser.current.phoneNumber || sessionStorage.getItem("phoneNumber");
     const ssn = authUser.current.personalId || sessionStorage.getItem("personalId");
     await updateFirestoreUserDocument(authUser.current.uid, email, phone, ssn); //Important that this happens first, since many other functions depend on an existing user document
+    await createCrossDomainSession();
   }
   const hostname = window.location.protocol + "//" + window.location.host;
   const params = new URL(window.location).searchParams;
