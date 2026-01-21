@@ -1,4 +1,5 @@
 import { itemCoverImage } from "./general";
+import QRCode from "qrcode";
 
 function startAutoScroll(itemListElement) {
   if (!itemListElement) return;
@@ -200,4 +201,20 @@ if (typeof Intercom === "function") {
   }, 100);
   // Timeout after 5 seconds if Intercom doesn't load
   setTimeout(() => clearInterval(checkIntercom), 5000);
+}
+
+// Generate QR code for desktop users
+var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+if (!isMobile) {
+  const qrCanvas = document.getElementById('qrCanvas');
+  if (qrCanvas) {
+    QRCode.toCanvas(qrCanvas, window.location.href, function (error) {
+      if (error) {
+        console.error('QR code generation error:', error);
+        errorHandler.report(error);
+      } else {
+        console.log('QR code generated successfully');
+      }
+    });
+  }
 }
