@@ -168,7 +168,7 @@ window.intercomSettings = {
 })();
 
 // Track VIP pickup button clicks with Intercom
-function setupVipPickupTracking() {
+function setupVipPickupHandler() {
   const buttonIds = [
     "bookVipPickupCtaButton",
     "stickyBookVipPickupButton",
@@ -180,7 +180,7 @@ function setupVipPickupTracking() {
     if (button) {
       button.addEventListener("click", () => {
         if (typeof Intercom === "function") {
-          Intercom("trackEvent", "vip_pickup_requested");
+          Intercom('startSurvey', 57206742)
         }
       });
     }
@@ -189,13 +189,13 @@ function setupVipPickupTracking() {
 
 // Setup tracking after Intercom is loaded
 if (typeof Intercom === "function") {
-  setupVipPickupTracking();
+  setupVipPickupHandler();
 } else {
   // Wait for Intercom to load
   const checkIntercom = setInterval(() => {
     if (typeof Intercom === "function") {
       clearInterval(checkIntercom);
-      setupVipPickupTracking();
+      setupVipPickupHandler();
     }
   }, 100);
   // Timeout after 5 seconds if Intercom doesn't load
