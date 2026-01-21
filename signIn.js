@@ -24,9 +24,9 @@ firebase.auth().onAuthStateChanged(async (result) => {
           }}});
         }
         identify(authenticated, fsUser);
-        console.log("user:", fsUser);
         user.current = fsUser;
         localStorage.setItem('sessionUser', JSON.stringify(user.current));
+        await createCrossDomainSession();
       }
     } catch (error) {
       errorHandler.report(error);
@@ -165,7 +165,6 @@ async function signedInNextStep(fallbackRedirect) {
     const phone = authUser.current.phoneNumber || sessionStorage.getItem("phoneNumber");
     const ssn = authUser.current.personalId || sessionStorage.getItem("personalId");
     await updateFirestoreUserDocument(authUser.current.uid, email, phone, ssn); //Important that this happens first, since many other functions depend on an existing user document
-    await createCrossDomainSession();
   }
   const hostname = window.location.protocol + "//" + window.location.host;
   const params = new URL(window.location).searchParams;
