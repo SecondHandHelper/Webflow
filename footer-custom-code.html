@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.3.54';
+  const JS_VERSION = 'v1.3.56';
   errorHandler = new StackdriverErrorReporter();
   const environment = (location.href.includes('maiapp.se') || location.href.includes('mairesale.com')) ? 'web-prod' : 'web-test';
   errorHandler.start({
@@ -130,13 +130,11 @@
   }
 
   const AUTH_IF_AVAILABLE = 'IF_AVAILABLE';
-
-  // TODO: Temporarily disabled due to CORS issues. Backend needs to add these headers to Access-Control-Allow-Headers
   // const CLIENT_CHANNEL_HEADERS = {
   //   'X-Client-Channel': 'Web',
   //   'X-Client-Version': JS_VERSION,
   // };
-  const CLIENT_CHANNEL_HEADERS = {}; // Disabled until backend CORS is fixed
+  const CLIENT_CHANNEL_HEADERS = {};
 
   // Function to call web api backend function, with or without auth
   async function callBackendApi(path, { data, method, requiresAuth, timeoutSec = 20, useLegacyFallback = true } = {}) {
@@ -291,6 +289,20 @@
   document.getElementById('footerContactDesktop').addEventListener('click', function () {
     Intercom('show');
   });
+
+  // Check URL parameter to open Intercom chat
+  // Usage: ?chat=true or ?openChat=true
+  if (p.has('chat') || p.has('openChat')) {
+    // Wait for Intercom to load, then open it
+    const checkIntercom = setInterval(() => {
+      if (window.Intercom && typeof window.Intercom === 'function') {
+        clearInterval(checkIntercom);
+        Intercom('show');
+      }
+    }, 100);
+    // Timeout after 5 seconds if Intercom doesn't load
+    setTimeout(() => clearInterval(checkIntercom), 5000);
+  }
 
   // FUNCTIONS PRIVATE PAGE
   function formatPhoneNumber(str) {
