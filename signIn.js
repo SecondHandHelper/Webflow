@@ -145,7 +145,7 @@ async function getSignInInfo(signInInfoKey) {
 async function createCrossDomainSession() {
   try {
     const res = await callBackendApi('/api/users/session', {
-      requiresAuth: true,
+      method: "POST",
       fetchInit: { credentials: "include" }, // required for httpOnly cookie
     });
 
