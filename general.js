@@ -1,5 +1,6 @@
-export function signOut() {
-    firebase.auth().signOut().then(() => {
+export async function signOut() {
+    try {
+        await firebase.auth().signOut();
         console.log('User signed out');
         authUser.current = null;
         user.current = null;
@@ -9,7 +10,9 @@ export function signOut() {
         localStorage.removeItem('authUserId');
         localStorage.removeItem('authUser');
         deleteCookie('maiAuth');
-        callBackendApi('/api/users/session', {
+
+        // Wait for session cookie deletion to complete
+        await callBackendApi('/api/users/session', {
           method: "DELETE",
           requiresAuth: false,
           fetchInit: { credentials: "include" },
@@ -17,11 +20,12 @@ export function signOut() {
           errorHandler.report(error);
           console.warn("[SSO] Error clearing session cookie:", error);
         });
+
         location.href = '/';
-    }).catch((error) => {
+    } catch (error) {
         errorHandler.report(error);
         console.log(error);
-    });
+    }
 }
 
 export function setFormAddressFields(user) {

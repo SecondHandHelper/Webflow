@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.3.66';
+  const JS_VERSION = 'v1.3.67';
   errorHandler = new StackdriverErrorReporter();
   const environment = (location.href.includes('maiapp.se') || location.href.includes('mairesale.com')) ? 'web-prod' : 'web-test';
   errorHandler.start({
@@ -222,6 +222,30 @@
 
   async function bootstrapFromSessionCookie() {
     try {
+      // Only auto-login if coming from another domain
+      // Don't auto-login on page reloads or same-domain navigation
+      const referrer = document.referrer;
+      const currentDomain = window.location.hostname;
+
+      if (referrer) {
+        try {
+          const referrerDomain = new URL(referrer).hostname;
+          // If referrer is from the same domain, don't auto-login
+          if (referrerDomain === currentDomain) {
+            console.log("[SSO] Skipping auto-login: same-domain referrer");
+            return;
+          }
+        } catch (e) {
+          // If referrer URL is invalid, don't auto-login
+          console.log("[SSO] Skipping auto-login: invalid referrer URL");
+          return;
+        }
+      } else {
+        // No referrer usually means direct navigation, page reload, or bookmark
+        console.log("[SSO] Skipping auto-login: no referrer (likely page reload or direct navigation)");
+        return;
+      }
+
       // Ensure Firebase is initialized before this runs
       const auth = firebase.auth();
 
@@ -238,6 +262,8 @@
 
       if (auth.currentUser) return;
 
+      console.log("[SSO] Attempting auto-login from cross-domain referrer:", referrer);
+
       // Ask backend to verify session cookie and return a Firebase custom token
       const res = await callBackendApi('/api/users/session/verify', {
         method: "POST",
@@ -249,6 +275,7 @@
 
       // Log into Firebase using the custom token
       await auth.signInWithCustomToken(res.data.token);
+      console.log("[SSO] Auto-login successful");
     } catch (e) {
       console.warn("[SSO] Session cookie bootstrap failed:", e);
     }
