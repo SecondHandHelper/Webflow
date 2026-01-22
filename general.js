@@ -11,10 +11,11 @@ export function signOut() {
         deleteCookie('maiAuth');
         callBackendApi('/api/users/session', {
           method: "DELETE",
+          requiresAuth: false,
           fetchInit: { credentials: "include" },
         }).catch((error) => {
           errorHandler.report(error);
-          console.warn("[SSO] Error clearing session cookie:", e);
+          console.warn("[SSO] Error clearing session cookie:", error);
         });
         location.href = '/';
     }).catch((error) => {
