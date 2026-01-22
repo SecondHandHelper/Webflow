@@ -66,7 +66,7 @@ export function updateIC(userId, em, ph) {
   });
 }
 
-function prepareMenu(u) {
+export function prepareMenu(u) {
   let identifier;
   let signInMethodText;
   console.log("Prepare menu", u.signInMethod)
@@ -96,6 +96,9 @@ function prepareMenu(u) {
     menuInviteLink.style.display = 'block';
   }
 }
+
+// Make prepareMenu available globally for session cookie auto-login
+window.prepareMenu = prepareMenu;
 
 const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
 if (sessionUser) {

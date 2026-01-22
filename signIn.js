@@ -26,14 +26,20 @@ firebase.auth().onAuthStateChanged(async (result) => {
         identify(authenticated, fsUser);
         user.current = fsUser;
         localStorage.setItem('sessionUser', JSON.stringify(user.current));
+
+        // Update menu with user info if we're on the private page
+        if (window.location.pathname === '/private' && typeof prepareMenu === 'function') {
+          prepareMenu(fsUser);
+        }
+
         createCrossDomainSession();
         if (!fsUser.shopifyCustomer?.customerId) {
           createShopifyUser();
         }
       }
     } catch (error) {
-      errorHandler.report(error);
       console.log("Error getting document:", error);
+      errorHandler.report(error);
     }
   } else {
     console.log('No user');
@@ -52,6 +58,7 @@ firebase.auth().onAuthStateChanged(async (result) => {
       headerLoginButton.style.display = 'flex';
     }
   }
+  hideBootstrapSpinner();
 });
 
 // Refresh token and update localStorage

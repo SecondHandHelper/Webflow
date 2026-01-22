@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.3.68';
+  const JS_VERSION = 'v1.3.69';
   errorHandler = new StackdriverErrorReporter();
   const environment = (location.href.includes('maiapp.se') || location.href.includes('mairesale.com')) ? 'web-prod' : 'web-test';
   errorHandler.start({
@@ -267,6 +267,7 @@
       // Ask backend to verify session cookie and return a Firebase custom token
       const res = await callBackendApi('/api/users/session/verify', {
         method: "POST",
+        timeoutSec: 1,
         requiresAuth: false,
         fetchInit: { credentials: "include" },
       });
@@ -281,15 +282,61 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
-    bootstrapFromSessionCookie();
+  function showBootstrapSpinner() {
+    // Create spinner overlay if it doesn't exist
+    console.log("Showing bootstrap spinner");
+    if (!document.getElementById('bootstrap-spinner')) {
+      const spinnerHTML = `
+        <div id="bootstrap-spinner" style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: white;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 9999;
+        ">
+          <div style="
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #333;
+            border-radius: 50%;
+            animation: bootstrap-spin 1s linear infinite;
+          "></div>
+        </div>
+        <style>
+          @keyframes bootstrap-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        </style>
+      `;
+      document.body.insertAdjacentHTML('beforeend', spinnerHTML);
+    }
+    document.getElementById('bootstrap-spinner').style.display = 'flex';
+  }
+
+  function hideBootstrapSpinner() {
+    const spinner = document.getElementById('bootstrap-spinner');
+    if (spinner) {
+      spinner.style.display = 'none';
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", async function () {
+    showBootstrapSpinner();
+    await bootstrapFromSessionCookie();
   });
 
 </script>
 
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.65/cookieManagement.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.65/signIn.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.65/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.69/cookieManagement.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.69/signIn.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.69/referralFunctions.js"></script>
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>
