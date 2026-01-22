@@ -238,19 +238,19 @@
         } catch (e) {
           // If referrer URL is invalid, don't auto-login
           console.log("[SSO] Skipping auto-login: invalid referrer URL");
-          return;
+          return false;
         }
       } else {
         // No referrer usually means direct navigation, page reload, or bookmark
         console.log("[SSO] Skipping auto-login: no referrer (likely page reload or direct navigation)");
-        return;
+        return false;
       }
 
       // Ensure Firebase is initialized before this runs
       const auth = firebase.auth();
 
       // If already logged in, nothing to do
-      if (auth.currentUser) return;
+      if (auth.currentUser) return false;
 
       // Wait briefly for Firebase to hydrate cached auth state
       await new Promise((resolve) => {
@@ -260,7 +260,7 @@
         });
       });
 
-      if (auth.currentUser) return;
+      if (auth.currentUser) return false;
 
       console.log("[SSO] Attempting auto-login from cross-domain referrer:", referrer);
 
@@ -272,14 +272,16 @@
         fetchInit: { credentials: "include" },
       });
 
-      if (!res.data?.token) return;
+      if (!res.data?.token) return false;
 
       // Log into Firebase using the custom token
       await auth.signInWithCustomToken(res.data.token);
       console.log("[SSO] Auto-login successful");
     } catch (e) {
       console.warn("[SSO] Session cookie bootstrap failed:", e);
+      return false;
     }
+    return true;
   }
 
   function showBootstrapSpinner() {
@@ -329,7 +331,11 @@
 
   document.addEventListener("DOMContentLoaded", async function () {
     showBootstrapSpinner();
-    await bootstrapFromSessionCookie();
+    const loggingIn = await bootstrapFromSessionCookie();
+    if (!loggingIn) {
+      // If logging in the bootstrap spinner will be hidden on authStateChanged callback in signIn.js
+      hideBootstrapSpinner();
+    }
   });
 
 </script>
