@@ -1,5 +1,15 @@
 export async function signOut() {
     try {
+        try {
+          // Delete session cookie
+          await callBackendApi('/api/users/session', {
+            method: "DELETE",
+            fetchInit: { credentials: "include" },
+          });
+        } catch (error) {
+          console.warn("[SSO] Error clearing session cookie:", error);
+          errorHandler.report(error);
+        }
         await firebase.auth().signOut();
         console.log('User signed out');
         authUser.current = null;
@@ -11,15 +21,6 @@ export async function signOut() {
         localStorage.removeItem('authUser');
         deleteCookie('maiAuth');
 
-        // Wait for session cookie deletion to complete
-        await callBackendApi('/api/users/session', {
-          method: "DELETE",
-          requiresAuth: false,
-          fetchInit: { credentials: "include" },
-        }).catch((error) => {
-          errorHandler.report(error);
-          console.warn("[SSO] Error clearing session cookie:", error);
-        });
 
         location.href = '/';
     } catch (error) {
