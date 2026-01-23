@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.3.69';
+  const JS_VERSION = 'v1.3.70';
   errorHandler = new StackdriverErrorReporter();
   const environment = (location.href.includes('maiapp.se') || location.href.includes('mairesale.com')) ? 'web-prod' : 'web-test';
   errorHandler.start({
@@ -233,7 +233,7 @@
           // If referrer is from the same domain, don't auto-login
           if (referrerDomain === currentDomain) {
             console.log("[SSO] Skipping auto-login: same-domain referrer");
-            return;
+            return false;
           }
         } catch (e) {
           // If referrer URL is invalid, don't auto-login
@@ -250,7 +250,7 @@
       const auth = firebase.auth();
 
       // If already logged in, nothing to do
-      if (auth.currentUser) return false;
+      if (auth.currentUser) return;
 
       // Wait briefly for Firebase to hydrate cached auth state
       await new Promise((resolve) => {
@@ -277,11 +277,11 @@
       // Log into Firebase using the custom token
       await auth.signInWithCustomToken(res.data.token);
       console.log("[SSO] Auto-login successful");
+      return true;
     } catch (e) {
       console.warn("[SSO] Session cookie bootstrap failed:", e);
       return false;
     }
-    return true;
   }
 
   function showBootstrapSpinner() {
@@ -320,29 +320,50 @@
       document.body.insertAdjacentHTML('beforeend', spinnerHTML);
     }
     document.getElementById('bootstrap-spinner').style.display = 'flex';
+
+    // Safety timeout: hide spinner after 10 seconds no matter what
+    setTimeout(() => {
+      console.warn("[SSO] Bootstrap spinner timeout reached, hiding spinner as safety measure");
+      hideBootstrapSpinner();
+    }, 10000);
   }
 
   function hideBootstrapSpinner() {
+    console.log("Hiding bootstrap spinner");
     const spinner = document.getElementById('bootstrap-spinner');
     if (spinner) {
       spinner.style.display = 'none';
     }
   }
 
+  // Make hideBootstrapSpinner available globally for signIn.js
+  window.hideBootstrapSpinner = hideBootstrapSpinner;
+
   document.addEventListener("DOMContentLoaded", async function () {
     showBootstrapSpinner();
-    const loggingIn = await bootstrapFromSessionCookie();
-    if (!loggingIn) {
-      // If logging in the bootstrap spinner will be hidden on authStateChanged callback in signIn.js
+
+    // Additional safety timeout in case everything fails
+    setTimeout(() => {
+      console.warn("[SSO] Emergency timeout reached, forcing spinner hide");
+      hideBootstrapSpinner();
+    }, 11000);
+
+    try {
+      const isLoggingIn = await bootstrapFromSessionCookie();
+      if (!isLoggingIn) {
+        hideBootstrapSpinner();
+      }
+    } catch (e) {
+      console.error("[SSO] Bootstrap error:", e);
       hideBootstrapSpinner();
     }
   });
 
 </script>
 
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.69/cookieManagement.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.69/signIn.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.69/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.70/cookieManagement.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.70/signIn.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.70/referralFunctions.js"></script>
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>
