@@ -177,10 +177,6 @@ async function signedInNextStep(fallbackRedirect) {
     const ssn = authUser.current.personalId || sessionStorage.getItem("personalId");
     await updateFirestoreUserDocument(authUser.current.uid, email, phone, ssn); //Important that this happens first, since many other functions depend on an existing user document
   }
-  // Hide bootstrap spinner if it exists
-  if (typeof window.hideBootstrapSpinner === 'function') {
-    window.hideBootstrapSpinner();
-  }
   const hostname = window.location.protocol + "//" + window.location.host;
   const params = new URL(window.location).searchParams;
   if (params.has('s') && params.get('s').length >= 3 && document.referrer.startsWith(hostname)) {

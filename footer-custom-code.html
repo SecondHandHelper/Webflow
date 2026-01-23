@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.3.70';
+  const JS_VERSION = 'v1.3.71';
   errorHandler = new StackdriverErrorReporter();
   const environment = (location.href.includes('maiapp.se') || location.href.includes('mairesale.com')) ? 'web-prod' : 'web-test';
   errorHandler.start({
@@ -339,6 +339,11 @@
   // Make hideBootstrapSpinner available globally for signIn.js
   window.hideBootstrapSpinner = hideBootstrapSpinner;
 
+  // Hide spinner when page starts to navigate away
+  window.addEventListener('beforeunload', () => {
+    hideBootstrapSpinner();
+  });
+
   document.addEventListener("DOMContentLoaded", async function () {
     showBootstrapSpinner();
 
@@ -361,9 +366,9 @@
 
 </script>
 
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.70/cookieManagement.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.70/signIn.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.70/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.71/cookieManagement.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.71/signIn.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.71/referralFunctions.js"></script>
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>
