@@ -321,11 +321,7 @@
     }
     document.getElementById('bootstrap-spinner').style.display = 'flex';
 
-    // Safety timeout: hide spinner after 10 seconds no matter what
-    setTimeout(() => {
-      console.warn("[SSO] Bootstrap spinner timeout reached, hiding spinner as safety measure");
-      hideBootstrapSpinner();
-    }, 10000);
+    setTimeout(hideBootstrapSpinner, 10000);
   }
 
   function hideBootstrapSpinner() {
@@ -339,19 +335,15 @@
   // Make hideBootstrapSpinner available globally for signIn.js
   window.hideBootstrapSpinner = hideBootstrapSpinner;
 
-  // Hide spinner when page starts to navigate away
-  window.addEventListener('beforeunload', () => {
-    hideBootstrapSpinner();
-  });
-
   document.addEventListener("DOMContentLoaded", async function () {
-    showBootstrapSpinner();
-
-    // Additional safety timeout in case everything fails
-    setTimeout(() => {
-      console.warn("[SSO] Emergency timeout reached, forcing spinner hide");
+    // If there's already a spinner from a previous page (after navigation), hide it immediately
+    const existingSpinner = document.getElementById('bootstrap-spinner');
+    if (existingSpinner && existingSpinner.style.display !== 'none') {
       hideBootstrapSpinner();
-    }, 11000);
+      return;
+    }
+
+    showBootstrapSpinner();
 
     try {
       const isLoggingIn = await bootstrapFromSessionCookie();
