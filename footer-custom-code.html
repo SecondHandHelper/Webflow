@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.3.71';
+  const JS_VERSION = 'v1.3.72';
   errorHandler = new StackdriverErrorReporter();
   const environment = (location.href.includes('maiapp.se') || location.href.includes('mairesale.com')) ? 'web-prod' : 'web-test';
   errorHandler.start({
@@ -302,10 +302,10 @@
           z-index: 9999;
         ">
           <div style="
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #333;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #333;
             border-radius: 50%;
             animation: bootstrap-spin 1s linear infinite;
           "></div>
