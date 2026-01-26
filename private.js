@@ -1,6 +1,7 @@
 import { itemCoverImage, shareCode, signOut, animateCloseToast } from "./general";
 import { loadInfoRequests } from "./infoRequestsFunctions";
 import { loadItemCards } from "./loadItemCards";
+import QRCode from "qrcode";
 
 var userId;
 var email;
@@ -974,3 +975,30 @@ window.intercomSettings = {
   app_id: "klyy0le5"
 };
 (function () { var w = window; var ic = w.Intercom; if (typeof ic === "function") { ic('reattach_activator'); ic('update', w.intercomSettings); } else { var d = document; var i = function () { i.c(arguments); }; i.q = []; i.c = function (args) { i.q.push(args); }; w.Intercom = i; var l = function () { var s = d.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = 'https://widget.intercom.io/widget/klyy0le5'; var x = d.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x); }; if (w.attachEvent) { w.attachEvent('onload', l); } else { w.addEventListener('load', l, false); } } })();
+
+// Generate QR code and show blurryOverlay/onlyMobileBox for desktop users on sell.mairesale.com
+var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+if (!isMobile && window.location.hostname === 'sell.mairesale.com') {
+  // Generate QR code
+  const qrCanvas = document.getElementById('qrCanvas');
+  if (qrCanvas) {
+    QRCode.toCanvas(qrCanvas, window.location.href, function (error) {
+      if (error) {
+        console.error('QR code generation error:', error);
+        errorHandler.report(error);
+      } else {
+        console.log('QR code generated successfully');
+      }
+    });
+  }
+  
+  // Show blurryOverlay and onlyMobileBox on sell.mairesale.com (desktop only)
+  const blurryOverlay = document.getElementById('blurryOverlay');
+  if (blurryOverlay) {
+    blurryOverlay.style.display = 'block';
+  }
+  const onlyMobileBox = document.getElementById('onlyMobileBox');
+  if (onlyMobileBox) {
+    onlyMobileBox.style.display = 'block';
+  }
+}

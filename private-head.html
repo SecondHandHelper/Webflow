@@ -1,4 +1,5 @@
 <style>
+    #headerMaiCircleButton {display: none;}
     #fullLogo {display: none;}
 #trustedIconHeader {display: none;}
 #freeSellBox {display: none;}
@@ -35,6 +36,7 @@
 #extraInfoText {display: none;}
 #holidayModeDiv {display: none;}
 #longerPeriodToast {display: none;}
+#bidToast {display: none;}
 #discountToast {display: none;}
 #inviteToast {display: none;}
 #changeToServicePointButton {display: none;}
@@ -58,6 +60,8 @@
 #approvedSaleInfoBox { display: none; }
 #trustedSellerWidget { display: none; }
 #trustedSellerLinkIcon { display: none; }
+#menuDownloadApp { display: none; }
+#acceptBidLoading { display: none; }
     ::-webkit-scrollbar {
         width: 0;
         background: transparent;
@@ -103,5 +107,19 @@
 /* When active, slide in */
 #trustedSellerBottomSheet.active {
     bottom: 0;
+}
+
+/* Hide by default, show only on sell.mairesale.com via JavaScript */
+#blurryOverlay {
+  display: none;
+  backdrop-filter: blur(8px);
+}
+#onlyMobileBox {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  #blurryOverlay { display: none; }
+  #onlyMobileBox { display: none; }
 }
 </style>
