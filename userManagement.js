@@ -9,11 +9,12 @@ const actionCode = getParameterByName('oobCode');
 const continueUrl = getParameterByName('continueUrl');
 const lang = getParameterByName('lang');
 var accountEmail;
-
+console.log("mode", mode);
 // Handle the user management action.
 switch (mode) {
   case 'resetPassword':
     // Display reset password handler and UI.
+    console.log("case resetPassword calling handleResetPassword", auth, actionCode, continueUrl, lang);
     handleResetPassword(auth, actionCode, continueUrl, lang);
     break;
   case 'recoverEmail':
@@ -36,18 +37,16 @@ switch (mode) {
 function handleResetPassword(auth, actionCode, continueUrl, lang) {
   // Localize the UI to the selected language as determined by the lang
   // parameter.
-
   // Verify the password reset code is valid.
   auth.verifyPasswordResetCode(actionCode).then((email) => {
+    console.log("verifyPasswordResetCode callback invoked", email);
     accountEmail = email;
-    // TODO: Show the reset screen with the user's email and ask the user for
-    // the new password.
     accountEmailText.innerHTML = `Email: ${accountEmail}`;
     resetPasswordDiv.style.display = 'block';
     loadingDiv.style.display = 'none';
   }).catch((error) => {
-    errorHandler.report(error);
     console.log(error.code, error.message);
+    errorHandler.report(error);
   });
 }
 // [END auth_handle_reset_password]
@@ -139,7 +138,18 @@ savePasswordAndLoginButton.addEventListener('click', function () {
     // Sign in
     firebase.auth().signInWithEmailAndPassword(accountEmail, password)
       .then((userCredential) => {
-        location.href = './private';
+        if (continueUrl) {
+          let redirectUrl = continueUrl;
+          try {
+            redirectUrl = decodeURIComponent(continueUrl);
+          } catch (e) {
+          // decodeURIComponent may throw, so we catch and fall back to original string.
+          redirectUrl = continueUrl;
+          }
+          location.href = redirectUrl;
+        } else {
+          location.href = './private';
+        }
       })
       .catch((error) => {
         errorHandler.report(error);
