@@ -1,3 +1,5 @@
+import { create } from "qrcode";
+
 function getParameterByName(name) {
   const paramsObj = getParamsObject();
   return paramsObj[name];
@@ -9,12 +11,10 @@ const actionCode = getParameterByName('oobCode');
 const continueUrl = getParameterByName('continueUrl');
 const lang = getParameterByName('lang');
 var accountEmail;
-console.log("mode", mode);
 // Handle the user management action.
 switch (mode) {
   case 'resetPassword':
     // Display reset password handler and UI.
-    console.log("case resetPassword calling handleResetPassword", auth, actionCode, continueUrl, lang);
     handleResetPassword(auth, actionCode, continueUrl, lang);
     break;
   case 'recoverEmail':
@@ -39,7 +39,6 @@ function handleResetPassword(auth, actionCode, continueUrl, lang) {
   // parameter.
   // Verify the password reset code is valid.
   auth.verifyPasswordResetCode(actionCode).then((email) => {
-    console.log("verifyPasswordResetCode callback invoked", email);
     accountEmail = email;
     accountEmailText.innerHTML = `Email: ${accountEmail}`;
     resetPasswordDiv.style.display = 'block';
@@ -146,7 +145,13 @@ savePasswordAndLoginButton.addEventListener('click', function () {
           // decodeURIComponent may throw, so we catch and fall back to original string.
           redirectUrl = continueUrl;
           }
-          location.href = redirectUrl;
+          if (createCrossDomainSession) {
+            createCrossDomainSession().then(() => {
+              location.href = redirectUrl;
+            });
+          } else {
+            location.href = redirectUrl.startsWith('https://mairesale.com') ? 'https://mairesale.com/account' : redirectUrl;
+          }
         } else {
           location.href = './private';
         }
