@@ -263,18 +263,50 @@ document
 document
   .getElementById("headerLoginButton")
   .addEventListener("click", () => channelRouter("/sign-in"));
-  document
-  .getElementById("menuLoginButton")
-  .addEventListener("click", () => channelRouter("/sign-in"));
-document
-  .getElementById("menuChatButton")
-  .addEventListener("click", () => {
-          Intercom('show');
+
+  const menuLoginButton = document.getElementById("menuLoginButton");
+if (menuLoginButton) {
+  menuLoginButton.addEventListener("click", () => {
+    closeMenuWithAnimation();
+    channelRouter("/sign-in");
   });
+}
+
+// Menu Sell Item button - close menu and navigate to sell-item page
+const menuSellItemButton = document.getElementById("menuSellItemButton");
+if (menuSellItemButton) {
+  menuSellItemButton.addEventListener("click", () => {
+    closeMenuWithAnimation();
+    channelRouter("/sell-item");
+  });
+}
 
 // Menu fade animations
 const menuButton = document.getElementById("menuButton");
 const closeMenuButton = document.getElementById("closeMenuButton");
+
+// Reusable function to close menu with fade animation
+function closeMenuWithAnimation(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  
+  const menu = document.getElementById('menu');
+  if (menu) {
+    // Ensure menu is visible and transition is set before animating
+    menu.style.display = 'block';
+    menu.style.transition = 'opacity 0.3s ease-in-out';
+    // Trigger reflow to ensure transition is applied
+    menu.offsetHeight;
+    // Start fade out
+    menu.style.opacity = '0';
+    // Hide menu after animation completes
+    setTimeout(() => {
+      menu.style.display = 'none';
+    }, 300);
+  }
+}
 
 if (menuButton) {
   menuButton.addEventListener("click", function () {
@@ -292,26 +324,42 @@ if (menuButton) {
 }
 
 if (closeMenuButton) {
-  closeMenuButton.addEventListener("click", function (e) {
-    // Prevent Webflow's default behavior
+  closeMenuButton.addEventListener("click", closeMenuWithAnimation);
+}
+
+// Menu Chat button - close menu and open Intercom
+const menuChatButton = document.getElementById("menuChatButton");
+if (menuChatButton) {
+  menuChatButton.addEventListener("click", () => {
+    // Close menu with animation
+    closeMenuWithAnimation();
+    // Open Intercom chat
+    Intercom('show');
+  });
+}
+
+// Menu FAQ button - close menu and scroll to FAQ section
+const menuFaqButton = document.getElementById("menuFaqButton");
+if (menuFaqButton) {
+  menuFaqButton.addEventListener("click", function (e) {
     e.preventDefault();
     e.stopPropagation();
     
-    // Fade out menu animation
-    const menu = document.getElementById('menu');
-    if (menu) {
-      // Ensure menu is visible and transition is set before animating
-      menu.style.display = 'block';
-      menu.style.transition = 'opacity 0.3s ease-in-out';
-      // Trigger reflow to ensure transition is applied
-      menu.offsetHeight;
-      // Start fade out
-      menu.style.opacity = '0';
-      // Hide menu after animation completes
-      setTimeout(() => {
-        menu.style.display = 'none';
-      }, 300);
-    }
+    // Close menu with animation
+    closeMenuWithAnimation();
+    
+    // Wait for menu animation to start, then scroll to FAQ with 50px offset
+    setTimeout(() => {
+      const faqSection = document.getElementById('faq');
+      if (faqSection) {
+        const elementPosition = faqSection.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - 50;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    }, 50);
   });
 }
 
