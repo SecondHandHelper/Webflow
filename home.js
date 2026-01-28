@@ -263,6 +263,57 @@ document
 document
   .getElementById("headerLoginButton")
   .addEventListener("click", () => channelRouter("/sign-in"));
+  document
+  .getElementById("menuLoginButton")
+  .addEventListener("click", () => channelRouter("/sign-in"));
+document
+  .getElementById("menuChatButton")
+  .addEventListener("click", () => {
+          Intercom('show');
+  });
+
+// Menu fade animations
+const menuButton = document.getElementById("menuButton");
+const closeMenuButton = document.getElementById("closeMenuButton");
+
+if (menuButton) {
+  menuButton.addEventListener("click", function () {
+    // Fade in menu animation
+    const menu = document.getElementById('menu');
+    if (menu) {
+      menu.style.display = 'block';
+      menu.style.opacity = '0';
+      menu.style.transition = 'opacity 0.3s ease-in-out';
+      // Trigger reflow to ensure initial opacity is applied
+      menu.offsetHeight;
+      menu.style.opacity = '1';
+    }
+  });
+}
+
+if (closeMenuButton) {
+  closeMenuButton.addEventListener("click", function (e) {
+    // Prevent Webflow's default behavior
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Fade out menu animation
+    const menu = document.getElementById('menu');
+    if (menu) {
+      // Ensure menu is visible and transition is set before animating
+      menu.style.display = 'block';
+      menu.style.transition = 'opacity 0.3s ease-in-out';
+      // Trigger reflow to ensure transition is applied
+      menu.offsetHeight;
+      // Start fade out
+      menu.style.opacity = '0';
+      // Hide menu after animation completes
+      setTimeout(() => {
+        menu.style.display = 'none';
+      }, 300);
+    }
+  });
+}
 
 function hideChannelBottomSheet() {
   document.getElementById("darkOverlay").classList.remove("active");
