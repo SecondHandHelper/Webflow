@@ -98,11 +98,11 @@ function loadRecentlySold() {
           (soldDate.getTime() - publishedDate.getTime()) / (1000 * 3600 * 24)
         );
         if (soldPrice >= 180 || daysToSold <= 20) {
-          const itemCardHTML = `<div class="item-card-recently-sold"><div class="ratio-box _16-9"><div class="content-block with-image">
+          const itemCardHTML = `<div class="item-card-recently-sold home"><div class="ratio-box _16-9"><div class="content-block with-image">
                         <div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div>
                         <div>
                         <div>${brand}</div>
-                        <div>Såld för ${soldPrice} kr</div>
+                        <div>${soldPrice} kr</div>
                         </div>
                         </div>`;
           itemListRecentlySold1.innerHTML += itemCardHTML;
@@ -387,7 +387,7 @@ fetchAndLoadRecentlyAddedItems();
 trackHowItWorksInteractions();
 noCommissionCampaign();
 if (isIos) {
-  showDownloadAppLink();
+  //showDownloadAppLink();
 }
 
 // Set attribution cookies (could be put on any campaign page)
