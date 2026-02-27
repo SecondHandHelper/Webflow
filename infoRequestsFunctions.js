@@ -288,7 +288,6 @@ export function loadInfoRequests(items) {
             }
 
             function displayRequests() {
-                console.log("displayRequests", infoRequests);
                 for (const req in infoRequests) {
                     if (infoRequests[req]?.status === "Active") {
                         let description = infoRequests[req].description;
