@@ -25,10 +25,10 @@ async function getValuation(itemBrand, itemCategory) {
   document.getElementById('howItWorksDiv').style.display = 'none';
   document.getElementById('valuationInfoButton').style.display = 'none';
   try {
-    const valuationRes = await callBackendApi('/api/valuation?partial=true',
-      { data: { brand, category }});
+    const valuationRes = await callBackendApi('/api/valuation/estimate',
+      { data: { item: { brand, category } }, requiresAuth: false });
     const {
-      minPrice, maxPrice, decline, newBrand, valuatedBrandItems, fewBrand, valuatedBrandCategoryItems,
+      minPriceEstimate: minPrice, maxPriceEstimate: maxPrice, decline, newBrand, valuatedBrandItems, fewBrand, valuatedBrandCategoryItems,
       brandCategoryAccuracy, brandAccuracy, highPriceVarBrandCategory, brandShareSold, humanCheckExplanation,
       brandCategoryMeanMinPrice, brandCategoryMeanMaxPrice, brandCategoryMinSoldPrice, brandCategoryMaxSoldPrice,
       lowValueSegment, latestSales
@@ -96,7 +96,7 @@ function showLatestItemsSold(latestSales) {
   for (const item of latestSales) {
     const newItemCard = itemCard.cloneNode(true);
     newItemCard.id = '';
-    const frontImage = item.images?.enhancedFrontImageLarge || item.images?.enhancedFrontImage || item.images?.frontImageLarge || item.images?.frontImage;
+    const frontImage = item.imagesv2?.[0]?.url;
     if (!frontImage) {
       continue;
     }
