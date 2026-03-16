@@ -80,6 +80,7 @@ async function updateFirestoreUserDocument(userId, email, phone, ssn) {
   const signInMethod = authUser.current.providerData[0].providerId;
   if (signInMethod) { fields["signInMethod"] = signInMethod; }
   fields["preferences"] = { shippingMethod: 'Service point' };
+  fields["hasSellIntent"] = true;
   const docRef = db.collection("users").doc(userId);
 
   try {
