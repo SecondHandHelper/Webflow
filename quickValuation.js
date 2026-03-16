@@ -154,8 +154,6 @@ async function quickValuationMain() {
   if (sessionUser) {
     showMenu(sessionUser);
     document.getElementById("sellItemButton").value = 'Sälj plagget';
-  } else {
-    document.getElementById("headerLogo").style.display = 'block';
   }
   Webflow.push(function () {
     $('form').submit(function () {
