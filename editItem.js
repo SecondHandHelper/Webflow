@@ -7,6 +7,10 @@ if (params.app) {
   goBackButtons.forEach(button => {
     button.style.visibility = 'hidden';
   });
+  const body = document.body;
+  if (body) {
+    body.style.paddingTop = '55px';
+  }
 }
 
 function isNumeric(str) {
