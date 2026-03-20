@@ -22,7 +22,7 @@ async function getValuation(itemBrand, itemCategory) {
   document.getElementById('disclaimerDiv').style.display = 'none';
   document.getElementById('loadingValuationDiv').style.display = 'flex';
   document.getElementById('mainDivider').style.display = 'block';
-  document.getElementById('howItWorksDiv').style.display = 'none';
+  document.getElementById('buttonsDiv').style.display = 'none';
   document.getElementById('valuationInfoButton').style.display = 'none';
   try {
     const valuationRes = await callBackendApi('/api/valuation/estimate',
@@ -33,13 +33,14 @@ async function getValuation(itemBrand, itemCategory) {
       brandCategoryMeanMinPrice, brandCategoryMeanMaxPrice, brandCategoryMinSoldPrice, brandCategoryMaxSoldPrice,
       lowValueSegment, latestSales
     } = valuationRes.data || {};
+    localStorage.setItem('valuation', JSON.stringify(valuationRes.data));
     document.getElementById('soldItemsDiv').style.display = 'none';
     document.getElementById('itemsSoldDiv').style.display = 'block';
     document.getElementById('itemsSoldDiv').classList.toggle('appear-animation', true);
     analytics.track("Element Viewed", { elementID: "itemsSoldDiv", brand, category });
     document.getElementById('refreshValuationButton').style.display = 'none';
     document.getElementById('loadingValuationDiv').style.display = 'none';
-    document.getElementById('howItWorksDiv').style.display = 'none';
+    document.getElementById('buttonsDiv').style.display = 'none';
     document.getElementById('brandCategoryText').innerText = `${brand}-${category.toLowerCase()}`;
     document.getElementById('valuatedItemHeader').style.display = 'flex';
     if (decline) {
@@ -55,7 +56,7 @@ async function getValuation(itemBrand, itemCategory) {
       const categoryText = (latestSales.length < 3 || (valuatedBrandCategoryItems === 0 && valuatedBrandItems > 0)) ? 'av denna kategori ' : '';
       document.getElementById('itemValuationText').innerText = `Vi har inte sålt så mycket ${categoryText}från detta varumärke tidigare, så detta plagg skulle vi behöva kika på manuellt för att kunna ge en värdering. Lägg upp ditt plagg till Mai så får du en värdering inom 2 dagar.`;
       document.getElementById('valuationText').style.display = 'block';
-      document.getElementById('howItWorksDiv').style.display = 'block';
+      document.getElementById('buttonsDiv').style.display = 'flex';
     } else if (minPrice && maxPrice) {
       showLatestItemsSold(latestSales);
       document.getElementById('valuationInfoButton').style.display = 'flex';
@@ -75,11 +76,11 @@ async function getValuation(itemBrand, itemCategory) {
       const fromPrice = round10(brandCategoryMeanMinPrice || minPrice);
       const toPrice = round10(brandCategoryMeanMaxPrice || maxPrice);
       document.getElementById('valuationText').innerText = `~${round10((fromPrice+toPrice)/2)} kr`;
-      document.getElementById('howItWorksDiv').style.display = 'block';
+      document.getElementById('buttonsDiv').style.display = 'flex';
     } else {
       document.getElementById('itemValuationText').innerText = 'Något gick fel, försök igen eller kontakta oss om felet kvarstår.';
       document.getElementById('valuationText').style.display = 'none';
-      document.getElementById('howItWorksDiv').style.display = 'none';
+      document.getElementById('buttonsDiv').style.display = 'none';
     }
   } catch (e) {
     console.log(e);
@@ -151,6 +152,7 @@ function showMenu(u) {
 
 async function quickValuationMain() {
   const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
+  document.getElementById('ctoDiv').style.display = 'none';
   if (sessionUser) {
     showMenu(sessionUser);
     document.getElementById("sellItemButton").value = 'Sälj plagget';
@@ -187,7 +189,7 @@ async function quickValuationMain() {
     itemBrand.value = '';
     document.getElementById('itemsSoldDiv').style.display = 'none';
     document.getElementById('mainDivider').style.display = 'none';
-    document.getElementById('howItWorksDiv').style.display = 'none';
+    document.getElementById('buttonsDiv').style.display = 'none';
     document.getElementById('disclaimerDiv').style.display = 'block';
     document.getElementById('itemBrand').dispatchEvent(new Event('input'));
     brandClearButton.style.display = 'none';
@@ -209,7 +211,7 @@ async function quickValuationMain() {
     itemCategory.value = '';
     document.getElementById('itemsSoldDiv').style.display = 'none';
     document.getElementById('mainDivider').style.display = 'none';
-    document.getElementById('howItWorksDiv').style.display = 'none';
+    document.getElementById('buttonsDiv').style.display = 'none';
     document.getElementById('disclaimerDiv').style.display = 'block';
     unfold(document.getElementById('categoryQuickSelectDiv'));
     $('#itemCategory').trigger('change');
@@ -242,6 +244,16 @@ async function quickValuationMain() {
     localStorage.removeItem('newItem');
     localStorage.setItem('newItem', JSON.stringify({ brand: itemBrand.value, category: itemCategory.value }));
     window.location.href = '/sell-item';
+  })
+  document.getElementById('sellItemButton2').addEventListener('click', () => {
+    localStorage.removeItem('newItem');
+    localStorage.setItem('newItem', JSON.stringify({ brand: itemBrand.value, category: itemCategory.value }));
+    window.location.href = '/sell-item';
+  })
+  document.getElementById('expertValuationButton').addEventListener('click', () => {
+    localStorage.removeItem('newItem');
+    localStorage.setItem('newItem', JSON.stringify({ brand: itemBrand.value, category: itemCategory.value }));
+    window.location.href = '/expert-valuation';
   })
   document.getElementById('refreshValuationButton').addEventListener('click', () => {
     getValuation(itemBrand, itemCategory);

@@ -57,7 +57,7 @@ async function scaleImageToMaxSize(input) {
   const MAX_WIDTH = 3024;
   const MAX_HEIGHT = 4032;
 
- 
+
   if ('createImageBitmap' in window) {
     try {
       console.log('Attempting to scale image with createImageBitmap');
@@ -119,7 +119,7 @@ async function imageBitmapScale(input, maxWidth, maxHeight) {
 
 async function offscreenCanvasScale(input, maxWidth, maxHeight) {
   const img = await createImageBitmap(input);
-  
+
   let width = img.width;
   let height = img.height;
   if (width > height) {
@@ -301,7 +301,7 @@ export function showLoadingIcon(imageName) {
     if (imageName === 'frontImage'){
         document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
         document.getElementById(`loading${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
-        if(!localStorage.getItem('sessionUser')){
+        if(!localStorage.getItem('sessionUser') && document.getElementById('photoroomDiv')){
           document.getElementById('photoroomDiv').style.display = 'flex';
         };
         document.getElementById('enhancedAnimationDiv').style.display = 'block';

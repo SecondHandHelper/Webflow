@@ -122,6 +122,11 @@ async function sellItemMainAuthenticated() {
           method: 'PUT'
         });
       }
+      const draftItemId = sessionStorage.getItem('draftItemIdAfterSignIn');
+      if (draftItemId) {
+        sessionStorage.removeItem('draftItemIdAfterSignIn');
+        return location.href = `/item-valuation?id=${draftItemId}`;
+      }
       const userPhoneSet = user.current?.phoneNumber?.length;
       return location.href = userPhoneSet ? '/item-confirmation' : '/user-contact';
     } else {
@@ -418,12 +423,20 @@ async function getAndSaveValuation(itemId, item) {
     console.error('No item and no itemId, unexpected!!');
     return '/item-confirmation';
   }
-  if (params.id && params.type !== 'draft') {
-    const getItemResponse = await callBackendApi(`/api/items/${params.id}`);
-    const resellItem = getItemResponse.data;
-    if (shouldUseResellValuation(resellItem)) {
-      await setValuationFromResellItem(resellItem, itemId);
-      return '/item-valuation';
+  if (params.id) {
+    if (params.type !== 'draft') {
+      const getItemResponse = await callBackendApi(`/api/items/${params.id}`);
+      const resellItem = getItemResponse.data;
+      if (shouldUseResellValuation(resellItem)) {
+        await setValuationFromResellItem(resellItem, itemId);
+        return '/item-valuation';
+      }
+    } else {
+      if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+        sessionStorage.setItem('draftItemIdAfterSignIn', params.id);
+        return '/sign-in';
+      }
+      return `/item-valuation?id=${params.id}`;
     }
   }
   try {
@@ -863,7 +876,7 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
     if (modelDivShown) {
       const models = JSON.parse(sessionStorage.getItem('models'));
       let model = models?.find(m => m.id === data.modelId);
-      if (!data.modelVariantFields && !model) {
+      if (!data.modelVariantFields && !model && data.modelId) {
         const response = await callBackendApi(`/api/models/${data.modelId}`);
         if (response.data) {
           const { maiName, gender, maiCategory = '', collectionYear, brand } = response.data;

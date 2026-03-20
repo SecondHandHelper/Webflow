@@ -703,6 +703,7 @@ const main = async () => {
     console.error('Invalid item id or no saved item to show valuation for');
     return location.href = '/private';
   }
+
   initialPageSetup(item);
   await showValuation(item);
   showSellToMaiOption(item);
