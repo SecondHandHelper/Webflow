@@ -1,5 +1,5 @@
 import {getFormAddressFields} from "./general";
-import {deleteCookie} from "./cookieManagement";
+import {deleteCookie} from "./clientUtils";
 
 async function submitPhotoShootForm() {
   localStorage.setItem('photoShootBooked', true);
