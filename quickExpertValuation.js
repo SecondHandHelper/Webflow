@@ -75,7 +75,7 @@ async function expertValuationMain() {
     if (!emailInput.value) {
       emailInput.setCustomValidity('E-post måste fyllas i');
     }
-    if (!item?.images?.length) {
+    if (Object.keys(item?.images).length === 0) {
       imageInput.setCustomValidity('Bild måste laddas upp');
     }
 
