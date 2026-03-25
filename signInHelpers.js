@@ -213,7 +213,8 @@ function signInWithEmailPassword() {
       window.userId = user.uid;
       console.log("Logged in user: ", user.uid);
       authUser.whenSet(() => {
-        if (!authUser.current.emailVerified && getCookie('viewedVerifyEmailDiv') !== 'true') {
+        const isSellingItem = sessionStorage.getItem('itemToBeCreatedAfterSignIn') || sessionStorage.getItem('expertValuationDraftAfterSignIn');
+        if (!authUser.current.emailVerified && getCookie('viewedVerifyEmailDiv') !== 'true' && !isSellingItem) {
           signedInNextStep('./user-management?mode=sendEmailVerification');
         } else {
           signedInNextStep();
@@ -247,7 +248,10 @@ function signUpWithEmailPassword() {
       window.userId = user.uid;
       console.log("Logged in user: ", user);
       firebase.auth().currentUser.sendEmailVerification().then(() => {
-        authUser.whenSet(() => signedInNextStep('./user-management?mode=sendEmailVerification'));
+        authUser.whenSet(() => {
+          const isSellingItem = sessionStorage.getItem('itemToBeCreatedAfterSignIn') || sessionStorage.getItem('expertValuationDraftAfterSignIn');
+          signedInNextStep(isSellingItem ? undefined : './user-management?mode=sendEmailVerification');
+        });
       });
     })
     .catch((error) => {
