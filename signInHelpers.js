@@ -301,26 +301,29 @@ function checkEmail() {
     });
 }
 
-emailNextStepButton.addEventListener('click', checkEmail);
-tipsEmailButton.addEventListener('click', addEmailAndNavigate)
-resetPasswordLink.addEventListener('click', sendPasswordReset);
+document.addEventListener('DOMContentLoaded', () => {
 
-signUpWithEmailButton.addEventListener('click', signUpWithEmailPassword);
-signInWithEmailButton.addEventListener('click', signInWithEmailPassword);
-showOtherSignInMethodsButton.addEventListener('click', function () {
-  triggerOtherSignInMethodsView.click();
-});
+  emailNextStepButton.addEventListener('click', checkEmail);
+  tipsEmailButton.addEventListener('click', addEmailAndNavigate)
+  resetPasswordLink.addEventListener('click', sendPasswordReset);
 
-document.getElementById('passwordGoBack').addEventListener('click', () => {
-  chooseEmailDiv.style.display = 'block';
-  choosePasswordDiv.style.display = 'none';
-  document.getElementById('Choose-email-form').style.display = 'block';
-  document.querySelector('.success-message').style.display = 'none';
-})
-googleSignInButton.addEventListener('click', signInWithGoogle);
-googleSignInButton2.addEventListener('click', signInWithGoogle);
-document.getElementById('emailAndPasswordButton').addEventListener('click', function () {
-  console.log('button clicked');
-  chooseEmailDiv.style.display = 'block';
-  loginAlternativesDiv.style.display = 'none';
+  signUpWithEmailButton.addEventListener('click', signUpWithEmailPassword);
+  signInWithEmailButton.addEventListener('click', signInWithEmailPassword);
+  showOtherSignInMethodsButton.addEventListener('click', function () {
+    triggerOtherSignInMethodsView.click();
+  });
+
+  document.getElementById('passwordGoBack').addEventListener('click', () => {
+    chooseEmailDiv.style.display = 'block';
+    choosePasswordDiv.style.display = 'none';
+    document.getElementById('Choose-email-form').style.display = 'block';
+    document.querySelector('.success-message').style.display = 'none';
+  })
+  googleSignInButton.addEventListener('click', signInWithGoogle);
+  googleSignInButton2.addEventListener('click', signInWithGoogle);
+  document.getElementById('emailAndPasswordButton').addEventListener('click', function () {
+    console.log('button clicked');
+    chooseEmailDiv.style.display = 'block';
+    loginAlternativesDiv.style.display = 'none';
+  });
 });
