@@ -30,6 +30,7 @@ import {
 let itemDraftSaved = false;
 const params = getParamsObject();
 let itemDraft;
+let isExpertValuationDraft = false;
 
 async function addUserDetails() {
   // Grab values from form
@@ -134,6 +135,15 @@ async function sellItemMainAuthenticated() {
       sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
     }
   }
+
+  const expertValuationDraftId = sessionStorage.getItem('expertValuationDraftAfterSignIn');
+  if (expertValuationDraftId && document.referrer.includes('/sign-in')) {
+    sessionStorage.removeItem('expertValuationDraftAfterSignIn');
+    await callBackendApi(`/api/items/${expertValuationDraftId}`, {
+      data: { item: { user: authUser.current.uid } }
+    });
+    return location.href = `/item-valuation?id=${expertValuationDraftId}`;
+  }
 }
 
 async function sellItemMain() {
@@ -147,7 +157,7 @@ async function sellItemMain() {
   localStorage.removeItem('latestItemCreated');
   sessionStorage.removeItem('itemValuation');
 
-  if (sessionStorage.getItem('itemToBeCreatedAfterSignIn') && document.referrer.includes('/sign-in')) {
+  if ((sessionStorage.getItem('itemToBeCreatedAfterSignIn') || sessionStorage.getItem('expertValuationDraftAfterSignIn')) && document.referrer.includes('/sign-in')) {
     console.log(`showing spinner and waiting for item to be created when user is set ${user.current?.email}`);
     // ... if we are redirected here from the sign-in page and have a saved item that should be created
     document.getElementById('loadingDiv').style.display = 'flex';
@@ -298,7 +308,7 @@ async function sellItemMain() {
 }
 
 async function addItem() {
-  const id = params.type === 'draft' ? params.id : (sessionStorage.getItem('newItemId') || await requestUniqueId());
+  const id = (params.type === 'draft' || isExpertValuationDraft) ? params.id : (sessionStorage.getItem('newItemId') || await requestUniqueId());
   let reUploadingImage = null;
   try {
     // Check that all images are uploaded
@@ -424,7 +434,8 @@ async function getAndSaveValuation(itemId, item) {
     return '/item-confirmation';
   }
   if (params.id) {
-    if (params.type !== 'draft') {
+    const isDraftItem = params.type === 'draft' || isExpertValuationDraft;
+    if (!isDraftItem) {
       const getItemResponse = await callBackendApi(`/api/items/${params.id}`);
       const resellItem = getItemResponse.data;
       if (shouldUseResellValuation(resellItem)) {
@@ -432,6 +443,9 @@ async function getAndSaveValuation(itemId, item) {
         return '/item-valuation';
       }
     } else {
+      if (sessionStorage.getItem('expertValuationDraftAfterSignIn')) {
+        return '/sign-in';
+      }
       if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
         sessionStorage.setItem('draftItemIdAfterSignIn', params.id);
         return '/sign-in';
@@ -576,7 +590,7 @@ async function addItemInner(id, status = 'New') {
   if (modelConfirmed && modelCoverImageUrl) {
     images['modelImage'] = modelCoverImageUrl;
   }
-  const createdFromItem = (params.id && params.type !== 'draft') ? { createdFromItem: params.id } : {};
+  const createdFromItem = (params.id && params.type !== 'draft' && !isExpertValuationDraft) ? { createdFromItem: params.id } : {};
   const isCreatedFromItem = !!Object.keys(createdFromItem).length;
   const draftSource = status === 'Draft' ? { draftSource: isCreatedFromItem ? 'Mai purchase' : 'Sell item' } : {};
 
@@ -584,7 +598,12 @@ async function addItemInner(id, status = 'New') {
 
   if (!authUser.current) {
     localStorage.removeItem('detectedModel');
-    sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
+    if (isExpertValuationDraft) {
+      await callBackendApi(`/api/items/${id}`, { data: { item }, requiresAuth: false });
+      sessionStorage.setItem('expertValuationDraftAfterSignIn', id);
+    } else {
+      sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
+    }
   } else {
     const createItemResponse = await callBackendApi(`/api/items/${id}`, { data: { item } });
     await trackUserActivated();
@@ -822,6 +841,15 @@ async function fillForm(itemId, savedItem = null, restoreSavedState = false) {
     }
     const atItem = atItemResponse?.data || {};
     const data = item.data;
+
+    if (!savedItem && data.status === 'Draft' && data.infoRequests?.price?.response === 'Expert valuation request') {
+      isExpertValuationDraft = true;
+      restoreSavedState = true;
+      document.getElementById('saveItemDraftButton').style.display = 'none';
+      document.getElementById('frontImage').required = true;
+      document.getElementById('brandTagImage').required = true;
+    }
+
     const images = data.images || {};
     let originalPrice = data.originalPrice;
     if (originalPrice <= 0) {
@@ -1273,7 +1301,7 @@ function initializeModelConfirm() {
 function initializeSaveFormButton() {
   const saveItemDraftDiv = document.getElementById('saveItemDraftDiv');
   function showButtonIfFormChanged(event) {
-    if ((!params.id && !itemDraftSaved) || (params.id && params.type !== 'resell' && params.type !== 'draft')) {
+    if ((!params.id && !itemDraftSaved) || (params.id && params.type !== 'resell' && params.type !== 'draft' && !isExpertValuationDraft)) {
       return;
     }
     let field = event.target;
@@ -1289,7 +1317,7 @@ function initializeSaveFormButton() {
 
   document.getElementById('saveItemDraft').addEventListener('click', async () => {
     saveItemDraftDiv.classList.add('saving');
-    const id = params.type === 'resell' ? await requestUniqueId() : (params.type === 'draft' ? params.id : itemDraft.id);
+    const id = params.type === 'resell' ? await requestUniqueId() : ((params.type === 'draft' || isExpertValuationDraft) ? params.id : itemDraft.id);
     await addItemInner(id, 'Draft');
     saveItemDraftDiv.classList.remove('saving');
     saveItemDraftDiv.classList.add('saved');

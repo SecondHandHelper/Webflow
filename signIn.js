@@ -68,7 +68,7 @@ firebase.auth().onIdTokenChanged(async (user) => {
 });
 
 function userIsSellingNewItem() {
-  return sessionStorage.getItem('itemToBeCreatedAfterSignIn') &&
+  return (sessionStorage.getItem('itemToBeCreatedAfterSignIn') || sessionStorage.getItem('expertValuationDraftAfterSignIn')) &&
     (document.referrer.includes('/sell-item') || document.referrer.includes('/item-valuation'));
 }
 

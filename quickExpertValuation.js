@@ -93,6 +93,7 @@ async function expertValuationMain() {
 
     item.condition = itemCondition.value;
     item.valuationEmail = emailInput.value;
+    item.model = document.getElementById('itemModel').value;
     const id = await requestUniqueId();
     const createItemResponse = await callBackendApi(`/api/items/${id}`, { requiresAuth: false, data: { item } });
     const estimatedValuationData = JSON.parse(localStorage.getItem('valuation'));
