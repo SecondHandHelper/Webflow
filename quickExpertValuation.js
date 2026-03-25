@@ -52,13 +52,11 @@ async function expertValuationMain() {
   itemCategory.readOnly = true;
   itemCategory.style.backgroundColor = itemBrandBg;
   const imageInput = document.getElementById('frontImage')
-  console.log('imageInput', imageInput);
   imageInput.addEventListener('change', async (e) => {
-    console.log('image uploading');
     const imageUrl = await uploadImageAndShowPreview(imageInput.files[0], 'frontImage', false);
     const item = JSON.parse(localStorage.getItem('newItem'));
     const enhancedImage = await enhanceFrontImage(imageUrl, false)
-    item.imagesv2 = [{ name: 'frontImage', url: imageUrl }, { name: 'enhancedFrontImage', url: enhancedImage.url }];
+    item.images = { frontImage: imageUrl, enhancedFrontImage: enhancedImage.url };
     localStorage.setItem('newItem', JSON.stringify(item));
   })
   document.getElementById('expertValuationButton').addEventListener('click', async () => {
@@ -77,7 +75,7 @@ async function expertValuationMain() {
     if (!emailInput.value) {
       emailInput.setCustomValidity('E-post måste fyllas i');
     }
-    if (!item?.imagesv2?.length) {
+    if (!item?.images?.length) {
       imageInput.setCustomValidity('Bild måste laddas upp');
     }
 
