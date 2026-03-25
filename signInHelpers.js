@@ -90,10 +90,13 @@ if (params.has('s') && params.get('s').length >= 3) {
 }
 
 if (userIsSellingNewItem()) {
-  const item = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn')).item;
-  itemImage.src = item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || '';
-  notificationText.innerHTML = `För att fullfölja försäljningen av ditt ${item.brand}-plagg behöver du logga in eller skapa konto`;
-  itemToBeCreatedDiv.style.display = 'block';
+  const storedItem = sessionStorage.getItem('itemToBeCreatedAfterSignIn');
+  if (storedItem) {
+    const item = JSON.parse(storedItem).item;
+    itemImage.src = item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || '';
+    notificationText.innerHTML = `För att fullfölja försäljningen av ditt ${item.brand}-plagg behöver du logga in eller skapa konto`;
+    itemToBeCreatedDiv.style.display = 'block';
+  }
 }
 
 // Disable Webflow form submit
