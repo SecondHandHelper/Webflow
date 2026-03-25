@@ -111,6 +111,15 @@ async function sellItemMainAuthenticated() {
   // Visa alla "viktiga" fält om man är inloggad
   toggleMoreInfoFields.click();
 
+  const expertValuationDraftId = sessionStorage.getItem('expertValuationDraftAfterSignIn');
+  if (expertValuationDraftId && document.referrer.includes('/sign-in')) {
+    sessionStorage.removeItem('expertValuationDraftAfterSignIn');
+    await callBackendApi(`/api/items/${expertValuationDraftId}`, {
+      data: { item: { user: authUser.current.uid } }
+    });
+    return location.href = `/item-valuation?id=${expertValuationDraftId}`;
+  }
+
   // Create item from sessionStorage
   if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
     // ... if we are redirected here from the sign-in page
@@ -134,15 +143,6 @@ async function sellItemMainAuthenticated() {
       // otherwise make sure to remove any previously saved item as a precaution
       sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
     }
-  }
-
-  const expertValuationDraftId = sessionStorage.getItem('expertValuationDraftAfterSignIn');
-  if (expertValuationDraftId && document.referrer.includes('/sign-in')) {
-    sessionStorage.removeItem('expertValuationDraftAfterSignIn');
-    await callBackendApi(`/api/items/${expertValuationDraftId}`, {
-      data: { item: { user: authUser.current.uid } }
-    });
-    return location.href = `/item-valuation?id=${expertValuationDraftId}`;
   }
 }
 
@@ -601,8 +601,11 @@ async function addItemInner(id, status = 'New') {
     if (isExpertValuationDraft) {
       await callBackendApi(`/api/items/${id}`, { data: { item }, requiresAuth: false });
       sessionStorage.setItem('expertValuationDraftAfterSignIn', id);
+      sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
+      sessionStorage.removeItem('draftItemIdAfterSignIn');
     } else {
       sessionStorage.setItem('itemToBeCreatedAfterSignIn', JSON.stringify({ id, item }));
+      sessionStorage.removeItem('expertValuationDraftAfterSignIn');
     }
   } else {
     const createItemResponse = await callBackendApi(`/api/items/${id}`, { data: { item } });
