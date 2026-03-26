@@ -9,14 +9,18 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.3.94';
-  errorHandler = new StackdriverErrorReporter();
+  const JS_VERSION = 'v1.3.95';
   const environment = (location.href.includes('maiapp.se') || location.href.includes('mairesale.com')) ? 'web-prod' : 'web-test';
-  errorHandler.start({
-    key: 'AIzaSyA1XebVWrZ_WlhKtlqqaRE8omzzn50zd-U',
-    projectId: 'second-hand-helper',
-    service: environment,
-  });
+  if (environment === 'web-prod') {
+    errorHandler = new StackdriverErrorReporter();
+    errorHandler.start({
+      key: 'AIzaSyA1XebVWrZ_WlhKtlqqaRE8omzzn50zd-U',
+      projectId: 'second-hand-helper',
+      service: environment,
+    });
+  } else {
+    errorHandler = { report: () => {} };
+  }
 
   // Firebase config
   var firebaseConfig = {
@@ -425,9 +429,11 @@
   }
   document.querySelectorAll("a").forEach(link => link.addEventListener('click', linkClickTracker) );
   document.querySelectorAll('[type=submit]').forEach(link => link.addEventListener('click', linkClickTracker) );
-  document.getElementById('footerContactDesktop').addEventListener('click', function () {
-    Intercom('show');
-  });
+  if (document.getElementById('footerContactDesktop')) {
+    document.getElementById('footerContactDesktop').addEventListener('click', function () {
+      Intercom('show');
+    });
+  }
 
   // Check URL parameter to open Intercom chat
   // Usage: ?chat=true or ?openChat=true
@@ -495,7 +501,7 @@
     if (location.href.match(/maiapp.se|mairesale.com/)) {
       loadFromGitHack();
     } else {
-      appendJsScript(`http://localhost:1234/${jsFile}`, loadFromGitHack);
+      appendJsScript(`https://localhost:1234/${jsFile}`, loadFromGitHack);
     }
   }
 </script>

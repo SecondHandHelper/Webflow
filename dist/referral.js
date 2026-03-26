@@ -22,7 +22,7 @@ await callBackendApi("/api/users/session",{method:"DELETE",fetchInit:{credential
 if(10!==(e=e.replace(/\D/g,"")// strip out all but digits
 .split("")// convert string to array
 .reverse()// reverse order for Luhn
-.slice(0,10)).length)return!1;let t=e.map(e=>Number(e)).reduce((e,t,r)=>(r%2&&(t*=2),t>9&&(t-=9),e+t));return 0==t%10}function l(e){let t=e.replace("-","");return(12!==t.length&&("19"!==t.substring(0,2)||"20"!==t.substring(0,2))&&(t=99>=Number(t.substring(0,2))&&Number(t.substring(0,2))>25?"19"+t:"20"+t),12===t.length)?t:null}function u(e){if(e.images){let t=e.images;return t.modelImageSmall||t.modelImage||t.coverImageSmall||t.coverImage||t.enhancedFrontImageSmall||t.enhancedFrontImage||t.frontImageSmall||t.frontImage}if(e.imagesv2)for(let t of["modelImage","enhancedFrontImage","frontImage"]){let r=e.imagesv2.find(e=>e.name===t);if(r){if(r?.versions?.small)return r.versions.small;if(r?.versions?.medium)return r.versions.medium;if(r?.versions?.large)return r.versions.large;if(r.url)return r.url}}return null}function d(){let e;let t=user.current.referralData.referralCode;if(e=user.current?.maiCircle?"H\xe4r f\xe5r du en exklusiv inbjudan till Mai, som ger en extra fin start med tre kommissionsfria f\xf6rs\xe4ljningar.":"Jag bjuder in dig till Mai f\xf6r att s\xe4lja dina kl\xe4der! G\xe5 genom min l\xe4nk f\xf6r att f\xe5 en extra kommissionsfri f\xf6rs\xe4ljning.",navigator.share)navigator.share({text:e,url:`https://invite.mairesale.com/refer?invite=${t}`}).then(()=>{console.log("Thanks for sharing!")}).catch(e=>{console.error(e),errorHandler.report(e)});else{console.log("Browser doesn't support navigator.share => Copy to clipboard!");let r=e+"\n"+`https://invite.mairesale.com/refer?invite=${t}`;navigator.clipboard.writeText(r),linkCopiedBanner.style.display="flex",setTimeout(function(){linkCopiedBanner.style.display="none"},1500)}}function c(e){let t=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;t?(document.getElementById("continueOnWebBottomSheet").href=window.location.origin+e,document.getElementById("darkOverlay").classList.add("active"),document.getElementById("channelBottomSheet").classList.add("active")):window.location.href=e}function f(){document.getElementById("darkOverlay").classList.remove("active"),document.getElementById("channelBottomSheet").classList.remove("active")}function h(e){let t=document.getElementById(e);t&&(// Set initial position below screen
+.slice(0,10)).length)return!1;let t=e.map(e=>Number(e)).reduce((e,t,r)=>(r%2&&(t*=2),t>9&&(t-=9),e+t));return 0==t%10}function l(e){let t=e.replace("-","");return(12!==t.length&&("19"!==t.substring(0,2)||"20"!==t.substring(0,2))&&(t=99>=Number(t.substring(0,2))&&Number(t.substring(0,2))>25?"19"+t:"20"+t),12===t.length)?t:null}function u(e){if(e.images){let t=e.images;return t.modelImageSmall||t.modelImage||t.coverImageSmall||t.coverImage||t.enhancedFrontImageSmall||t.enhancedFrontImage||t.frontImageSmall||t.frontImage}if(e.imagesv2)for(let t of["modelImage","enhancedFrontImage","frontImage"]){let r=e.imagesv2.find(e=>e.name===t);if(r){if(r?.versions?.small)return r.versions.small;if(r?.versions?.medium)return r.versions.medium;if(r?.versions?.large)return r.versions.large;if(r.url)return r.url}}return null}function d(){let e;let t=user.current.referralData.referralCode;if(e=user.current?.maiCircle?"H\xe4r f\xe5r du en exklusiv inbjudan till Mai, som ger en extra fin start med tre kommissionsfria f\xf6rs\xe4ljningar.":"Jag bjuder in dig till Mai f\xf6r att s\xe4lja dina kl\xe4der! G\xe5 genom min l\xe4nk f\xf6r att f\xe5 en extra kommissionsfri f\xf6rs\xe4ljning.",navigator.share)navigator.share({text:e,url:`https://invite.mairesale.com/refer?invite=${t}`}).then(()=>{console.log("Thanks for sharing!")}).catch(e=>{console.error(e),errorHandler.report(e)});else{console.log("Browser doesn't support navigator.share => Copy to clipboard!");let r=e+"\n"+`https://invite.mairesale.com/refer?invite=${t}`;navigator.clipboard.writeText(r),linkCopiedBanner.style.display="flex",setTimeout(function(){linkCopiedBanner.style.display="none"},1500)}}function c(e){console.log("channelRouter",e,isIos),isIos?(document.getElementById("continueOnWebBottomSheet").href=window.location.origin+e,document.getElementById("darkOverlay").classList.add("active"),document.getElementById("channelBottomSheet").classList.add("active")):window.location.href=e}function f(){document.getElementById("darkOverlay").classList.remove("active"),document.getElementById("channelBottomSheet").classList.remove("active")}function h(e){let t=document.getElementById(e);t&&(// Set initial position below screen
 t.style.transform="translateY(100%)",t.style.transition="transform 0.3s ease-out",t.style.display="block",// Animate to visible position
 setTimeout(()=>{t.style.transform="translateY(0%)"},10),document.getElementById("darkOverlay").classList.add("active"))}function g(e){let t=document.getElementById(e);// Add the visibility check here
 t&&"none"!==t.style.display&&(// Animate down and hide
@@ -103,14 +103,14 @@ let u=(l-o.getLengthInBits())/8;for(let e=0;e<u;e++)o.put(e%2?17:236,8);return(/
  * @param  {ErrorCorrectionLevel} errorCorrectionLevel Error correction level
  * @return {Uint8Array}                     Buffer containing encoded codewords
  */function(e,t,r){let o,i;// Total codewords for this QR code version (Data + Error correction)
-let a=n.getSymbolTotalCodewords(t),s=d.getTotalCodewordsCount(t,r),l=a-s,u=d.getBlocksCount(t,r),f=a%u,h=u-f,g=Math.floor(a/u),m=Math.floor(l/u),p=m+1,y=g-m,E=new c(y),v=0,b=Array(u),B=Array(u),I=0,C=new Uint8Array(e.buffer);// Divide the buffer into the required number of blocks
+let a=n.getSymbolTotalCodewords(t),s=d.getTotalCodewordsCount(t,r),l=a-s,u=d.getBlocksCount(t,r),f=a%u,h=u-f,g=Math.floor(a/u),m=Math.floor(l/u),p=m+1,y=g-m,E=new c(y),b=0,v=Array(u),I=Array(u),B=0,C=new Uint8Array(e.buffer);// Divide the buffer into the required number of blocks
 for(let e=0;e<u;e++){let t=e<h?m:p;// extract a block of data from buffer
-b[e]=C.slice(v,v+t),// Calculate EC codewords for this data block
-B[e]=E.encode(b[e]),v+=t,I=Math.max(I,t)}// Create final data
+v[e]=C.slice(b,b+t),// Calculate EC codewords for this data block
+I[e]=E.encode(v[e]),b+=t,B=Math.max(B,t)}// Create final data
 // Interleave the data and error correction codewords from each block
 let w=new Uint8Array(a),A=0;// Add data codewords
-for(o=0;o<I;o++)for(i=0;i<u;i++)o<b[i].length&&(w[A++]=b[i][o]);// Apped EC codewords
-for(o=0;o<y;o++)for(i=0;i<u;i++)w[A++]=B[i][o];return w}(o,e,t))}(t,r,h),v=n.getSymbolSize(t),b=new a(v);return(// Add function modules
+for(o=0;o<B;o++)for(i=0;i<u;i++)o<v[i].length&&(w[A++]=v[i][o]);// Apped EC codewords
+for(o=0;o<y;o++)for(i=0;i<u;i++)w[A++]=I[i][o];return w}(o,e,t))}(t,r,h),b=n.getSymbolSize(t),v=new a(b);return(// Add function modules
 /**
  * QRCode for JavaScript
  *
@@ -140,37 +140,37 @@ for(o=0;o<y;o++)for(i=0;i<u;i++)w[A++]=B[i][o];return w}(o,e,t))}(t,r,h),v=n.get
  *
  * @param  {BitMatrix} matrix  Modules matrix
  * @param  {Number}    version QR Code version
- */function(e,t){let r=e.size,n=l.getPositions(t);for(let t=0;t<n.length;t++){let o=n[t][0],i=n[t][1];for(let t=-1;t<=7;t++)if(!(o+t<=-1)&&!(r<=o+t))for(let n=-1;n<=7;n++)i+n<=-1||r<=i+n||(t>=0&&t<=6&&(0===n||6===n)||n>=0&&n<=6&&(0===t||6===t)||t>=2&&t<=4&&n>=2&&n<=4?e.set(o+t,i+n,!0,!0):e.set(o+t,i+n,!1,!0))}}(b,t),/**
+ */function(e,t){let r=e.size,n=l.getPositions(t);for(let t=0;t<n.length;t++){let o=n[t][0],i=n[t][1];for(let t=-1;t<=7;t++)if(!(o+t<=-1)&&!(r<=o+t))for(let n=-1;n<=7;n++)i+n<=-1||r<=i+n||(t>=0&&t<=6&&(0===n||6===n)||n>=0&&n<=6&&(0===t||6===t)||t>=2&&t<=4&&n>=2&&n<=4?e.set(o+t,i+n,!0,!0):e.set(o+t,i+n,!1,!0))}}(v,t),/**
  * Add timing pattern bits to matrix
  *
  * Note: this function must be called before {@link setupAlignmentPattern}
  *
  * @param  {BitMatrix} matrix Modules matrix
- */function(e){let t=e.size;for(let r=8;r<t-8;r++){let t=r%2==0;e.set(r,6,t,!0),e.set(6,r,t,!0)}}(b),/**
+ */function(e){let t=e.size;for(let r=8;r<t-8;r++){let t=r%2==0;e.set(r,6,t,!0),e.set(6,r,t,!0)}}(v),/**
  * Add alignment patterns bits to matrix
  *
  * Note: this function must be called after {@link setupTimingPattern}
  *
  * @param  {BitMatrix} matrix  Modules matrix
  * @param  {Number}    version QR Code version
- */function(e,t){let r=s.getPositions(t);for(let t=0;t<r.length;t++){let n=r[t][0],o=r[t][1];for(let t=-2;t<=2;t++)for(let r=-2;r<=2;r++)-2===t||2===t||-2===r||2===r||0===t&&0===r?e.set(n+t,o+r,!0,!0):e.set(n+t,o+r,!1,!0)}}(b,t),// Add temporary dummy bits for format info just to set them as reserved.
+ */function(e,t){let r=s.getPositions(t);for(let t=0;t<r.length;t++){let n=r[t][0],o=r[t][1];for(let t=-2;t<=2;t++)for(let r=-2;r<=2;r++)-2===t||2===t||-2===r||2===r||0===t&&0===r?e.set(n+t,o+r,!0,!0):e.set(n+t,o+r,!1,!0)}}(v,t),// Add temporary dummy bits for format info just to set them as reserved.
 // This is needed to prevent these bits from being masked by {@link MaskPattern.applyMask}
 // since the masking operation must be performed only on the encoding region.
 // These blocks will be replaced with correct values later in code.
-p(b,r,0),t>=7&&/**
+p(v,r,0),t>=7&&/**
  * Add version info bits to matrix
  *
  * @param  {BitMatrix} matrix  Modules matrix
  * @param  {Number}    version QR Code version
- */function(e,t){let r,n,o;let i=e.size,a=f.getEncodedBits(t);for(let t=0;t<18;t++)r=Math.floor(t/3),n=t%3+i-8-3,o=(a>>t&1)==1,e.set(r,n,o,!0),e.set(n,r,o,!0)}(b,t),// Add data codewords
+ */function(e,t){let r,n,o;let i=e.size,a=f.getEncodedBits(t);for(let t=0;t<18;t++)r=Math.floor(t/3),n=t%3+i-8-3,o=(a>>t&1)==1,e.set(r,n,o,!0),e.set(n,r,o,!0)}(v,t),// Add data codewords
 /**
  * Add encoded data bits to matrix
  *
  * @param  {BitMatrix}  matrix Modules matrix
  * @param  {Uint8Array} data   Data codewords
- */function(e,t){let r=e.size,n=-1,o=r-1,i=7,a=0;for(let s=r-1;s>0;s-=2)for(6===s&&s--;;){for(let r=0;r<2;r++)if(!e.isReserved(o,s-r)){let n=!1;a<t.length&&(n=(t[a]>>>i&1)==1),e.set(o,s-r,n),-1==--i&&(a++,i=7)}if((o+=n)<0||r<=o){o-=n,n=-n;break}}}(b,E),isNaN(o)&&(o=u.getBestMask(b,p.bind(null,b,r))),// Apply mask pattern
-u.applyMask(o,b),// Replace format info bits with correct values
-p(b,r,o),{modules:b,version:t,errorCorrectionLevel:r,maskPattern:o,segments:h})}(e,r,y,h)}},{"4cf6a8173d9f3a2":"2iHLf","2ad62f61c352884c":"kU8Fo","87d5a6270eb1dc26":"dvmjt","91abc94f777368cc":"4koKB","9737c3939ab85d95":"2m37T",cee3d371e219e45e:"9BWaM","8700c8c682afabf3":"2hy8U","65ad903a6ba3e":"ivpAq","1e8e447afb4d169c":"ixGQe","8a4a19af97836d80":"61NkN","26720f9d94c9e268":"4DCia","7b6429a248ecc51f":"2XDDf","1368d0fa14524351":"kBoY1"}],"2iHLf":[function(e,t,r){let n;let o=[0,26,44,70,100,134,172,196,242,292,346,404,466,532,581,655,733,815,901,991,1085,1156,1258,1364,1474,1588,1706,1828,1921,2051,2185,2323,2465,2611,2761,2876,3034,3196,3362,3532,3706];/**
+ */function(e,t){let r=e.size,n=-1,o=r-1,i=7,a=0;for(let s=r-1;s>0;s-=2)for(6===s&&s--;;){for(let r=0;r<2;r++)if(!e.isReserved(o,s-r)){let n=!1;a<t.length&&(n=(t[a]>>>i&1)==1),e.set(o,s-r,n),-1==--i&&(a++,i=7)}if((o+=n)<0||r<=o){o-=n,n=-n;break}}}(v,E),isNaN(o)&&(o=u.getBestMask(v,p.bind(null,v,r))),// Apply mask pattern
+u.applyMask(o,v),// Replace format info bits with correct values
+p(v,r,o),{modules:v,version:t,errorCorrectionLevel:r,maskPattern:o,segments:h})}(e,r,y,h)}},{"4cf6a8173d9f3a2":"2iHLf","2ad62f61c352884c":"kU8Fo","87d5a6270eb1dc26":"dvmjt","91abc94f777368cc":"4koKB","9737c3939ab85d95":"2m37T",cee3d371e219e45e:"9BWaM","8700c8c682afabf3":"2hy8U","65ad903a6ba3e":"ivpAq","1e8e447afb4d169c":"ixGQe","8a4a19af97836d80":"61NkN","26720f9d94c9e268":"4DCia","7b6429a248ecc51f":"2XDDf","1368d0fa14524351":"kBoY1"}],"2iHLf":[function(e,t,r){let n;let o=[0,26,44,70,100,134,172,196,242,292,346,404,466,532,581,655,733,815,901,991,1085,1156,1258,1364,1474,1588,1706,1828,1921,2051,2185,2323,2465,2611,2761,2876,3034,3196,3362,3532,3706];/**
  * Returns the QR Code size for the specified version
  *
  * @param  {Number} version QR Code version

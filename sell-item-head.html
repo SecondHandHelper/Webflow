@@ -53,7 +53,7 @@
   #closePricingInfoBox{
     -webkit-tap-highlight-color: transparent !important;
   }
-  
+
   #itemListSelling::-webkit-scrollbar {
   	display: none;
 	}
@@ -64,12 +64,39 @@
   }
   #onlyMobileBox{display:block;}
 
+  #darkOverlay {
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  /* When active, fade in */
+  #darkOverlay.active {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  #channelBottomSheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 5;
+    bottom: -100%;
+    transition: bottom 0.3s ease-in-out;
+  }
+
+  /* When active, slide in */
+  #channelBottomSheet.active {
+    bottom: 0;
+  }
+
   @media screen and (max-width: 768px) {
     #blurryOverlay { display: none; }
     #onlyMobileBox { display: none; }
   }
 
-  #modelSearchInput { 
+  #modelSearchInput {
     border-radius: 0;
     -webkit-border-radius: 0;
   }
@@ -87,27 +114,27 @@
     -moz-appearance: none;
     appearance: none;
   }
- 
+
   .select2.select2-container {
     width: 100% !important;
   }
-  
+
   .select2-selection__placeholder {
     font-size: 16px;
   }
-  
+
   .select2-container .select2-selection.select2-selection--single {
     height: 55px;
     padding: 12px;
-    border: 1px solid #ccc;      
+    border: 1px solid #ccc;
   }
-  
+
   .select2-container .select2-selection.select2-selection--single .select2-selection__rendered {
     padding: 0px;
     font-size: 16px;
     color: #333333;
   }
- 
+
   .select2.select2-container--default .select2-selection--single .select2-selection__arrow b {
     border: 0px;
   }
@@ -203,7 +230,7 @@
     background-position: calc(100% - 20px) center;
     background-repeat: no-repeat;
   }
- 
+
   input#modelSearchInput {
     outline: 0;
     -webkit-appearance: none;
@@ -213,7 +240,7 @@
 </style>
 
 <style>
-/*CSS for the autocomplete box for brands*/ 
+/*CSS for the autocomplete box for brands*/
 .autocomplete-items {
 position: absolute;
 z-index: 99;
@@ -244,8 +271,8 @@ color: #fff;
 */
 /*when navigating through the items using the arrow keys:*/
 .autocomplete-active {
-background-color: #fff !important; 
-color: #101010; 
+background-color: #fff !important;
+color: #101010;
 }
 #cover-spin {
 position: fixed;

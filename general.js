@@ -150,8 +150,8 @@ export function shareCode() {
 
 // Channel bottom sheet
 export function channelRouter(webpath){
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  if (isIOS) {
+  console.log('channelRouter', webpath, isIos);
+  if (isIos) {
     showChannelBottomSheet(webpath)
   } else {
     window.location.href = webpath;

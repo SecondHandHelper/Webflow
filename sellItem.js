@@ -16,7 +16,13 @@ import {
   colorMapping
 } from "./sellItemHelpers";
 import QRCode from "qrcode";
-import { formatPersonalId, getFormAddressFields, isValidSwedishSsn, setFormAddressFields } from "./general";
+import {
+  formatPersonalId,
+  getFormAddressFields,
+  isValidSwedishSsn,
+  channelRouter,
+  hideChannelBottomSheet
+} from "./general";
 import { autocomplete, brands } from "./autocomplete-brands";
 import {
   displayFindModelDiv,
@@ -304,6 +310,29 @@ async function sellItemMain() {
 
   if (document.getElementById('imagesDownloadApp') && /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
     document.getElementById('imagesDownloadApp').style.display = 'block';
+  }
+  console.log('params', params);
+  if (params.id && params.type === 'draft') {
+    console.log('showing channel bottom sheet');
+    channelRouter(window.location.pathname);
+    document
+      .getElementById("darkOverlay")
+      .addEventListener("click", hideChannelBottomSheet);
+    document
+      .getElementById("closeChannelBottomSheet")
+      .addEventListener("click", hideChannelBottomSheet);
+    document.getElementById("downloadAppBottomSheet").href = "https://invite.mairesale.com/sell-item";
+    const continueOnWebBtn = document.getElementById('continueOnWebBottomSheet');
+    if (continueOnWebBtn) {
+      continueOnWebBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        hideChannelBottomSheet();
+      });
+    }
+  } else {
+    console.log('hiding channel bottom sheet');
+    hideChannelBottomSheet();
   }
 }
 

@@ -994,7 +994,7 @@ if (!isMobile && window.location.hostname === 'sell.mairesale.com') {
       }
     });
   }
-  
+
   // Show blurryOverlay and onlyMobileBox on sell.mairesale.com (desktop only)
   const blurryOverlay = document.getElementById('blurryOverlay');
   if (blurryOverlay) {
