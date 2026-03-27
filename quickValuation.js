@@ -42,7 +42,6 @@ async function getValuation(itemBrand, itemCategory) {
     document.getElementById('loadingValuationDiv').style.display = 'none';
     document.getElementById('buttonsDiv').style.display = 'none';
     document.getElementById('brandCategoryText').innerText = `${brand}-${category.toLowerCase()}`;
-    document.getElementById('valuatedItemHeader').style.display = 'flex';
     if (decline) {
       document.getElementById('itemValuationText').innerText = valuationComment;
       document.getElementById('valuationText').style.display = 'block';
