@@ -43,13 +43,12 @@ async function getValuation(itemBrand, itemCategory) {
     document.getElementById('buttonsDiv').style.display = 'none';
     document.getElementById('brandCategoryText').innerText = `${brand}-${category.toLowerCase()}`;
     document.getElementById('valuatedItemHeader').style.display = 'flex';
+    document.getElementById('itemValuationText').innerText = valuationComment || '';
     if (decline) {
-      document.getElementById('itemValuationText').innerText = valuationComment;
       document.getElementById('valuationText').style.display = 'block';
       document.getElementById('valuationText').innerText = 'Säljer ej';
     } else if (newBrand || valuatedBrandItems === 0 || !minPrice || !maxPrice || latestSales.length < 3) {
       document.getElementById('valuationText').innerText = 'För få träffar';
-      document.getElementById('itemValuationText').innerText = valuationComment;
       document.getElementById('valuationText').style.display = 'block';
       document.getElementById('buttonsDiv').style.display = 'flex';
     } else if (minPrice && maxPrice) {
@@ -58,7 +57,6 @@ async function getValuation(itemBrand, itemCategory) {
       if (fewBrand) {
         document.getElementById('valuationText').style.display = 'none';
       }
-      document.getElementById('itemValuationText').innerText = valuationComment;
       document.getElementById('valuationText').style.display = 'block';
       const fromPrice = round10(brandCategoryMeanMinPrice || minPrice);
       const toPrice = round10(brandCategoryMeanMaxPrice || maxPrice);
