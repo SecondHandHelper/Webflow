@@ -96,6 +96,21 @@ if (userIsSellingNewItem()) {
     itemImage.src = item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || '';
     notificationText.innerHTML = `För att fullfölja försäljningen av ditt ${item.brand}-plagg behöver du logga in eller skapa konto`;
     itemToBeCreatedDiv.style.display = 'block';
+  } else {
+    const expertValuationDraftId = sessionStorage.getItem('expertValuationDraftAfterSignIn');
+    if (expertValuationDraftId) {
+      callBackendApi(`/api/items/${expertValuationDraftId}`, { requiresAuth: false })
+        .then(response => {
+          const item = response.data;
+          itemImage.src = item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || '';
+          notificationText.innerHTML = `För att fullfölja försäljningen av ditt ${item.brand}-plagg behöver du logga in eller skapa konto`;
+          itemToBeCreatedDiv.style.display = 'block';
+        })
+        .catch(e => {
+          console.error('Failed to fetch expert valuation draft', e);
+          itemToBeCreatedDiv.style.display = 'block';
+        });
+    }
   }
 }
 

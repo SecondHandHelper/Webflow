@@ -314,7 +314,7 @@ async function sellItemMain() {
   console.log('params', params);
   if (params.id && params.type === 'draft') {
     console.log('showing channel bottom sheet');
-    channelRouter(window.location.pathname);
+    channelRouter(window.location.href);
     document
       .getElementById("darkOverlay")
       .addEventListener("click", hideChannelBottomSheet);
