@@ -182,8 +182,9 @@ async function saveValuationStatus(itemId, minPrice, maxPrice) {
     }
     if (!document.referrer.includes('/private')) {
       const userPhoneSet = user.current?.phoneNumber?.length;
-      return window.location.href = userPhoneSet ? `/item-confirmation` :
-        `/user-contact`;
+      const idParam = params.id ? `?id=${params.id}` : '';
+      return window.location.href = userPhoneSet ? `/item-confirmation${idParam}` :
+        `/user-contact${idParam}`;
     } else {
       return window.location.href = `/private`;
     }
