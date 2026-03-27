@@ -19,7 +19,10 @@
       service: environment,
     });
   } else {
-    errorHandler = { report: () => {} };
+    errorHandler = {
+      report: () => {},
+      setUser: () => {},
+    };
   }
 
   // Firebase config
