@@ -1,5 +1,6 @@
 import {autocomplete, brands} from "./autocomplete-brands";
 import {fieldLabelToggle, initializeCategorySelect} from "./sellItemHelpers";
+import { setupMenuHandlers } from "./general";
 
 async function getValuation(itemBrand, itemCategory) {
   const brand = itemBrand.value ? itemBrand.value.trim() : "";
@@ -131,10 +132,12 @@ function showMenu(u) {
   if (u?.referralData?.referralCode) {
     menuInviteLink.style.display = 'block';
   }
+  const menuButton = document.getElementById("menuButton");
   menuButton.style.display = 'flex';
 }
 
 async function quickValuationMain() {
+  setupMenuHandlers();
   const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
   document.getElementById('ctoDiv').style.display = 'none';
   if (sessionUser) {

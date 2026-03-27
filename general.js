@@ -169,6 +169,90 @@ export function hideChannelBottomSheet(){
 }
 // End of channel bottom sheet
 
+export function closeMenuWithAnimation(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  const menu = document.getElementById('menu');
+  if (menu) {
+    menu.style.display = 'block';
+    menu.style.transition = 'opacity 0.3s ease-in-out';
+    menu.offsetHeight;
+    menu.style.opacity = '0';
+    setTimeout(() => {
+      menu.style.display = 'none';
+    }, 300);
+  }
+}
+
+export function setupMenuHandlers() {
+  const menuLoginButton = document.getElementById("menuLoginButton");
+  if (menuLoginButton) {
+    menuLoginButton.addEventListener("click", () => {
+      closeMenuWithAnimation();
+      channelRouter("/sign-in");
+    });
+  }
+
+  const menuSellItemButton = document.getElementById("menuSellItemButton");
+  if (menuSellItemButton) {
+    menuSellItemButton.addEventListener("click", () => {
+      closeMenuWithAnimation();
+      channelRouter("/sell-item");
+    });
+  }
+
+  const menuButton = document.getElementById("menuButton");
+  const closeMenuButton = document.getElementById("closeMenuButton");
+
+  if (menuButton) {
+    menuButton.addEventListener("click", function () {
+      const menu = document.getElementById('menu');
+      if (menu) {
+        menu.style.display = 'block';
+        menu.style.opacity = '0';
+        menu.style.transition = 'opacity 0.3s ease-in-out';
+        menu.offsetHeight;
+        menu.style.opacity = '1';
+      }
+    });
+  }
+
+  if (closeMenuButton) {
+    closeMenuButton.addEventListener("click", closeMenuWithAnimation);
+  }
+
+  const menuChatButton = document.getElementById("menuChatButton");
+  if (menuChatButton) {
+    menuChatButton.addEventListener("click", () => {
+      closeMenuWithAnimation();
+      Intercom('show');
+    });
+  }
+
+  const menuFaqButton = document.getElementById("menuFaqButton");
+  if (menuFaqButton) {
+    menuFaqButton.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeMenuWithAnimation();
+      setTimeout(() => {
+        const faqSection = document.getElementById('faq');
+        if (faqSection) {
+          const elementPosition = faqSection.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - 50;
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      }, 50);
+    });
+  }
+}
+
 // Toast animation functions
 export function animateOpenToast(elementId) {
   const element = document.getElementById(elementId);
