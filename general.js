@@ -150,10 +150,9 @@ export function shareCode() {
 
 // Channel bottom sheet
 export function channelRouter(webpath){
-  console.log('channelRouter', webpath, isIos);
   if (isIos) {
     showChannelBottomSheet(webpath)
-  } else {
+  } else if (window.location.href !== webpath) {
     window.location.href = webpath;
   }
 }
