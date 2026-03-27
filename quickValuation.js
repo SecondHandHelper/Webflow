@@ -31,7 +31,7 @@ async function getValuation(itemBrand, itemCategory) {
       minPriceEstimate: minPrice, maxPriceEstimate: maxPrice, decline, newBrand, valuatedBrandItems, fewBrand, valuatedBrandCategoryItems,
       brandCategoryAccuracy, brandAccuracy, highPriceVarBrandCategory, brandShareSold, humanCheckExplanation,
       brandCategoryMeanMinPrice, brandCategoryMeanMaxPrice, brandCategoryMinSoldPrice, brandCategoryMaxSoldPrice,
-      lowValueSegment, latestSales
+      lowValueSegment, latestSales, valuationComment
     } = valuationRes.data || {};
     localStorage.setItem('valuation', JSON.stringify(valuationRes.data));
     document.getElementById('soldItemsDiv').style.display = 'none';
@@ -44,34 +44,21 @@ async function getValuation(itemBrand, itemCategory) {
     document.getElementById('brandCategoryText').innerText = `${brand}-${category.toLowerCase()}`;
     document.getElementById('valuatedItemHeader').style.display = 'flex';
     if (decline) {
-      if (humanCheckExplanation?.match(/decline_blocked_brand/)) {
-        document.getElementById('itemValuationText').innerText = `Vi säljer generellt inte plagg från ${brand} på grund av för låg efterfrågan.`;
-      } else {
-        document.getElementById('itemValuationText').innerText = `Vi säljer generellt inte ${category.toLowerCase()} från ${brand} på grund av för låg efterfrågan.`;
-      }
+      document.getElementById('itemValuationText').innerText = valuationComment;
       document.getElementById('valuationText').style.display = 'block';
       document.getElementById('valuationText').innerText = 'Säljer ej';
     } else if (newBrand || valuatedBrandItems === 0 || !minPrice || !maxPrice || latestSales.length < 3) {
       document.getElementById('valuationText').innerText = 'För få träffar';
-      const categoryText = (latestSales.length < 3 || (valuatedBrandCategoryItems === 0 && valuatedBrandItems > 0)) ? 'av denna kategori ' : '';
-      document.getElementById('itemValuationText').innerText = `Vi har inte sålt så mycket ${categoryText}från detta varumärke tidigare, så detta plagg skulle vi behöva kika på manuellt för att kunna ge en värdering. Lägg upp ditt plagg till Mai så får du en värdering inom 2 dagar.`;
+      document.getElementById('itemValuationText').innerText = valuationComment;
       document.getElementById('valuationText').style.display = 'block';
       document.getElementById('buttonsDiv').style.display = 'flex';
     } else if (minPrice && maxPrice) {
       showLatestItemsSold(latestSales);
       document.getElementById('valuationInfoButton').style.display = 'flex';
-      const soldBrandItems = Math.round(valuatedBrandItems * brandShareSold);
-      if (!fewBrand) {
-        const startCopy = highPriceVarBrandCategory || (brandCategoryAccuracy < 0.7 && brandAccuracy < 0.8) ?
-          `Slutpriser för ${brand}-${category.toLowerCase()} kan variera mycket beroende på bl.a. modell och ålder. ` : '';
-        const shareSoldInfo = brandShareSold >= 0.5 ? `${brand} är eftertraktat på andrahandsmarknaden, och mycket av det som läggs upp säljs.` :
-          lowValueSegment ? `Efterfrågan på ${brand} är lite lägre än snittet, så det kan ta lite längre tid att sälja.` : '';
-        const endCopy = highPriceVarBrandCategory && startCopy === '' ? ' Lägg upp ditt plagg till Mai för en mer exakt värdering, då tar vi också hänsyn till bl.a. material, skick och modell.' : '';
-        document.getElementById('itemValuationText').innerText = `${startCopy}${shareSoldInfo}${endCopy}`;
-      } else {
-        document.getElementById('itemValuationText').innerText = `Vi har inte sålt så mycket av av denna kategori från ${brand} ännu, värderingen baseras på ${soldBrandItems} plagg från ${brand} som vi tidigare värderat. Lägg upp ditt plagg till Mai för en mer exakt värdering. Då tar vi också hänsyn till material, skick, säsong, modell och originalpris.`;
+      if (fewBrand) {
         document.getElementById('valuationText').style.display = 'none';
       }
+      document.getElementById('itemValuationText').innerText = valuationComment;
       document.getElementById('valuationText').style.display = 'block';
       const fromPrice = round10(brandCategoryMeanMinPrice || minPrice);
       const toPrice = round10(brandCategoryMeanMaxPrice || maxPrice);
