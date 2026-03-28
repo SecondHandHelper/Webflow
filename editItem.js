@@ -3,14 +3,9 @@ import { autocomplete, brands } from "./autocomplete-brands";
 
 const params = getParamsObject();
 if (params.app) {
-  const goBackButtons = document.querySelectorAll('.goback');
-  goBackButtons.forEach(button => {
+  document.querySelectorAll('.goback').forEach((button) => {
     button.style.visibility = 'hidden';
   });
-  const body = document.body;
-  if (body) {
-    body.style.paddingTop = '55px';
-  }
 }
 
 function isNumeric(str) {
