@@ -88,12 +88,15 @@ async function expertValuationMain() {
     document.getElementById('buttonSpinner').style.display = 'block';
     item.status = 'Draft';
     item.version = '2'
+    item.preferences = {
+      userValuationApproval: true,
+    }
 
     item.condition = itemCondition.value;
     item.valuationEmail = emailInput.value;
     item.model = document.getElementById('itemModel').value;
     const id = await requestUniqueId();
-    const createItemResponse = await callBackendApi(`/api/items/${id}`, { requiresAuth: false, data: { item } });
+    await callBackendApi(`/api/items/${id}`, { requiresAuth: false, data: { item } });
     const estimatedValuationData = JSON.parse(localStorage.getItem('valuation'));
     const estimatedData = {
       estimatedValuation: estimatedValuationData,
@@ -103,7 +106,6 @@ async function expertValuationMain() {
         estimatedValuationData.humanCheckNeeded
           ? {}
           : {
-              valuationStatus: 'Completed',
               valuationDate: new Date().toISOString(),
               infoRequests: {
                 price: {
