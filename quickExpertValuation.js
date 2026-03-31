@@ -80,21 +80,16 @@ async function expertValuationMain() {
   document.getElementById('expertValuationButton').addEventListener('click', async () => {
     const itemCondition = document.getElementById('itemCondition');
     const emailInput = document.getElementById('email');
-    const imageInput = document.getElementById('frontImage');
     const item = JSON.parse(localStorage.getItem('newItem'));
 
     itemCondition.setCustomValidity('');
     emailInput.setCustomValidity('');
-    imageInput.setCustomValidity('');
 
     if (!itemCondition.value) {
       itemCondition.setCustomValidity('Skick måste väljas');
     }
     if (!emailInput.value) {
       emailInput.setCustomValidity('E-post måste fyllas i');
-    }
-    if (Object.keys(item?.images).length === 0) {
-      imageInput.setCustomValidity('Bild måste laddas upp');
     }
 
     if (!document.querySelector('#valuateForm form').reportValidity()) {
@@ -148,6 +143,7 @@ async function expertValuationMain() {
     localStorage.removeItem('newItem');
     localStorage.removeItem('valuation');
     document.getElementById('valuateForm').style.display = 'none';
+    document.getElementById('expertInstruction').style.display = 'none';
     document.getElementById('expertValuationSent').style.display = 'flex';
   })
 }
