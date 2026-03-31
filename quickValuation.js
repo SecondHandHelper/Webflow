@@ -138,12 +138,6 @@ function showMenu(u) {
 
 async function quickValuationMain() {
   setupMenuHandlers();
-  const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
-  document.getElementById('ctoDiv').style.display = 'none';
-  if (sessionUser) {
-    showMenu(sessionUser);
-    document.getElementById("sellItemButton").value = 'Sälj plagget';
-  }
   Webflow.push(function () {
     $('form').submit(function () {
       return false;
@@ -228,11 +222,6 @@ async function quickValuationMain() {
     });
   }
   document.getElementById('sellItemButton').addEventListener('click', () => {
-    localStorage.removeItem('newItem');
-    localStorage.setItem('newItem', JSON.stringify({ brand: itemBrand.value, category: itemCategory.value }));
-    window.location.href = '/sell-item';
-  })
-  document.getElementById('sellItemButton2').addEventListener('click', () => {
     localStorage.removeItem('newItem');
     localStorage.setItem('newItem', JSON.stringify({ brand: itemBrand.value, category: itemCategory.value }));
     window.location.href = '/sell-item';
