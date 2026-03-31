@@ -50,12 +50,8 @@ async function expertValuationMain() {
   const itemCondition = document.getElementById('itemCondition');
   const emailInput = document.getElementById('email');
 
-  const emptyConditionOption = itemCondition.querySelector('option[value="Skick"]');
-  if (emptyConditionOption) {
-    emptyConditionOption.textContent = 'Välj skick';
-  }
   const toggleConditionColor = () => {
-    itemCondition.style.color = itemCondition.value ? '#101010' : '#929292';
+    itemCondition.style.color = itemCondition.value ? '#101010' : '#B9B9B9';
   };
   toggleConditionColor();
 
@@ -78,6 +74,9 @@ async function expertValuationMain() {
     item.images = { frontImage: imageUrl, enhancedFrontImage: enhancedImage.url };
     localStorage.setItem('newItem', JSON.stringify(item));
   })
+  document.getElementById('startOverButton')?.addEventListener('click', () => {
+    window.location.href = '/valuation';
+  });
   document.getElementById('expertValuationButton').addEventListener('click', async () => {
     const itemCondition = document.getElementById('itemCondition');
     const emailInput = document.getElementById('email');
@@ -165,9 +164,6 @@ user.whenSet(async () => {
   if (user.current?.email) {
     const emailInput = document.getElementById('email');
     emailInput.value = user.current.email;
-    const backgroundColor = window.getComputedStyle(emailInput).backgroundColor;
-    emailInput.readOnly = true;
-    emailInput.style.backgroundColor = backgroundColor;
     fieldLabelToggle('emailLabel')({ target: emailInput });
   }
 })
