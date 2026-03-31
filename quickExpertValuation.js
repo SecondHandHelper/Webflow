@@ -1,5 +1,5 @@
 import {
-  uploadImageAndShowPreview, requestUniqueId, enhanceFrontImage
+  uploadImageAndShowPreview, requestUniqueId, enhanceFrontImage, fieldLabelToggle
 } from "./sellItemHelpers";
 
 function showMenu(u) {
@@ -44,13 +44,32 @@ async function expertValuationMain() {
   const item = JSON.parse(localStorage.getItem('newItem'));
   const itemBrand = document.getElementById("itemBrand");
   itemBrand.value = item?.brand;
-  const itemBrandBg = window.getComputedStyle(itemBrand).backgroundColor;
-  itemBrand.readOnly = true;
-  itemBrand.style.backgroundColor = itemBrandBg;
   const itemCategory = document.getElementById('itemCategory');
   itemCategory.value = item?.category;
-  itemCategory.readOnly = true;
-  itemCategory.style.backgroundColor = itemBrandBg;
+  const itemModel = document.getElementById('itemModel');
+  const itemCondition = document.getElementById('itemCondition');
+  const emailInput = document.getElementById('email');
+
+  const emptyConditionOption = itemCondition.querySelector('option[value="Skick"]');
+  if (emptyConditionOption) {
+    emptyConditionOption.textContent = 'Välj skick';
+  }
+  const toggleConditionColor = () => {
+    itemCondition.style.color = itemCondition.value ? '#101010' : '#929292';
+  };
+  toggleConditionColor();
+
+  itemModel.addEventListener('input', fieldLabelToggle('itemModelLabel'));
+  itemCondition.addEventListener('input', fieldLabelToggle('itemConditionLabel'));
+  itemCondition.addEventListener('change', fieldLabelToggle('itemConditionLabel'));
+  itemCondition.addEventListener('change', toggleConditionColor);
+  emailInput.addEventListener('input', fieldLabelToggle('emailLabel'));
+
+  // Initialize label visibility for prefilled values.
+  fieldLabelToggle('itemModelLabel')({ target: itemModel });
+  fieldLabelToggle('itemConditionLabel')({ target: itemCondition });
+  fieldLabelToggle('emailLabel')({ target: emailInput });
+
   const imageInput = document.getElementById('frontImage')
   imageInput.addEventListener('change', async (e) => {
     const imageUrl = await uploadImageAndShowPreview(imageInput.files[0], 'frontImage', false);
@@ -144,9 +163,11 @@ window.addEventListener('pageshow', (event) => {
 expertValuationMain();
 user.whenSet(async () => {
   if (user.current?.email) {
-    document.getElementById('email').value = user.current.email;
-    const backgroundColor = window.getComputedStyle(document.getElementById('email')).backgroundColor;
-    document.getElementById('email').readOnly = true;
-    document.getElementById('email').style.backgroundColor = backgroundColor;
+    const emailInput = document.getElementById('email');
+    emailInput.value = user.current.email;
+    const backgroundColor = window.getComputedStyle(emailInput).backgroundColor;
+    emailInput.readOnly = true;
+    emailInput.style.backgroundColor = backgroundColor;
+    fieldLabelToggle('emailLabel')({ target: emailInput });
   }
 })
