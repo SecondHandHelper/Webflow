@@ -169,13 +169,20 @@ export function hideChannelBottomSheet(){
 }
 // End of channel bottom sheet
 
+function getActiveMenuElement() {
+  const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
+  if (sessionUser) {
+    return document.getElementById('menu') || document.getElementById('menu-logged-out');
+  }
+  return document.getElementById('menu-logged-out') || document.getElementById('menu');
+}
+
 export function closeMenuWithAnimation(e) {
   if (e) {
     e.preventDefault();
     e.stopPropagation();
   }
-  console.log('[menu-debug] closeMenuWithAnimation');
-  const menu = document.getElementById('menu');
+  const menu = getActiveMenuElement();
   if (menu) {
     menu.style.display = 'block';
     menu.style.transition = 'opacity 0.3s ease-in-out';
@@ -243,11 +250,7 @@ export function setupMenuHandlers() {
 
   if (menuButton) {
     menuButton.addEventListener("click", function () {
-      let menu = document.getElementById('menu-logged-out');
-      const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
-      if (sessionUser) {
-        menu = document.getElementById('menu');
-      }
+      const menu = getActiveMenuElement();
       if (menu) {
         menu.style.display = 'block';
         menu.style.opacity = '0';
