@@ -852,9 +852,6 @@ let loadHandlerHasRun = false;
 
 function onLoadHandler() {
   console.log('onLoadHandler running');
-  menuSignoutButton.addEventListener('click', async function () {
-    await signOut();
-  });
   bookPickupForm.addEventListener("submit", bookPickup);
   closePickupToastIcon.addEventListener("click", closePickupToast);
   closeFeedbackFormButton.addEventListener("click", closeFeedbackForm);
