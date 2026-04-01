@@ -114,25 +114,6 @@ async function quickValuationMain() {
     prepareMenu(sessionUser);
   }
 
-  // Override default menuButton behavior on this page:
-  // logged in -> #menu, logged out -> #menu-logged-out.
-  const menuButton = document.getElementById('menuButton');
-  if (menuButton) {
-    const freshMenuButton = menuButton.cloneNode(true);
-    menuButton.parentNode.replaceChild(freshMenuButton, menuButton);
-    freshMenuButton.addEventListener('click', () => {
-      const loggedIn = !!authUser.current || !!sessionUser;
-      const menuId = loggedIn ? 'menu' : 'menu-logged-out';
-      const selectedMenu = document.getElementById(menuId);
-      if (selectedMenu) {
-        selectedMenu.style.display = 'block';
-        selectedMenu.style.opacity = '0';
-        selectedMenu.style.transition = 'opacity 0.3s ease-in-out';
-        selectedMenu.offsetHeight;
-        selectedMenu.style.opacity = '1';
-      }
-    });
-  }
   Webflow.push(function () {
     $('form').submit(function () {
       return false;

@@ -209,7 +209,11 @@ export function setupMenuHandlers() {
 
   if (menuButton) {
     menuButton.addEventListener("click", function () {
-      const menu = document.getElementById('menu');
+      let menu = document.querySelector('.menu-logged-out');
+      const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
+      if (sessionUser) {
+        menu = document.querySelector('.menu');
+      }
       if (menu) {
         menu.style.display = 'block';
         menu.style.opacity = '0';
