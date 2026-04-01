@@ -103,6 +103,7 @@ async function expertValuationMain() {
     const button = document.getElementById('expertValuationButton');
     button.disabled = true;
     document.getElementById('buttonSpinner').style.display = 'block';
+    button.style.display = 'none';
     item.status = 'Draft';
     item.version = '2'
     item.preferences = {
