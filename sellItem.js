@@ -212,28 +212,6 @@ async function sellItemMain() {
     }
   };
 
-  // Show intro info about the importance to accurately describe the items condition
-  itemCondition.addEventListener("input", () => {
-    if (itemCondition.value === "Använd, men utan anmärkning") {
-      const hasCookieSeen = getCookie('conditionUsedInfoBoxSeen') === 'true';
-      if (authUser.current) {
-        const hasViewedElement = user.current?.elementViews?.some(view =>
-          view.elementID === "conditionUsedInfoBox"
-        );
-
-        if (!hasViewedElement && !hasCookieSeen) {
-          document.getElementById("triggerOpenConditionUsedInfo").click();
-          // Store elementViews to be able to hinder it to show automatically again
-          db.collection('users').doc(authUser.current.uid).update({ elementViews: firebase.firestore.FieldValue.arrayUnion({ elementID: "conditionUsedInfoBox", timestamp: new Date() }) });
-          setCookie('conditionUsedInfoBoxSeen', 'true', 100);
-        }
-      } else if (!hasCookieSeen) {
-        document.getElementById("triggerOpenConditionUsedInfo").click();
-        setCookie('conditionUsedInfoBoxSeen', 'true', 100);
-      }
-    }
-  })
-
   nwt.addEventListener('click', () => {
     selectFieldValue(itemCondition, 'Helt ny, med prislapp kvar');
   })
@@ -696,10 +674,6 @@ function initializeInputEventListeners() {
   document.getElementById('conditionInfoIcon').addEventListener('click', (e) => {
     document.getElementById('darkOverlay').classList.add('active');
     document.getElementById('conditionInfoBox').style.display = 'block';
-  });
-  document.getElementById('closeConditionUsedInfoBox').addEventListener('click', () => {
-    document.getElementById('darkOverlay').classList.remove('active');
-    document.getElementById('conditionInfoBox').style.display = 'none';
   });
   itemColor.addEventListener('change', fieldLabelToggle('itemColorLabel'));
   itemColor.addEventListener('input', async (event) => {
