@@ -693,6 +693,14 @@ function initializeInputEventListeners() {
   itemOriginalPrice.addEventListener('input', fieldLabelToggle('itemOriginalPriceLabel'));
   itemAge.addEventListener('input', fieldLabelToggle('itemAgeLabel'));
   itemCondition.addEventListener('input', fieldLabelToggle('itemConditionLabel'));
+  document.getElementById('conditionInfoIcon').addEventListener('click', (e) => {
+    document.getElementById('darkOverlay').classList.add('active');
+    document.getElementById('conditionInfoBox').style.display = 'block';
+  });
+  document.getElementById('closeConditionUsedInfoBox').addEventListener('click', () => {
+    document.getElementById('darkOverlay').classList.remove('active');
+    document.getElementById('conditionInfoBox').style.display = 'none';
+  });
   itemColor.addEventListener('change', fieldLabelToggle('itemColorLabel'));
   itemColor.addEventListener('input', async (event) => {
     clearConfirmButtonValidity(event);

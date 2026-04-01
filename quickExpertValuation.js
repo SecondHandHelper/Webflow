@@ -77,6 +77,21 @@ async function expertValuationMain() {
   document.getElementById('startOverButton')?.addEventListener('click', () => {
     window.location.href = '/valuation';
   });
+  nwt.addEventListener('click', () => {
+    selectFieldValue(itemCondition, 'Helt ny, med prislapp kvar');
+  })
+  nwot.addEventListener('click', () => {
+    selectFieldValue(itemCondition, 'Helt ny, men utan prislapp');
+  })
+  usedLikeNew.addEventListener('click', () => {
+    selectFieldValue(itemCondition, 'Använd, men utan anmärkning');
+  })
+  usedGood.addEventListener('click', () => {
+    selectFieldValue(itemCondition, 'Använd, tecken på slitage');
+  })
+  usedWorn.addEventListener('click', () => {
+    selectFieldValue(itemCondition, 'Använd, tydligt slitage');
+  })
   document.getElementById('expertValuationButton').addEventListener('click', async () => {
     const itemCondition = document.getElementById('itemCondition');
     const emailInput = document.getElementById('email');
