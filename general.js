@@ -174,7 +174,7 @@ export function closeMenuWithAnimation(e) {
     e.preventDefault();
     e.stopPropagation();
   }
-
+  console.log('[menu-debug] closeMenuWithAnimation');
   const menu = document.getElementById('menu');
   if (menu) {
     menu.style.display = 'block';
