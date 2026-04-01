@@ -37,15 +37,14 @@
   #darkOverlay{display:none;}
   #moreInfoFields{display:none;}
   #hideFieldsText{display:none;}
-	#deleteFrontImageIcon{display:none;}
-	#clearItemForm{display:none;}
+  #deleteFrontImageIcon{display:none;}
+  #clearItemForm{display:none;}
   #enhancedAnimationDiv {display:none;}
   #warningIcon {display: none;}
   #itemDraftSavedPopup { display: none; }
   #saveItemDraftDiv { display: none; }
   #saveItemDraftButton { display: none; }
   #photoroomDiv { display: none; }
-  #conditionUsedInfoBox { display: none; }
   #conditionInfoBox{ display: none; }
   #suggest-categories-div { display: none; }
   #suggest-colors-div { display: none; }
@@ -53,7 +52,7 @@
   #closePricingInfoBox{
     -webkit-tap-highlight-color: transparent !important;
   }
-
+  
   #itemListSelling::-webkit-scrollbar {
   	display: none;
 	}
@@ -64,10 +63,19 @@
   }
   #onlyMobileBox{display:block;}
 
+  @media screen and (max-width: 768px) {
+    #blurryOverlay { display: none; }
+    #onlyMobileBox { display: none; }
+  }
+
+  #modelSearchInput { 
+    border-radius: 0;
+    -webkit-border-radius: 0;
+  }
   #darkOverlay {
-    display: block;
-    visibility: hidden;
-    opacity: 0;
+	display: block;
+	visibility: hidden;
+	opacity: 0;
     transition: opacity 0.3s ease-in-out;
   }
 
@@ -78,7 +86,7 @@
   }
 
   #channelBottomSheet {
-    position: fixed;
+	position: fixed;
     left: 0;
     right: 0;
     z-index: 5;
@@ -89,16 +97,6 @@
   /* When active, slide in */
   #channelBottomSheet.active {
     bottom: 0;
-  }
-
-  @media screen and (max-width: 768px) {
-    #blurryOverlay { display: none; }
-    #onlyMobileBox { display: none; }
-  }
-
-  #modelSearchInput {
-    border-radius: 0;
-    -webkit-border-radius: 0;
   }
   .suggest-buttons{display:none;}
 
@@ -114,27 +112,27 @@
     -moz-appearance: none;
     appearance: none;
   }
-
+ 
   .select2.select2-container {
     width: 100% !important;
   }
-
+  
   .select2-selection__placeholder {
     font-size: 16px;
   }
-
+  
   .select2-container .select2-selection.select2-selection--single {
     height: 55px;
     padding: 12px;
-    border: 1px solid #ccc;
+    border: 1px solid #ccc;      
   }
-
+  
   .select2-container .select2-selection.select2-selection--single .select2-selection__rendered {
     padding: 0px;
     font-size: 16px;
     color: #333333;
   }
-
+ 
   .select2.select2-container--default .select2-selection--single .select2-selection__arrow b {
     border: 0px;
   }
@@ -230,7 +228,7 @@
     background-position: calc(100% - 20px) center;
     background-repeat: no-repeat;
   }
-
+ 
   input#modelSearchInput {
     outline: 0;
     -webkit-appearance: none;
@@ -240,7 +238,7 @@
 </style>
 
 <style>
-/*CSS for the autocomplete box for brands*/
+/*CSS for the autocomplete box for brands*/ 
 .autocomplete-items {
 position: absolute;
 z-index: 99;
@@ -271,8 +269,8 @@ color: #fff;
 */
 /*when navigating through the items using the arrow keys:*/
 .autocomplete-active {
-background-color: #fff !important;
-color: #101010;
+background-color: #fff !important; 
+color: #101010; 
 }
 #cover-spin {
 position: fixed;
