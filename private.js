@@ -1,4 +1,4 @@
-import { itemCoverImage, shareCode, animateCloseToast, prepareMenu } from "./general";
+import { itemCoverImage, shareCode, animateCloseToast, prepareMenu, setupMenuHandlers } from "./general";
 import { loadInfoRequests } from "./infoRequestsFunctions";
 import { loadItemCards } from "./loadItemCards";
 import QRCode from "qrcode";
@@ -852,6 +852,7 @@ let loadHandlerHasRun = false;
 
 function onLoadHandler() {
   console.log('onLoadHandler running');
+  setupMenuHandlers();
   bookPickupForm.addEventListener("submit", bookPickup);
   closePickupToastIcon.addEventListener("click", closePickupToast);
   closeFeedbackFormButton.addEventListener("click", closeFeedbackForm);
