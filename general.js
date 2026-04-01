@@ -169,20 +169,12 @@ export function hideChannelBottomSheet(){
 }
 // End of channel bottom sheet
 
-function getActiveMenuElement() {
-  const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
-  if (sessionUser) {
-    return document.getElementById('menu') || document.getElementById('menu-logged-out');
-  }
-  return document.getElementById('menu-logged-out') || document.getElementById('menu');
-}
-
 export function closeMenuWithAnimation(e) {
   if (e) {
     e.preventDefault();
     e.stopPropagation();
   }
-  const menu = getActiveMenuElement();
+  const menu = e?.target?.closest?.('.menu');
   if (menu) {
     menu.style.display = 'block';
     menu.style.transition = 'opacity 0.3s ease-in-out';
@@ -229,28 +221,29 @@ export function prepareMenu(u) {
 window.prepareMenu = prepareMenu;
 
 export function setupMenuHandlers() {
+  const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
+  const menu = sessionUser ? document.getElementById('menu') : document.getElementById('menu-logged-out');
   const menuLoginButton = document.getElementById("menuLoginButton");
   if (menuLoginButton) {
-    menuLoginButton.addEventListener("click", () => {
-      closeMenuWithAnimation();
+    menuLoginButton.addEventListener("click", (e) => {
+      closeMenuWithAnimation(e);
       channelRouter("/sign-in");
     });
   }
 
   const menuSellItemButton = document.getElementById("menuSellItemButton");
   if (menuSellItemButton) {
-    menuSellItemButton.addEventListener("click", () => {
-      closeMenuWithAnimation();
+    menuSellItemButton.addEventListener("click", (e) => {
+      closeMenuWithAnimation(e);
       channelRouter("/sell-item");
     });
   }
 
   const menuButton = document.getElementById("menuButton");
-  const closeMenuButton = document.getElementById("closeMenuButton");
+  const closeMenuButtons = document.querySelectorAll('.menu-close');
 
   if (menuButton) {
     menuButton.addEventListener("click", function () {
-      const menu = getActiveMenuElement();
       if (menu) {
         menu.style.display = 'block';
         menu.style.opacity = '0';
@@ -261,9 +254,9 @@ export function setupMenuHandlers() {
     });
   }
 
-  if (closeMenuButton) {
-    closeMenuButton.addEventListener("click", closeMenuWithAnimation);
-  }
+  closeMenuButtons.forEach((button) => {
+    button.addEventListener("click", closeMenuWithAnimation);
+  });
 
   const menuSignoutButton = document.getElementById('menuSignoutButton');
   if (menuSignoutButton && !menuSignoutButton.dataset.signoutBound) {
@@ -275,8 +268,8 @@ export function setupMenuHandlers() {
 
   const menuChatButton = document.getElementById("menuChatButton");
   if (menuChatButton) {
-    menuChatButton.addEventListener("click", () => {
-      closeMenuWithAnimation();
+    menuChatButton.addEventListener("click", (e) => {
+      closeMenuWithAnimation(e);
       Intercom('show');
     });
   }
@@ -286,7 +279,7 @@ export function setupMenuHandlers() {
     menuFaqButton.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
-      closeMenuWithAnimation();
+      closeMenuWithAnimation(e);
       setTimeout(() => {
         const faqSection = document.getElementById('faq');
         if (faqSection) {
