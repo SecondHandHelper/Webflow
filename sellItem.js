@@ -675,6 +675,10 @@ function initializeInputEventListeners() {
     document.getElementById('darkOverlay').classList.add('active');
     document.getElementById('conditionInfoBox').style.display = 'block';
   });
+  document.getElementById('closeConditionInfoBox').addEventListener('click', () => {
+    document.getElementById('darkOverlay').classList.remove('active');
+    document.getElementById('conditionInfoBox').style.display = 'none';
+  });
   itemColor.addEventListener('change', fieldLabelToggle('itemColorLabel'));
   itemColor.addEventListener('input', async (event) => {
     clearConfirmButtonValidity(event);
