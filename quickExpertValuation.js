@@ -4,40 +4,17 @@ import {
 import {
   selectFieldValue,
 } from "./sellItemModelSearch";
-
-function showMenu(u) {
-  let identifier = '';
-  let signInMethodText;
-  if (u.signInMethod.includes('phone') && u.phoneNumber) {
-    identifier = u.phoneNumber;
-    signInMethodText = 'Inloggad med SMS-kod';
-  } else if (u.signInMethod.includes('password') && u.email) {
-    identifier = u.email;
-    signInMethodText = 'Inloggad med email';
-  } else if (u.signInMethod.includes('google') && u.email){
-    identifier = u.email;
-    signInMethodText = 'Inloggad med Google';
-  }
-  if (identifier) {
-    account.innerHTML = identifier;
-    account.style.display = 'block';
-    accountSignInMethod.innerHTML = signInMethodText;
-    accountSignInMethod.style.display = 'block';
-  }
-  if (u.addressFirstName && u.addressLastName) {
-    accountName.innerHTML = u.addressFirstName + ' ' + u.addressLastName;
-    accountName.style.display = 'block';
-  }
-  if (u?.referralData?.referralCode) {
-    menuInviteLink.style.display = 'block';
-  }
-  menuButton.style.display = 'flex';
-}
+import { setupMenuHandlers, prepareMenu } from "./general";
 
 async function expertValuationMain() {
+  setupMenuHandlers();
+  const menuChatButton = document.getElementById('menuChatButton');
+  if (menuChatButton) {
+    menuChatButton.style.display = 'none';
+  }
   const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
   if (sessionUser) {
-    showMenu(sessionUser);
+    prepareMenu(sessionUser);
   }
   Webflow.push(function () {
     $('form').submit(function () {

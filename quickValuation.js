@@ -108,6 +108,10 @@ function round10(val) {
 
 async function quickValuationMain() {
   setupMenuHandlers();
+  const menuChatButton = document.getElementById('menuChatButton');
+  if (menuChatButton) {
+    menuChatButton.style.display = 'none';
+  }
   const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
   if (sessionUser) {
     prepareMenu(sessionUser);
