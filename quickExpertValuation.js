@@ -1,6 +1,9 @@
 import {
   uploadImageAndShowPreview, requestUniqueId, enhanceFrontImage, fieldLabelToggle
 } from "./sellItemHelpers";
+import {
+  selectFieldValue,
+} from "./sellItemModelSearch";
 
 function showMenu(u) {
   let identifier = '';
@@ -77,6 +80,7 @@ async function expertValuationMain() {
   document.getElementById('startOverButton')?.addEventListener('click', () => {
     window.location.href = '/valuation';
   });
+
   nwt.addEventListener('click', () => {
     selectFieldValue(itemCondition, 'Helt ny, med prislapp kvar');
   })
@@ -92,6 +96,7 @@ async function expertValuationMain() {
   usedWorn.addEventListener('click', () => {
     selectFieldValue(itemCondition, 'Använd, tydligt slitage');
   })
+
   document.getElementById('expertValuationButton').addEventListener('click', async () => {
     const itemCondition = document.getElementById('itemCondition');
     const emailInput = document.getElementById('email');
