@@ -83,10 +83,15 @@ async function expertValuationMain() {
     emailInput.setCustomValidity('');
 
     if (!itemCondition.value) {
-      itemCondition.setCustomValidity('Skick måste väljas');
+      itemCondition.setCustomValidity('Välj ett skick');
     }
     if (!emailInput.value) {
-      emailInput.setCustomValidity('E-post måste fyllas i');
+      emailInput.setCustomValidity('Fyll i en e-postadress');
+    }
+
+    if (itemCondition.value && !emailInput.value) {
+      emailInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      emailInput.focus();
     }
 
     if (!document.querySelector('#valuateForm form').reportValidity()) {
