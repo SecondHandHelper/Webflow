@@ -1,4 +1,4 @@
-import { itemCoverImage, shareCode, signOut, animateCloseToast, prepareMenu } from "./general";
+import { itemCoverImage, shareCode, animateCloseToast, prepareMenu } from "./general";
 import { loadInfoRequests } from "./infoRequestsFunctions";
 import { loadItemCards } from "./loadItemCards";
 import QRCode from "qrcode";

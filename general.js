@@ -188,14 +188,6 @@ export function closeMenuWithAnimation(e) {
 }
 
 export function prepareMenu(u) {
-  const menuSignoutButton = document.getElementById('menuSignoutButton');
-  if (menuSignoutButton && !menuSignoutButton.dataset.signoutBound) {
-    menuSignoutButton.addEventListener('click', async function () {
-      await signOut();
-    });
-    menuSignoutButton.dataset.signoutBound = 'true';
-  }
-
   let identifier;
   let signInMethodText;
   console.log("Prepare menu", u.signInMethod);
@@ -291,6 +283,16 @@ export function setupMenuHandlers() {
 
   if (closeMenuButton) {
     closeMenuButton.addEventListener("click", closeMenuWithAnimation);
+  }
+
+  const menuSignoutButton = document.getElementById('menuSignoutButton');
+  console.log('[menu-debug] menuSignoutButton found:', !!menuSignoutButton);
+  if (menuSignoutButton && !menuSignoutButton.dataset.signoutBound) {
+    menuSignoutButton.addEventListener('click', async function () {
+      console.log('[menu-debug] menuSignoutButton click');
+      await signOut();
+    });
+    menuSignoutButton.dataset.signoutBound = 'true';
   }
 
   const menuChatButton = document.getElementById("menuChatButton");
