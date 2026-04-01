@@ -222,17 +222,22 @@ export function prepareMenu(u) {
 window.prepareMenu = prepareMenu;
 
 export function setupMenuHandlers() {
+  console.log('[menu-debug] setupMenuHandlers init');
   const menuLoginButton = document.getElementById("menuLoginButton");
+  console.log('[menu-debug] menuLoginButton found:', !!menuLoginButton);
   if (menuLoginButton) {
     menuLoginButton.addEventListener("click", () => {
+      console.log('[menu-debug] menuLoginButton click');
       closeMenuWithAnimation();
       channelRouter("/sign-in");
     });
   }
 
   const menuSellItemButton = document.getElementById("menuSellItemButton");
+  console.log('[menu-debug] menuSellItemButton found:', !!menuSellItemButton);
   if (menuSellItemButton) {
     menuSellItemButton.addEventListener("click", () => {
+      console.log('[menu-debug] menuSellItemButton click');
       closeMenuWithAnimation();
       channelRouter("/sell-item");
     });
@@ -240,20 +245,38 @@ export function setupMenuHandlers() {
 
   const menuButton = document.getElementById("menuButton");
   const closeMenuButton = document.getElementById("closeMenuButton");
+  console.log('[menu-debug] menuButton found:', !!menuButton);
+  console.log('[menu-debug] closeMenuButton found:', !!closeMenuButton);
 
   if (menuButton) {
     menuButton.addEventListener("click", function () {
+      console.log('[menu-debug] menuButton click');
       let menu = document.querySelector('.menu-logged-out');
       const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
+      console.log('[menu-debug] sessionUser exists:', !!sessionUser);
       if (sessionUser) {
         menu = document.querySelector('.menu');
+        console.log('[menu-debug] trying logged-in menu selector .menu');
+      } else {
+        console.log('[menu-debug] trying logged-out menu selector .menu-logged-out');
       }
+      console.log('[menu-debug] resolved menu element:', menu);
       if (menu) {
+        console.log('[menu-debug] before open styles:', {
+          display: menu.style.display,
+          opacity: menu.style.opacity
+        });
         menu.style.display = 'block';
         menu.style.opacity = '0';
         menu.style.transition = 'opacity 0.3s ease-in-out';
         menu.offsetHeight;
         menu.style.opacity = '1';
+        console.log('[menu-debug] after open styles:', {
+          display: menu.style.display,
+          opacity: menu.style.opacity
+        });
+      } else {
+        console.warn('[menu-debug] menu element not found for current auth state');
       }
     });
   }
@@ -263,16 +286,20 @@ export function setupMenuHandlers() {
   }
 
   const menuChatButton = document.getElementById("menuChatButton");
+  console.log('[menu-debug] menuChatButton found:', !!menuChatButton);
   if (menuChatButton) {
     menuChatButton.addEventListener("click", () => {
+      console.log('[menu-debug] menuChatButton click');
       closeMenuWithAnimation();
       Intercom('show');
     });
   }
 
   const menuFaqButton = document.getElementById("menuFaqButton");
+  console.log('[menu-debug] menuFaqButton found:', !!menuFaqButton);
   if (menuFaqButton) {
     menuFaqButton.addEventListener("click", function (e) {
+      console.log('[menu-debug] menuFaqButton click');
       e.preventDefault();
       e.stopPropagation();
       closeMenuWithAnimation();
