@@ -39,7 +39,9 @@ async function expertValuationMain() {
   itemCondition.addEventListener('input', fieldLabelToggle('itemConditionLabel'));
   itemCondition.addEventListener('change', fieldLabelToggle('itemConditionLabel'));
   itemCondition.addEventListener('change', toggleConditionColor);
+  itemCondition.addEventListener('change', () => itemCondition.setCustomValidity(''));
   emailInput.addEventListener('input', fieldLabelToggle('emailLabel'));
+  emailInput.addEventListener('input', () => emailInput.setCustomValidity(''));
 
   // Initialize label visibility for prefilled values.
   fieldLabelToggle('itemModelLabel')({ target: itemModel });
