@@ -289,6 +289,8 @@ export function setupMenuHandlers() {
             top: offsetPosition,
             behavior: 'smooth'
           });
+        } else {
+          window.location.href = '/#faq';
         }
       }, 50);
     });
