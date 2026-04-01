@@ -1,7 +1,6 @@
 import {autocomplete, brands} from "./autocomplete-brands";
 import {fieldLabelToggle, initializeCategorySelect} from "./sellItemHelpers";
-import { setupMenuHandlers } from "./general";
-import { prepareMenu } from "./private";
+import { setupMenuHandlers, prepareMenu } from "./general";
 
 async function getValuation(itemBrand, itemCategory) {
   const brand = itemBrand.value ? itemBrand.value.trim() : "";

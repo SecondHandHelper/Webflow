@@ -187,6 +187,40 @@ export function closeMenuWithAnimation(e) {
   }
 }
 
+export function prepareMenu(u) {
+  let identifier;
+  let signInMethodText;
+  console.log("Prepare menu", u.signInMethod);
+  if (u.signInMethod === 'phone' && u.phoneNumber) {
+    identifier = u.phoneNumber;
+    signInMethodText = 'Inloggad med SMS-kod';
+  } else if (u.signInMethod === 'password' && u.email) {
+    identifier = u.email;
+    signInMethodText = 'Inloggad med email';
+  } else if (u.signInMethod === 'google.com' && u.email) {
+    identifier = u.email;
+    signInMethodText = 'Inloggad med Google';
+  }
+  if (identifier) {
+    account.innerHTML = identifier;
+    account.style.display = 'block';
+    accountSignInMethod.innerHTML = signInMethodText;
+    accountSignInMethod.style.display = 'block';
+  }
+  if (u.addressFirstName && u.addressLastName) {
+    accountName.innerHTML = `${u.addressFirstName} ${u.addressLastName}`;
+    accountName.style.display = 'block';
+  }
+  if (u?.referralData?.referralCode) {
+    referralCodeText.innerHTML = u.referralData.referralCode;
+    headerInviteButton.style.display = 'flex';
+    menuInviteLink.style.display = 'block';
+  }
+}
+
+// Make prepareMenu available globally for session cookie auto-login
+window.prepareMenu = prepareMenu;
+
 export function setupMenuHandlers() {
   const menuLoginButton = document.getElementById("menuLoginButton");
   if (menuLoginButton) {
