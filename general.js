@@ -251,14 +251,14 @@ export function setupMenuHandlers() {
   if (menuButton) {
     menuButton.addEventListener("click", function () {
       console.log('[menu-debug] menuButton click');
-      let menu = document.querySelector('.menu-logged-out');
+      let menu = document.getElementById('menu-logged-out');
       const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
       console.log('[menu-debug] sessionUser exists:', !!sessionUser);
       if (sessionUser) {
-        menu = document.querySelector('.menu');
-        console.log('[menu-debug] trying logged-in menu selector .menu');
+        menu = document.getElementById('menu');
+        console.log('[menu-debug] trying logged-in menu selector #menu');
       } else {
-        console.log('[menu-debug] trying logged-out menu selector .menu-logged-out');
+        console.log('[menu-debug] trying logged-out menu selector #menu-logged-out');
       }
       console.log('[menu-debug] resolved menu element:', menu);
       if (menu) {
