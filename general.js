@@ -224,6 +224,12 @@ export function setupMenuHandlers() {
   const sessionUser = JSON.parse(localStorage.getItem('sessionUser'));
   const menu = sessionUser ? document.getElementById('menu') : document.getElementById('menu-logged-out');
   const menuLoginButton = document.getElementById("menuLoginButton");
+
+  const menuStartButton = document.getElementById('menuStartButton');
+  if (menuStartButton) {
+    menuStartButton.style.display = window.location.pathname !== '/' ? 'block' : 'none';
+  }
+
   if (menuLoginButton) {
     menuLoginButton.addEventListener("click", (e) => {
       closeMenuWithAnimation(e);
