@@ -150,6 +150,7 @@ async function expertValuationMain() {
     document.getElementById('valuateForm').style.display = 'none';
     document.getElementById('expertInstruction').style.display = 'none';
     document.getElementById('expertValuationSent').style.display = 'flex';
+    document.getElementById('startOverButton').style.display = 'none';
   })
 }
 

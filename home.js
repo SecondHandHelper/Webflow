@@ -12,7 +12,7 @@ function startAutoScroll(itemListElement) {
   let animationFrameId = null;
   let isProgrammaticScroll = false;
   let lastScrollLeft = itemListElement.scrollLeft;
-  const scrollSpeed = 0.5; // pixels per frame (adjust for speed)
+  const scrollSpeed = 0.35; // pixels per frame (adjust for speed)
   
   // Check if there's content to scroll
   const maxScroll = itemListElement.scrollWidth - itemListElement.clientWidth;
