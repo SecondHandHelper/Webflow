@@ -1,4 +1,4 @@
-import { channelRouter } from "./general";
+import { channelRouter, hideChannelBottomSheet } from "./general";
 
 auth.onAuthStateChanged(function (user) {
   const urlParams = new URLSearchParams(window.location.search);
@@ -32,3 +32,10 @@ if (document.referrer.includes("mairesale.com")) {
 document
   .getElementById("sellItemButton")
   .addEventListener("click", () => channelRouter("/sell-item"));
+
+  document
+  .getElementById("darkOverlay")
+  .addEventListener("click", hideChannelBottomSheet);
+document
+  .getElementById("closeChannelBottomSheet")
+  .addEventListener("click", hideChannelBottomSheet);
