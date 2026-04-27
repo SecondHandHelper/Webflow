@@ -11,10 +11,10 @@ auth.onAuthStateChanged(function (user) {
     });
   }
 
-  if (document.referrer.includes("mairesale.com")) {
-    // show neither
-  } else if (document.referrer.includes(window.location.origin) || user) {
+  if (document.referrer.includes(window.location.origin) || user) {
     loggedInHeader.style.display = "flex";
+  } else if (document.referrer.includes("mairesale.com")) {
+    // show neither
   } else {
     if (!appParam) {
       loggedOutHeader.style.display = "flex";
