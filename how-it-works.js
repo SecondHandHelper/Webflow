@@ -24,8 +24,9 @@ auth.onAuthStateChanged(function (user) {
 });
 
 if (document.referrer.includes("mairesale.com")) {
+  console.log("mairesale.com");
   document.getElementById("sellItemButton").style.display = "none";
-  document.getElementById("startSellingButton").style.display = "block";
+  document.getElementById("startSellingButton").style.display = "inline-flex";
 }
 
 document
