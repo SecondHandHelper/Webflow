@@ -103,6 +103,12 @@ async function updateFirestoreUserDocument(userId, email, phone, ssn) {
       if (utm_content) { a["utm_content"] = utm_content; }
       if (Object.keys(a).length > 0) { fields["attribution"] = a }
 
+      // Webflow is currently SE-only — DK sellers onboard via MaiApp/Shopify, not here.
+      // Only set on create so we don't clobber a country a user has set elsewhere
+      // (e.g. updated to 'DK' in the MaiApp settings later).
+      fields["country"] = "SE";
+      fields["payoutMethod"] = "swish";
+
       // Create User Document
       // Always set preferences.shippingMethod to 'Service point' when creating user
       await docRef.set(fields);
