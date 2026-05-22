@@ -109,11 +109,6 @@ async function sellItemMainAuthenticated() {
   if (params.type !== 'draft' && params.type !== 'resell') {
     document.getElementById('saveItemDraftButton').style.display = 'flex';
   }
-  window.addEventListener('beforeunload', () => {
-    if (params.id || itemDraftSaved) {
-      localStorage.removeItem('newItem');
-    }
-  });
   // Visa alla "viktiga" fält om man är inloggad
   toggleMoreInfoFields.click();
 
