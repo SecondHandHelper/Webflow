@@ -690,7 +690,7 @@ function initializeInputEventListeners() {
     itemDraft = item;
     document.getElementById('clearItemForm').style.display = 'none';
     document.getElementById('saveDraftSpinner').style.display = 'none';
-    document.getElementById('darkOverlay').style.display = 'block';
+    document.getElementById('darkOverlay').classList.add('active');
     const image = item.images?.enhancedFrontImageSmall || item.images?.enhancedFrontImage || item.images?.frontImage;
     if (image) {
       document.getElementById('popUpImage').src = image;
@@ -705,7 +705,7 @@ function initializeInputEventListeners() {
   });
   document.getElementById('closeItemSavedPopup').addEventListener('click', () => {
     document.getElementById('itemDraftSavedPopup').style.display = 'none';
-    document.getElementById('darkOverlay').style.display = 'none';
+    document.getElementById('darkOverlay').classList.remove('active');
   });
   document.getElementById('popUpNewItem').addEventListener('click', () => {
     clearFormFields();
