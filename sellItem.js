@@ -452,7 +452,9 @@ async function getAndSaveValuation(itemId, item) {
         sessionStorage.setItem('draftItemIdAfterSignIn', params.id);
         return '/sign-in';
       }
-      return `/item-valuation?id=${params.id}`;
+      // Completing a draft: fall through to the estimate below so the item gets valued.
+      // Drafts are saved without a valuation; returning straight to /item-valuation here
+      // left the item unvalued and the valuation screen rendered "NaN kr" / "undefined".
     }
   }
   try {

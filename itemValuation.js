@@ -269,6 +269,14 @@ const showValuation = async (item) => {
   }
   const minPrice = item.infoRequests?.price?.minPrice || newMinPriceEstimate || minPriceEstimate;
   const maxPrice = item.infoRequests?.price?.maxPrice || newMaxPriceEstimate || maxPriceEstimate;
+  if (!decline && !(minPrice > 0 && maxPrice > 0)) {
+    // Safety net: an item reached this screen without a usable valuation (e.g. a draft
+    // that was never estimated). Don't render "NaN kr" / "undefined" — send the seller to
+    // the no-valuation flow instead, mirroring nextStepAfterValuation in sellItem.js.
+    errorHandler.report(`item-valuation: no usable valuation for item ${item?.id}; redirecting`);
+    const userPhoneSet = user.current?.phoneNumber?.length;
+    return window.location.href = userPhoneSet ? '/item-confirmation' : '/user-contact';
+  }
   document.getElementById('valuationText').innerText = `${estimatedPrice(minPrice, maxPrice)} kr`;
   document.getElementById('valuationResultDiv').style.display = 'flex';
   document.body.addEventListener('click', hideTooltip);
