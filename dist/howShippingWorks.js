@@ -1,21 +1,2 @@
-!// modules are defined as an array
-// [ module function, map of requires ]
-//
-// map of requires is short require name -> numeric require
-//
-// anything defined in a previous bundle is accessed via the
-// orig method which is the require for previous bundles
-function(e,n,t,o,r){/* eslint-disable no-undef */var i="undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:"undefined"!=typeof window?window:"undefined"!=typeof global?global:{},f="function"==typeof i[o]&&i[o],u=f.cache||{},d="undefined"!=typeof module&&"function"==typeof module.require&&module.require.bind(module);function l(n,t){if(!u[n]){if(!e[n]){// if we cannot find the module within our internal map or
-// cache jump to the current global require ie. the last bundle
-// that was added to the page.
-var r="function"==typeof i[o]&&i[o];if(!t&&r)return r(n,!0);// If there are other bundles on this page the require from the
-// previous one is saved to 'previousRequire'. Repeat this as
-// many times as there are bundles until the module is found or
-// we exhaust the require chain.
-if(f)return f(n,!0);// Try the node require function if it exists.
-if(d&&"string"==typeof n)return d(n);var a=Error("Cannot find module '"+n+"'");throw a.code="MODULE_NOT_FOUND",a}s.resolve=function(t){var o=e[n][1][t];return null!=o?o:t},s.cache={};var c=u[n]=new l.Module(n);e[n][0].call(c.exports,s,c,c.exports,this)}return u[n].exports;function s(e){var n=s.resolve(e);return!1===n?{}:l(n)}}l.isParcelRequire=!0,l.Module=function(e){this.id=e,this.bundle=l,this.exports={}},l.modules=e,l.cache=u,l.parent=f,l.register=function(n,t){e[n]=[function(e,n){n.exports=t},{}]},Object.defineProperty(l,"root",{get:function(){return i[o]}}),i[o]=l;for(var a=0;a<n.length;a++)l(n[a]);if(t){// Expose entry point to Node, AMD or browser globals
-// Based on https://github.com/ForbesLindesay/umd/blob/master/template.js
-var c=l(t);// CommonJS
-"object"==typeof exports&&"undefined"!=typeof module?module.exports=c:"function"==typeof define&&define.amd?define(function(){return c}):r&&(this[r]=c)}}({kMCfr:[function(e,n,t){!async function(){if(authUser.current){let e=await callBackendApi("/api/bags/orders/allowed",{requiresAuth:!0});console.log("maxBags",e),e?.data?.maxOrderBags>0&&(document.getElementById("orderBagsButton").style.display="flex")}}()},{}]},["kMCfr"],"kMCfr","parcelRequire81ca")//# sourceMappingURL=howShippingWorks.js.map
-;
+!function(e,r,t,o,n){var u="u">typeof globalThis?globalThis:"u">typeof self?self:"u">typeof window?window:"u">typeof global?global:{},i="function"==typeof u[o]&&u[o],f=i.i||{},l=i.cache||{},a="u">typeof module&&"function"==typeof module.require&&module.require.bind(module);function c(r,t){if(!l[r]){if(!e[r]){if(n[r])return n[r];var f="function"==typeof u[o]&&u[o];if(!t&&f)return f(r,!0);if(i)return i(r,!0);if(a&&"string"==typeof r)return a(r);var d=Error("Cannot find module '"+r+"'");throw d.code="MODULE_NOT_FOUND",d}p.resolve=function(t){var o=e[r][1][t];return null!=o?o:t},p.cache={};var s=l[r]=new c.Module(r);e[r][0].call(s.exports,p,s,s.exports,u)}return l[r].exports;function p(e){var r=p.resolve(e);if(!1===r)return{};if(Array.isArray(r)){var t={__esModule:!0};return r.forEach(function(e){var r=e[0],o=e[1],n=e[2]||e[0],u=c(o);"*"===r?Object.keys(u).forEach(function(e){"default"===e||"__esModule"===e||Object.prototype.hasOwnProperty.call(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:function(){return u[e]}})}):"*"===n?Object.defineProperty(t,r,{enumerable:!0,value:u}):Object.defineProperty(t,r,{enumerable:!0,get:function(){return"default"===n?u.__esModule?u.default:u:u[n]}})}),t}return c(r)}}c.isParcelRequire=!0,c.Module=function(e){this.id=e,this.bundle=c,this.require=a,this.exports={}},c.modules=e,c.cache=l,c.parent=i,c.distDir=void 0,c.publicUrl=void 0,c.devServer=void 0,c.i=f,c.register=function(r,t){e[r]=[function(e,r){r.exports=t},{}]},Object.defineProperty(c,"root",{get:function(){return u[o]}}),u[o]=c;for(var d=0;d<r.length;d++)c(r[d]);if(t){var s=c(t);"object"==typeof exports&&"u">typeof module?module.exports=s:"function"==typeof define&&define.amd&&define(function(){return s})}}({kMCfr:[function(e,r,t,o){!async function(){if(authUser.current){let e=await callBackendApi("/api/bags/orders/allowed",{requiresAuth:!0});console.log("maxBags",e),e?.data?.maxOrderBags>0&&(document.getElementById("orderBagsButton").style.display="flex")}}()},{}]},["kMCfr"],"kMCfr","parcelRequire81ca",{});
 //# sourceMappingURL=howShippingWorks.js.map

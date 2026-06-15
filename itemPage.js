@@ -133,6 +133,7 @@ async function loadItemEvents(itemId, item) {
     itemEventsDiv.innerHTML = '';
     let response = await fetch(`https://api.mairesale.com/api/itemEvents/${itemId}`, {
         method: 'GET',
+        requiresAuth: true,
         headers: {'Content-Type': 'application/json'},
     });
     const events = await response.json();
