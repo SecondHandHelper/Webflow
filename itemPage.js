@@ -10,7 +10,7 @@ if (params.app) {
 
 async function loadItem(itemId) {
   const item = await callBackendApi(`/api/items/${itemId}`);
-  if (!item.data) { 
+  if (!item.data) {
     return null;
   }
   const data = item.data;
@@ -131,7 +131,7 @@ async function loadItem(itemId) {
 
 async function loadItemEvents(itemId, item) {
     itemEventsDiv.innerHTML = '';
-    let response = await fetch(`https://europe-west3-second-hand-helper.cloudfunctions.net/itemEvents/${itemId}`, {
+    let response = await fetch(`https://api.mairesale.com/api/itemEvents/${itemId}`, {
         method: 'GET',
         headers: {'Content-Type': 'application/json'},
     });
@@ -185,9 +185,9 @@ async function loadItemEvents(itemId, item) {
 }
 
 function eventComponentHtml(displayLine, icon, className, text, time, displayInfoIcon = false) {
-    const infoIconHtml = displayInfoIcon ? 
+    const infoIconHtml = displayInfoIcon ?
         `<img class="event-info-icon" src="https://global-uploads.webflow.com/6297d3d527db5dd4cf02e924/64a5c2b2484c893d82cdd2d4_info-icon-grey.svg" loading="lazy" alt="">` : '';
-    
+
     return `<div class="div-block-135"><div class="div-block-144"><div class="div-block-142">
                         <div class="div-block-139" style="display: ${displayLine};"></div>
                         </div>
@@ -347,14 +347,14 @@ function showEventInfoModal() {
     const modal = document.querySelector('.event-info-modal');
     if (modal) {
         modal.style.display = 'flex';
-        
+
         // Close on backdrop click
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 closeEventInfoModal();
             }
         });
-        
+
         // Close on close button click
         const closeBtn = modal.querySelector('.close-modal-btn');
         if (closeBtn) {

@@ -550,23 +550,6 @@ function setupBottomMenuPopupListeners() {
   });
 }
 
-async function yearlyDataExist(userId) {
-  //Get data
-  const url = 'https://europe-west3-second-hand-helper.cloudfunctions.net/yearlyData';
-  const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ id: userId, year: '2024' })
-  };
-  const yearlyDataResponse = await fetch(url, options);
-  if (!yearlyDataResponse.ok) { throw new Error('Network response was not ok.'); }
-  const yearlyDataJson = await yearlyDataResponse.json();
-  const yearlyData = yearlyDataJson.data;
-  return yearlyData.sold ? true : false
-}
-
 async function showFreeSellBox(items) {
   const noItems = items.length === 0;
   const noSoldItems = !items.some(item => item.status === "Sold");

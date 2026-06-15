@@ -149,7 +149,7 @@ function displayIntroDivText(introId, email) {
 async function getSignInInfo(signInInfoKey) {
   try {
     // response data: {"method":"google.com","email":"user@maiapp.se","phone":"+46734433221"}
-    const response = await fetch(`https://europe-west1-second-hand-helper.cloudfunctions.net/webApi/api/users/signInInfo?signInInfoKey=${signInInfoKey}`);
+    const response = await fetch(`https://api.mairesale.com/api/users/signInInfo?signInInfoKey=${signInInfoKey}`);
     return await response.json();
   } catch(e) {
     console.error(e);

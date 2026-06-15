@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.3.111';
+  const JS_VERSION = 'v1.3.112';
   const environment = (location.href.includes('maiapp.se') || location.href.includes('mairesale.com')) ? 'web-prod' : 'web-test';
   if (environment === 'web-prod') {
     errorHandler = new StackdriverErrorReporter();
@@ -101,7 +101,6 @@
   }
   const BACKEND_API_URL = 'https://api.mairesale.com';
   const IMAGE_BACKEND_API_URL = 'https://images-api-886292162262.europe-west1.run.app';
-  const LEGACY_BACKEND_API_URL = 'https://europe-west1-second-hand-helper.cloudfunctions.net/webApi';
 
   async function getIdToken(refresh = false) {
     let idToken = localStorage.getItem('idToken');
@@ -144,7 +143,7 @@
   };
 
   // Function to call web api backend function, with or without auth
-  async function callBackendApi(path, { data, method, requiresAuth, timeoutSec = 20, useLegacyFallback = true, fetchInit = {} } = {}) {
+  async function callBackendApi(path, { data, method, requiresAuth, timeoutSec = 20, fetchInit = {} } = {}) {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), timeoutSec*1000);
     let idToken = '';
@@ -205,13 +204,6 @@
       // Try the new backend first
       const useImagesApi = path.startsWith('/api/images');
       let response = await makeRequest(useImagesApi ? IMAGE_BACKEND_API_URL : BACKEND_API_URL);
-
-      // If the new backend fails and we have fallback enabled, try the legacy backend
-      if (!response.ok && useLegacyFallback) {
-        errorHandler.report(`New backend failed, falling back to legacy backend for ${method} ${path}`);
-        console.log('New backend failed, falling back to legacy backend');
-        response = await makeRequest(LEGACY_BACKEND_API_URL);
-      }
 
       if (!response.ok || response.headers.get('content-length') === '0') {
         return { data: undefined }
@@ -365,9 +357,9 @@
 
 </script>
 
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.86/clientUtils.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.86/signIn.js"></script>
-<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.86/referralFunctions.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.112/clientUtils.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.112/signIn.js"></script>
+<script src="https://rawcdn.githack.com/SecondHandHelper/Webflow/v1.3.112/referralFunctions.js"></script>
 
 
 <!-- Google Tag Manager (noscript) -->

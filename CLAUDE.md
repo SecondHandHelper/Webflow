@@ -56,7 +56,7 @@ That maps Webflow page → repo entry file. Look at the small `*.html` files (e.
 
 - `firebase`, `db` (Firestore), `auth`, `functions`, `firebase.analytics()` — Firebase SDK v11.6.1 compat build, loaded from gstatic.
 - `user` / `authUser` — observable singletons with `.current` getter/setter and `.whenSet(cb)`. `authUser` mirrors Firebase Auth state; `user` is the Firestore user doc. Don't replace these or read `firebase.auth().currentUser` directly when `authUser.current` is what callers expect.
-- `callBackendApi(path, { data, method, requiresAuth, timeoutSec, useLegacyFallback, fetchInit })` — primary backend client. Hits `BACKEND_API_URL` (`https://api.mairesale.com`) first, falls back to `LEGACY_BACKEND_API_URL` (`europe-west1-second-hand-helper.cloudfunctions.net/webApi`) on failure. Image endpoints (`/api/images/*`) route to `IMAGE_BACKEND_API_URL`. Use `requiresAuth: AUTH_IF_AVAILABLE` to send the token only when present.
+- `callBackendApi(path, { data, method, requiresAuth, timeoutSec, fetchInit })` — primary backend client. Hits `BACKEND_API_URL` (`https://api.mairesale.com`). Image endpoints (`/api/images/*`) route to `IMAGE_BACKEND_API_URL`. Use `requiresAuth: AUTH_IF_AVAILABLE` to send the token only when present.
 - `getIdToken(refresh)`, `onAuthStateChangedPromise()`, `bootstrapFromSessionCookie()`.
 - `errorHandler` — Stackdriver reporter in prod, no-op in test/dev (`environment === 'web-test'` is anything not on maiapp.se / mairesale.com).
 - `featureIsEnabled(name)` — feature gate keyed by `user.current.testGroups` (`alpha` / `beta` / `default`).
@@ -86,7 +86,6 @@ The repo is flat — all `.js` lives at the root. Logical layers:
 ### Backend
 
 - Primary: `https://api.mairesale.com` (Cloud Run, Go).
-- Legacy fallback: `https://europe-west1-second-hand-helper.cloudfunctions.net/webApi` (Cloud Functions).
 - Images: `https://images-api-886292162262.europe-west1.run.app`.
 - Firebase project: `second-hand-helper`. Firestore is read directly from the client (`db.collection(...)`) for many flows.
 
