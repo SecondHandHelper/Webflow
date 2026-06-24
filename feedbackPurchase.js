@@ -14,7 +14,7 @@ function initializePage(item) {
 
 async function goToReclaim(itemId) {
   const res = await saveFeedback(itemId);
-  window.location.href = `/reclaim/?id=${itemId}`;
+  window.location.href = `https://mairesale.com/pages/claim?id=${itemId}`;
 }
 
 function addEventListeners() {
@@ -32,7 +32,7 @@ function addEventListeners() {
             thankYouDiv.style.display = 'block';
             
             const lowRating = parseInt(document.querySelector('input[name="rating"]:checked').value) <= 2;
-            reclaimLink.href = lowRating ? window.location.origin + `/reclaim/?id=${params.id}` : '#';
+            reclaimLink.href = lowRating ? `https://mairesale.com/pages/claim?id=${params.id}` : '#';
             reclaimText.style.display = lowRating ? 'block' : 'none';
         }
     });
