@@ -1,8 +1,13 @@
-[{
+[
+  {
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "your.package.name",
-      "sha256_cert_fingerprints": ["YOUR:SHA256:FINGERPRINT"]
+      "package_name": "se.maiapp.app.prod",
+      "sha256_cert_fingerprints": [
+        "18:FF:99:04:20:27:96:C8:32:A7:9C:27:B3:37:BC:1B:29:8C:BC:5C:7D:34:B8:8D:CE:A0:7E:FE:70:12:86:AC"
+      ]
     }
-  }]
+  }
+]
+
