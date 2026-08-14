@@ -8,6 +8,15 @@
         "18:FF:99:04:20:27:96:C8:32:A7:9C:27:B3:37:BC:1B:29:8C:BC:5C:7D:34:B8:8D:CE:A0:7E:FE:70:12:86:AC"
       ]
     }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "se.maiapp.app.dev",
+      "sha256_cert_fingerprints": [
+        "77:9F:D7:70:8F:6E:92:8D:8B:08:5D:78:82:E5:73:0E:FD:17:BB:1B:6C:03:0D:1E:26:60:07:E8:BA:E0:DF:C9"
+      ]
+    }
   }
 ]
-
