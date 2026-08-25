@@ -150,7 +150,7 @@ export function shareCode() {
 
 // Channel bottom sheet
 export function channelRouter(webpath){
-  if (isIos) {
+  if (isIos || isAndroid) {
     showChannelBottomSheet(webpath)
   } else if (window.location.href !== webpath) {
     window.location.href = webpath;
@@ -159,6 +159,10 @@ export function channelRouter(webpath){
 
 function showChannelBottomSheet(webpath){
   document.getElementById('continueOnWebBottomSheet').href = window.location.origin + webpath;
+  const iosRow = document.getElementById('downloadAppBottomSheet');
+  const androidRow = document.getElementById('downloadAndroidApp');
+  if (iosRow) iosRow.style.display = isIos ? 'flex' : 'none';
+  if (androidRow) androidRow.style.display = isAndroid ? 'flex' : 'none';
   document.getElementById('darkOverlay').classList.add('active');
   document.getElementById('channelBottomSheet').classList.add('active');
 }

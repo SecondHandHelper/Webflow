@@ -295,6 +295,8 @@ async function sellItemMain() {
       .getElementById("closeChannelBottomSheet")
       .addEventListener("click", hideChannelBottomSheet);
     document.getElementById("downloadAppBottomSheet").href = "https://invite.mairesale.com/sell-item";
+    const androidRow = document.getElementById("downloadAndroidApp");
+    if (androidRow) androidRow.href = "https://invite.mairesale.com/sell-item";
     const continueOnWebBtn = document.getElementById('continueOnWebBottomSheet');
     if (continueOnWebBtn) {
       continueOnWebBtn.addEventListener('click', (e) => {
