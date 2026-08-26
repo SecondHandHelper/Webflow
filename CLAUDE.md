@@ -34,6 +34,8 @@ To ship a JS change:
 2. Bump `JS_VERSION` in `footer-custom-code.html` and paste that file into Webflow's site-wide footer custom-code area.
 3. Commit, push to `master`, and create the matching tag — githack serves `dist/` from that ref.
 
+**Only tag a commit that is already on `origin/master`.** githack serves whatever ref the tag names, so a tag cut on a feature branch publishes code `master` does not contain — and the next `JS_VERSION` bump, cut from master, silently reverts it. Merge to `master` first, then tag that commit. `master` must always be the answer to "what is live?".
+
 The header (`header-custom-code.html`) and per-page head files (`*-head.html`, e.g. `private-head.html`, `sell-item-head.html`) are pasted into Webflow's corresponding embed slots. The page-level `*.html` files in the repo root (e.g. `home.html`, `sell-item.html`) are the small Webflow embed snippets that call `urlDependentLoadJs('xxx.js')`.
 
 ## Architecture
