@@ -33,6 +33,12 @@
             },
             {
                 "/": "/trusted-seller-status/*"
+            },
+            {
+                "/": "/verify-email"
+            },
+            {
+                "/": "/verify-email/*"
             }
         ]
       }
