@@ -110,3 +110,14 @@ Defined in `header-custom-code.html` under `EXPERIMENTS`. Pattern: a `<test>Live
 - The `qrcode` npm package is the only runtime dep; everything else is loaded from CDNs in the Webflow custom code (Firebase, Segment, Stackdriver, select2, uuid).
 - `.parcel-cache/` and `dist/` are build artefacts — `dist/` IS committed (githack serves it), `.parcel-cache/` is ignored.
 - `package-lock.json` is gitignored.
+
+## Team Preferences
+
+- Always ask for confirmation before running `git commit` or `git push`.
+
+### Two words that mean the whole sequence
+
+- **"Check in the code"** (or "checka in koden") — commit, push, and get the commit onto `origin/master`. Nothing is deployed or released.
+- **"Deploy"** — everything "check in the code" covers, and then bump `JS_VERSION`, tag that master commit, and paste `footer-custom-code.html` into Webflow — the tag is what githack serves, so tagging is the release.
+
+Either word is itself the confirmation the rules above ask for; don't re-ask for each step. Stop and ask only where a step needs a decision: a merge conflict, a failing test, an unclear set of affected functions, or anything that would go live beyond what was asked for.
