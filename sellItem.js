@@ -395,29 +395,69 @@ async function saveItemValuation(itemId, estimatedValuationData) {
   await saveValuationInStorageOrBackend(estimatedData, itemId);
 }
 
+function round10(val) {
+  return Math.round((val || 0) / 10) * 10;
+}
+
+function shouldUseResellValuation(resellItem) {
+  return (
+    resellItem.status !== 'Sold' &&
+    resellItem.valuatedBy &&
+    !['Tobias Rosman', 'Mai Development'].includes(resellItem.valuatedBy)
+  );
+};
+
+async function setValuationFromResellItem(resellItem, itemId) {
+  const maxPrice = resellItem.status === 'Sold' ? resellItem.maxPriceEstimate :
+    Math.min(resellItem.maxPriceEstimate,
+      Math.max(resellItem.minPriceEstimate + 150, round10(resellItem.minPriceEstimate * 1.3)));
+  const valuationData = {
+    valuationStatus: 'Completed',
+    valuationDate: new Date().toISOString(),
+    newMinPriceEstimate: resellItem.minPriceEstimate,
+    newMaxPriceEstimate: maxPrice,
+    infoRequests: {
+      price: {
+        status: 'Active',
+        response: '',
+        description: 'Vi börjar med startpriset, och justerar successivt ner till lägsta priset under säljperioden på 30 dagar. Värderingen utgår från vad liknande sålts för.',
+        minPrice: resellItem.minPriceEstimate,
+        maxPrice: maxPrice,
+        type: 'Valuation',
+        source: 'createdFromItem',
+        adjustmentAllowed: true,
+      }
+    }
+  }
+  await saveValuationInStorageOrBackend(valuationData, itemId);
+}
+
 async function getAndSaveValuation(itemId, item) {
   if (!itemId && !item) {
     console.error('No item and no itemId, unexpected!!');
     return '/item-confirmation';
   }
-  // A resell (params.id names the item this one was copied from) used to be
-  // priced right here, from the source item's own numbers. The backend owns
-  // that now: /api/valuation/estimate reads `createdFromItem` off the item and
-  // prices against what the source actually did -- sold at a known price, or
-  // failed to sell at one (functions/src/items/valuation/resellValuation.ts).
-  // This flow and the app each carried their own copy of the old rule and had
-  // drifted apart, quoting the same garment differently.
-  if (params.id && (params.type === 'draft' || isExpertValuationDraft)) {
-    if (sessionStorage.getItem('expertValuationDraftAfterSignIn')) {
-      return '/sign-in';
+  if (params.id) {
+    const isDraftItem = params.type === 'draft' || isExpertValuationDraft;
+    if (!isDraftItem) {
+      const getItemResponse = await callBackendApi(`/api/items/${params.id}`);
+      const resellItem = getItemResponse.data;
+      if (shouldUseResellValuation(resellItem)) {
+        await setValuationFromResellItem(resellItem, itemId);
+        return '/item-valuation';
+      }
+    } else {
+      if (sessionStorage.getItem('expertValuationDraftAfterSignIn')) {
+        return '/sign-in';
+      }
+      if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
+        sessionStorage.setItem('draftItemIdAfterSignIn', params.id);
+        return '/sign-in';
+      }
+      // Completing a draft: fall through to the estimate below so the item gets valued.
+      // Drafts are saved without a valuation; returning straight to /item-valuation here
+      // left the item unvalued and the valuation screen rendered "NaN kr" / "undefined".
     }
-    if (sessionStorage.getItem('itemToBeCreatedAfterSignIn')) {
-      sessionStorage.setItem('draftItemIdAfterSignIn', params.id);
-      return '/sign-in';
-    }
-    // Completing a draft: fall through to the estimate below so the item gets valued.
-    // Drafts are saved without a valuation; returning straight to /item-valuation here
-    // left the item unvalued and the valuation screen rendered "NaN kr" / "undefined".
   }
   try {
     const res = await callBackendApi('/api/valuation/estimate', { data: { itemId, item }, requiresAuth: false });
