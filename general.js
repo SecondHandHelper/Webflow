@@ -158,7 +158,12 @@ export function channelRouter(webpath){
 }
 
 function showChannelBottomSheet(webpath){
-  document.getElementById('continueOnWebBottomSheet').href = window.location.origin + webpath;
+  const webRow = document.getElementById('continueOnWebBottomSheet');
+  webRow.href = window.location.origin + webpath;
+  // "Fortsätt på webben" carries the `hidden` combo class (display: none) in
+  // Webflow. Only the login buttons offer it: an existing seller may still sign
+  // in on the web, while "Sälj ett plagg" sends new listings to the app.
+  webRow.style.display = webpath === '/sign-in' ? 'flex' : '';
   const iosRow = document.getElementById('downloadAppBottomSheet');
   const androidRow = document.getElementById('downloadAndroidApp');
   if (iosRow) iosRow.style.display = isIos ? 'flex' : 'none';
