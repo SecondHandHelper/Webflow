@@ -9,7 +9,9 @@ if (params.app) {
 }
 
 async function loadItem(itemId) {
-  const item = await callBackendApi(`/api/items/${itemId}`);
+  // Signed in when possible: web-api adds the sale's follow-up (saleFollowUp: when it is paid)
+  // only when the owner asks.
+  const item = await callBackendApi(`/api/items/${itemId}`, { requiresAuth: AUTH_IF_AVAILABLE });
   if (!item.data) {
     return null;
   }
@@ -68,12 +70,19 @@ async function loadItem(itemId) {
     }
   }
   if (data.status === "Sold") {
-    const notTrustedSeller = user.current.trustedSellerStatus !== 'Trusted';
+    // When this sale is paid (web-api's saleFollowUp, per sale since 2026-10-19): after the
+    // approval for a Pending or Untrusted seller, and for a Trusted seller's sale paying over
+    // 3 000 kr unless they are Mai Circle; on shipment otherwise. An answer without it falls back
+    // to the seller's status.
+    const payoutWhen = data.saleFollowUp?.payoutWhen;
+    const paysAfterApproval = payoutWhen ? payoutWhen === 'afterApproval' : user.current?.trustedSellerStatus !== 'Trusted';
+    const heldOverCap = data.saleFollowUp?.payoutHeld === 'overCap';
     statusText = `Såld!`;
 
     // Happy case
-    if (notTrustedSeller) {
+    if (paysAfterApproval) {
       text1 = "Du får betalt 5 dagar efter att köparen hämtat ut plagget, och ingen reklamation har skett."
+        + (heldOverCap ? "<br>Snabbare utbetalning gäller inte för denna försäljning då summan är över 3 000 kr." : "");
     } else if (data.payoutStatus !== "Payed") {
       text1 = data.payoutType === 'Brand Gift Card'
         ? `Ditt presentkort på ${data.cleanedBrand} skapas inom en dag`
@@ -88,10 +97,10 @@ async function loadItem(itemId) {
       toShipItemLink.style.display = "flex";
     } else {
       console.log('data.saleApprovalStatus', data.saleApprovalStatus);
-      if (notTrustedSeller) {
+      if (paysAfterApproval) {
         if (!data.saleApprovalStatus || data.saleApprovalStatus === 'Pending') {
           statusText = 'Inväntar godkännande';
-          toTrustedSellerArticleLink.style.display = "flex";
+          // The link beside it opened the 2024 "Pålitlig Säljare" article; not shown since 2026-10-19.
         // Return case
         } else if (data?.reclaim?.status === 'Approved' && data.refundResponsible === 'Seller') {
           if (data.returnShippingStatus === 'Collected') {

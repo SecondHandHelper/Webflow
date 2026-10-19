@@ -291,7 +291,8 @@ async function privateMain() {
     showInactiveItemsSection(),
   ]);
   loadItemCards(items, user.current);
-  showTrustedSellerWidget(items);
+  // The 2024 "Bli Pålitlig Säljare" countdown (3 approved sales) is gone since the seller status
+  // rule of 2026-10-19 (9 of the first 10, then 90 %); the app's quality page explains it now.
   console.log('user.current', user.current);
 
   if (window.location.href.endsWith('#wardrobe')) {
@@ -308,10 +309,10 @@ async function privateMain() {
   prepareMenu(user.current);
   loadInfoRequests(items);
   showFreeSellBox(items);
-  if (user.current?.trustedSellerStatus !== 'Pending' &&
-    user.current?.trustedSellerStatusChange && !user.current.trustedSellerStatusChange.seen) {
-    showTrustedSellerBottomSheet();
-  }
+  // The 2024 status-change sheet ("Pålitlig Säljare") is no longer shown (2026-10-19): the
+  // backend has stopped setting trustedSellerStatusChange, and the stale ones some sellers still
+  // hold would greet them with the old rules. showTrustedSellerBottomSheet stays for the close
+  // handlers below until the Webflow element goes.
   //showAppPromoSection();
   showDownloadAppInMenu();
   //showHolidayModeDiv(items);
@@ -771,37 +772,6 @@ function showTrustedSellerBottomSheet() {
     document.getElementById('trustedSellerText').innerText = `På grund av upprepade reklamationer eller försäljningar som inte skickats i tid, så uppfyller du för närvarande inte kriterierna för säljarstatusen Pålitlig Säljare. Du kan fortfarande sälja, men utbetalning sker först när köparen mottagit varan och eventuella reklamationer skickas tillbaka till dig.`;
   }
   document.getElementById("trustedSellerBottomSheet").classList.add("active");
-}
-
-function showTrustedSellerWidget(items) {
-  if (!user.current?.trustedSellerStatus || user.current?.trustedSellerStatus === 'Pending') {
-    const trustedSellerWidget = document.getElementById('trustedSellerWidget');
-    const hasItems = items?.data?.length > 0;
-
-    // If no items, move widget after soldByOthersDiv
-    if (!hasItems) {
-      console.log('No items, moving widget after soldByOthersDiv');
-      const soldByOthersDiv = document.getElementById('soldByOthersDiv');
-      soldByOthersDiv.parentNode.insertBefore(trustedSellerWidget, soldByOthersDiv.nextSibling);
-    }
-
-    if (user.current?.approvedSalesCount) {
-      document.getElementById('widgetNumApprovedSales').innerText = Math.max(0, 3 - Number(user.current?.approvedSalesCount));
-    }
-    if (user.current?.approvedSalesCount === 2) {
-      document.getElementById('approvedSalesText').innerText = 'godkänd försäljning kvar';
-    }
-    if (user.current?.approvedSalesCount >= 1) {
-      document.getElementById('widgetFirstSaleBar').style.backgroundColor = '#02AC08';
-    }
-    if (user.current?.approvedSalesCount >= 2) {
-      document.getElementById('widgetSecondSaleBar').style.backgroundColor = '#02AC08';
-    }
-    if (user.current?.approvedSalesCount >= 3) {
-      document.getElementById('widgetThirdSaleBar').style.backgroundColor = '#02AC08';
-    }
-    trustedSellerWidget.style.display = 'block';
-  }
 }
 
 async function hideApprovedSaleInfoBox() {
