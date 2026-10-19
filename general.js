@@ -164,6 +164,13 @@ function showChannelBottomSheet(webpath){
   // Webflow. Only the login buttons offer it: an existing seller may still sign
   // in on the web, while "Sälj ett plagg" sends new listings to the app.
   webRow.style.display = webpath === '/sign-in' ? 'flex' : '';
+  // The login buttons ask how to continue; every other caller keeps the
+  // title written in Webflow, remembered on first open.
+  const title = document.getElementById('channelBottomSheetTitle');
+  if (title) {
+    if (title.dataset.defaultText === undefined) title.dataset.defaultText = title.textContent;
+    title.textContent = webpath === '/sign-in' ? 'Hur vill du fortsätta?' : title.dataset.defaultText;
+  }
   const iosRow = document.getElementById('downloadAppBottomSheet');
   const androidRow = document.getElementById('downloadAndroidApp');
   if (iosRow) iosRow.style.display = isIos ? 'flex' : 'none';
