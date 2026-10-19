@@ -34,9 +34,17 @@ function dateOf(value) {
   return parsed && !isNaN(parsed.getTime()) ? parsed : null;
 }
 
-function contactSoon(blockedAt) {
-  const at = dateOf(blockedAt);
-  return !!at && Date.now() - at.getTime() <= CONTACT_DAYS * 24 * 60 * 60 * 1000;
+// Mai Desk records that someone wrote to the seller about this pause (users.pauseContact, Functions
+// webApi/deskIntercomApi.ts): the promise is kept, so it is not repeated. A later pause brings it back.
+function contactedSincePause(seller) {
+  const pausedAt = dateOf(seller?.blockedAt);
+  const contactedAt = dateOf(seller?.pauseContact?.at);
+  return !!pausedAt && !!contactedAt && contactedAt.getTime() >= pausedAt.getTime();
+}
+
+function contactSoon(seller) {
+  const at = dateOf(seller?.blockedAt);
+  return !!at && Date.now() - at.getTime() <= CONTACT_DAYS * 24 * 60 * 60 * 1000 && !contactedSincePause(seller);
 }
 
 function contentFor(seller) {
@@ -46,7 +54,7 @@ function contentFor(seller) {
     return {
       trusted: false,
       heading: 'Pausat konto',
-      body: `${PAUSED[seller.blockedReason] ?? PAUSED.ops}${contactSoon(seller.blockedAt) ? '\n\nVi hör av oss inom kort.' : ''}`,
+      body: `${PAUSED[seller.blockedReason] ?? PAUSED.ops}${contactSoon(seller) ? '\n\nVi hör av oss inom kort.' : ''}`,
     };
   }
   if (seller?.trustedSellerStatus === 'Trusted') {
