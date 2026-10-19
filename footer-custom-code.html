@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.3.122';
+  const JS_VERSION = 'v1.3.123';
   const environment = (location.href.includes('maiapp.se') || location.href.includes('mairesale.com')) ? 'web-prod' : 'web-test';
   if (environment === 'web-prod') {
     errorHandler = new StackdriverErrorReporter();
@@ -462,10 +462,12 @@
   }
 
   // FEATURE TOGGLE FUNCTION
+  // sellAppSignInNote: the "loggas in automatiskt" line in the sell sheet (sellAppSheet.js).
+  // Turn on once the app version that redeems the sign-in code is live in the stores.
   const featureConfig = {
-    alpha: { trustedSeller: true, modelDB: true, adjustValuation: true },
-    beta: { trustedSeller: true, modelDB: true, adjustValuation: true },
-    default: { trustedSeller: true, modelDB: true, adjustValuation: true }
+    alpha: { trustedSeller: true, modelDB: true, adjustValuation: true, sellAppSignInNote: false },
+    beta: { trustedSeller: true, modelDB: true, adjustValuation: true, sellAppSignInNote: false },
+    default: { trustedSeller: true, modelDB: true, adjustValuation: true, sellAppSignInNote: false }
   };
 
   function featureIsEnabled(featureName) {

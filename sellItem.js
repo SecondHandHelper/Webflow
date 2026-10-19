@@ -31,6 +31,7 @@ import {
   setupModelSearchEventListeners, showModelSuggestion,
   showSelectedModel
 } from "./sellItemModelSearch";
+import { gateSellItemPage } from "./sellAppSheet";
 
 
 let itemDraftSaved = false;
@@ -1630,6 +1631,9 @@ export const isNoBgImage = async (source) => {
 
 // Call sellItemMainAuthenticated after/when a user has logged in
 user.whenSet(sellItemMainAuthenticated);
+
+// A logged-in seller on a phone sells in the app (sellAppSheet.js).
+gateSellItemPage();
 
 // Call sellItemMain directly
 sellItemMain();

@@ -1,3 +1,14 @@
+import {
+  installSellAppLinkInterceptor,
+  openSellAppSheet,
+  sellItemTarget,
+  shouldSellInApp,
+} from "./sellAppSheet";
+
+// A logged-in seller on a phone sells in the app: every link to /sell-item on a page
+// that loads this module opens "Sälj vidare i appen" instead (sellAppSheet.js).
+installSellAppLinkInterceptor();
+
 export async function signOut() {
     try {
         try {
@@ -150,6 +161,13 @@ export function shareCode() {
 
 // Channel bottom sheet
 export function channelRouter(webpath){
+  // A logged-in seller gets "Sälj vidare i appen", which signs the app in on this
+  // account; the channel sheet below is for logged-out visitors.
+  const sellTarget = sellItemTarget(webpath);
+  if (sellTarget && shouldSellInApp()) {
+    openSellAppSheet(sellTarget);
+    return;
+  }
   if (isIos || isAndroid) {
     showChannelBottomSheet(webpath)
   } else if (window.location.href !== webpath) {

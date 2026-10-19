@@ -1,6 +1,7 @@
 import { itemCoverImage, shareCode, animateCloseToast, prepareMenu, setupMenuHandlers } from "./general";
 import { loadInfoRequests } from "./infoRequestsFunctions";
 import { loadItemCards } from "./loadItemCards";
+import { goToSellItem, rememberSellerItems } from "./sellAppSheet";
 import QRCode from "qrcode";
 
 var userId;
@@ -272,6 +273,7 @@ async function privateMain() {
   */
 
   const items = (await callBackendApi('/api/items', { requiresAuth: true }))?.data;
+  rememberSellerItems(items);
   showInviteToast(items);
 
   const inviteCode = checkCookie("invite");
@@ -470,7 +472,7 @@ async function showInYourWardrobeSection() {
       newItemCard.querySelector('.img-container').style.display = 'none';
     }
     newItemCard.addEventListener('click', () => {
-      location.href = `/sell-item?id=${item.id}&type=${item.status === 'Draft' ? 'draft' : 'resell'}`;
+      goToSellItem(`/sell-item?id=${item.id}&type=${item.status === 'Draft' ? 'draft' : 'resell'}`);
     });
     newItemCard.querySelector('.resell-button').href = `/sell-item?id=${item.id}&type=${item.status === 'Draft' ? 'draft' : 'resell'}`;
 

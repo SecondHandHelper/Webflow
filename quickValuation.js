@@ -1,6 +1,7 @@
 import {autocomplete, brands} from "./autocomplete-brands";
 import {fieldLabelToggle, initializeCategorySelect} from "./sellItemHelpers";
 import { setupMenuHandlers, prepareMenu } from "./general";
+import { goToSellItem } from "./sellAppSheet";
 
 async function getValuation(itemBrand, itemCategory) {
   const brand = itemBrand.value ? itemBrand.value.trim() : "";
@@ -203,7 +204,7 @@ async function quickValuationMain() {
   document.getElementById('sellItemButton').addEventListener('click', () => {
     localStorage.removeItem('newItem');
     localStorage.setItem('newItem', JSON.stringify({ brand: itemBrand.value, category: itemCategory.value }));
-    window.location.href = '/sell-item';
+    goToSellItem('/sell-item');
   })
   document.getElementById('expertValuationButton').addEventListener('click', () => {
     localStorage.removeItem('newItem');
