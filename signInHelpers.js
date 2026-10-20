@@ -61,22 +61,29 @@ function displayPreferredSignInMethod(signInMethod) {
   showOtherSignInMethodsButton.style.display = 'flex';
   otherSignInMethodsDiv.style.display = 'none';
 }
+function escapeHtml(value) {
+  return typeof value === 'string'
+    ? value.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
+    : '';
+}
+
 const params = new URL(window.location).searchParams;
 //Get preferred sign in method
 if (params.has('s') && params.get('s').length >= 3) {
   getSignInInfo(params.get('s')).then(res => {
-    if (!(res.email || res.phone || res.method)) {
+    // The link's key is public (it is also the id of the seller's shop page), so the answer
+    // carries the sign-in method and a masked hint, never the email address or phone number.
+    if (!res?.method) {
       return;
     }
-    emailAddress.value = res.email;
-    document.getElementById('signinPhoneNumber').value = res.phone?.replace('+46', '');
+    // displayIntroDivText puts the address into innerHTML; the hint comes from a user's own doc.
+    const emailHint = escapeHtml(res.emailHint);
     if (res.method === 'google.com') {
-      displayIntroDivText('logInIntroText', res.email);
+      displayIntroDivText('logInIntroText', emailHint);
       displayPreferredSignInMethod('google.com');
     } else if (res.method === 'password') {
-      loginAlternativesDiv.style.display = 'none';
-      displayIntroDivText('logInIntroText');
-      checkEmail();
+      displayIntroDivText('logInIntroText', emailHint);
+      displayPreferredSignInMethod('password');
     } else if (res.method === 'phone') {
       displayIntroDivText('logInIntroText');
       phoneLoginDiv.style.display = 'block';
