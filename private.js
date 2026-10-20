@@ -132,30 +132,19 @@ function showInviteToast(items) {
   }
 }
 
-function loadSoldByOthers(userID) {
+async function loadSoldByOthers() {
   var itemListSoldByOthers = document.getElementById('itemListSoldByOthers');
   itemListSoldByOthers.innerHTML = "";
 
-  // SOLD BY OTHERS QUERY + Add cards to list
-  db.collection("items")
-    .where("status", "==", "Sold")
-    .orderBy('soldDate', 'desc')
-    .limit(30)
-    .get()
-    .then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        var sellerId = doc.data().user;
-        var brand = doc.data().brand;
-        var soldPrice = doc.data().soldPrice;
-        var imageUrl = itemCoverImage(doc.data());
-
-        // Add card to list if seller is other than myself
-        if (sellerId != userID && soldPrice >= 200) {
-          var soldByOthersItemCardHTML = `<div class="div-block-14"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div><div class="text-block-14">${soldPrice} kr</div><div class='text-block-34'>${brand}</div></div>`;
-          itemListSoldByOthers.innerHTML += soldByOthersItemCardHTML;
-        }
-      });
-    });
+  // Recently sold items, from the API: a seller reads only their own items from Firestore.
+  // callBackendApi answers without data when the call fails: then the section stays hidden.
+  const recentlySold = (await callBackendApi('/api/items/recentlySold'))?.data || [];
+  if (!recentlySold.length) return;
+  recentlySold.slice(0, 30).forEach((item) => {
+    var imageUrl = itemCoverImage(item);
+    var soldByOthersItemCardHTML = `<div class="div-block-14"><div class="ratio-box _16-9"><div class="conten-block with-image"><div class="img-container" style="background-image: url('${imageUrl}');"></div></div></div><div class="text-block-14">${item.soldPrice} kr</div><div class='text-block-34'>${item.brand}</div></div>`;
+    itemListSoldByOthers.innerHTML += soldByOthersItemCardHTML;
+  });
 
   soldByOthersDiv.style.display = "block";
 }
@@ -254,7 +243,7 @@ async function privateMain() {
     document.getElementById('cta-header-text').style.display = 'none';
     document.getElementById('cta-header').style.borderRadius = '9999px';
   }
-  loadSoldByOthers(userId);
+  loadSoldByOthers();
   setPreferredLogInMethodCookie(authUser.current.providerData[0].providerId);
 
   //Yearly Summary

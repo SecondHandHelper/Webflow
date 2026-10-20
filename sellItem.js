@@ -617,29 +617,14 @@ async function addItemInner(id, status = 'New') {
   } else {
     const createItemResponse = await callBackendApi(`/api/items/${id}`, { data: { item } });
     await trackUserActivated();
-    await setCampaignCoupon();
     if (status !== 'Draft') {
       localStorage.removeItem('newItem');
       localStorage.removeItem('detectedModel');
       sessionStorage.removeItem('newItemId');
       localStorage.setItem('latestItemCreated', JSON.stringify(createItemResponse.data));
     }
-    //Archive if "createdFromItem" is same seller
-    if (isCreatedFromItem) {
-      const createdFromItemUserId = await getCreatedFromItemUserId(params.id);
-      if (createdFromItemUserId === authUser.current.uid) {
-        await db.collection('items').doc(params.id).update({ 'archived': true });
-      }
-    }
   }
   return { ...item, id };
-}
-
-async function getCreatedFromItemUserId(itemId) {
-  console.log('getCreatedFromItemUserId()');
-  const item = await db.collection("items").doc(itemId).get();
-  if (!item.exists) return null;
-  return item.data().user;
 }
 
 function validateForm() {
@@ -740,20 +725,12 @@ function isElementInView(el) {
   );
 }
 
-async function setCampaignCoupon() {
-  const campaignDateOk = new Intl.DateTimeFormat('se-SV').format(new Date()) <= '2024-08-18';
-  if (campaignDateOk && getCookie('noCommissionCampaignCookie') === 'noCommission' && (await userItemsCount()) === 1) {
-    await callBackendApi('/api/users/noCommissionCoupon', { method: 'PUT' });
-  }
-}
-
 async function createItemAfterSignIn() {
   const itemFromStorage = JSON.parse(sessionStorage.getItem('itemToBeCreatedAfterSignIn'));
   sessionStorage.removeItem('itemToBeCreatedAfterSignIn');
   sessionStorage.removeItem('newItemId');
   await callBackendApi(`/api/items/${itemFromStorage.id}`, { data: itemFromStorage });
   await trackUserActivated();
-  await setCampaignCoupon()
   localStorage.removeItem('newItem');
   itemFromStorage.item.id = itemFromStorage.id;
   localStorage.setItem('latestItemCreated', JSON.stringify(itemFromStorage.item));
