@@ -276,12 +276,8 @@ noCommissionCampaign();
 if (isIos) {
   //showDownloadAppLink();
 }
-if (isAndroid) {
-  const footerGetApp = document.getElementById("footerGetApp");
-  if (footerGetApp) {
-    footerGetApp.href = "https://play.google.com/store/apps/details?id=se.maiapp.app.prod";
-  }
-}
+// On Android, footerGetApp and the other App Store links point at Google Play:
+// footer-custom-code.html rewrites them on every page.
 
 // Set attribution cookies (could be put on any campaign page)
 checkCookie("utm_campaign");

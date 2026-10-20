@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/stackdriver-errors-js@v0.12.0/dist/stackdriver-errors-concat.min.js"></script>
 
 <script>
-  const JS_VERSION = 'v1.3.124';
+  const JS_VERSION = 'v1.3.125';
   const environment = (location.href.includes('maiapp.se') || location.href.includes('mairesale.com')) ? 'web-prod' : 'web-test';
   if (environment === 'web-prod') {
     errorHandler = new StackdriverErrorReporter();
@@ -410,6 +410,15 @@
       }
     });
   });
+
+  // APP STORE LINKS ON ANDROID
+  // The "Hämta appen" links placed in Webflow (footer, menus, promo blocks)
+  // carry the App Store URL. On an Android phone they go to Google Play.
+  if (isAndroid) {
+    document.querySelectorAll('a[href*="apps.apple.com"][href*="id6738430790"]').forEach(link => {
+      link.href = 'https://play.google.com/store/apps/details?id=se.maiapp.app.prod';
+    });
+  }
 
   // TRACK LINK CLICKS
   function linkClickTracker(event) {
