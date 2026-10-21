@@ -312,70 +312,49 @@ export function showLoadingIcon(imageName) {
     document.getElementById(`delete${capitalizeFirstLetter(imageName)}Icon`).style.display = 'none';
 }
 
+// The brand decline rules live in the backend (GET /api/brands/declineRules,
+// from the declineRules sheet); this page only shows the verdict. A later
+// keystroke supersedes an answer still in flight.
+let brandCheckSeq = 0;
+let brandCheckTimer;
+
 export function checkBlockedOrLowShareSoldBrand(brand, category) {
-  const BLOCKED_BRANDS = ['shein', 'lager 157', 'divided', 'brandy melville', 'cubus', 'bubbleroom', 'bondelid', 'nelly',
-    'dobber', 'åhléns', 'kappahl', 'primark', 'jack & jones', 'sisters point', 'missguided', 'topman',
-    'bik bok', 'cubus', 'happy holly', 'zign', 'glamorous', 'hollister', 'river island',
-    'light before dark', 'bohoo', 'crocker', 'forever 21', 'maze', 'mint&berry', 'chiara forthi',
-    'zalando', 'din sko', 'pull & bear', 'svea', 'zoul', 'boohoo', 'gap', 'topshop', 'ellos', 'lager 157',
-    'stradivarius', 'studio total', 'indiska', 'bershka', 'shein', 'riley', 'vero moda', 'vila',
-    'don donna', 'aldo', 'new look denim']
-
-  const BLOCK_ONLY_LOW_VALUE_CATEGORY = ['karl kani', 'rieker', 'uniqlo', 'carin wester', 'stockh lm', 'weekday', 'mango',
-    'wera', 'ichi', 'lindex', 'h&m', 'zara', 'mng', 'mq', 'cheap monday', 'h&m premium',
-    'na-kd', 'clarks', 'gant', 'hackett', 'hugo boss', 'la chemise', 'lacoste',
-    'lyle & scott', 'marc o\'polo', 'melvin & hamilton', 'ray-ban', 'reebok', 'sebago',
-    'stenströms', 'the shirt factory', 'hampton republic', 'quicksilver',
-    'banana republic', 'pieces', 'sprit', 'denim', 'east west', 'xit', 'jacqueline de yong',
-    'mexx', 'fb sister', 'okänt', 'bodyflirt', 'dorothy perkins', 'fransa', 'laurel',
-    'rut&circle', 'soc', 'junkyard', 'soyaconcept', 'amisu', 'u.s. polo assn.',
-    'line of oslo', 'gossip', 'i say', 'jascha stockholm', 'noisy may', 'six ames',
-    'velour by nostalgi', 'house of lola', 'fiveunits', 'miss me', 'flash', 'champion',
-    'under armour', 'oasis', 'fornarina', 'isolde', 'rosebud', 'chiquelle', 'kaffe',
-    'mckinley', 'cream', 'abercrombie & fitch', 'modström', 'ecco', 'esprit',
-    'alice bizous', 'craft', 'ellesse', 'wesc', 'dry lake', 'röhnisch', 'acqua limone',
-    'anna field', 'le', 'ax paris', 'burton', 'hansen & jacob', 'lou in love', 'mad lady',
-    'selected homme', 'tenson', 'whistles', 'zizzi', 'gerry weber']
-
-  const BLOCK_NON_HIGH_VALUE_CATEGORY = ['tom tailor', 'monki', 'dressmann', 'urban outfitters', 'asos', 'holly & white',
-    'only', 'gina tricot']
-
-  const HIGH_VALUE_CATEGORY = ['boots', 'dunjacka', 'jacka', 'kängor', 'kappa', 'kavaj', 'kostym', 'pälsjacka', 'regnjacka',
-    'rock', 'skinnjacka', 'vinterskor']
-
-  const LOW_VALUE_CATEGORY = ['baddräkt', 'bikini', 'bodysuit', 'chinos', 'flip-flops', 'halsduk', 'handduk', 'hatt', 'jeans',
-    'keps', 'långärmad t-shirt', 'linne', 'mjukisbyxor', 'morgonrock', 'mössa', 'necessär', 'piké',
-    'pyjamas', 'sandaler', 'sarong', 'shorts', 'slips', 'sport-bh', 'strumpbyxor', 't-shirt',
-    'tights', 'topp', 'träningsbyxor', 'träningströja', 'underställ', 'vantar']
-
   let hardToSellDiv = document.getElementById("hardToSellDiv");
   let wordsToWarnOn = ["H&M", "HM", "Zara", "ASOS", "Nelly", "Gina Tricot", "BikBok", "Bik Bok", "Lindex", "Kappahl", "Cubus", "NA-KD", "NAKD", "Mango", "Ellos", "Primark", "Shein", "Vila", "Forever 21", "Pull & Bear", "Bershka", "Stradivarius"];
   document.getElementById("itemBrand").setCustomValidity('');
-  const params = getParamsObject();;
-  if ( !params.id && (
-      BLOCKED_BRANDS.includes(brand.toLowerCase()) ||
-      (!HIGH_VALUE_CATEGORY.includes(category?.toLowerCase()) && BLOCK_NON_HIGH_VALUE_CATEGORY.includes(brand.toLowerCase())) ||
-      (LOW_VALUE_CATEGORY.includes(category?.toLowerCase()) && BLOCK_ONLY_LOW_VALUE_CATEGORY.includes(brand.toLowerCase()))
-    )
-  ) {
-    hardToSellText.innerHTML = BLOCKED_BRANDS.includes(brand.toLowerCase()) ?
+  const seq = ++brandCheckSeq;
+  clearTimeout(brandCheckTimer);
+  if (wordsToWarnOn.some(words => brand.toLowerCase().includes(words.toLowerCase()))) {
+    hardToSellText.innerHTML = `Vi säljer i regel inte ${brand}-plagg på grund av för lågt andrahandsvärde. Undantag kan finnas.`;
+    stopIcon.style.display = 'none';
+    warningIcon.style.display = 'block';
+    hardToSellDiv.style.display = 'block';
+  } else {
+    hardToSellDiv.style.display = 'none';
+  }
+  const params = getParamsObject();
+  if (params.id || !brand.trim()) return;
+  brandCheckTimer = setTimeout(async () => {
+    const material = document.getElementById('itemMaterial')?.value?.trim() || '';
+    const query = `brand=${encodeURIComponent(brand.trim())}&category=${encodeURIComponent(category || '')}&material=${encodeURIComponent(material)}`;
+    let result;
+    try {
+      result = (await callBackendApi(`/api/brands/declineRules?${query}`))?.data;
+    } catch (e) {
+      console.error('Could not check the brand decline rules', e);
+      return;
+    }
+    if (seq !== brandCheckSeq || !result?.decline) return;
+    const wholeBrand = result.rule === 'always_reject';
+    hardToSellText.textContent = wholeBrand ?
       `Vi säljer tyvärr inte ${brand}-plagg på grund av för låg efterfrågan.` :
       `Vi säljer tyvärr inte kategorin ${category} från ${brand} på grund av för låg efterfrågan.`;
     stopIcon.style.display = 'flex';
     warningIcon.style.display = 'none';
     hardToSellDiv.style.display = 'block';
-    document.getElementById("itemBrand").setCustomValidity(BLOCKED_BRANDS.includes(brand.toLowerCase()) ?
+    document.getElementById("itemBrand").setCustomValidity(wholeBrand ?
       `Vi säljer inte plagg från ${brand}` : `Vi säljer inte kategorin '${category}' från ${brand}`);
-    return true;
-  } else if (wordsToWarnOn.some(words => brand.toLowerCase().includes(words.toLowerCase()))) {
-    hardToSellText.innerHTML = `Vi säljer i regel inte ${brand}-plagg på grund av för lågt andrahandsvärde. Undantag kan finnas.`;
-    stopIcon.style.display = 'none';
-    warningIcon.style.display = 'block';
-    hardToSellDiv.style.display = 'block';
-    return true;
-  } else {
-    hardToSellDiv.style.display = 'none';
-  }
+  }, 300);
 }
 
 export function initializeCategorySelect(placeholderText = 'Kategori', onChangeCallback = checkBlockedOrLowShareSoldBrand) {

@@ -181,6 +181,10 @@ async function sellItemMain() {
     shareSoldDiv.style.display = 'none';
     checkBlockedOrLowShareSoldBrand(this.value, category.value);
   };
+  // The decline rules read the material too, and detect-info fills brand and
+  // material with a change event, not input.
+  brand.addEventListener('change', () => checkBlockedOrLowShareSoldBrand(brand.value, category.value));
+  document.getElementById('itemMaterial').addEventListener('change', () => checkBlockedOrLowShareSoldBrand(brand.value, category.value));
   brand.onblur = function () {
     const hardToSellDiv = document.getElementById('hardToSellDiv');
     const unknownBrandWords = ['Okänt', 'Unknown', 'Vet ej', 'Vet inte', 'Okänd', 'Se bild'];
