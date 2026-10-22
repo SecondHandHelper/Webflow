@@ -10,8 +10,11 @@
 // account, but only when Branch reports the match as guaranteed:
 // - app already installed: the link opens it directly;
 // - Android install: Google Play's install referrer;
-// - iPhone install: NativeLink, the link copied to the pasteboard below and read by the
-//   app on its first open (iOS asks the seller to allow the paste).
+// - iPhone install: the link is copied to the pasteboard below, and the app's
+//   "Logga in på samma konto" sheet (MaiApp WebHandoffSheet) pastes it with Apple's
+//   paste button.
+// Every other "download the app" link on the page carries a code too
+// (installAppLinkHandoff), so any of them signs the app in, not only this sheet's.
 // Logged-out visitors keep the channel sheet in general.js.
 
 const BRANCH_SELL_LINK = 'https://invite.mairesale.com/sell-item';
@@ -20,6 +23,9 @@ const HANDOFF_FETCH_TIMEOUT_MS = 4000;
 // The backend's 30 minutes have to cover the store and the install after the tap, so a
 // code is only reused while this much of it is left; otherwise a new one is fetched.
 const HANDOFF_MIN_REMAINING_MS = 25 * 60 * 1000;
+// The backend's lifetime (Functions HANDOFF_TTL_MINUTES), counted from when the request left
+// this phone: its own clock may be minutes off the server's expiresAt.
+const HANDOFF_TTL_MS = 30 * 60 * 1000;
 
 const SHEET_ID = 'sellAppSheet';
 const OVERLAY_ID = 'sellAppSheetOverlay';
@@ -180,12 +186,12 @@ function hasFreshHandoff() {
 function fetchHandoff() {
   if (hasFreshHandoff()) return Promise.resolve(handoff.code);
   if (handoffRequest) return handoffRequest;
+  const requestedAtMs = Date.now();
   handoffRequest = callBackendApi('/api/users/app-handoff', { method: 'POST', requiresAuth: true, timeoutSec: 10 })
     .then((res) => {
       const code = res?.data?.code;
-      const expiresAtMs = Date.parse(res?.data?.expiresAt);
-      if (!code || Number.isNaN(expiresAtMs)) return null;
-      handoff = { code, expiresAtMs };
+      if (!code || Number.isNaN(Date.parse(res?.data?.expiresAt))) return null;
+      handoff = { code, expiresAtMs: requestedAtMs + HANDOFF_TTL_MS };
       return code;
     })
     .catch((e) => {
@@ -204,29 +210,37 @@ function withTimeout(promise, ms) {
 }
 
 /**
- * NativeLink: the app's Branch SDK reads the pasteboard on its first open and only
- * accepts an item typed as a URL (UIPasteboard.URL), hence text/uri-list next to plain
- * text. Must run inside the tap, which Safari requires for clipboard writes.
+ * For an iPhone install: the app's sign-in sheet only opens while the pasteboard holds a
+ * URL (UIPasteboard.hasURLs), hence text/uri-list next to plain text. Must run inside the
+ * tap, which Safari requires for clipboard writes. `link` may be a promise of the link
+ * (or of null, which writes nothing): Safari lets the tap start the write and the content
+ * follow once the code has arrived. Resolves when the write is done or has failed.
  */
-function copyLinkForNativeLink(link) {
-  if (!isIosDevice() || !navigator.clipboard) return;
+function copyHandoffLink(link) {
+  if (!isIosDevice() || !navigator.clipboard) return Promise.resolve();
   try {
     const canWriteUriList =
       typeof ClipboardItem !== 'undefined' &&
       navigator.clipboard.write &&
       (typeof ClipboardItem.supports !== 'function' || ClipboardItem.supports('text/uri-list'));
     if (canWriteUriList) {
-      const item = new ClipboardItem({
-        'text/uri-list': new Blob([link], { type: 'text/uri-list' }),
-        'text/plain': new Blob([link], { type: 'text/plain' }),
-      });
-      navigator.clipboard.write([item]).catch((e) => console.warn('[sellAppSheet] clipboard write failed', e));
-    } else if (navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(link).catch((e) => console.warn('[sellAppSheet] clipboard writeText failed', e));
+      const blob = (type) =>
+        typeof link === 'string'
+          ? new Blob([link], { type })
+          : link.then((value) => {
+              if (!value) throw new Error('no link to copy');
+              return new Blob([value], { type });
+            });
+      const item = new ClipboardItem({ 'text/uri-list': blob('text/uri-list'), 'text/plain': blob('text/plain') });
+      return navigator.clipboard.write([item]).catch((e) => console.warn('[sellAppSheet] clipboard write failed', e));
+    }
+    if (navigator.clipboard.writeText && typeof link === 'string') {
+      return navigator.clipboard.writeText(link).catch((e) => console.warn('[sellAppSheet] clipboard writeText failed', e));
     }
   } catch (e) {
     console.warn('[sellAppSheet] clipboard unavailable', e);
   }
+  return Promise.resolve();
 }
 
 /**
@@ -368,7 +382,7 @@ function onCtaClick() {
   const link = cta().href;
   const hadCode = link.includes('handoff=');
   track('Sell App Sheet Clicked', { has_handoff: hadCode, item_id: currentTarget.itemId || null });
-  copyLinkForNativeLink(link);
+  copyHandoffLink(link);
   if (hadCode) {
     // The app spends the code, so a seller who comes back and taps again needs a new
     // one: fetched when the page is visible again, not while they are in the store.
@@ -509,4 +523,215 @@ export function gateSellItemPage() {
   };
   if (isLoggedIn()) open();
   if (typeof authUser !== 'undefined') authUser.whenSet(open);
+}
+
+// Every other way to the app on the page: the "Hämta appen" links placed in Webflow
+// (App Store, Google Play, menus, footer, banners) and any invite.mairesale.com/sell-item
+// link. For a logged-in seller on a phone they carry a code like the sheet's button, so
+// whichever one the seller taps, the app signs in on this account.
+
+const APP_STORE_APP_ID = 'id6738430790';
+const PLAY_PACKAGE = 'se.maiapp.app.prod';
+const BRANCH_HOST = 'invite.mairesale.com';
+const ORIGINAL_HREF = 'appHandoffHref'; // dataset key: the link's href before any code
+
+// How long a navigation waits for a late clipboard write before it leaves anyway.
+const CLIPBOARD_WAIT_MS = 1000;
+
+let appLinkObserver = null;
+let appLinkRefreshTimer = null;
+let pageHasAppLinks = false; // a logged-in phone user on a page with app links
+let appLinksHaveCode = false; // some link's href holds a code right now
+let appLinksNeedFreshCode = false;
+
+/** True for the App Store's and Google Play's Mai pages and the Branch sell link. */
+export function isAppLink(href) {
+  let url;
+  try {
+    url = new URL(href, window.location.href);
+  } catch (e) {
+    return false;
+  }
+  const host = url.hostname.toLowerCase();
+  if (host === 'apps.apple.com') return url.pathname.includes(APP_STORE_APP_ID);
+  if (host === 'play.google.com') return url.searchParams.get('id') === PLAY_PACKAGE;
+  if (host === BRANCH_HOST) return /^\/sell-item\/?$/.test(url.pathname);
+  return false;
+}
+
+/**
+ * The Branch link an app link becomes. A store link turns into the plain sell link, which
+ * opens the app (in sell mode) where it is installed and the right store where it is not;
+ * a Branch sell link keeps its own parameters. Without a code it is the same link bare.
+ */
+export function appLinkWithHandoff(href, code) {
+  const own = new URL(href, window.location.href);
+  const url = own.hostname.toLowerCase() === BRANCH_HOST ? own : new URL(BRANCH_SELL_LINK);
+  url.searchParams.delete('handoff');
+  if (code) url.searchParams.set('handoff', code);
+  return url.toString();
+}
+
+function originalHref(link) {
+  return link.dataset[ORIGINAL_HREF] || link.getAttribute('href');
+}
+
+/** The page's app links, without the sheet's own button (it handles its code itself). */
+function appLinks() {
+  return Array.from(document.querySelectorAll('a[href]')).filter(
+    (link) => !link.closest(`#${SHEET_ID}`) && isAppLink(originalHref(link)),
+  );
+}
+
+/**
+ * Remembers where a link went before it got a code. On Android an App Store link is
+ * remembered as Google Play, as the footer rewrites it, whichever of the two ran first.
+ */
+function rememberOriginalHref(link) {
+  if (link.dataset[ORIGINAL_HREF]) return;
+  let href = link.getAttribute('href');
+  if (isAndroidDevice() && /apps\.apple\.com/.test(href)) {
+    href = `https://play.google.com/store/apps/details?id=${PLAY_PACKAGE}`;
+  }
+  link.dataset[ORIGINAL_HREF] = href;
+}
+
+function pointAppLinks(code) {
+  appLinks().forEach((link) => {
+    rememberOriginalHref(link);
+    link.href = appLinkWithHandoff(link.dataset[ORIGINAL_HREF], code);
+  });
+  appLinksHaveCode = !!code;
+  clearTimeout(appLinkRefreshTimer);
+  if (code && handoff) {
+    // A code is fresh for its first five minutes (HANDOFF_MIN_REMAINING_MS); a page left
+    // open gets the next one before then, so a tap never has to wait for one.
+    const delay = Math.max(handoff.expiresAtMs - HANDOFF_MIN_REMAINING_MS - Date.now(), 60 * 1000);
+    appLinkRefreshTimer = setTimeout(() => {
+      if (document.visibilityState === 'visible') prepareAppLinks();
+    }, delay);
+  }
+}
+
+/** Puts a code on the links, or a fresh one when theirs is getting old. */
+function prepareAppLinks() {
+  if (!shouldSellInApp()) return;
+  if (hasFreshHandoff()) {
+    pointAppLinks(handoff.code);
+    return;
+  }
+  fetchHandoff().then((code) => {
+    if (code && shouldSellInApp()) pointAppLinks(code);
+  });
+}
+
+/**
+ * Once a code may have been used, or may belong to whoever was signed in before, it is
+ * dropped: after the tap that spent it, a click that opened it elsewhere, and whenever the
+ * page is hidden (the app opened, another tab, maybe a sign-out there). The links go back to
+ * the bare Branch link, and the page and the sheet's button get a new code when visible again.
+ */
+function retireAppLinkCode() {
+  clearTimeout(appLinkRefreshTimer);
+  if (!pageHasAppLinks) return;
+  handoff = null;
+  needsFreshCode = true;
+  appLinksNeedFreshCode = true;
+  if (appLinksHaveCode) pointAppLinks(null);
+}
+
+function onAppLinkClick(e) {
+  if (e.defaultPrevented) return;
+  const link = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+  if (!link || link.closest(`#${SHEET_ID}`)) return;
+  const own = originalHref(link);
+  if (!isAppLink(own)) return;
+  if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+    // Opened in another tab or window with the code it holds: not reused here.
+    setTimeout(retireAppLinkCode, 0);
+    return;
+  }
+  if (!shouldSellInApp()) {
+    // Signed out since the code was put there: the link goes where it went before.
+    if (link.dataset[ORIGINAL_HREF]) link.href = own;
+    return;
+  }
+
+  if (hasFreshHandoff()) {
+    // The link's own navigation: a tap on a universal link is what opens an installed app.
+    const href = appLinkWithHandoff(own, handoff.code);
+    rememberOriginalHref(link);
+    link.href = href;
+    appLinksHaveCode = true;
+    track('App Link Clicked', { has_handoff: true, path: window.location.pathname });
+    copyHandoffLink(href);
+    // After the navigation has taken the href, not before.
+    setTimeout(retireAppLinkCode, 0);
+    return;
+  }
+
+  // No usable code yet (the fetch is slow or failed, or the code is too old): wait briefly
+  // for one. The clipboard write has to start inside the tap; its content follows with the
+  // code, and the page leaves once it is written. A navigation this late may land on
+  // Branch's store page instead of an installed app; the pasted link still signs in there.
+  e.preventDefault();
+  const hrefPromise = withTimeout(fetchHandoff(), HANDOFF_FETCH_TIMEOUT_MS).then((code) => ({
+    code,
+    href: appLinkWithHandoff(own, code),
+  }));
+  const written = copyHandoffLink(hrefPromise.then(({ code, href }) => (code ? href : null)));
+  hrefPromise.then(({ code, href }) => {
+    track('App Link Clicked', { has_handoff: !!code, path: window.location.pathname });
+    if (code) {
+      handoff = null;
+      appLinksNeedFreshCode = true;
+    }
+    withTimeout(written, CLIPBOARD_WAIT_MS).then(() => {
+      window.location.href = href;
+      if (code) setTimeout(retireAppLinkCode, 0);
+    });
+  });
+}
+
+function onAppLinksHidden() {
+  if (document.visibilityState === 'hidden') retireAppLinkCode();
+}
+
+function onAppLinksVisible() {
+  if (document.visibilityState !== 'visible' || !appLinksNeedFreshCode) return;
+  appLinksNeedFreshCode = false;
+  prepareAppLinks();
+}
+
+function observeAppLinks() {
+  if (pageHasAppLinks || !shouldSellInApp()) return;
+  const links = appLinks();
+  if (!links.length) return;
+  pageHasAppLinks = true;
+  // Fetched now, so that a link in a menu opened a second before the tap has its code too.
+  prepareAppLinks();
+  if (typeof IntersectionObserver === 'undefined') return;
+  // A link that comes into view after the code has aged gets a new one.
+  appLinkObserver = new IntersectionObserver((entries) => {
+    if (entries.some((entry) => entry.isIntersecting)) prepareAppLinks();
+  });
+  links.forEach((link) => appLinkObserver.observe(link));
+}
+
+/** Installed once per page (general.js). Does nothing for visitors who are logged out or on a computer. */
+export function installAppLinkHandoff() {
+  if (window.__maiAppLinkHandoff) return;
+  window.__maiAppLinkHandoff = true;
+  document.addEventListener('click', onAppLinkClick, true);
+  document.addEventListener('visibilitychange', onAppLinksHidden);
+  document.addEventListener('visibilitychange', onAppLinksVisible);
+  window.addEventListener('pagehide', retireAppLinkCode);
+  window.addEventListener('pageshow', onAppLinksVisible);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', observeAppLinks);
+  } else {
+    observeAppLinks();
+  }
+  // Signed in after load, e.g. by the session cookie from mairesale.com.
+  if (typeof authUser !== 'undefined') authUser.whenSet(observeAppLinks);
 }

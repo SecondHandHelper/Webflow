@@ -1,4 +1,5 @@
 import {
+  installAppLinkHandoff,
   installSellAppLinkInterceptor,
   openSellAppSheet,
   sellItemTarget,
@@ -8,6 +9,8 @@ import {
 // A logged-in seller on a phone sells in the app: every link to /sell-item on a page
 // that loads this module opens "Sälj vidare i appen" instead (sellAppSheet.js).
 installSellAppLinkInterceptor();
+// ...and every "Hämta appen" link signs the app in on the same account.
+installAppLinkHandoff();
 
 export async function signOut() {
     try {
