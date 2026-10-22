@@ -211,27 +211,37 @@ function withTimeout(promise, ms) {
 
 /**
  * For an iPhone install: the app's sign-in sheet only opens while the pasteboard holds a
- * URL (UIPasteboard.hasURLs), hence text/uri-list next to plain text. Must run inside the
+ * URL (UIPasteboard.hasURLs), hence text/uri-list next to plain text, and only for this
+ * copy: text/html is what tells it apart from any other copied link. The app reads only
+ * the pasteboard's type names, never the content (MaiApp src/lib/webHandoffPasteboard.ts:
+ * WebKit's custom data, public.url and public.html together). Must run inside the
  * tap, which Safari requires for clipboard writes. `link` may be a promise of the link
  * (or of null, which writes nothing): Safari lets the tap start the write and the content
  * follow once the code has arrived. Resolves when the write is done or has failed.
  */
 function copyHandoffLink(link) {
   if (!isIosDevice() || !navigator.clipboard) return Promise.resolve();
+  // A link without a code would only make the app's sheet promise a sign-in it cannot do.
+  if (typeof link === 'string' && !link.includes('handoff=')) return Promise.resolve();
   try {
     const canWriteUriList =
       typeof ClipboardItem !== 'undefined' &&
       navigator.clipboard.write &&
       (typeof ClipboardItem.supports !== 'function' || ClipboardItem.supports('text/uri-list'));
     if (canWriteUriList) {
-      const blob = (type) =>
+      const asHtml = (value) => `<a href="${value}">${value}</a>`;
+      const blob = (type, format = (value) => value) =>
         typeof link === 'string'
-          ? new Blob([link], { type })
+          ? new Blob([format(link)], { type })
           : link.then((value) => {
               if (!value) throw new Error('no link to copy');
-              return new Blob([value], { type });
+              return new Blob([format(value)], { type });
             });
-      const item = new ClipboardItem({ 'text/uri-list': blob('text/uri-list'), 'text/plain': blob('text/plain') });
+      const item = new ClipboardItem({
+        'text/uri-list': blob('text/uri-list'),
+        'text/plain': blob('text/plain'),
+        'text/html': blob('text/html', asHtml),
+      });
       return navigator.clipboard.write([item]).catch((e) => console.warn('[sellAppSheet] clipboard write failed', e));
     }
     if (navigator.clipboard.writeText && typeof link === 'string') {
