@@ -10,10 +10,12 @@
 // Its button is a Branch link (invite.mairesale.com) that opens the app, or the store
 // when the app is missing. For a logged-in seller on a phone it carries a one-time
 // handoff code from the backend (Functions src/users/appHandoff). The app trades the
-// code for a sign-in on this account, but only when Branch reports the match as
-// guaranteed:
-// - app already installed: the link opens it directly;
-// - Android install: Google Play's install referrer;
+// code for a sign-in on this account only where it knows the code came from this
+// phone's own tap:
+// - app already installed: the link opens it directly (Branch's match is guaranteed);
+// - Android install: the link is an intent link instead (androidIntentLink, behind
+//   `androidPlayReferrer`), and Google Play hands the code to the new install in its
+//   install referrer; without it, Branch's match via Play, which a reinstall only guesses;
 // - iPhone install: the link is copied to the pasteboard below, and the app's
 //   "Logga in på samma konto" sheet (MaiApp WebHandoffSheet) pastes it with Apple's
 //   paste button.
@@ -247,6 +249,54 @@ export function branchSellLink({ itemId, type } = {}, code) {
   }
   if (code) url.searchParams.set('handoff', code);
   return url.toString();
+}
+
+/**
+ * On an Android phone a link with a code becomes the browser's own intent link
+ * (2026-10-23). Where the app is installed it opens the app on the same Branch link,
+ * as before. Where it is missing it opens Google Play with the code in the install
+ * referrer, which Play hands to that install alone and the app reads on its first start
+ * (MaiApp src/lib/installReferrerHandoff.ts). Branch's own redirect sends Play its click
+ * id instead, and on a phone that has had Mai before Branch counts the install as a
+ * reinstall it only guesses, so the app did not sign in. In-app browsers do not open
+ * intent links and keep the Branch link; so does a link without a code, and every link
+ * while `androidPlayReferrer` is off (usesPlayReferrer).
+ */
+export function androidIntentLink(link) {
+  if (!isAndroidDevice() || !opensIntentLinks() || !usesPlayReferrer()) return link;
+  let url;
+  try {
+    url = new URL(link);
+  } catch (e) {
+    return link;
+  }
+  const code = url.searchParams.get('handoff');
+  if (!code || url.hostname.toLowerCase() !== BRANCH_HOST) return link;
+  const referrer = encodeURIComponent(`handoff=${code}`);
+  const play = `https://play.google.com/store/apps/details?id=${PLAY_PACKAGE}&referrer=${referrer}`;
+  return (
+    `intent://${url.host}${url.pathname}${url.search}` +
+    `#Intent;scheme=https;package=${PLAY_PACKAGE};S.browser_fallback_url=${encodeURIComponent(play)};end`
+  );
+}
+
+/**
+ * Off until the Android app that reads the referrer is in the store: an older app never
+ * reads it, and Play gets no Branch click id either. `androidPlayReferrer` in the footer's
+ * featureConfig (footer-custom-code.html), on for testers first.
+ */
+function usesPlayReferrer() {
+  try {
+    return typeof featureIsEnabled === 'function' && !!featureIsEnabled('androidPlayReferrer');
+  } catch (e) {
+    return false;
+  }
+}
+
+/** False in the in-app browsers (an Android WebView, Facebook, Instagram), which do not open intent links. */
+function opensIntentLinks() {
+  const ua = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
+  return !/; wv\)|FBAN|FBAV|Instagram/.test(ua);
 }
 
 function track(event, props = {}) {
@@ -560,7 +610,7 @@ async function prepareCta() {
     return;
   }
   if (hasFreshHandoff()) {
-    button.href = branchSellLink(target, handoff.code);
+    button.href = androidIntentLink(branchSellLink(target, handoff.code));
     button.classList.remove('is-loading');
     return;
   }
@@ -569,12 +619,12 @@ async function prepareCta() {
   const request = fetchHandoff();
   const code = await withTimeout(request, HANDOFF_FETCH_TIMEOUT_MS);
   if (target !== currentTarget) return; // reopened for another item meanwhile
-  button.href = branchSellLink(target, code);
+  button.href = androidIntentLink(branchSellLink(target, code));
   button.classList.remove('is-loading');
   if (!code) {
     // Timed out rather than failed: the button takes the code if it still arrives.
     request.then((late) => {
-      if (late && target === currentTarget) button.href = branchSellLink(target, late);
+      if (late && target === currentTarget) button.href = androidIntentLink(branchSellLink(target, late));
     });
   }
 }
@@ -776,7 +826,7 @@ function rememberOriginalHref(link) {
 function pointAppLinks(code) {
   appLinks().forEach((link) => {
     rememberOriginalHref(link);
-    link.href = appLinkWithHandoff(link.dataset[ORIGINAL_HREF], code);
+    link.href = androidIntentLink(appLinkWithHandoff(link.dataset[ORIGINAL_HREF], code));
   });
   appLinksHaveCode = !!code;
   clearTimeout(appLinkRefreshTimer);
@@ -836,7 +886,7 @@ function onAppLinkClick(e) {
 
   if (hasFreshHandoff()) {
     // The link's own navigation: a tap on a universal link is what opens an installed app.
-    const href = appLinkWithHandoff(own, handoff.code);
+    const href = androidIntentLink(appLinkWithHandoff(own, handoff.code));
     rememberOriginalHref(link);
     link.href = href;
     appLinksHaveCode = true;
@@ -854,7 +904,7 @@ function onAppLinkClick(e) {
   e.preventDefault();
   const hrefPromise = withTimeout(fetchHandoff(), HANDOFF_FETCH_TIMEOUT_MS).then((code) => ({
     code,
-    href: appLinkWithHandoff(own, code),
+    href: androidIntentLink(appLinkWithHandoff(own, code)),
   }));
   const written = copyHandoffLink(hrefPromise.then(({ code, href }) => (code ? href : null)));
   hrefPromise.then(({ code, href }) => {
