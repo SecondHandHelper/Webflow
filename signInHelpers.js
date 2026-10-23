@@ -1,3 +1,18 @@
+import { openSellAppSheet } from './sellAppSheet';
+
+// New accounts are created in the app (since 2026-10-23): every way of creating one on
+// this page opens "Fortsätt med appen" instead. An existing account signs in as before.
+// The backend refuses a phone sign-up from the web too (POST /api/users/authVerify);
+// e-mail and Google accounts are made by the Firebase SDK itself, so they are stopped here.
+function blockWebSignup(method) {
+  try {
+    analytics.track('Web Signup Blocked', { method, path: window.location.pathname });
+  } catch (e) {
+    // Tracking never blocks the sheet.
+  }
+  openSellAppSheet({}, { variant: 'signup' });
+}
+
 function isInAppBrowser() {
   const browsers = {
     facebook: /\bFB[\w_]+\//,
@@ -33,7 +48,22 @@ async function signInWithGoogle() {
 
   //NEW POPUP SIGNIN
   try {
-    await firebase.auth().signInWithPopup(provider)
+    const credential = await firebase.auth().signInWithPopup(provider);
+    if (credential?.additionalUserInfo?.isNewUser) {
+      // The popup has already made the account: undo it before anything is written for it.
+      // Deleting needs a recent sign-in, which this is; should it still fail, the visitor
+      // is at least signed out again.
+      try {
+        await credential.user.delete();
+      } catch (e) {
+        errorHandler.report(e);
+        await firebase.auth().signOut();
+      }
+      googleButtonText.style.display = 'block';
+      googleButtonLoadingIcon.style.display = 'none';
+      blockWebSignup('google.com');
+      return;
+    }
     await authUser.whenSet(signedInNextStep);
   } catch (error) {
     errorHandler.report(error);
@@ -101,7 +131,7 @@ if (userIsSellingNewItem()) {
   if (storedItem) {
     const item = JSON.parse(storedItem).item;
     itemImage.src = item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || '';
-    notificationText.innerHTML = `För att fullfölja försäljningen av ditt ${item.brand}-plagg behöver du logga in eller skapa konto`;
+    notificationText.innerHTML = `För att fullfölja försäljningen av ditt ${item.brand}-plagg behöver du logga in`;
     itemToBeCreatedDiv.style.display = 'block';
   } else {
     const expertValuationDraftId = sessionStorage.getItem('expertValuationDraftAfterSignIn');
@@ -110,7 +140,7 @@ if (userIsSellingNewItem()) {
         .then(response => {
           const item = response.data;
           itemImage.src = item?.images?.enhancedFrontImageSmall || item?.images?.enhancedFrontImage || '';
-          notificationText.innerHTML = `För att fullfölja försäljningen av ditt ${item.brand}-plagg behöver du logga in eller skapa konto`;
+          notificationText.innerHTML = `För att fullfölja försäljningen av ditt ${item.brand}-plagg behöver du logga in`;
           itemToBeCreatedDiv.style.display = 'block';
         })
         .catch(e => {
@@ -140,11 +170,23 @@ function phoneSignIn(event) {
   const formPhoneNumber = signinPhoneNumber.value.startsWith('0') ? signinPhoneNumber.value.slice(1) : signinPhoneNumber.value;
   const phoneNumber = formPhoneNumber.startsWith('+46') ? formPhoneNumber : `+46${formPhoneNumber}`;
   console.log('signInWithPhoneNumber', phoneNumber);
-  callBackendApi('/api/users/authStart', { data: { phoneNumber }, requiresAuth: false })
-    .then(() => {
-      window.phoneNumber = phoneNumber;
-      mobileNumberDiv.style.display = 'none';
-      verifyDiv.style.display = 'block';
+  // A number without an account gets the app sheet before any SMS is sent. When the
+  // check itself fails (no answer), the code is sent anyway: verifyCode asks again, and
+  // the backend refuses a sign-up from the web regardless.
+  callBackendApi('/api/users/phoneNumberExists', { data: { phoneNumber }, requiresAuth: false })
+    .then((result) => {
+      if (result?.data && result.data.exists === false) {
+        submitLoadIcon.style.display = 'none';
+        sendCodeButton.style.display = 'block';
+        blockWebSignup('phone');
+        return;
+      }
+      return callBackendApi('/api/users/authStart', { data: { phoneNumber }, requiresAuth: false })
+        .then(() => {
+          window.phoneNumber = phoneNumber;
+          mobileNumberDiv.style.display = 'none';
+          verifyDiv.style.display = 'block';
+        });
     }).catch((error) => {
       submitLoadIcon.style.display = 'none';
       errorMessageDiv.innerText = error.message;
@@ -165,34 +207,37 @@ function verifyCode() {
   const code = verificationCode.value;
   console.log('Verify screen. My code: ', code);
   console.log('phone number to verify', phoneNumber);
-  let isNewUser = false;
+  // Only an existing account is signed in: a number the backend says has none gets the
+  // app sheet. When the check itself fails (no answer) the code is still verified as a
+  // sign-in, which the backend answers 401 for a number without an account; it refuses
+  // `type: 'signUp'` from the web should it ever be sent.
   callBackendApi('/api/users/phoneNumberExists', { data: { phoneNumber }, requiresAuth: false })
     .then((result) => {
       console.log('phoneNumberExists result', phoneNumber, JSON.stringify(result));
-      const type = result.data.exists ? 'signIn' : 'signUp';
-      isNewUser = type === 'signUp';
-      return callBackendApi('/api/users/authVerify', { data: { phoneNumber, code, type }, requiresAuth: false });
+      if (result?.data && result.data.exists === false) {
+        verifyDiv.style.display = 'none';
+        phoneLoginDiv.style.display = 'none';
+        loginAlternativesDiv.style.display = 'block';
+        blockWebSignup('phone');
+        return null;
+      }
+      return callBackendApi('/api/users/authVerify', { data: { phoneNumber, code, type: 'signIn' }, requiresAuth: false });
     })
     .then((result) => {
-      const customToken = result.data.customToken;
+      if (!result) return null;
+      const customToken = result.data?.customToken;
+      if (!customToken) throw new Error('authVerify gave no token');
       return firebase.auth().signInWithCustomToken(customToken);
     })
     .then((user) => {
+      if (!user) return;
       if (typeof (Storage) !== "undefined") {
         sessionStorage.setItem("userId", user.uid);
         sessionStorage.setItem("phone", user.phoneNumber);
       } else {
         console.log("Sorry, your browser does not support Web Storage...");
       }
-
-      console.log("isNewUser", isNewUser);
-      if (isNewUser) {
-        emailForTipsDiv.style.display = 'block';
-        verifyDiv.style.display = 'none';
-        phoneLoginDiv.style.display = 'none';
-      } else {
-        authUser.whenSet(signedInNextStep);
-      }
+      authUser.whenSet(signedInNextStep);
     }).catch((error) => {
       console.log('My error: ' + error.message);
       errorHandler.report(error);
@@ -256,37 +301,10 @@ function signInWithEmailPassword() {
   // [END auth_signin_password]
 }
 
+// The "Välj lösenord" step is no longer shown (checkEmail): should its button still be
+// reached, it opens the app sheet instead of creating an account.
 function signUpWithEmailPassword() {
-  const email = emailAddress.value;
-  const password = newPassword.value;
-  signUpWithEmailButton.style.display = 'none';
-  passwordGoBack.style.display = 'none';
-  newPasswordLoadIcon.style.display = 'block';
-  // [START auth_signup_password]
-  firebase.auth().createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      // Signed in
-      const user = userCredential.user;
-      window.userId = user.uid;
-      console.log("Logged in user: ", user);
-      firebase.auth().currentUser.sendEmailVerification().then(() => {
-        authUser.whenSet(() => {
-          const isSellingItem = sessionStorage.getItem('itemToBeCreatedAfterSignIn') || sessionStorage.getItem('expertValuationDraftAfterSignIn');
-          signedInNextStep(isSellingItem ? undefined : './user-management?mode=sendEmailVerification');
-        });
-      });
-    })
-    .catch((error) => {
-      errorHandler.report(error);
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      console.log("Error message:", errorCode, errorMessage);
-      newPasswordFeedback.innerText = errorMessage;
-      signUpWithEmailButton.style.display = 'block';
-      passwordGoBack.style.display = 'block';
-      newPasswordLoadIcon.style.display = 'none';
-    });
-  // [END auth_signup_password]
+  blockWebSignup('password');
 }
 
 function sendPasswordReset() {
@@ -311,16 +329,32 @@ function checkEmail() {
   const email = emailAddress.value;
   firebase.auth().fetchSignInMethodsForEmail(email)
     .then((signInMethods) => {
-      chooseEmailDiv.style.display = 'none';
       if (signInMethods.indexOf(
         firebase.auth.EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD) !== -1) {
         // Account exists
+        chooseEmailDiv.style.display = 'none';
         signinWithEmailDiv.style.display = 'block';
         document.getElementById('prefilledEmail').innerText = `Ange lösenord för ${email}`;
+      } else if (signInMethods.indexOf(firebase.auth.GoogleAuthProvider.GOOGLE_SIGN_IN_METHOD) !== -1) {
+        // The address belongs to a Google account: offer that sign-in, not a second account.
+        chooseEmailDiv.style.display = 'none';
+        choosePasswordDiv.style.display = 'none';
+        document.getElementById('logInIntroText').innerText = 'Det här kontot loggar in med Google.';
+        document.getElementById('notificationBanner').style.display = 'flex';
+        displayPreferredSignInMethod('google.com');
+      } else if (signInMethods.length) {
+        // An account the web cannot sign in (Apple, from the app): say so instead of
+        // offering a new one.
+        keepChooseEmailStep();
+        document.getElementById('logInIntroText').innerText = 'Det här kontot loggar in med Apple. Logga in i appen.';
+        document.getElementById('notificationBanner').style.display = 'flex';
       } else {
-        // New account
-        choosePasswordDiv.style.display = 'block';
-        document.getElementById('createAccountEmail').innerText = `Välj lösenord för ${email}`;
+        // No account for this address: new accounts are created in the app. Webflow's own
+        // form handling puts the e-mail form in its "success" state a few hundred ms after
+        // the click, before or after this answer; the e-mail step is put back under the
+        // sheet now and again once that has run.
+        keepChooseEmailStep();
+        blockWebSignup('password');
       }
     })
     .catch((error) => {
@@ -339,12 +373,23 @@ showOtherSignInMethodsButton.addEventListener('click', function () {
   triggerOtherSignInMethodsView.click();
 });
 
-document.getElementById('passwordGoBack').addEventListener('click', () => {
+// Back to the e-mail field from the "Välj lösenord" step, which the Fortsätt button's
+// Webflow interaction shows (it also puts the e-mail form in its "success" state).
+function showChooseEmailStep() {
   chooseEmailDiv.style.display = 'block';
   choosePasswordDiv.style.display = 'none';
   document.getElementById('Choose-email-form').style.display = 'block';
   document.querySelector('.success-message').style.display = 'none';
-})
+}
+document.getElementById('passwordGoBack').addEventListener('click', showChooseEmailStep);
+// Webflow's form handling hides the e-mail form (its "success" state) about 300 ms after
+// the Fortsätt click (measured 2026-10-23 on the staging site), usually after
+// fetchSignInMethodsForEmail has answered. That timing is Webflow's, so the e-mail step
+// is restored a few times over the next second rather than once.
+function keepChooseEmailStep() {
+  showChooseEmailStep();
+  [250, 600, 1200].forEach((ms) => setTimeout(showChooseEmailStep, ms));
+}
 googleSignInButton.addEventListener('click', signInWithGoogle);
 googleSignInButton2.addEventListener('click', signInWithGoogle);
 document.getElementById('emailAndPasswordButton').addEventListener('click', function () {

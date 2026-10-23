@@ -5,6 +5,12 @@ import {
   selectFieldValue,
 } from "./sellItemModelSearch";
 import { setupMenuHandlers, prepareMenu } from "./general";
+import { gateSellItemPage } from "./sellAppSheet";
+
+// This page creates a draft listing (POST /api/items/:id) without a sign-in. Listings are
+// made in the app: the sheet covers the page for everyone, closing it leaves, and the form
+// behind it gets no handlers, so removing the sheet in devtools gives a form that does nothing.
+const sellPageGated = gateSellItemPage();
 
 async function expertValuationMain() {
   setupMenuHandlers();
@@ -161,7 +167,7 @@ window.addEventListener('pageshow', (event) => {
   }
 });
 
-expertValuationMain();
+if (!sellPageGated) expertValuationMain();
 user.whenSet(async () => {
   if (user.current?.email) {
     const emailInput = document.getElementById('email');

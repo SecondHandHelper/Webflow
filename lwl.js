@@ -1,8 +1,18 @@
 import QRCode from "qrcode";
+import { gateSellItemPage } from "./sellAppSheet";
 
 const WS_SERVER = 'wss://lwl-to-mai-22-heypmjzjfq-lz.a.run.app';
 const params = getParamsObject();
 
+// This page creates draft listings from an LWL thread (POST /api/items/lwl). Listings
+// are made in the app: the sheet covers the page for everyone, closing it leaves, and the
+// scrape never starts (doneButton below), so removing the sheet in devtools gives a form
+// that does nothing. Drafts scraped before a sign-in (lwlItemDrafts) are no longer
+// created either: the key is dropped so Mina sidor stops sending the seller back here.
+const sellPageGated = gateSellItemPage();
+localStorage.removeItem('lwlItemDrafts');
+
+// Kept for the day the page is reopened; `lwlItemDrafts` is cleared above, so it never runs.
 if (params.createDrafts === 'true') {
   if (localStorage.getItem('lwlItemDrafts') && (document.referrer.includes('sign-in') || document.referrer.includes('private'))) {
     document.getElementsByClassName('div-block-230')[0].style.display = 'none';
@@ -38,7 +48,7 @@ const showParseError = (error) => {
 }
 
 document.getElementById('doneButton').addEventListener('click', () => {
-  if (scrapingStarted) {
+  if (sellPageGated || scrapingStarted) {
     return;
   }
   firstPreviewShown = false;

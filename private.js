@@ -860,9 +860,8 @@ function onLoadHandler() {
   });
   document.getElementById('closeApprovedSaleInfoBox').addEventListener('click', hideApprovedSaleInfoBox);
 }
-if (localStorage.getItem('lwlItemDrafts')) {
-  location.href = '/lwl?createDrafts=true';
-}
+// LWL drafts scraped before a sign-in used to be created on /lwl?createDrafts=true from
+// here. Listings are made in the app now; /lwl drops the key.
 window.addEventListener('load', onLoadHandler);
 console.log(`document.readyState ${document.readyState}`);
 if (document.readyState === "complete" && !loadHandlerHasRun) {

@@ -1,13 +1,17 @@
-// "Sälj vidare i appen": what a logged-in seller on a phone gets instead of the web sell
-// form (/sell-item). New listings are made in the app; Mina sidor stays on the web for
-// following sales and shipping what sold.
+// "Sälj vidare i appen" / "Fortsätt med appen": what every visitor gets instead of the web
+// sell form (/sell-item) and instead of creating an account on /sign-in. New listings and
+// new accounts are made in the app; Mina sidor stays on the web for following sales and
+// shipping what sold, and an existing seller can still sign in on the web.
 //
-// The sheet is built here, markup and CSS, so the Webflow designer needs nothing.
+// The sheet is built here, markup and CSS, so the Webflow designer needs nothing. On a
+// phone it is a bottom sheet with a "Ladda ner appen" button; on a computer a centered
+// dialog with a QR code of the same link and the two store links.
 //
 // Its button is a Branch link (invite.mairesale.com) that opens the app, or the store
-// when the app is missing, and carries a one-time handoff code from the backend
-// (Functions src/users/appHandoff). The app trades the code for a sign-in on this
-// account, but only when Branch reports the match as guaranteed:
+// when the app is missing. For a logged-in seller on a phone it carries a one-time
+// handoff code from the backend (Functions src/users/appHandoff). The app trades the
+// code for a sign-in on this account, but only when Branch reports the match as
+// guaranteed:
 // - app already installed: the link opens it directly;
 // - Android install: Google Play's install referrer;
 // - iPhone install: the link is copied to the pasteboard below, and the app's
@@ -15,9 +19,13 @@
 //   paste button.
 // Every other "download the app" link on the page carries a code too
 // (installAppLinkHandoff), so any of them signs the app in, not only this sheet's.
-// Logged-out visitors keep the channel sheet in general.js.
+// The "Logga in" buttons keep the channel sheet in general.js.
+
+import QRCode from 'qrcode';
 
 const BRANCH_SELL_LINK = 'https://invite.mairesale.com/sell-item';
+const APP_STORE_LINK = 'https://apps.apple.com/se/app/mai-premium-resale/id6738430790';
+const PLAY_STORE_LINK = 'https://play.google.com/store/apps/details?id=se.maiapp.app.prod';
 const APP_ICON_URL = 'https://cdn.shopify.com/s/files/1/0645/1229/5125/files/app-icon-1024.png?v=1766272333';
 const HANDOFF_FETCH_TIMEOUT_MS = 4000;
 // The backend's 30 minutes have to cover the store and the install after the tap, so a
@@ -31,16 +39,41 @@ const SHEET_ID = 'sellAppSheet';
 const OVERLAY_ID = 'sellAppSheetOverlay';
 const STYLE_ID = 'sellAppSheetStyle';
 
+// `sell` is a click that would have opened the web sell form; `signup` is an attempt to
+// create an account on /sign-in (signInHelpers.js).
+export const SHEET_VARIANTS = ['sell', 'signup'];
+
 const COPY = {
-  title: 'Sälj vidare i appen',
-  body: 'Mai flyttar nu till appen. För att fortsätta lägga upp nya plagg och följa din försäljningskvalitet behöver du ladda ner appen.',
+  // A seller who is signed in here: the move is about their selling.
+  sellLoggedIn: {
+    title: 'Sälj vidare i appen',
+    body: 'Mai flyttar nu till appen. För att fortsätta lägga upp nya plagg och följa din försäljningskvalitet behöver du ladda ner appen.',
+  },
+  sell: {
+    title: 'Fortsätt med appen',
+    body: 'Nya plagg läggs upp i Mai-appen. Ladda ner appen för att komma igång – det tar bara en minut.',
+  },
+  signup: {
+    title: 'Fortsätt med appen',
+    body: 'Nya konton skapas i Mai-appen. Ladda ner appen för att komma igång – det tar bara en minut. Har du redan ett konto kan du logga in här på webben.',
+  },
   // Only for a seller with something on sale or sold and not yet shipped (hasOngoingSales).
   ongoingSales: 'Du kan fortfarande se dina pågående försäljningar och skicka det som redan sålts här på webben under en övergångsperiod.',
   button: 'Ladda ner appen',
+  // On a computer, above the QR code; the store links follow it.
+  scan: 'Skanna QR-koden med mobilen så öppnas appen – eller App Store/Google Play om du inte har den än.',
+  appStore: 'App Store',
+  playStore: 'Google Play',
   // Under the button, small and grey; hidden until the app can keep the promise (showSignInNote).
   note: 'När du laddar ner appen via knappen ovan loggas du in automatiskt på ditt konto.',
   close: 'Stäng',
 };
+
+/** The title and body for a variant, given who is looking at it. */
+export function copyFor(variant, loggedIn) {
+  if (variant === 'signup') return COPY.signup;
+  return loggedIn ? COPY.sellLoggedIn : COPY.sell;
+}
 
 const CSS = `
 #${OVERLAY_ID} {
@@ -98,6 +131,36 @@ const CSS = `
   margin: 12px 0 0; font-family: "Ersjo Grotesk", Arial, sans-serif;
   font-size: 13px; line-height: 17px; font-weight: 500; color: #848484;
 }
+/* On a computer: a centered dialog with the QR code instead of the button. */
+#${SHEET_ID}.sell-app-sheet--modal {
+  left: 50%; right: auto; top: 50%; bottom: auto;
+  width: calc(100% - 32px); max-width: 440px; max-height: 90vh;
+  padding: 28px 32px 36px; border-radius: 16px;
+  transform: translate(-50%, -46%);
+  transition: transform 0.25s ease-out, visibility 0.25s ease-out;
+}
+#${SHEET_ID}.sell-app-sheet--modal.active { transform: translate(-50%, -50%); }
+#${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__close { right: 12px; }
+#${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__app { margin-top: 24px; }
+#${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__cta,
+#${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__note { display: none; }
+#${SHEET_ID} .sell-app-sheet__desktop { display: none; margin-top: 28px; }
+#${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__desktop { display: block; }
+#${SHEET_ID} .sell-app-sheet__qr {
+  display: block; width: 168px; height: 168px; margin: 16px auto 0;
+  padding: 8px; box-sizing: content-box; border: 1px solid #e5e5e5; border-radius: 12px;
+}
+#${SHEET_ID} .sell-app-sheet__stores {
+  display: flex; justify-content: center; gap: 12px; margin-top: 20px;
+}
+#${SHEET_ID} .sell-app-sheet__store {
+  display: inline-flex; align-items: center; justify-content: center;
+  box-sizing: border-box; min-width: 140px; height: 44px; padding: 0 18px;
+  border: 1px solid #101010; border-radius: 0; background: #fff; color: #101010;
+  font-family: "Ersjo Grotesk", Arial, sans-serif; font-size: 14px; font-weight: 500;
+  text-decoration: none;
+}
+#${SHEET_ID} .sell-app-sheet__store:hover { background: #101010; color: #fff; }
 `;
 
 // The same X image the site's other bottom sheets use (Webflow asset Close_mai.svg).
@@ -108,6 +171,8 @@ let sellerItemsRequest = null;
 let handoff = null; // { code, expiresAtMs }
 let handoffRequest = null; // Promise while a code is being fetched
 let currentTarget = {};
+let currentVariant = 'sell';
+let currentLoggedIn = false; // the login state the sheet was last prepared for
 let currentOnClose = null;
 let lastFocused = null;
 let needsFreshCode = false;
@@ -133,8 +198,21 @@ export function isLoggedIn() {
   }
 }
 
-/** True where a sell click should open the sheet instead of the web sell form. */
+/**
+ * True where a sell click should open the sheet instead of the web sell form: everywhere,
+ * since 2026-10-23. New listings are made in the app on every device, signed in or not.
+ * Kept as a function so the callers read as the rule they apply.
+ */
 export function shouldSellInApp() {
+  return true;
+}
+
+/**
+ * True where the app can be signed in on this account: a logged-in seller on a phone.
+ * Only then is a handoff code fetched and put on the sheet's button and the page's app
+ * links; a computer shows a QR code, and a visitor who is logged out has no account to hand over.
+ */
+export function canHandoff() {
   return isPhone() && isLoggedIn();
 }
 
@@ -176,7 +254,8 @@ export function branchSellLink({ itemId, type } = {}, code) {
 function track(event, props = {}) {
   try {
     if (typeof analytics !== 'undefined' && analytics.track) {
-      analytics.track(event, { platform: isIosDevice() ? 'ios' : 'android', ...props });
+      const platform = isIosDevice() ? 'ios' : isAndroidDevice() ? 'android' : 'desktop';
+      analytics.track(event, { platform, ...props });
     }
   } catch (e) {
     // Tracking never blocks the sheet.
@@ -307,8 +386,35 @@ async function updateOngoingSalesSentence() {
   const sentence = document.querySelector(`#${SHEET_ID} .sell-app-sheet__ongoing`);
   if (!sentence) return;
   if (!sellerItems) sentence.hidden = true;
+  // Only a signed-in seller has sales to speak of (and may read /api/items).
+  if (!isLoggedIn() || currentVariant !== 'sell') return;
   const items = await fetchSellerItems();
+  if (currentVariant !== 'sell') return;
   sentence.hidden = !hasOngoingSales(items);
+}
+
+/** Puts the variant's title and body in the sheet. Called on every open: the login state may have changed. */
+function applyCopy() {
+  const sheet = document.getElementById(SHEET_ID);
+  if (!sheet) return;
+  const copy = copyFor(currentVariant, isLoggedIn());
+  sheet.querySelector('.sell-app-sheet__title').textContent = copy.title;
+  sheet.querySelector('.sell-app-sheet__body').textContent = copy.body;
+}
+
+/** The QR code a computer shows instead of the button: the same Branch link, never with a code. */
+function renderQr(target) {
+  const canvas = document.querySelector(`#${SHEET_ID} .sell-app-sheet__qr`);
+  if (!canvas) return;
+  const link = branchSellLink(target);
+  if (canvas.dataset.link === link) return;
+  canvas.dataset.link = link;
+  QRCode.toCanvas(canvas, link, { width: 168, margin: 0 }, (error) => {
+    if (error) {
+      console.warn('[sellAppSheet] QR code failed', error);
+      if (typeof errorHandler !== 'undefined') errorHandler.report(error);
+    }
+  });
 }
 
 function ensureStyle() {
@@ -330,6 +436,7 @@ function ensureSheet() {
 
   sheet = document.createElement('div');
   sheet.id = SHEET_ID;
+  if (!isPhone()) sheet.classList.add('sell-app-sheet--modal');
   sheet.setAttribute('role', 'dialog');
   sheet.setAttribute('aria-modal', 'true');
   sheet.setAttribute('aria-labelledby', `${SHEET_ID}Title`);
@@ -358,11 +465,12 @@ function ensureSheet() {
   const title = document.createElement('h2');
   title.id = `${SHEET_ID}Title`;
   title.className = 'sell-app-sheet__title';
-  title.textContent = COPY.title;
 
   const text = document.createElement('p');
   text.className = 'sell-app-sheet__text';
-  text.append(COPY.body);
+  const body = document.createElement('span');
+  body.className = 'sell-app-sheet__body';
+  text.append(body);
   const ongoing = document.createElement('span');
   ongoing.className = 'sell-app-sheet__ongoing';
   ongoing.hidden = true;
@@ -379,7 +487,33 @@ function ensureSheet() {
   note.className = 'sell-app-sheet__note';
   note.textContent = COPY.note;
 
-  sheet.append(close, app, title, text, cta, note);
+  // A computer cannot open the app: the QR code is the button there.
+  const desktop = document.createElement('div');
+  desktop.className = 'sell-app-sheet__desktop';
+  const scan = document.createElement('p');
+  scan.className = 'sell-app-sheet__text';
+  scan.textContent = COPY.scan;
+  const qr = document.createElement('canvas');
+  qr.className = 'sell-app-sheet__qr';
+  qr.setAttribute('aria-label', 'QR-kod till Mai-appen');
+  const stores = document.createElement('div');
+  stores.className = 'sell-app-sheet__stores';
+  [
+    [COPY.appStore, APP_STORE_LINK],
+    [COPY.playStore, PLAY_STORE_LINK],
+  ].forEach(([label, href]) => {
+    const store = document.createElement('a');
+    store.className = 'sell-app-sheet__store';
+    store.textContent = label;
+    store.href = href;
+    store.target = '_blank';
+    store.rel = 'noopener';
+    store.addEventListener('click', () => track('Sell App Sheet Store Clicked', { store: label }));
+    stores.append(store);
+  });
+  desktop.append(scan, qr, stores);
+
+  sheet.append(close, app, title, text, cta, note, desktop);
   document.body.append(overlay, sheet);
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && sheet.classList.contains('active')) closeSellAppSheet('escape');
@@ -419,6 +553,13 @@ async function prepareCta() {
   const button = cta();
   if (!button) return;
   const target = currentTarget;
+  if (!canHandoff()) {
+    // No account to hand over (logged out), or a computer: the bare link, and the QR code of it.
+    button.href = branchSellLink(target);
+    button.classList.remove('is-loading');
+    if (!isPhone()) renderQr(target);
+    return;
+  }
   if (hasFreshHandoff()) {
     button.href = branchSellLink(target, handoff.code);
     button.classList.remove('is-loading');
@@ -442,20 +583,29 @@ async function prepareCta() {
 /**
  * Opens the sheet for a sell click. `target` is `sellItemTarget(...)` of the URL the
  * click would have gone to; `onClose` replaces the default close, e.g. on /sell-item
- * itself, where closing leaves for Mina sidor.
+ * itself, where closing leaves the page; `variant` picks the copy (SHEET_VARIANTS).
  */
-export function openSellAppSheet(target = {}, { onClose } = {}) {
+export function openSellAppSheet(target = {}, { onClose, variant = 'sell' } = {}) {
   const sheet = ensureSheet();
   const wasOpen = sheet.classList.contains('active');
   const sameTarget = target.itemId === currentTarget.itemId && target.type === currentTarget.type;
-  if (wasOpen && sameTarget) return;
+  const loggedIn = isLoggedIn();
+  // Opened again for the same thing: nothing to do, unless the seller has been signed in
+  // meanwhile (the session cookie from mairesale.com, after the page gated itself): then
+  // the copy, the button's code and the note are prepared again for them.
+  const sameOpen = wasOpen && sameTarget && variant === currentVariant;
+  if (sameOpen && loggedIn === currentLoggedIn) return;
   currentTarget = { ...target };
+  currentVariant = SHEET_VARIANTS.includes(variant) ? variant : 'sell';
+  currentLoggedIn = loggedIn;
   // Retargeting an open sheet keeps its close behaviour (on /sell-item: leave for Mina sidor).
   currentOnClose = onClose || (wasOpen ? currentOnClose : null);
   needsFreshCode = false;
+  applyCopy();
   prepareCta();
   updateOngoingSalesSentence();
-  sheet.querySelector('.sell-app-sheet__note').hidden = !showSignInNote();
+  sheet.querySelector('.sell-app-sheet__note').hidden = !(canHandoff() && showSignInNote());
+  if (sameOpen) return;
 
   lastFocused = document.activeElement;
   document.getElementById(OVERLAY_ID).classList.add('active');
@@ -463,7 +613,12 @@ export function openSellAppSheet(target = {}, { onClose } = {}) {
   sheet.setAttribute('aria-hidden', 'false');
   document.documentElement.style.overflow = 'hidden';
   sheet.querySelector('.sell-app-sheet__close').focus({ preventScroll: true });
-  track('Sell App Sheet Shown', { item_id: currentTarget.itemId || null, path: window.location.pathname });
+  track('Sell App Sheet Shown', {
+    variant: currentVariant,
+    logged_in: isLoggedIn(),
+    item_id: currentTarget.itemId || null,
+    path: window.location.pathname,
+  });
 }
 
 export function closeSellAppSheet(method = 'close_button') {
@@ -473,7 +628,7 @@ export function closeSellAppSheet(method = 'close_button') {
   sheet.setAttribute('aria-hidden', 'true');
   document.getElementById(OVERLAY_ID).classList.remove('active');
   document.documentElement.style.overflow = '';
-  track('Sell App Sheet Dismissed', { dismiss_method: method });
+  track('Sell App Sheet Dismissed', { dismiss_method: method, variant: currentVariant });
   if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus({ preventScroll: true });
   const onClose = currentOnClose;
   currentOnClose = null;
@@ -514,30 +669,38 @@ export function installSellAppLinkInterceptor() {
 }
 
 /**
- * On /sell-item itself: covers every way of arriving there that is not a click on this
- * site, such as the shop's "Sälj vidare", e-mails and JS redirects. `authUser.whenSet`
- * also catches a seller signed in after load by the session cookie from mairesale.com.
- * Closing leaves for Mina sidor: the form is not offered on a phone.
+ * On a page that creates listings (/sell-item, /expert-valuation, /lwl): covers every way
+ * of arriving there that is not a click on this site, such as the shop's "Sälj vidare",
+ * e-mails, search results and JS redirects. `authUser.whenSet` refreshes the copy for a
+ * seller signed in after load by the session cookie from mairesale.com. Closing leaves
+ * the page, for Mina sidor or the start page: the form is not offered on the web.
+ * Returns true when the page is gated: the caller then leaves its form uninitialized,
+ * so that hiding the sheet in the browser's devtools shows a form that does nothing.
  */
 export function gateSellItemPage() {
-  if (!isPhone()) return;
   // A form filled in logged out is being created right now, after sign-in sent the
   // seller back here (sellItem.js shows its spinner on the same condition). Covering
   // it would invite a tap that aborts the create.
   const finishingWebListing =
     (sessionStorage.getItem('itemToBeCreatedAfterSignIn') || sessionStorage.getItem('expertValuationDraftAfterSignIn')) &&
     document.referrer.includes('/sign-in');
-  if (finishingWebListing) return;
+  if (finishingWebListing) return false;
   const open = () => {
     const target = sellItemTarget(window.location.href) || {};
     openSellAppSheet(target, {
       onClose: () => {
-        window.location.href = '/private';
+        window.location.href = isLoggedIn() ? '/private' : '/';
       },
     });
   };
-  if (isLoggedIn()) open();
+  open();
+  // The page's own form stays behind the overlay, which stops the pointer but not the
+  // keyboard: `inert` keeps Tab out of it (browsers without it keep the overlay only).
+  Array.from(document.body.children).forEach((el) => {
+    if (el.id !== SHEET_ID && el.id !== OVERLAY_ID && 'inert' in el) el.inert = true;
+  });
   if (typeof authUser !== 'undefined') authUser.whenSet(open);
+  return true;
 }
 
 // Every other way to the app on the page: the "Hämta appen" links placed in Webflow
@@ -630,13 +793,13 @@ function pointAppLinks(code) {
 
 /** Puts a code on the links, or a fresh one when theirs is getting old. */
 function prepareAppLinks() {
-  if (!shouldSellInApp()) return;
+  if (!canHandoff()) return;
   if (hasFreshHandoff()) {
     pointAppLinks(handoff.code);
     return;
   }
   fetchHandoff().then((code) => {
-    if (code && shouldSellInApp()) pointAppLinks(code);
+    if (code && canHandoff()) pointAppLinks(code);
   });
 }
 
@@ -666,7 +829,7 @@ function onAppLinkClick(e) {
     setTimeout(retireAppLinkCode, 0);
     return;
   }
-  if (!shouldSellInApp()) {
+  if (!canHandoff()) {
     // Signed out since the code was put there: the link goes where it went before.
     if (link.dataset[ORIGINAL_HREF]) link.href = own;
     return;
@@ -719,7 +882,7 @@ function onAppLinksVisible() {
 }
 
 function observeAppLinks() {
-  if (pageHasAppLinks || !shouldSellInApp()) return;
+  if (pageHasAppLinks || !canHandoff()) return;
   const links = appLinks();
   if (!links.length) return;
   pageHasAppLinks = true;

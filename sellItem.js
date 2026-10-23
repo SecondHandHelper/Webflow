@@ -19,9 +19,7 @@ import QRCode from "qrcode";
 import {
   formatPersonalId,
   getFormAddressFields,
-  isValidSwedishSsn,
-  channelRouter,
-  hideChannelBottomSheet
+  isValidSwedishSsn
 } from "./general";
 import { autocomplete, brands } from "./autocomplete-brands";
 import {
@@ -290,30 +288,8 @@ async function sellItemMain() {
     document.getElementById('imagesDownloadApp').style.display = 'block';
   }
   console.log('params', params);
-  if (params.id && params.type === 'draft') {
-    console.log('showing channel bottom sheet');
-    channelRouter(window.location.href);
-    document
-      .getElementById("darkOverlay")
-      .addEventListener("click", hideChannelBottomSheet);
-    document
-      .getElementById("closeChannelBottomSheet")
-      .addEventListener("click", hideChannelBottomSheet);
-    document.getElementById("downloadAppBottomSheet").href = "https://invite.mairesale.com/sell-item";
-    const androidRow = document.getElementById("downloadAndroidApp");
-    if (androidRow) androidRow.href = "https://invite.mairesale.com/sell-item";
-    const continueOnWebBtn = document.getElementById('continueOnWebBottomSheet');
-    if (continueOnWebBtn) {
-      continueOnWebBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        hideChannelBottomSheet();
-      });
-    }
-  } else {
-    console.log('hiding channel bottom sheet');
-    hideChannelBottomSheet();
-  }
+  // A draft used to get the channel bottom sheet here; gateSellItemPage() (sellAppSheet.js)
+  // now covers every arrival on this page with the app sheet, drafts included.
 }
 
 async function addItem() {
@@ -1610,11 +1586,13 @@ export const isNoBgImage = async (source) => {
   }
 };
 
-// Call sellItemMainAuthenticated after/when a user has logged in
-user.whenSet(sellItemMainAuthenticated);
-
-// A logged-in seller on a phone sells in the app (sellAppSheet.js).
-gateSellItemPage();
-
-// Call sellItemMain directly
-sellItemMain();
+// Listings are made in the app: the sheet covers this page for everyone (sellAppSheet.js),
+// and the form behind it is left as Webflow renders it, hidden (sell-item-head.html) and
+// without handlers, so removing the sheet in devtools gives nothing to fill in. The one
+// exception is a listing being created right after sign-in, which runs as before.
+if (!gateSellItemPage()) {
+  // Call sellItemMainAuthenticated after/when a user has logged in
+  user.whenSet(sellItemMainAuthenticated);
+  // Call sellItemMain directly
+  sellItemMain();
+}

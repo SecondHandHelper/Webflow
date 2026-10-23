@@ -6,8 +6,8 @@ import {
   shouldSellInApp,
 } from "./sellAppSheet";
 
-// A logged-in seller on a phone sells in the app: every link to /sell-item on a page
-// that loads this module opens "Sälj vidare i appen" instead (sellAppSheet.js).
+// Listings are made in the app: every link to /sell-item on a page that loads this
+// module opens the app sheet instead (sellAppSheet.js), on every device, signed in or not.
 installSellAppLinkInterceptor();
 // ...and every "Hämta appen" link signs the app in on the same account.
 installAppLinkHandoff();
@@ -164,8 +164,8 @@ export function shareCode() {
 
 // Channel bottom sheet
 export function channelRouter(webpath){
-  // A logged-in seller gets "Sälj vidare i appen", which signs the app in on this
-  // account; the channel sheet below is for logged-out visitors.
+  // A sell click opens the app sheet (for a logged-in seller on a phone it signs the app
+  // in on this account); the channel sheet below is left for the "Logga in" buttons.
   const sellTarget = sellItemTarget(webpath);
   if (sellTarget && shouldSellInApp()) {
     openSellAppSheet(sellTarget);
