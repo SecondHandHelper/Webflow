@@ -149,10 +149,10 @@ const CSS = `
 #${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__note { display: none; }
 #${SHEET_ID} .sell-app-sheet__desktop { display: none; margin-top: 44px; }
 #${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__desktop { display: block; }
-#${SHEET_ID} .sell-app-sheet__qr { display: block; width: 140px; height: 140px; margin: 0 auto; }
+#${SHEET_ID} .sell-app-sheet__qr { display: block; width: 100px; height: 100px; margin: 0 auto; }
 /* Under the code, in the note's small grey. */
 #${SHEET_ID} .sell-app-sheet__scan {
-  margin: 14px auto 0; max-width: 330px; font-family: "Ersjo Grotesk", Arial, sans-serif;
+  margin: 24px auto 0; max-width: 330px; font-family: "Ersjo Grotesk", Arial, sans-serif;
   font-size: 11px; line-height: 15px; font-weight: 500; color: #848484;
 }
 #${SHEET_ID} .sell-app-sheet__stores {
@@ -458,7 +458,7 @@ function renderQr(target) {
   const link = branchSellLink(target);
   if (canvas.dataset.link === link) return;
   canvas.dataset.link = link;
-  QRCode.toCanvas(canvas, link, { width: 140, margin: 0 }, (error) => {
+  QRCode.toCanvas(canvas, link, { width: 100, margin: 0 }, (error) => {
     if (error) {
       console.warn('[sellAppSheet] QR code failed', error);
       if (typeof errorHandler !== 'undefined') errorHandler.report(error);
