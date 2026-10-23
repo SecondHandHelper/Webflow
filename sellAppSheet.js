@@ -52,7 +52,7 @@ const COPY = {
     body: 'Mai flyttar nu till appen. För att fortsätta lägga upp nya plagg och följa din försäljningskvalitet behöver du ladda ner appen.',
   },
   sell: {
-    title: 'Fortsätt med appen',
+    title: 'Sälj vidare i appen',
     body: 'Nya plagg läggs upp i Mai-appen. Ladda ner appen för att komma igång – det tar bara en minut.',
   },
   signup: {
@@ -64,8 +64,8 @@ const COPY = {
   button: 'Ladda ner appen',
   // On a computer, above the QR code; the store links follow it.
   scan: 'Skanna QR-koden med mobilen så öppnas appen – eller App Store/Google Play om du inte har den än.',
-  appStore: 'App Store',
-  playStore: 'Google Play',
+  appStore: 'iOS',
+  playStore: 'Android',
   // Under the button, small and grey; hidden until the app can keep the promise (showSignInNote).
   note: 'När du laddar ner appen via knappen ovan loggas du in automatiskt på ditt konto.',
   close: 'Stäng',
@@ -144,21 +144,22 @@ const CSS = `
 #${SHEET_ID}.sell-app-sheet--modal.active { transform: translate(-50%, -50%); }
 #${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__close { right: 12px; }
 #${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__app { margin-top: 24px; }
+#${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__title { margin-top: 20px; }
 #${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__cta,
 #${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__note { display: none; }
-#${SHEET_ID} .sell-app-sheet__desktop { display: none; margin-top: 20px; }
+#${SHEET_ID} .sell-app-sheet__desktop { display: none; margin-top: 44px; }
 #${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__desktop { display: block; }
 #${SHEET_ID} .sell-app-sheet__qr { display: block; width: 140px; height: 140px; margin: 0 auto; }
 /* Under the code, in the note's small grey. */
 #${SHEET_ID} .sell-app-sheet__scan {
   margin: 14px auto 0; max-width: 330px; font-family: "Ersjo Grotesk", Arial, sans-serif;
-  font-size: 13px; line-height: 17px; font-weight: 500; color: #848484;
+  font-size: 11px; line-height: 15px; font-weight: 500; color: #848484;
 }
 #${SHEET_ID} .sell-app-sheet__stores {
-  display: flex; justify-content: center; gap: 20px; margin-top: 16px;
+  display: flex; justify-content: center; gap: 20px; margin-top: 18px;
 }
 #${SHEET_ID} .sell-app-sheet__store {
-  font-family: "Ersjo Grotesk", Arial, sans-serif; font-size: 13px; line-height: 17px; font-weight: 500;
+  font-family: "Ersjo Grotesk", Arial, sans-serif; font-size: 11px; line-height: 15px; font-weight: 500;
   color: #101010; text-decoration: underline; text-underline-offset: 2px;
 }
 `;
