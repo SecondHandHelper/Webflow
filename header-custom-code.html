@@ -124,7 +124,13 @@
   // App webview
   if (!params.has('app')) {
     if (localStorage.getItem('authUserId')) {
-      if (window.location.pathname === '/' || window.location.pathname === '/sign-in') {
+      // A signed-in seller goes to Mina sidor from the start page on a phone, and from
+      // /sign-in anywhere. On a computer the start page stays (since 2026-10-23): Mina
+      // sidor only shows its "scanna QR" box there, while the start page can explain
+      // selling and its "Sälj ett plagg" opens the app sheet. A `?s=` link still goes.
+      const path = window.location.pathname;
+      const hasSignInKey = params.has('s') && params.get('s').length >= 3;
+      if (path === '/sign-in' || (path === '/' && (isMobile || hasSignInKey))) {
         location.href = '/private' + window.location.search;
       }
     } else {

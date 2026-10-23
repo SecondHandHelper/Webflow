@@ -268,7 +268,30 @@ function showDownloadAppLink() {
   elm.style.display = "flex";
 }
 
-authUser.whenSet(signedInNextStep);
+// A seller signed in on a phone goes on to Mina sidor (signedInNextStep, signIn.js). On a
+// computer the start page stays (since 2026-10-23; header-custom-code.html does the same
+// for a page load with a stored sign-in): Mina sidor only shows its "scanna QR" box
+// there, while the start page explains selling and "Sälj ett plagg" opens the app sheet.
+// The header's login button becomes the way to Mina sidor for them.
+function showMinaSidorInHeader() {
+  const button = document.getElementById('headerLoginButton');
+  const loading = document.getElementById('headerLoginLoading');
+  if (loading) loading.style.display = 'none';
+  if (!button) return;
+  const label = button.querySelector('div') || button;
+  label.textContent = 'Mina sidor';
+  const minaSidor = button.cloneNode(true); // drops the channelRouter('/sign-in') listener
+  minaSidor.href = '/private';
+  button.replaceWith(minaSidor);
+  minaSidor.style.display = 'flex';
+}
+authUser.whenSet(() => {
+  if (isMobile || (params.has('s') && params.get('s').length >= 3)) {
+    signedInNextStep();
+  } else {
+    showMinaSidorInHeader();
+  }
+});
 loadRecentlySold();
 fetchAndLoadRecentlyAddedItems();
 trackHowItWorksInteractions();

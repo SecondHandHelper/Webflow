@@ -144,23 +144,21 @@ const CSS = `
 #${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__app { margin-top: 24px; }
 #${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__cta,
 #${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__note { display: none; }
-#${SHEET_ID} .sell-app-sheet__desktop { display: none; margin-top: 28px; }
+#${SHEET_ID} .sell-app-sheet__desktop { display: none; margin-top: 20px; }
 #${SHEET_ID}.sell-app-sheet--modal .sell-app-sheet__desktop { display: block; }
-#${SHEET_ID} .sell-app-sheet__qr {
-  display: block; width: 168px; height: 168px; margin: 16px auto 0;
-  padding: 8px; box-sizing: content-box; border: 1px solid #e5e5e5; border-radius: 12px;
+#${SHEET_ID} .sell-app-sheet__qr { display: block; width: 140px; height: 140px; margin: 0 auto; }
+/* Under the code, in the note's small grey. */
+#${SHEET_ID} .sell-app-sheet__scan {
+  margin: 14px auto 0; max-width: 330px; font-family: "Ersjo Grotesk", Arial, sans-serif;
+  font-size: 13px; line-height: 17px; font-weight: 500; color: #848484;
 }
 #${SHEET_ID} .sell-app-sheet__stores {
-  display: flex; justify-content: center; gap: 12px; margin-top: 20px;
+  display: flex; justify-content: center; gap: 20px; margin-top: 16px;
 }
 #${SHEET_ID} .sell-app-sheet__store {
-  display: inline-flex; align-items: center; justify-content: center;
-  box-sizing: border-box; min-width: 140px; height: 44px; padding: 0 18px;
-  border: 1px solid #101010; border-radius: 0; background: #fff; color: #101010;
-  font-family: "Ersjo Grotesk", Arial, sans-serif; font-size: 14px; font-weight: 500;
-  text-decoration: none;
+  font-family: "Ersjo Grotesk", Arial, sans-serif; font-size: 13px; line-height: 17px; font-weight: 500;
+  color: #101010; text-decoration: underline; text-underline-offset: 2px;
 }
-#${SHEET_ID} .sell-app-sheet__store:hover { background: #101010; color: #fff; }
 `;
 
 // The same X image the site's other bottom sheets use (Webflow asset Close_mai.svg).
@@ -409,7 +407,7 @@ function renderQr(target) {
   const link = branchSellLink(target);
   if (canvas.dataset.link === link) return;
   canvas.dataset.link = link;
-  QRCode.toCanvas(canvas, link, { width: 168, margin: 0 }, (error) => {
+  QRCode.toCanvas(canvas, link, { width: 140, margin: 0 }, (error) => {
     if (error) {
       console.warn('[sellAppSheet] QR code failed', error);
       if (typeof errorHandler !== 'undefined') errorHandler.report(error);
@@ -487,15 +485,16 @@ function ensureSheet() {
   note.className = 'sell-app-sheet__note';
   note.textContent = COPY.note;
 
-  // A computer cannot open the app: the QR code is the button there.
+  // A computer cannot open the app: the QR code is the button there, right under the
+  // text, with the how-to in small grey below it and the store links as plain links.
   const desktop = document.createElement('div');
   desktop.className = 'sell-app-sheet__desktop';
-  const scan = document.createElement('p');
-  scan.className = 'sell-app-sheet__text';
-  scan.textContent = COPY.scan;
   const qr = document.createElement('canvas');
   qr.className = 'sell-app-sheet__qr';
   qr.setAttribute('aria-label', 'QR-kod till Mai-appen');
+  const scan = document.createElement('p');
+  scan.className = 'sell-app-sheet__scan';
+  scan.textContent = COPY.scan;
   const stores = document.createElement('div');
   stores.className = 'sell-app-sheet__stores';
   [
@@ -511,7 +510,7 @@ function ensureSheet() {
     store.addEventListener('click', () => track('Sell App Sheet Store Clicked', { store: label }));
     stores.append(store);
   });
-  desktop.append(scan, qr, stores);
+  desktop.append(qr, scan, stores);
 
   sheet.append(close, app, title, text, cta, note, desktop);
   document.body.append(overlay, sheet);
