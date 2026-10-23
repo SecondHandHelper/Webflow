@@ -75,11 +75,15 @@ const CSS = `
 #${SHEET_ID} .sell-app-sheet__icon {
   width: 80px; height: 80px; border-radius: 18px;
 }
+/* The site's serif at the one weight it loads (400): any heavier is a faux bold. */
 #${SHEET_ID} .sell-app-sheet__title {
-  margin: 36px 0 12px; font-size: 31px; line-height: 1.2; font-weight: 600; color: #101010;
+  margin: 36px 0 12px; font-family: "Source Serif 4 Subhead", "Times New Roman", serif;
+  font-size: 31px; line-height: 1.2; font-weight: 400; letter-spacing: normal; color: #101010;
 }
+/* Ersjo Grotesk Medium 14/19, the app's medium-sm (and the site's body text). */
 #${SHEET_ID} .sell-app-sheet__text {
-  margin: 0 0 12px; font-size: 15px; line-height: 115%; color: #101010;
+  margin: 0 0 12px; font-family: "Ersjo Grotesk", Arial, sans-serif;
+  font-size: 14px; line-height: 19px; font-weight: 500; color: #101010;
 }
 #${SHEET_ID} .sell-app-sheet__cta {
   display: flex; align-items: center; justify-content: center;
@@ -91,7 +95,8 @@ const CSS = `
 }
 #${SHEET_ID} .sell-app-sheet__cta.is-loading { opacity: 0.6; pointer-events: none; }
 #${SHEET_ID} .sell-app-sheet__note {
-  margin: 12px 0 0; font-size: 13px; line-height: 115%; color: #848484;
+  margin: 12px 0 0; font-family: "Ersjo Grotesk", Arial, sans-serif;
+  font-size: 13px; line-height: 17px; font-weight: 500; color: #848484;
 }
 `;
 
