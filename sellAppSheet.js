@@ -271,6 +271,7 @@ export function androidIntentLink(link) {
   } catch (e) {
     return link;
   }
+  if (url.protocol !== 'https:') return link; // already an intent link
   const code = url.searchParams.get('handoff');
   if (!code || url.hostname.toLowerCase() !== BRANCH_HOST) return link;
   const referrer = encodeURIComponent(`handoff=${code}`);
@@ -292,6 +293,11 @@ function usesPlayReferrer() {
   } catch (e) {
     return false;
   }
+}
+
+/** Which way a link leaves the page, for the click events: our intent link or Branch's. */
+function linkKind(href) {
+  return /^intent:/i.test(href) ? 'intent' : 'branch';
 }
 
 /** False in the in-app browsers (an Android WebView, Facebook, Instagram), which do not open intent links. */
@@ -578,9 +584,18 @@ function cta() {
 }
 
 function onCtaClick() {
-  const link = cta().href;
+  const button = cta();
+  // The Android link is chosen at the tap, which the navigation follows: its switch reads
+  // the tester group from the user document, which may not have loaded yet when the sheet
+  // opened with the page (/sell-item opens it as soon as the sign-in is known).
+  button.href = androidIntentLink(button.href);
+  const link = button.href;
   const hadCode = link.includes('handoff=');
-  track('Sell App Sheet Clicked', { has_handoff: hadCode, item_id: currentTarget.itemId || null });
+  track('Sell App Sheet Clicked', {
+    has_handoff: hadCode,
+    link: linkKind(link),
+    item_id: currentTarget.itemId || null,
+  });
   copyHandoffLink(link);
   if (hadCode) {
     // The app spends the code, so a seller who comes back and taps again needs a new
@@ -891,7 +906,7 @@ function onAppLinkClick(e) {
     rememberOriginalHref(link);
     link.href = href;
     appLinksHaveCode = true;
-    track('App Link Clicked', { has_handoff: true, path: window.location.pathname });
+    track('App Link Clicked', { has_handoff: true, link: linkKind(href), path: window.location.pathname });
     copyHandoffLink(href);
     // After the navigation has taken the href, not before.
     setTimeout(retireAppLinkCode, 0);
@@ -909,7 +924,7 @@ function onAppLinkClick(e) {
   }));
   const written = copyHandoffLink(hrefPromise.then(({ code, href }) => (code ? href : null)));
   hrefPromise.then(({ code, href }) => {
-    track('App Link Clicked', { has_handoff: !!code, path: window.location.pathname });
+    track('App Link Clicked', { has_handoff: !!code, link: linkKind(href), path: window.location.pathname });
     if (code) {
       handoff = null;
       appLinksNeedFreshCode = true;
