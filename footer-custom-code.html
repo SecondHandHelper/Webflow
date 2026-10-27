@@ -472,14 +472,14 @@
 
   // FEATURE TOGGLE FUNCTION
   // sellAppSignInNote: the "loggas in automatiskt" line in the sell sheet (sellAppSheet.js).
-  // Turn on once the app version that redeems the sign-in code is live in the stores.
+  // On since 2026-10-27: real sellers were signed in on iOS (App Store 1.6.3) and Android (1.6.4).
   // androidPlayReferrer: Android app links put the sign-in code in Google Play's install
   // referrer (sellAppSheet.js androidIntentLink). Testers first; turn on for everyone once
   // the Android app that reads it (MaiApp installReferrerHandoff) is live in Google Play.
   const featureConfig = {
-    alpha: { trustedSeller: true, modelDB: true, adjustValuation: true, sellAppSignInNote: false, androidPlayReferrer: true },
-    beta: { trustedSeller: true, modelDB: true, adjustValuation: true, sellAppSignInNote: false, androidPlayReferrer: false },
-    default: { trustedSeller: true, modelDB: true, adjustValuation: true, sellAppSignInNote: false, androidPlayReferrer: false }
+    alpha: { trustedSeller: true, modelDB: true, adjustValuation: true, sellAppSignInNote: true, androidPlayReferrer: true },
+    beta: { trustedSeller: true, modelDB: true, adjustValuation: true, sellAppSignInNote: true, androidPlayReferrer: false },
+    default: { trustedSeller: true, modelDB: true, adjustValuation: true, sellAppSignInNote: true, androidPlayReferrer: false }
   };
 
   function featureIsEnabled(featureName) {
